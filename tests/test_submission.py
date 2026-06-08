@@ -47,3 +47,18 @@ def test_load_csv_to_table_creates_table_and_returns_preview():
     assert rows[0]["c"] == 2
 
     db.execute("DROP TABLE upload_test_001")
+
+
+def test_submissions_tables_exist_after_init_schema():
+    db.init_schema()
+    cols = db.query("PRAGMA table_info('submissions')")
+    col_names = {c["name"] for c in cols}
+    assert col_names == {
+        "submission_id", "tenant_id", "title", "description", "theme",
+        "keywords", "license", "format", "table_name", "rows", "status",
+        "quality_summary", "decision_note", "submitted_at", "decided_at",
+    }
+
+    cols2 = db.query("PRAGMA table_info('consultant_comments')")
+    col_names2 = {c["name"] for c in cols2}
+    assert col_names2 == {"comment_id", "submission_id", "comment", "created_at"}
