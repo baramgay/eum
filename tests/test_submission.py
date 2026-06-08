@@ -192,6 +192,54 @@ def test_submission_list_sql_includes_comment_count():
     db.execute(f"DROP TABLE {table}")
 
 
+# ---------- /api/evaluation/submissions 집계 (compute_submission_contribution 기반) ----------
+# (이 저장소에는 FastAPI TestClient 패턴이 없으므로, 라우트가 수행하는 SQL 조회 +
+#  evaluation.compute_submission_contribution 집계를 그대로 재현해 검증한다.)
+
+from app.evaluation import compute_submission_contribution, AREAS
+
+
+def _aggregate_contributions(rows):
+    total = len(rows)
+    counts = {a["key"]: 0 for a in AREAS}
+    for row in rows:
+        for c in compute_submission_contribution(row):
+            if c["contributes"]:
+                counts[c["key"]] += 1
+    return total, counts
+
+
+def test_evaluation_submissions_aggregation_counts_contributing_rows():
+    db.init_schema()
+    table_approved = "sub_48121_gggggggg"
+    table_submitted = "sub_48121_hhhhhhhh"
+    for t in (table_approved, table_submitted):
+        db.execute(f"DROP TABLE IF EXISTS {t}")
+        db.execute(f"CREATE TABLE {t} (x BIGINT)")
+
+    sub_approved = create_submission(_sample_meta(), table_name=table_approved, rows=120,
+                                     quality_summary="규칙 4종 / 오류 0건 / 오류율 0.0% / 통과")
+    record_decision(sub_approved, status="approved", decision_note="검토 완료, 승인")
+    add_comment(sub_approved, "분석 활용 가치가 높습니다.")
+
+    sub_submitted = create_submission(_sample_meta(), table_name=table_submitted, rows=5,
+                                      quality_summary="규칙 4종 / 오류 12건 / 오류율 3.0% / 미통과")
+
+    rows = db.query(_SUBMISSION_LIST_ALL_SQL)
+    rows = [r for r in rows if r["submission_id"] in (sub_approved, sub_submitted)]
+    total, counts = _aggregate_contributions(rows)
+
+    assert total == 2
+    assert counts["open"] == 1       # 승인된 sub_approved만 기여
+    assert counts["quality"] == 1    # 통과한 sub_approved만 기여
+    assert counts["analysis"] == 1   # 승인 + 120행 기준 충족
+    assert counts["share"] == 1      # 코멘트가 있는 sub_approved만 기여
+    assert counts["mgmt"] == 1       # 결정 메모가 있는 sub_approved만 기여
+
+    db.execute(f"DROP TABLE {table_approved}")
+    db.execute(f"DROP TABLE {table_submitted}")
+
+
 def test_submission_list_all_sql_includes_comment_count_and_zero_for_no_comments():
     db.init_schema()
     table_with = "sub_48121_eeeeeeee"

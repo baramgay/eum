@@ -199,7 +199,32 @@ def submission_detail(submission_id: str):
     detail = submission.get_submission(submission_id)
     diag = quality.run_quality_generic(detail["meta"]["table_name"])
     detail["quality"] = diag
+    detail["meta"]["comment_count"] = len(detail["comments"])
+    detail["contribution"] = evaluation.compute_submission_contribution(detail["meta"])
     return detail
+
+
+@app.get("/api/evaluation/submissions")
+def evaluation_submission_contributions():
+    """전체 제출 목록을 대상으로 5개 영역별 기여 건수를 집계한다."""
+    rows = db.query(
+        "SELECT s.*, "
+        "(SELECT count(*) FROM consultant_comments c WHERE c.submission_id = s.submission_id) AS comment_count "
+        "FROM submissions s")
+    total = len(rows)
+    counts = {a["key"]: 0 for a in evaluation.AREAS}
+    for row in rows:
+        for c in evaluation.compute_submission_contribution(row):
+            if c["contributes"]:
+                counts[c["key"]] += 1
+    return {
+        "total": total,
+        "areas": [
+            {"key": a["key"], "name": a["name"], "color": a["color"],
+             "contributing": counts[a["key"]], "total": total}
+            for a in evaluation.AREAS
+        ],
+    }
 
 
 @app.get("/api/plan/draft")
