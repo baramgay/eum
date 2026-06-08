@@ -325,9 +325,9 @@ searchCatalog();
     }
     root.innerHTML = rows.map((r) => `
       <div class="ds" data-id="${r.submission_id}">
-        <strong>${r.title}</strong>
+        <strong>${esc(r.title)}</strong>
         <span class="badge ${r.status === 'approved' ? 'b-ok' : r.status === 'rejected' ? 'b-na' : 'b-warn'}">${r.status}</span>
-        <p>${r.quality_summary || ''}</p>
+        <p>${esc(r.quality_summary || '')}</p>
       </div>
     `).join("");
     $all(".ds", root).forEach((el) => {
@@ -343,9 +343,9 @@ searchCatalog();
     modalRoot.innerHTML = `
       <div class="modal">
         <div class="box">
-          <h3>${m.title}</h3>
-          <p>${m.description}</p>
-          <p><span class="badge ${m.status === 'approved' ? 'b-ok' : m.status === 'rejected' ? 'b-na' : 'b-warn'}">${m.status}</span> ${m.quality_summary || ''}</p>
+          <h3>${esc(m.title)}</h3>
+          <p>${esc(m.description)}</p>
+          <p><span class="badge ${m.status === 'approved' ? 'b-ok' : m.status === 'rejected' ? 'b-na' : 'b-warn'}">${m.status}</span> ${esc(m.quality_summary || '')}</p>
           ${m.status === 'submitted' ? `
             <p>
               <button class="btn btn-p" id="btn-approve">승인(개방)</button>
@@ -355,7 +355,7 @@ searchCatalog();
           ` : ''}
           <h4>센터 코멘트</h4>
           ${detail.comments.length
-            ? detail.comments.map((c) => `<p>- ${c.comment} (${c.created_at})</p>`).join("")
+            ? detail.comments.map((c) => `<p>- ${esc(c.comment)} (${c.created_at})</p>`).join("")
             : '<p class="note">코멘트가 없습니다.</p>'}
           <p><button class="btn btn-o" id="btn-close">닫기</button></p>
         </div>
