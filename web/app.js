@@ -443,6 +443,11 @@ searchCatalog();
 
   function renderCenterView() {
     const root = $("#sub-center-view");
+    // 모드를 다시 열 때마다 화면은 기본값(전체/빈 검색어/최신순)으로 다시 그려지므로,
+    // 보존된 상태도 함께 초기화해야 화면 표시와 실제 필터링 결과가 어긋나지 않는다.
+    centerFilter = "all";
+    centerSort = "latest";
+    centerSearch = "";
     root.innerHTML = `
       <div class="card"><h3>전체 제출 현황</h3><div id="center-summary" class="cards c4"></div></div>
       <div class="card">
