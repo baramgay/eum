@@ -4,6 +4,7 @@ FastAPI 단일 진입점. 백엔드 모듈을 REST API로 노출하고
 정적 프론트엔드(SPA)를 서빙한다.
 """
 import os
+import re
 import datetime
 from fastapi import FastAPI, Query, UploadFile, File, Form
 from fastapi.responses import JSONResponse, FileResponse
@@ -116,6 +117,11 @@ def nl(q: str = Query(...)):
 
 
 # ---------- 공급자 워크플로우 ----------
+# submission.new_table_name(tenant_id)이 생성하는 패턴(f"sub_{tenant_id}_{8자리hex}")과
+# 일치하는지 검증하기 위한 정규식 (요청마다 재컴파일하지 않도록 모듈 레벨에 둠)
+_TABLE_NAME_RE = re.compile(r"^sub_(.+)_[0-9a-f]{8}$")
+
+
 @app.post("/api/submission/upload")
 def submission_upload(file: UploadFile = File(...), tenant_id: str = Form(...)):
     known = db.query("SELECT tenant_id FROM tenants WHERE tenant_id = ?", [tenant_id])
@@ -138,6 +144,14 @@ def submission_create(
     table_name: str = Form(...),
     rows: int = Form(...),
 ):
+    known = db.query("SELECT tenant_id FROM tenants WHERE tenant_id = ?", [tenant_id])
+    if not known:
+        return JSONResponse({"error": "알 수 없는 tenant_id"}, status_code=400)
+
+    m = _TABLE_NAME_RE.match(table_name)
+    if not m or m.group(1) != tenant_id:
+        return JSONResponse({"error": "유효하지 않은 table_name"}, status_code=400)
+
     meta = {
         "tenant_id": tenant_id, "title": title, "description": description,
         "theme": theme, "keywords": keywords, "license": license, "format": format,
