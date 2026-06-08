@@ -16,6 +16,7 @@
       <button data-tab="quality">품질진단</button>
       <button data-tab="ontology">온톨로지</button>
       <button data-tab="ai">자연어 질의</button>
+      <button data-tab="submission">데이터 등록·관리</button>
     </nav>
   </div>
 </header>
@@ -103,6 +104,19 @@
     </div>
     <div class="chips" id="nlq-samples"></div>
     <div class="card" style="margin-top:8px"><div id="nlresult" class="loading">질문을 입력하세요.</div></div>
+  </section>
+
+  <section id="tab-submission" class="hidden">
+    <div class="page-title">데이터 등록·관리</div>
+    <div class="page-sub">기관 담당자가 데이터를 등록하고 진단·승인을 직접 결정합니다. 센터는 현황을 모니터링하고 컨설팅 의견을 남깁니다.</div>
+
+    <div class="chips" id="sub-mode-toggle">
+      <button data-mode="agency" class="active">기관 담당자 모드</button>
+      <button data-mode="center">센터(컨설팅) 모드</button>
+    </div>
+
+    <div id="sub-agency-view"></div>
+    <div id="sub-center-view" class="hidden"></div>
   </section>
 </main>
 
