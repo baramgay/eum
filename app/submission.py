@@ -104,3 +104,12 @@ def get_submission(submission_id: str) -> dict:
         [submission_id],
     )
     return {"meta": meta, "preview": preview, "comments": comments}
+
+
+def summarize_quality(result: dict) -> str:
+    """품질진단 결과를 제출 레코드에 저장할 짧은 요약 문자열로 변환한다."""
+    verdict = "통과" if result["passed"] else "미통과"
+    return (
+        f"규칙 {result['rule_count']}종 / 오류 {result['errors']}건 "
+        f"/ 오류율 {result['error_rate']}% / {verdict}"
+    )

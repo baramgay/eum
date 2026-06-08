@@ -134,3 +134,19 @@ def test_add_comment_and_get_submission_includes_comments():
     assert "키워드" in detail["comments"][0]["comment"]
 
     db.execute(f"DROP TABLE {table}")
+
+
+from app.submission import summarize_quality
+
+
+def test_summarize_quality_formats_pass_and_fail():
+    passed = {"rule_count": 4, "checked": 400, "errors": 0, "error_rate": 0.0, "passed": True}
+    failed = {"rule_count": 4, "checked": 400, "errors": 12, "error_rate": 3.0, "passed": False}
+
+    s_pass = summarize_quality(passed)
+    s_fail = summarize_quality(failed)
+
+    assert "통과" in s_pass
+    assert "4종" in s_pass and "0건" in s_pass
+    assert "미통과" in s_fail
+    assert "12건" in s_fail and "3.0%" in s_fail
