@@ -335,6 +335,14 @@ searchCatalog();
     });
   }
 
+  function renderContributionRows(contribution) {
+    return (contribution || []).map((c) => `
+      <div class="ind">
+        <div class="nm">${esc(c.name)}<small>${esc(c.note)}</small></div>
+        <div class="vl">${c.contributes ? '<span class="badge b-ok">기여</span>' : '<span class="badge b-na">대기</span>'}</div>
+      </div>`).join('');
+  }
+
   async function openSubmissionDetail(submissionId) {
     const res = await fetch(`/api/submission/${submissionId}`);
     const detail = await res.json();
@@ -353,6 +361,8 @@ searchCatalog();
             </p>
             <p><input type="text" id="decision-note" placeholder="결정 메모(선택)"></p>
           ` : ''}
+          <h4>평가 기여도</h4>
+          <div>${renderContributionRows(detail.contribution)}</div>
           <h4>센터 코멘트</h4>
           ${detail.comments.length
             ? detail.comments.map((c) => `<p>- ${esc(c.comment)} (${c.created_at})</p>`).join("")
@@ -406,17 +416,6 @@ searchCatalog();
       && String(row.description || "").trim().length >= 20;
   }
 
-  function computeAreaTags(row) {
-    // 2026 평가편람 5개 영역(개방·활용/품질/분석·활용/공유/관리체계) 기여 추정 — 휴리스틱 분류
-    const tags = [];
-    if (row.status === "approved") tags.push("개방·활용");
-    if (isQualityPassed(row.quality_summary)) tags.push("품질");
-    if ((row.rows || 0) >= 50) tags.push("분석·활용");
-    if ((row.comment_count || 0) > 0) tags.push("공유");
-    if (row.decision_note) tags.push("관리체계");
-    return tags;
-  }
-
   function computeRecommendedAction(row) {
     const passed = isQualityPassed(row.quality_summary);
     const descLen = String(row.description || "").trim().length;
@@ -450,6 +449,7 @@ searchCatalog();
     centerSearch = "";
     root.innerHTML = `
       <div class="card"><h3>전체 제출 현황</h3><div id="center-summary" class="cards c4"></div></div>
+      <div class="card"><h3>평가 영역별 기여 집계</h3><div id="center-contribution"></div></div>
       <div class="card">
         <h3>검토 대기 목록</h3>
         <div class="chips" id="center-filters">
@@ -489,12 +489,14 @@ searchCatalog();
   }
 
   async function loadCenterView() {
-    const [subRes, tenantRes] = await Promise.all([
+    const [subRes, tenantRes, contribRes] = await Promise.all([
       fetch("/api/submission/all"),
       fetch("/api/tenants"),
+      fetch("/api/evaluation/submissions"),
     ]);
     centerRows = await subRes.json();
     const tenants = await tenantRes.json();
+    const contribAgg = await contribRes.json();
     centerTenantMap = {};
     tenants.forEach((t) => { centerTenantMap[t.tenant_id] = t.name; });
 
@@ -519,6 +521,16 @@ searchCatalog();
     ].map(([lbl, num]) => `
       <div class="card stat"><div class="num">${num}</div><div class="lbl">${esc(lbl)}</div></div>
     `).join("");
+
+    const contribTotal = contribAgg.total || 0;
+    $("#center-contribution").innerHTML = (contribAgg.areas || []).map((a) => {
+      const pct = contribTotal ? Math.round((a.contributing / contribTotal) * 100) : 0;
+      return `
+        <div class="abar">
+          <div class="top"><b>${esc(a.name)}</b><span>${a.contributing}/${a.total}건 기여 (${pct}%)</span></div>
+          <div class="track"><div class="fill" style="width:${pct}%;background:${esc(a.color)}"></div></div>
+        </div>`;
+    }).join("") || '<p class="note">집계할 제출이 없습니다.</p>';
 
     renderCenterList();
   }
@@ -579,7 +591,6 @@ searchCatalog();
     const mAug = Object.assign({}, m, { comment_count: detail.comments.length });
     const modalRoot = $("#modal-root");
     const tenantName = centerTenantMap[m.tenant_id] || m.tenant_id;
-    const areaTags = computeAreaTags(mAug).map((a) => `<span class="badge b-hv">${esc(a)}</span>`).join(" ");
 
     modalRoot.innerHTML = `
       <div class="modal">
@@ -588,7 +599,8 @@ searchCatalog();
           <p class="note">제출 ID: ${esc(m.submission_id)} · 제출기관: ${esc(tenantName)} · 제출일시: ${esc(m.submitted_at || '')}</p>
           <p>${esc(m.description)}</p>
           <p>${renderCenterBadges(mAug)}</p>
-          ${areaTags ? `<p><strong>평가 영역 기여 추정</strong> ${areaTags}</p>` : ''}
+          <h4>평가 기여도</h4>
+          <div>${renderContributionRows(detail.contribution)}</div>
           <p><strong>권장 조치</strong> ${esc(computeRecommendedAction(mAug))}</p>
           ${q ? `
             <h4>품질진단 상세</h4>
