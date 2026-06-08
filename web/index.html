@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이음(EUM) · 경남 공공데이터 플랫폼</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <div class="brand">이음 <span>EUM</span><small>경남 공공데이터 통합 플랫폼</small></div>
+    <nav id="nav">
+      <button data-tab="dashboard" class="active">대시보드</button>
+      <button data-tab="portal">개방포털</button>
+      <button data-tab="quality">품질진단</button>
+      <button data-tab="ontology">온톨로지</button>
+      <button data-tab="ai">자연어 질의</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard">
+    <div class="page-title">통합 대시보드</div>
+    <div class="page-sub">플랫폼 운영 현황과 2026 평가편람 5개 영역 자동대응 점수</div>
+    <div class="cards c4" id="stats"></div>
+
+    <div class="cards c2" style="margin-top:18px">
+      <div class="card">
+        <h3>평가편람 종합 대응 점수</h3>
+        <div class="donut">
+          <div class="ring" id="ring"><div class="inner"><b id="overall">–</b><small>/ 100</small></div></div>
+          <div style="flex:1" id="areabars"></div>
+        </div>
+        <div class="note">플랫폼 운영 데이터에서 5개 영역 지표를 자동 산출. 미흡 영역은 개선 가이드를 제공합니다.</div>
+      </div>
+      <div class="card">
+        <h3>입주 기관 현황 (경남 18개 시군)</h3>
+        <div id="tenants"></div>
+      </div>
+    </div>
+
+    <div class="cards c1" style="margin-top:18px">
+      <div class="card">
+        <h3>영역별 지표 상세</h3>
+        <div id="indicators" class="cards c3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTAL -->
+  <section id="tab-portal" class="hidden">
+    <div class="page-title">데이터 개방포털 (DCAT 카탈로그)</div>
+    <div class="page-sub">메타관리시스템 기반 개방 데이터셋 검색·미리보기·품질 확인</div>
+    <div class="search">
+      <input id="q" placeholder="데이터셋 검색 (예: 청년, 사업체, 시설)">
+      <button onclick="searchCatalog()">검색</button>
+    </div>
+    <div class="cards c3" id="catalog"></div>
+  </section>
+
+  <!-- QUALITY -->
+  <section id="tab-quality" class="hidden">
+    <div class="page-title">데이터 품질진단 (규칙기반 자동화)</div>
+    <div class="page-sub">평가편람 '데이터 값 관리' 대응 · 오류율 기준 0.001%</div>
+    <div style="margin-bottom:14px"><button class="btn btn-p" onclick="runQuality()">품질진단 재실행</button></div>
+    <div class="card"><div id="quality"></div></div>
+  </section>
+
+  <!-- ONTOLOGY -->
+  <section id="tab-ontology" class="hidden">
+    <div class="page-title">온톨로지 운영 (객체·관계·액션)</div>
+    <div class="page-sub">Gold 데이터를 의미 모델로 승격 · 팔란티어형 운영의 2단계 코어</div>
+    <div class="cards c2">
+      <div class="card">
+        <h3>객체·관계 그래프</h3>
+        <div class="legend" style="margin-bottom:8px">
+          <span><i class="dot" style="background:#1457b8"></i>시군</span>
+          <span><i class="dot" style="background:#7b4fc4"></i>청년인구</span>
+          <span><i class="dot" style="background:#e8731a"></i>사업체</span>
+          <span><i class="dot" style="background:#0f9d8f"></i>청년인프라</span>
+        </div>
+        <div style="margin-bottom:8px" class="chips" id="sgg-chips"></div>
+        <svg class="graph" id="graph"></svg>
+      </div>
+      <div class="card">
+        <h3>액션 · 청년 정착지원 우선지역 선정</h3>
+        <div class="note">객체 속성(청년규모·산업기반·인프라부족·순유출)을 스코어링하여 우선순위를 산출합니다. 보는 데이터를 넘어 '의사결정 액션'으로 전환.</div>
+        <div id="action"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI -->
+  <section id="tab-ai" class="hidden">
+    <div class="page-title">자연어 데이터 질의</div>
+    <div class="page-sub">전문가가 아니어도 자연어로 데이터를 찾고 분석 (공공망 폴백: 룰 기반 의도 매칭)</div>
+    <div class="search">
+      <input id="nlq" placeholder="예: 창원시 청년 순유입 보여줘 / 진주 사업체 현황 / 거창군 청년센터" onkeydown="if(event.key==='Enter')runNL()">
+      <button onclick="runNL()">질의</button>
+    </div>
+    <div class="chips" id="nlq-samples"></div>
+    <div class="card" style="margin-top:8px"><div id="nlresult" class="loading">질문을 입력하세요.</div></div>
+  </section>
+</main>
+
+<div id="modal-root"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
