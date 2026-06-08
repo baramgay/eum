@@ -97,6 +97,7 @@ def test_create_submission_inserts_row_with_submitted_status():
     assert row["submitted_at"] is not None
     assert row["decided_at"] is None
 
+    db.execute("DELETE FROM submissions WHERE submission_id = ?", [sub_id])
     db.execute(f"DROP TABLE {table}")
 
 
@@ -115,6 +116,7 @@ def test_record_decision_updates_status_and_decided_at():
     assert row["decision_note"] == "이상 없음, 개방 승인"
     assert row["decided_at"] is not None
 
+    db.execute("DELETE FROM submissions WHERE submission_id = ?", [sub_id])
     db.execute(f"DROP TABLE {table}")
 
 
@@ -133,6 +135,8 @@ def test_add_comment_and_get_submission_includes_comments():
     assert len(detail["comments"]) == 1
     assert "키워드" in detail["comments"][0]["comment"]
 
+    db.execute("DELETE FROM consultant_comments WHERE submission_id = ?", [sub_id])
+    db.execute("DELETE FROM submissions WHERE submission_id = ?", [sub_id])
     db.execute(f"DROP TABLE {table}")
 
 
@@ -189,6 +193,8 @@ def test_submission_list_sql_includes_comment_count():
     assert "comment_count" in target
     assert target["comment_count"] == 2
 
+    db.execute("DELETE FROM consultant_comments WHERE submission_id = ?", [sub_id])
+    db.execute("DELETE FROM submissions WHERE submission_id = ?", [sub_id])
     db.execute(f"DROP TABLE {table}")
 
 
@@ -236,6 +242,8 @@ def test_evaluation_submissions_aggregation_counts_contributing_rows():
     assert counts["share"] == 1      # 코멘트가 있는 sub_approved만 기여
     assert counts["mgmt"] == 1       # 결정 메모가 있는 sub_approved만 기여
 
+    db.execute("DELETE FROM consultant_comments WHERE submission_id = ?", [sub_approved])
+    db.execute("DELETE FROM submissions WHERE submission_id IN (?, ?)", [sub_approved, sub_submitted])
     db.execute(f"DROP TABLE {table_approved}")
     db.execute(f"DROP TABLE {table_submitted}")
 
@@ -262,5 +270,7 @@ def test_submission_list_all_sql_includes_comment_count_and_zero_for_no_comments
     assert row_with["comment_count"] == 1
     assert row_without["comment_count"] == 0
 
+    db.execute("DELETE FROM consultant_comments WHERE submission_id = ?", [sub_with])
+    db.execute("DELETE FROM submissions WHERE submission_id IN (?, ?)", [sub_with, sub_without])
     db.execute(f"DROP TABLE {table_with}")
     db.execute(f"DROP TABLE {table_without}")
