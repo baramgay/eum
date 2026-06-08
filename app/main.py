@@ -5,12 +5,12 @@ FastAPI 단일 진입점. 백엔드 모듈을 REST API로 노출하고
 """
 import os
 import datetime
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, UploadFile, File, Form
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import database as db
-from . import seed_data, quality, evaluation, ontology, nlquery
+from . import seed_data, quality, evaluation, ontology, nlquery, submission, planning
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB_DIR = os.path.join(BASE_DIR, "web")
@@ -113,6 +113,83 @@ def onto_action(top: int = 10):
 @app.get("/api/nlquery")
 def nl(q: str = Query(...)):
     return nlquery.answer(q)
+
+
+# ---------- 공급자 워크플로우 ----------
+@app.post("/api/submission/upload")
+def submission_upload(file: UploadFile = File(...), tenant_id: str = Form(...)):
+    known = db.query("SELECT tenant_id FROM tenants WHERE tenant_id = ?", [tenant_id])
+    if not known:
+        return JSONResponse({"error": "알 수 없는 tenant_id"}, status_code=400)
+    table_name = submission.new_table_name(tenant_id)
+    result = submission.load_csv_to_table(file.file, table_name=table_name)
+    return result
+
+
+@app.post("/api/submission")
+def submission_create(
+    tenant_id: str = Form(...),
+    title: str = Form(...),
+    description: str = Form(...),
+    theme: str = Form(...),
+    keywords: str = Form(...),
+    license: str = Form(...),
+    format: str = Form(...),
+    table_name: str = Form(...),
+    rows: int = Form(...),
+):
+    meta = {
+        "tenant_id": tenant_id, "title": title, "description": description,
+        "theme": theme, "keywords": keywords, "license": license, "format": format,
+    }
+    diag = quality.run_quality_generic(table_name)
+    summary = submission.summarize_quality(diag)
+    sub_id = submission.create_submission(meta, table_name=table_name, rows=rows,
+                                           quality_summary=summary)
+    return {"submission_id": sub_id, "status": "submitted",
+            "quality": diag, "quality_summary": summary}
+
+
+@app.get("/api/submission")
+def submission_list(tenant_id: str = Query(...)):
+    return db.query(
+        "SELECT * FROM submissions WHERE tenant_id = ? ORDER BY submitted_at DESC",
+        [tenant_id])
+
+
+@app.get("/api/submission/all")
+def submission_list_all():
+    return db.query("SELECT * FROM submissions ORDER BY submitted_at DESC")
+
+
+@app.post("/api/submission/{submission_id}/decision")
+def submission_decision(submission_id: str, status: str = Form(...),
+                         decision_note: str = Form(default="")):
+    submission.record_decision(submission_id, status=status, decision_note=decision_note)
+    return {"submission_id": submission_id, "status": status}
+
+
+@app.post("/api/submission/{submission_id}/comment")
+def submission_comment(submission_id: str, comment: str = Form(...)):
+    comment_id = submission.add_comment(submission_id, comment)
+    return {"comment_id": comment_id, "submission_id": submission_id}
+
+
+@app.get("/api/submission/{submission_id}")
+def submission_detail(submission_id: str):
+    detail = submission.get_submission(submission_id)
+    diag = quality.run_quality_generic(detail["meta"]["table_name"])
+    detail["quality"] = diag
+    return detail
+
+
+@app.get("/api/plan/draft")
+def plan_draft(tenant_id: str = Query(...), type: str = Query(...)):
+    if type == "open":
+        return {"type": "open", "draft": planning.draft_open_plan(tenant_id)}
+    if type == "quality":
+        return {"type": "quality", "draft": planning.draft_quality_plan(tenant_id)}
+    return JSONResponse({"error": "type must be 'open' or 'quality'"}, status_code=400)
 
 
 # ---------- 정적 프론트엔드 ----------
