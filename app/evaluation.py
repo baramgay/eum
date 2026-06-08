@@ -16,6 +16,52 @@ AREAS = [
 ]
 
 
+def compute_submission_contribution(row: dict) -> list[dict]:
+    """제출(submission) 1건이 평가편람 5개 영역에 기여하는 내용을 계산한다.
+    row는 submissions 테이블 행(dict) — status/quality_summary/rows/comment_count/decision_note 포함."""
+    status = row.get("status")
+    quality_summary = str(row.get("quality_summary") or "")
+    stripped = quality_summary.rstrip()
+    quality_passed = stripped.endswith("통과") and not stripped.endswith("미통과")
+    rows = row.get("rows") or 0
+    comment_count = row.get("comment_count") or 0
+    has_decision_note = bool(str(row.get("decision_note") or "").strip())
+
+    return [
+        {
+            "key": "open", "name": "개방·활용",
+            "contributes": status == "approved",
+            "note": "승인되어 개방포털에 등록·공개됨" if status == "approved"
+                    else "승인되면 개방 데이터셋으로 등록되어 기여",
+        },
+        {
+            "key": "quality", "name": "품질",
+            "contributes": quality_passed,
+            "note": f"자동 진단 결과 — {quality_summary}" if quality_summary
+                    else "진단 대기 중",
+        },
+        {
+            "key": "analysis", "name": "분석·활용",
+            "contributes": status == "approved" and rows >= 50,
+            "note": f"{rows:,}행 데이터가 온톨로지·분석 자산으로 활용 가능"
+                    if rows >= 50 else f"{rows:,}행 — 분석 활용 기준(50행 이상) 미달",
+        },
+        {
+            "key": "share", "name": "공유",
+            "contributes": comment_count > 0,
+            "note": f"센터 컨설팅 코멘트 {comment_count}건으로 기관-센터 간 공유 실적 형성"
+                    if comment_count > 0 else "코멘트 등록 시 기관-센터 간 공유 실적으로 기여",
+        },
+        {
+            "key": "mgmt", "name": "관리체계",
+            "contributes": status in ("approved", "rejected") and has_decision_note,
+            "note": "담당자 결정 이력(메모 포함)이 기록되어 관리체계 증빙으로 활용"
+                    if (status in ("approved", "rejected") and has_decision_note)
+                    else "검토·결정 메모가 등록되면 관리체계 증빙으로 기여",
+        },
+    ]
+
+
 def _scalar(sql, params=None):
     r = db.query(sql, params)
     return list(r[0].values())[0] if r else 0
