@@ -55,3 +55,52 @@ def new_table_name(tenant_id: str) -> str:
     """제출용 테이블명을 생성한다 (tenant_id + 짧은 uuid로 충돌 방지)."""
     suffix = uuid.uuid4().hex[:8]
     return f"sub_{tenant_id}_{suffix}"
+
+
+def _now() -> str:
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def create_submission(meta: dict, table_name: str, rows: int, quality_summary: str) -> str:
+    """메타정보 + 적재 결과 + 진단 요약으로 제출 레코드를 생성한다 (status=submitted)."""
+    submission_id = uuid.uuid4().hex
+    db.execute(
+        "INSERT INTO submissions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [
+            submission_id, meta["tenant_id"], meta["title"], meta["description"],
+            meta["theme"], meta["keywords"], meta["license"], meta["format"],
+            table_name, rows, "submitted", quality_summary, None,
+            _now(), None,
+        ],
+    )
+    return submission_id
+
+
+def record_decision(submission_id: str, status: str, decision_note: str = "") -> None:
+    """담당자의 승인/반려 결정을 기록한다 (status: approved | rejected)."""
+    db.execute(
+        "UPDATE submissions SET status = ?, decision_note = ?, decided_at = ? "
+        "WHERE submission_id = ?",
+        [status, decision_note, _now(), submission_id],
+    )
+
+
+def add_comment(submission_id: str, comment: str) -> str:
+    """센터(컨설팅)의 코멘트를 추가한다."""
+    comment_id = uuid.uuid4().hex
+    db.execute(
+        "INSERT INTO consultant_comments VALUES (?,?,?,?)",
+        [comment_id, submission_id, comment, _now()],
+    )
+    return comment_id
+
+
+def get_submission(submission_id: str) -> dict:
+    """제출 상세(메타 + 미리보기 + 코멘트 이력)를 반환한다."""
+    meta = db.query("SELECT * FROM submissions WHERE submission_id = ?", [submission_id])[0]
+    preview = db.query(f"SELECT * FROM {meta['table_name']} LIMIT {PREVIEW_LIMIT}")
+    comments = db.query(
+        "SELECT * FROM consultant_comments WHERE submission_id = ? ORDER BY created_at",
+        [submission_id],
+    )
+    return {"meta": meta, "preview": preview, "comments": comments}
