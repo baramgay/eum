@@ -167,13 +167,18 @@ def submission_create(
 @app.get("/api/submission")
 def submission_list(tenant_id: str = Query(...)):
     return db.query(
-        "SELECT * FROM submissions WHERE tenant_id = ? ORDER BY submitted_at DESC",
+        "SELECT s.*, "
+        "(SELECT count(*) FROM consultant_comments c WHERE c.submission_id = s.submission_id) AS comment_count "
+        "FROM submissions s WHERE s.tenant_id = ? ORDER BY s.submitted_at DESC",
         [tenant_id])
 
 
 @app.get("/api/submission/all")
 def submission_list_all():
-    return db.query("SELECT * FROM submissions ORDER BY submitted_at DESC")
+    return db.query(
+        "SELECT s.*, "
+        "(SELECT count(*) FROM consultant_comments c WHERE c.submission_id = s.submission_id) AS comment_count "
+        "FROM submissions s ORDER BY s.submitted_at DESC")
 
 
 @app.post("/api/submission/{submission_id}/decision")

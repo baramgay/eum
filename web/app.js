@@ -378,9 +378,251 @@ searchCatalog();
     loadMySubmissions();
   }
 
+  // ---------- 센터(컨설팅) 모드 ----------
+  let centerRows = [];
+  let centerTenantMap = {};
+  let centerFilter = "all";
+  let centerSort = "latest";
+  let centerSearch = "";
+
+  function parseErrorRate(qualitySummary) {
+    const m = String(qualitySummary || "").match(/오류율\s*([\d.]+)%/);
+    return m ? parseFloat(m[1]) : null;
+  }
+
+  function isQualityPassed(qualitySummary) {
+    const s = String(qualitySummary || "").trim();
+    return s.endsWith("통과") && !s.endsWith("미통과");
+  }
+
+  const CENTER_STATUS_LABEL = { submitted: "검토대기", approved: "승인", rejected: "반려" };
+  const CENTER_STATUS_BADGE = { submitted: "b-warn", approved: "b-ok", rejected: "b-na" };
+
+  function computeAiReady(row) {
+    // 휴리스틱(추정): 품질진단 통과 + 데이터 규모(30행 이상) + 설명 충실(20자 이상)을
+    // 동시에 만족하면 AI 학습 활용 후보로 추정한다.
+    return isQualityPassed(row.quality_summary)
+      && (row.rows || 0) >= 30
+      && String(row.description || "").trim().length >= 20;
+  }
+
+  function computeAreaTags(row) {
+    // 2026 평가편람 5개 영역(개방·활용/품질/분석·활용/공유/관리체계) 기여 추정 — 휴리스틱 분류
+    const tags = [];
+    if (row.status === "approved") tags.push("개방·활용");
+    if (isQualityPassed(row.quality_summary)) tags.push("품질");
+    if ((row.rows || 0) >= 50) tags.push("분석·활용");
+    if ((row.comment_count || 0) > 0) tags.push("공유");
+    if (row.decision_note) tags.push("관리체계");
+    return tags;
+  }
+
+  function computeRecommendedAction(row) {
+    const passed = isQualityPassed(row.quality_summary);
+    const descLen = String(row.description || "").trim().length;
+    if (row.status === "approved") return "개방포털 등록이 완료되었습니다 — 후속 활용 현황을 모니터링하세요.";
+    if (row.status === "rejected") return "반려 처리되었습니다 — 필요 시 기관과 데이터 범위를 재협의하도록 안내하세요.";
+    if (descLen < 10) return "설명(메타데이터)이 부족합니다 — 기관에 메타데이터 보완을 요청하세요.";
+    if (!passed) return "품질 기준 미달입니다 — 품질개선계획 초안을 생성해 기관에 보완을 요청하세요.";
+    return "품질진단을 통과했습니다 — 즉시 승인 가능한 개방 후보로 안내해도 좋습니다.";
+  }
+
+  function renderCenterBadges(row) {
+    const chips = [];
+    chips.push(`<span class="badge ${CENTER_STATUS_BADGE[row.status] || 'b-na'}">${esc(CENTER_STATUS_LABEL[row.status] || row.status)}</span>`);
+    chips.push(isQualityPassed(row.quality_summary)
+      ? '<span class="badge b-ok">품질 통과</span>'
+      : '<span class="badge b-red">품질 개선 필요</span>');
+    if (computeAiReady(row)) chips.push('<span class="badge b-ai">AI-Ready 후보</span>');
+    if (row.status === "submitted" && isQualityPassed(row.quality_summary)) {
+      chips.push('<span class="badge b-hv">즉시 승인 가능</span>');
+    }
+    if ((row.comment_count || 0) > 0) chips.push(`<span class="badge b-na">코멘트 ${row.comment_count}건</span>`);
+    return chips.join(" ");
+  }
+
   function renderCenterView() {
     const root = $("#sub-center-view");
-    root.innerHTML = `<p class="note">센터(컨설팅) 모드는 다음 단계에서 구현됩니다.</p>`;
+    root.innerHTML = `
+      <div class="card"><h3>전체 제출 현황</h3><div id="center-summary" class="cards c4"></div></div>
+      <div class="card">
+        <h3>검토 대기 목록</h3>
+        <div class="chips" id="center-filters">
+          <button data-filter="all" class="active">전체</button>
+          <button data-filter="submitted">검토대기</button>
+          <button data-filter="approved">승인</button>
+          <button data-filter="rejected">반려</button>
+        </div>
+        <div class="search" style="margin:10px 0">
+          <input id="center-search" placeholder="제목 · 설명 · 기관 · 품질요약 검색">
+          <select id="center-sort">
+            <option value="latest">최신순</option>
+            <option value="quality">품질점수순(오류율 낮은 순)</option>
+            <option value="status">상태순</option>
+          </select>
+        </div>
+        <div id="center-list"></div>
+      </div>
+    `;
+    $all("[data-filter]", root).forEach((btn) => {
+      btn.addEventListener("click", () => {
+        $all("[data-filter]", root).forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        centerFilter = btn.dataset.filter;
+        renderCenterList();
+      });
+    });
+    $("#center-search").addEventListener("input", (e) => {
+      centerSearch = e.target.value.trim().toLowerCase();
+      renderCenterList();
+    });
+    $("#center-sort").addEventListener("change", (e) => {
+      centerSort = e.target.value;
+      renderCenterList();
+    });
+    loadCenterView();
+  }
+
+  async function loadCenterView() {
+    const [subRes, tenantRes] = await Promise.all([
+      fetch("/api/submission/all"),
+      fetch("/api/tenants"),
+    ]);
+    centerRows = await subRes.json();
+    const tenants = await tenantRes.json();
+    centerTenantMap = {};
+    tenants.forEach((t) => { centerTenantMap[t.tenant_id] = t.name; });
+
+    const total = centerRows.length;
+    const pending = centerRows.filter((r) => r.status === "submitted").length;
+    const approved = centerRows.filter((r) => r.status === "approved").length;
+    const rejected = centerRows.filter((r) => r.status === "rejected").length;
+    const passed = centerRows.filter((r) => isQualityPassed(r.quality_summary)).length;
+    const failed = centerRows.filter((r) => r.quality_summary && !isQualityPassed(r.quality_summary)).length;
+    const aiReady = centerRows.filter(computeAiReady).length;
+    const comments = centerRows.reduce((sum, r) => sum + (r.comment_count || 0), 0);
+
+    $("#center-summary").innerHTML = [
+      ["전체 제출 수", total],
+      ["검토 대기", pending],
+      ["승인", approved],
+      ["반려", rejected],
+      ["품질 통과", passed],
+      ["품질 개선 필요", failed],
+      ["AI-Ready 추정", aiReady],
+      ["컨설팅 코멘트 누적", comments],
+    ].map(([lbl, num]) => `
+      <div class="card stat"><div class="num">${num}</div><div class="lbl">${esc(lbl)}</div></div>
+    `).join("");
+
+    renderCenterList();
+  }
+
+  function renderCenterList() {
+    const root = $("#center-list");
+    let rows = centerRows.slice();
+
+    if (centerFilter !== "all") rows = rows.filter((r) => r.status === centerFilter);
+    if (centerSearch) {
+      rows = rows.filter((r) => {
+        const tenantName = centerTenantMap[r.tenant_id] || r.tenant_id;
+        const haystack = [r.title, r.description, tenantName, r.quality_summary]
+          .map((v) => String(v || "").toLowerCase()).join(" ");
+        return haystack.includes(centerSearch);
+      });
+    }
+
+    if (centerSort === "quality") {
+      rows.sort((a, b) => {
+        const ra = parseErrorRate(a.quality_summary);
+        const rb = parseErrorRate(b.quality_summary);
+        if (ra === null && rb === null) return 0;
+        if (ra === null) return 1;
+        if (rb === null) return -1;
+        return ra - rb;
+      });
+    } else if (centerSort === "status") {
+      const order = { submitted: 0, approved: 1, rejected: 2 };
+      rows.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
+    } else {
+      rows.sort((a, b) => String(b.submitted_at).localeCompare(String(a.submitted_at)));
+    }
+
+    if (!rows.length) {
+      root.innerHTML = '<p class="note">조건에 맞는 제출이 없습니다.</p>';
+      return;
+    }
+
+    root.innerHTML = rows.map((r) => `
+      <div class="ds" data-id="${r.submission_id}">
+        <strong>${esc(r.title)}</strong>
+        <span class="badge b-hv">${esc(centerTenantMap[r.tenant_id] || r.tenant_id)}</span>
+        ${renderCenterBadges(r)}
+        <p>${esc(r.quality_summary || '')} · 제출 ${esc(r.submitted_at || '')}</p>
+      </div>
+    `).join("");
+    $all(".ds", root).forEach((el) => {
+      el.addEventListener("click", () => openCenterDetail(el.dataset.id));
+    });
+  }
+
+  async function openCenterDetail(submissionId) {
+    const res = await fetch(`/api/submission/${submissionId}`);
+    const detail = await res.json();
+    const m = detail.meta;
+    const q = detail.quality;
+    const mAug = Object.assign({}, m, { comment_count: detail.comments.length });
+    const modalRoot = $("#modal-root");
+    const tenantName = centerTenantMap[m.tenant_id] || m.tenant_id;
+    const areaTags = computeAreaTags(mAug).map((a) => `<span class="badge b-hv">${esc(a)}</span>`).join(" ");
+
+    modalRoot.innerHTML = `
+      <div class="modal">
+        <div class="box">
+          <h3>${esc(m.title)}</h3>
+          <p class="note">제출 ID: ${esc(m.submission_id)} · 제출기관: ${esc(tenantName)} · 제출일시: ${esc(m.submitted_at || '')}</p>
+          <p>${esc(m.description)}</p>
+          <p>${renderCenterBadges(mAug)}</p>
+          ${areaTags ? `<p><strong>평가 영역 기여 추정</strong> ${areaTags}</p>` : ''}
+          <p><strong>권장 조치</strong> ${esc(computeRecommendedAction(mAug))}</p>
+          ${q ? `
+            <h4>품질진단 상세</h4>
+            <p>오류율 ${esc(String(q.error_rate))}% (기준 ${esc(String(q.threshold))}%) · 규칙 ${esc(String(q.rule_count))}종 · 오류 ${esc(String(q.errors))}건 · ${q.passed ? '<span class="badge b-ok">통과</span>' : '<span class="badge b-red">미통과</span>'}</p>
+            <ul>${q.detail.map((d) => `<li>${esc(d.rule)} — 위반 ${esc(String(d.violations))}건 (기준 ${esc(String(d.threshold))}%)</li>`).join('')}</ul>
+          ` : ''}
+          ${m.decision_note ? `<p><strong>결정 메모</strong> ${esc(m.decision_note)} (${esc(m.decided_at || '')})</p>` : ''}
+          <h4>컨설팅 코멘트</h4>
+          <div id="center-comment-list">
+            ${detail.comments.length
+              ? detail.comments.map((c) => `<p>- ${esc(c.comment)} <small class="note">(${esc(c.created_at)})</small></p>`).join("")
+              : '<p class="note">코멘트가 없습니다.</p>'}
+          </div>
+          <p>
+            <textarea id="center-comment-input" rows="3" style="width:100%" placeholder="컨설팅 의견을 입력하세요"></textarea>
+          </p>
+          <p>
+            <button class="btn btn-p" id="btn-comment-submit">코멘트 등록</button>
+            <button class="btn btn-o" id="btn-draft-quality">품질개선 권고문 생성</button>
+            <button class="btn btn-o" id="btn-close">닫기</button>
+          </p>
+        </div>
+      </div>
+    `;
+    $("#btn-close").addEventListener("click", () => { modalRoot.innerHTML = ""; });
+    $("#btn-comment-submit").addEventListener("click", async () => {
+      const text = $("#center-comment-input").value.trim();
+      if (!text) return;
+      const fd = new FormData();
+      fd.append("comment", text);
+      await fetch(`/api/submission/${submissionId}/comment`, { method: "POST", body: fd });
+      openCenterDetail(submissionId);
+      loadCenterView();
+    });
+    $("#btn-draft-quality").addEventListener("click", async () => {
+      const res2 = await fetch(`/api/plan/draft?tenant_id=${m.tenant_id}&type=quality`);
+      const data = await res2.json();
+      $("#center-comment-input").value = data.draft;
+    });
   }
 
   // 기존 탭 전환 핸들러(app.js:8-17)가 호출할 수 있도록 전역에 노출한다

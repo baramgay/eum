@@ -150,3 +150,69 @@ def test_summarize_quality_formats_pass_and_fail():
     assert "4종" in s_pass and "0건" in s_pass
     assert "미통과" in s_fail
     assert "12건" in s_fail and "3.0%" in s_fail
+
+
+# ---------- /api/submission, /api/submission/all 의 comment_count 서브쿼리 ----------
+# (라우트 핸들러와 동일한 SQL을 직접 실행하여 comment_count 컬럼 동작을 검증한다.
+#  이 저장소에는 FastAPI TestClient를 사용하는 패턴이 없으므로, 라우트가 실행하는
+#  SQL을 그대로 재현해 db 계층에서 검증하는 기존 스타일을 따른다.)
+
+_SUBMISSION_LIST_SQL = (
+    "SELECT s.*, "
+    "(SELECT count(*) FROM consultant_comments c WHERE c.submission_id = s.submission_id) "
+    "AS comment_count "
+    "FROM submissions s WHERE s.tenant_id = ? ORDER BY s.submitted_at DESC"
+)
+
+_SUBMISSION_LIST_ALL_SQL = (
+    "SELECT s.*, "
+    "(SELECT count(*) FROM consultant_comments c WHERE c.submission_id = s.submission_id) "
+    "AS comment_count "
+    "FROM submissions s ORDER BY s.submitted_at DESC"
+)
+
+
+def test_submission_list_sql_includes_comment_count():
+    db.init_schema()
+    table = "sub_48121_dddddddd"
+    db.execute(f"DROP TABLE IF EXISTS {table}")
+    db.execute(f"CREATE TABLE {table} (x BIGINT)")
+    sub_id = create_submission(_sample_meta(), table_name=table, rows=0,
+                               quality_summary="규칙 4종 / 오류 0건 / 통과")
+
+    add_comment(sub_id, "기관 제출 목록용 코멘트 1")
+    add_comment(sub_id, "기관 제출 목록용 코멘트 2")
+
+    rows = db.query(_SUBMISSION_LIST_SQL, [_sample_meta()["tenant_id"]])
+    target = next(r for r in rows if r["submission_id"] == sub_id)
+
+    assert "comment_count" in target
+    assert target["comment_count"] == 2
+
+    db.execute(f"DROP TABLE {table}")
+
+
+def test_submission_list_all_sql_includes_comment_count_and_zero_for_no_comments():
+    db.init_schema()
+    table_with = "sub_48121_eeeeeeee"
+    table_without = "sub_48121_ffffffff"
+    for t in (table_with, table_without):
+        db.execute(f"DROP TABLE IF EXISTS {t}")
+        db.execute(f"CREATE TABLE {t} (x BIGINT)")
+
+    sub_with = create_submission(_sample_meta(), table_name=table_with, rows=0,
+                                 quality_summary="규칙 4종 / 오류 0건 / 통과")
+    sub_without = create_submission(_sample_meta(), table_name=table_without, rows=0,
+                                    quality_summary="규칙 4종 / 오류 0건 / 통과")
+
+    add_comment(sub_with, "전체 목록용 코멘트")
+
+    rows = db.query(_SUBMISSION_LIST_ALL_SQL)
+    row_with = next(r for r in rows if r["submission_id"] == sub_with)
+    row_without = next(r for r in rows if r["submission_id"] == sub_without)
+
+    assert row_with["comment_count"] == 1
+    assert row_without["comment_count"] == 0
+
+    db.execute(f"DROP TABLE {table_with}")
+    db.execute(f"DROP TABLE {table_without}")
