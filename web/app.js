@@ -13,6 +13,7 @@ document.querySelectorAll('#nav button').forEach(b => {
     $('#tab-' + b.dataset.tab).classList.remove('hidden');
     if (b.dataset.tab === 'ontology') loadOntology();
     if (b.dataset.tab === 'portal') searchCatalog();
+    if (b.dataset.tab === 'submission') window.initSubmissionTab();
   };
 });
 
@@ -201,3 +202,187 @@ loadDashboard();
 loadQuality();
 loadNLSamples();
 searchCatalog();
+
+// ---------- 데이터 등록·관리 탭 ----------
+(function () {
+  const TENANT_ID = "48121"; // 데모: 창원시 고정 (로그인 미구현 단계)
+  let currentMode = "agency";
+
+  // 파일 상단에 이미 정의된 전역 $ (querySelector)를 그대로 쓰고, $all만 추가한다
+  function $all(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
+
+  function initSubmissionTab() {
+    const toggle = $("#sub-mode-toggle");
+    if (!toggle || toggle.dataset.bound) return;
+    toggle.dataset.bound = "1";
+
+    $all("button", toggle).forEach((btn) => {
+      btn.addEventListener("click", () => {
+        $all("button", toggle).forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentMode = btn.dataset.mode;
+        $("#sub-agency-view").classList.toggle("hidden", currentMode !== "agency");
+        $("#sub-center-view").classList.toggle("hidden", currentMode !== "center");
+        if (currentMode === "agency") renderAgencyView();
+        else renderCenterView();
+      });
+    });
+
+    renderAgencyView();
+  }
+
+  function renderAgencyView() {
+    const root = $("#sub-agency-view");
+    root.innerHTML = `
+      <div class="cards c2">
+        <div class="card">
+          <h3>새 데이터 등록</h3>
+          <form id="upload-form">
+            <p><input type="file" id="upload-file" accept=".csv" required></p>
+            <p><button type="submit" class="btn btn-p">업로드 &amp; 미리보기</button></p>
+          </form>
+          <div id="upload-result"></div>
+          <form id="meta-form" class="hidden">
+            <p><input type="text" name="title" placeholder="제목" required></p>
+            <p><input type="text" name="description" placeholder="설명" required></p>
+            <p><input type="text" name="theme" placeholder="주제(예: 인구·행정·교통)" required></p>
+            <p><input type="text" name="keywords" placeholder="키워드(쉼표로 구분)" required></p>
+            <p><input type="text" name="license" placeholder="라이선스(예: CC-BY)" required></p>
+            <p><input type="text" name="format" placeholder="형식(예: CSV)" required></p>
+            <p><button type="submit" class="btn btn-p">등록(자동 진단 실행)</button></p>
+          </form>
+          <div id="register-result"></div>
+        </div>
+        <div class="card">
+          <h3>내 제출 현황</h3>
+          <div id="my-submissions"></div>
+        </div>
+      </div>
+      <div class="card" id="plan-draft-card">
+        <h3>계획서 초안 생성</h3>
+        <div class="chips">
+          <button data-plan="open" class="btn btn-o">공공데이터 개방계획 초안</button>
+          <button data-plan="quality" class="btn btn-o">품질개선계획 초안</button>
+        </div>
+        <pre id="plan-draft-output" class="sql"></pre>
+      </div>
+    `;
+
+    let uploadedTable = null;
+    let uploadedRows = 0;
+
+    $("#upload-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = $("#upload-file");
+      if (!fileInput.files.length) return;
+      const fd = new FormData();
+      fd.append("file", fileInput.files[0]);
+      fd.append("tenant_id", TENANT_ID);
+      const res = await fetch("/api/submission/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      uploadedTable = data.table_name;
+      uploadedRows = data.rows;
+      $("#upload-result").innerHTML =
+        `<p class="note">스키마 추론 완료: ${data.rows}행, 컬럼 ${data.schema.length}개. 아래 메타정보를 입력해 등록하세요.</p>`;
+      $("#meta-form").classList.remove("hidden");
+    });
+
+    $("#meta-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!uploadedTable) return;
+      const fd = new FormData(e.target);
+      fd.append("tenant_id", TENANT_ID);
+      fd.append("table_name", uploadedTable);
+      fd.append("rows", String(uploadedRows));
+      const res = await fetch("/api/submission", { method: "POST", body: fd });
+      const data = await res.json();
+      $("#register-result").innerHTML =
+        `<p class="note">등록 완료 — 자동 진단 결과: ${data.quality_summary}</p>`;
+      e.target.reset();
+      e.target.classList.add("hidden");
+      uploadedTable = null;
+      loadMySubmissions();
+    });
+
+    $all("[data-plan]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const res = await fetch(`/api/plan/draft?tenant_id=${TENANT_ID}&type=${btn.dataset.plan}`);
+        const data = await res.json();
+        $("#plan-draft-output").textContent = data.draft;
+      });
+    });
+
+    loadMySubmissions();
+  }
+
+  async function loadMySubmissions() {
+    const res = await fetch(`/api/submission?tenant_id=${TENANT_ID}`);
+    const rows = await res.json();
+    const root = $("#my-submissions");
+    if (!rows.length) {
+      root.innerHTML = '<p class="note">등록된 제출이 없습니다.</p>';
+      return;
+    }
+    root.innerHTML = rows.map((r) => `
+      <div class="ds" data-id="${r.submission_id}">
+        <strong>${r.title}</strong>
+        <span class="badge ${r.status === 'approved' ? 'b-ok' : r.status === 'rejected' ? 'b-na' : 'b-warn'}">${r.status}</span>
+        <p>${r.quality_summary || ''}</p>
+      </div>
+    `).join("");
+    $all(".ds", root).forEach((el) => {
+      el.addEventListener("click", () => openSubmissionDetail(el.dataset.id));
+    });
+  }
+
+  async function openSubmissionDetail(submissionId) {
+    const res = await fetch(`/api/submission/${submissionId}`);
+    const detail = await res.json();
+    const m = detail.meta;
+    const modalRoot = $("#modal-root");
+    modalRoot.innerHTML = `
+      <div class="modal">
+        <div class="box">
+          <h3>${m.title}</h3>
+          <p>${m.description}</p>
+          <p><span class="badge ${m.status === 'approved' ? 'b-ok' : m.status === 'rejected' ? 'b-na' : 'b-warn'}">${m.status}</span> ${m.quality_summary || ''}</p>
+          ${m.status === 'submitted' ? `
+            <p>
+              <button class="btn btn-p" id="btn-approve">승인(개방)</button>
+              <button class="btn btn-o" id="btn-reject">반려(보류)</button>
+            </p>
+            <p><input type="text" id="decision-note" placeholder="결정 메모(선택)"></p>
+          ` : ''}
+          <h4>센터 코멘트</h4>
+          ${detail.comments.length
+            ? detail.comments.map((c) => `<p>- ${c.comment} (${c.created_at})</p>`).join("")
+            : '<p class="note">코멘트가 없습니다.</p>'}
+          <p><button class="btn btn-o" id="btn-close">닫기</button></p>
+        </div>
+      </div>
+    `;
+    $("#btn-close").addEventListener("click", () => { modalRoot.innerHTML = ""; });
+    const approveBtn = $("#btn-approve");
+    const rejectBtn = $("#btn-reject");
+    if (approveBtn) approveBtn.addEventListener("click", () => decide(submissionId, "approved"));
+    if (rejectBtn) rejectBtn.addEventListener("click", () => decide(submissionId, "rejected"));
+  }
+
+  async function decide(submissionId, status) {
+    const note = $("#decision-note") ? $("#decision-note").value : "";
+    const fd = new FormData();
+    fd.append("status", status);
+    fd.append("decision_note", note);
+    await fetch(`/api/submission/${submissionId}/decision`, { method: "POST", body: fd });
+    $("#modal-root").innerHTML = "";
+    loadMySubmissions();
+  }
+
+  function renderCenterView() {
+    const root = $("#sub-center-view");
+    root.innerHTML = `<p class="note">센터(컨설팅) 모드는 다음 단계에서 구현됩니다.</p>`;
+  }
+
+  // 기존 탭 전환 핸들러(app.js:8-17)가 호출할 수 있도록 전역에 노출한다
+  window.initSubmissionTab = initSubmissionTab;
+})();
