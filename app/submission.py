@@ -26,3 +26,32 @@ def infer_schema(df: pd.DataFrame) -> list[tuple[str, str]]:
         duck_type = _DTYPE_MAP.get(str(df[col].dtype), "VARCHAR")
         schema.append((col, duck_type))
     return schema
+
+
+PREVIEW_LIMIT = 20
+
+
+def load_csv_to_table(file_obj, table_name: str) -> dict:
+    """CSV를 읽어 스키마를 추론하고 DuckDB 테이블로 적재한 뒤 미리보기를 반환한다."""
+    df = pd.read_csv(file_obj)
+    schema = infer_schema(df)
+
+    conn = db.get_conn()
+    conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+    conn.register("_upload_df", df)
+    conn.execute(f"CREATE TABLE {table_name} AS SELECT * FROM _upload_df")
+    conn.unregister("_upload_df")
+
+    preview = db.query(f"SELECT * FROM {table_name} LIMIT {PREVIEW_LIMIT}")
+    return {
+        "table_name": table_name,
+        "rows": len(df),
+        "schema": schema,
+        "preview": preview,
+    }
+
+
+def new_table_name(tenant_id: str) -> str:
+    """제출용 테이블명을 생성한다 (tenant_id + 짧은 uuid로 충돌 방지)."""
+    suffix = uuid.uuid4().hex[:8]
+    return f"sub_{tenant_id}_{suffix}"
