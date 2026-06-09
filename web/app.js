@@ -244,8 +244,29 @@ async function loadAction() {
 
 /* ---------- 자연어 질의 ---------- */
 function loadNLSamples() {
-  const samples = ['창원시 청년 순유입 보여줘', '진주 사업체 현황', '거창군 청년센터', '양산 일자리', '김해 청년 인구'];
-  $('#nlq-samples').innerHTML = samples.map(s => `<button onclick="$('#nlq').value='${s}';runNL()">${s}</button>`).join('');
+  const categories = [
+    { label: "청년인구", samples: ["창원시 청년 순유입", "경남 전체 청년 유출입"] },
+    { label: "사업체·고용", samples: ["진주 사업체 현황", "경남 일자리·종사자 현황"] },
+    { label: "공공시설", samples: ["거창군 청년센터", "경남 전체 공공시설"] },
+  ];
+  const chips = categories.flatMap(cat =>
+    cat.samples.map(s => `<button class="chip-sample" data-q="${esc(s)}">[${esc(cat.label)}] ${esc(s)}</button>`)
+  );
+  $('#nlq-samples').innerHTML = chips.join('');
+  document.querySelectorAll('.chip-sample', $('#nlq-samples')).forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('#nlq').value = btn.dataset.q;
+      runNL();
+    });
+  });
+  // 초기 안내 메시지 설정
+  $('#nlresult').innerHTML = `
+    <div class="note">
+      자연어로 경남 데이터를 질의하세요. 위 예시 버튼을 클릭하거나 직접 입력해 보세요.<br>
+      지원 질의 유형: <span class="badge b-hv">청년인구 유출입</span>
+      <span class="badge b-ai">사업체·고용</span>
+      <span class="badge b-na">공공시설</span>
+    </div>`;
 }
 async function runNL() {
   const q = $('#nlq').value.trim();
@@ -253,7 +274,32 @@ async function runNL() {
   $('#nlresult').innerHTML = '<div class="loading">질의 중...</div>';
   const r = await api('/api/nlquery?q=' + encodeURIComponent(q));
   if (!r.intent) {
-    $('#nlresult').innerHTML = `<div class="note">의도를 해석하지 못했습니다. ${esc(r.hint || '')}</div>`;
+    const fallbackSamples = ['창원시 청년 순유입', '진주 사업체 현황', '거창군 청년센터'];
+    const fallbackChips = fallbackSamples.map(s =>
+      `<button class="chip-sample" data-q="${esc(s)}">${esc(s)}</button>`
+    ).join(' ');
+    $('#nlresult').innerHTML = `
+      <div class="note">
+        <b>의도를 해석하지 못했습니다.</b> ${esc(r.hint || '')}<br>
+        아래 예시 질문으로 시작해 보세요:<br>${fallbackChips}
+      </div>`;
+    document.querySelectorAll('#nlresult .chip-sample').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $('#nlq').value = btn.dataset.q;
+        runNL();
+      });
+    });
+    return;
+  }
+  if (!r.rows || r.rows.length === 0) {
+    $('#nlresult').innerHTML = `
+      <div class="note">
+        <b>검색 결과가 없습니다.</b>
+        <span class="badge b-hv">의도: ${esc(r.intent)}</span>
+        ${r.sigun ? `<span class="badge b-ai">${esc(r.sigun)}</span>` : ''}<br>
+        조건에 맞는 데이터가 없거나 아직 로드되지 않았습니다.
+        <a href="#" onclick="event.preventDefault();document.querySelector('[data-tab=portal]').click()">개방포털</a>에서 데이터를 확인하세요.
+      </div>`;
     return;
   }
   const cols = r.columns;
