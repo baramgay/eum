@@ -49,13 +49,16 @@ def tenants():
 
 # ---------- L3 카탈로그(개방포털) ----------
 @app.get("/api/catalog")
-def catalog(q: str = Query(default="")):
+def catalog(q: str = Query(default=""), sort: str = Query(default="high_value")):
+    # 허용 컬럼 화이트리스트 — SQL injection 방지
+    allowed_sorts = {"high_value", "updated_at", "rows", "title"}
+    sort_col = sort if sort in allowed_sorts else "high_value"
     if q:
         rows = db.query(
-            "SELECT * FROM catalog WHERE title ILIKE ? OR keywords ILIKE ? ORDER BY high_value DESC",
-            [f"%{q}%", f"%{q}%"])
+            f"SELECT * FROM catalog WHERE title ILIKE ? OR keywords ILIKE ? OR description ILIKE ? ORDER BY {sort_col} DESC",
+            [f"%{q}%", f"%{q}%", f"%{q}%"])
     else:
-        rows = db.query("SELECT * FROM catalog ORDER BY high_value DESC")
+        rows = db.query(f"SELECT * FROM catalog ORDER BY {sort_col} DESC")
     return rows
 
 
