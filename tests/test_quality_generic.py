@@ -1,5 +1,5 @@
 from app import database as db
-from app.quality import generic_rules, run_quality_generic
+from app.quality import generic_rules, run_quality_generic, generate_quality_recommendations
 
 
 def _make_test_table():
@@ -44,3 +44,56 @@ def test_run_quality_generic_reports_detected_issues():
     assert len(result["detail"]) == result["rule_count"]
 
     db.execute(f"DROP TABLE {table}")
+
+
+# ---- generate_quality_recommendations 테스트 ----
+
+def test_recommendations_empty_when_passed():
+    """진단 통과(passed=True) 결과 → 빈 권고 목록 반환"""
+    diag = {
+        "checked": 100,
+        "errors": 0,
+        "error_rate": 0.0,
+        "threshold": 5.0,
+        "passed": True,
+        "detail": [],
+    }
+    recs = generate_quality_recommendations(diag)
+    assert recs == []
+
+
+def test_recommendations_no_data_message():
+    """빈 데이터(0건 체크) 결과 → '데이터 행이 없습니다' 권고 반환"""
+    diag = {
+        "checked": 0,
+        "errors": 0,
+        "error_rate": 0.0,
+        "threshold": 5.0,
+        "passed": True,
+        "detail": [],
+    }
+    recs = generate_quality_recommendations(diag)
+    assert len(recs) == 1
+    assert "데이터 행이 없습니다" in recs[0]
+
+
+def test_recommendations_includes_rule_name_and_violations():
+    """특정 rule에 위반이 있는 결과 → 해당 rule 이름·위반수를 담은 권고 텍스트 반환"""
+    diag = {
+        "checked": 300,
+        "errors": 3,
+        "error_rate": 1.0,
+        "threshold": 5.0,
+        "passed": False,
+        "detail": [
+            {"rule": "NULL/빈값", "violations": 3, "threshold": 5.0},
+            {"rule": "중복행 비율", "violations": 0, "threshold": 5.0},
+        ],
+    }
+    recs = generate_quality_recommendations(diag)
+    assert len(recs) >= 1
+    # 위반이 있는 "NULL/빈값" 규칙이 포함되어야 함
+    assert any("NULL/빈값" in r for r in recs)
+    assert any("3" in r for r in recs)
+    # 위반이 없는 "중복행 비율"은 포함되지 않아야 함
+    assert not any("중복행 비율" in r for r in recs)
