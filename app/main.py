@@ -217,6 +217,7 @@ def submission_detail(submission_id: str):
     detail["meta"]["comment_count"] = len(detail["comments"])
     detail["contribution"] = evaluation.compute_submission_contribution(detail["meta"])
     detail["ai_ready_checklist"] = evaluation.compute_ai_ready_checklist(detail["meta"])
+    detail["ontology_candidates"] = ontology.recommend_ontology_candidates(detail["meta"])
     return detail
 
 
