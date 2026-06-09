@@ -348,6 +348,10 @@ searchCatalog();
     const detail = await res.json();
     const m = detail.meta;
     const modalRoot = $("#modal-root");
+    const recs = detail.recommendations || [];
+    const recsHtml = recs.length ? `
+  <h4>품질개선 권고</h4>
+  <ul>${recs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>` : '';
     modalRoot.innerHTML = `
       <div class="modal">
         <div class="box">
@@ -365,9 +369,10 @@ searchCatalog();
           <div>${(function(){const aicl=detail.ai_ready_checklist||{ai_ready:false,checklist:[]};return aicl.checklist.map((c)=>`<div class="ind"><div class="nm">${esc(c.item)}<small>${esc(c.detail)}</small></div><div class="vl">${c.passed?'<span class="badge b-ai">충족</span>':'<span class="badge b-warn">미충족</span>'}</div></div>`).join('');})()}</div>
           <h4>평가 기여도</h4>
           <div>${renderContributionRows(detail.contribution)}</div>
+          ${recsHtml}
           <h4>센터 코멘트</h4>
           ${detail.comments.length
-            ? detail.comments.map((c) => `<p>- ${esc(c.comment)} (${c.created_at})</p>`).join("")
+            ? detail.comments.map((c) => `<p>- ${esc(c.comment)} (${esc(c.created_at)})</p>`).join("")
             : '<p class="note">코멘트가 없습니다.</p>'}
           <p><button class="btn btn-o" id="btn-close">닫기</button></p>
         </div>
@@ -593,6 +598,10 @@ searchCatalog();
     const mAug = Object.assign({}, m, { comment_count: detail.comments.length });
     const modalRoot = $("#modal-root");
     const tenantName = centerTenantMap[m.tenant_id] || m.tenant_id;
+    const recs = detail.recommendations || [];
+    const recsHtml = recs.length ? `
+  <h4>품질개선 권고 <button class="btn btn-o" id="btn-save-rec">코멘트로 저장</button></h4>
+  <ul>${recs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>` : '';
 
     modalRoot.innerHTML = `
       <div class="modal">
@@ -606,6 +615,7 @@ searchCatalog();
           <h4>평가 기여도</h4>
           <div>${renderContributionRows(detail.contribution)}</div>
           <p><strong>권장 조치</strong> ${esc(computeRecommendedAction(mAug))}</p>
+          ${recsHtml}
           ${q ? `
             <h4>품질진단 상세</h4>
             <p>오류율 ${esc(String(q.error_rate))}% (기준 ${esc(String(q.threshold))}%) · 규칙 ${esc(String(q.rule_count))}종 · 오류 ${esc(String(q.errors))}건 · ${q.passed ? '<span class="badge b-ok">통과</span>' : '<span class="badge b-red">미통과</span>'}</p>
@@ -644,6 +654,17 @@ searchCatalog();
       const data = await res2.json();
       $("#center-comment-input").value = data.draft;
     });
+    const saveRecBtn = $("#btn-save-rec");
+    if (saveRecBtn) {
+      saveRecBtn.addEventListener("click", async () => {
+        const recText = recs.join("\n");
+        const fd = new FormData();
+        fd.append("comment", recText);
+        await fetch(`/api/submission/${submissionId}/comment`, { method: "POST", body: fd });
+        modalRoot.innerHTML = "";
+        loadCenterView();
+      });
+    }
   }
 
   // 기존 탭 전환 핸들러(app.js:8-17)가 호출할 수 있도록 전역에 노출한다
