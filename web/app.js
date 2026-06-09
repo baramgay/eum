@@ -53,7 +53,11 @@ const badge = (st) => ({ok:'<span class="badge b-ok">충족</span>', warn:'<span
 /* ---------- 개방포털 ---------- */
 async function searchCatalog() {
   const q = $('#q').value.trim();
-  const rows = await api('/api/catalog' + (q ? '?q=' + encodeURIComponent(q) : ''));
+  const sort = $('#sort-catalog') ? $('#sort-catalog').value : 'high_value';
+  const params = new URLSearchParams();
+  if (q) params.set('q', q);
+  params.set('sort', sort);
+  const rows = await api('/api/catalog?' + params.toString());
   $('#catalog').innerHTML = rows.length ? rows.map(d => {
     const desc = d.description ? d.description.slice(0, 80) : '';
     const kw   = d.keywords   ? d.keywords.slice(0, 30)   : '';
@@ -62,7 +66,7 @@ async function searchCatalog() {
       ${desc ? `<div class="page-sub" style="margin:2px 0 6px;font-size:12.5px">${esc(desc)}${d.description.length > 80 ? '…' : ''}</div>` : ''}
       <div class="meta">${esc(d.theme)} · ${Number(d.rows).toLocaleString()}행 · ${esc(d.format)}</div>
       <div class="tags">
-        ${d.is_open  ? '<span class="badge b-ok">개방</span>'     : ''}
+        ${d.is_open  ? '<span class="badge b-ok">개방</span>' : '<span class="badge b-na">비공개</span>'}
         ${d.ai_ready ? '<span class="badge b-ai">AI-Ready</span>' : ''}
         ${d.high_value ? '<span class="badge b-hv">고가치</span>' : ''}
         ${kw ? `<span class="badge b-na">${esc(kw)}${d.keywords.length > 30 ? '…' : ''}</span>` : ''}

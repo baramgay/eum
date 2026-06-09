@@ -56,7 +56,13 @@
     <div class="page-title">데이터 개방포털 (DCAT 카탈로그)</div>
     <div class="page-sub">메타관리시스템 기반 개방 데이터셋 검색·미리보기·품질 확인</div>
     <div class="search">
-      <input id="q" placeholder="데이터셋 검색 (예: 청년, 사업체, 시설)">
+      <input id="q" placeholder="데이터셋 검색 (예: 청년, 사업체, 시설)" onkeydown="if(event.key==='Enter')searchCatalog()">
+      <select id="sort-catalog">
+        <option value="high_value">고가치 순</option>
+        <option value="updated_at">최신 수정 순</option>
+        <option value="rows">데이터 규모 순</option>
+        <option value="title">제목 가나다 순</option>
+      </select>
       <button onclick="searchCatalog()">검색</button>
     </div>
     <div class="cards c3" id="catalog"></div>
