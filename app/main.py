@@ -201,6 +201,7 @@ def submission_detail(submission_id: str):
     detail["quality"] = diag
     detail["meta"]["comment_count"] = len(detail["comments"])
     detail["contribution"] = evaluation.compute_submission_contribution(detail["meta"])
+    detail["ai_ready_checklist"] = evaluation.compute_ai_ready_checklist(detail["meta"])
     return detail
 
 
