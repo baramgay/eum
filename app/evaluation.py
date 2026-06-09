@@ -16,6 +16,60 @@ AREAS = [
 ]
 
 
+_MACHINE_READABLE_FORMATS = {"csv", "json", "xlsx", "parquet", "tsv", "geojson"}
+
+
+def compute_ai_ready_checklist(row: dict) -> dict:
+    """제출(submission) 1건의 AI 친화성(AI-Ready) 체크리스트를 평가한다.
+    row: submissions 테이블 행(dict) — quality_summary/rows/description/title/
+         theme/keywords/license/format 포함."""
+    quality_summary = str(row.get("quality_summary") or "")
+    stripped = quality_summary.rstrip()
+    quality_passed = stripped.endswith("통과") and not stripped.endswith("미통과")
+    rows = row.get("rows") or 0
+    description = str(row.get("description") or "").strip()
+    title = str(row.get("title") or "").strip()
+    theme = str(row.get("theme") or "").strip()
+    keywords = str(row.get("keywords") or "").strip()
+    license_ = str(row.get("license") or "").strip()
+    fmt = str(row.get("format") or "").strip().lower()
+
+    checklist = [
+        {
+            "item": "품질진단 통과",
+            "passed": quality_passed,
+            "detail": "오류율 기준 이하, 자동 품질진단 통과" if quality_passed
+                      else f"품질진단 미통과 — {quality_summary or '진단 미실시'}",
+        },
+        {
+            "item": "충분한 데이터 규모 (30행 이상)",
+            "passed": rows >= 30,
+            "detail": f"{rows:,}행 — AI 학습에 적정한 규모 확보" if rows >= 30
+                      else f"{rows:,}행 — 최소 30행 이상 권장",
+        },
+        {
+            "item": "메타데이터 충실 (제목·설명·주제·키워드)",
+            "passed": bool(title and theme and keywords and len(description) >= 20),
+            "detail": "제목·설명·주제·키워드가 모두 충실히 입력됨" if (title and theme and keywords and len(description) >= 20)
+                      else "제목·설명(20자 이상)·주제·키워드를 모두 입력해야 합니다",
+        },
+        {
+            "item": "라이선스 명시",
+            "passed": bool(license_),
+            "detail": f"라이선스: {license_}" if license_
+                      else "라이선스가 명시되지 않았습니다 — CC BY 4.0 등 명시 권장",
+        },
+        {
+            "item": "기계가독 형식 (CSV/JSON/Parquet 등)",
+            "passed": fmt in _MACHINE_READABLE_FORMATS,
+            "detail": f"형식 {fmt.upper()} — AI 학습 도구에서 직접 읽기 가능" if fmt in _MACHINE_READABLE_FORMATS
+                      else f"형식 {fmt.upper() if fmt else '미지정'} — CSV/JSON/Parquet 등 기계가독 형식 권장",
+        },
+    ]
+    ai_ready = all(c["passed"] for c in checklist)
+    return {"ai_ready": ai_ready, "checklist": checklist}
+
+
 def compute_submission_contribution(row: dict) -> list[dict]:
     """제출(submission) 1건이 평가편람 5개 영역에 기여하는 내용을 계산한다.
     row는 submissions 테이블 행(dict) — status/quality_summary/rows/comment_count/decision_note 포함."""

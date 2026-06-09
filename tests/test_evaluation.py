@@ -1,4 +1,4 @@
-from app.evaluation import compute_submission_contribution, AREAS
+from app.evaluation import compute_submission_contribution, compute_ai_ready_checklist, AREAS
 
 
 _AREA_KEYS = [a["key"] for a in AREAS]
@@ -98,3 +98,101 @@ def test_mgmt_requires_decision_status_and_nonblank_note():
 
     assert _by_key(approved_no_note)["mgmt"]["contributes"] is False
     assert _by_key(rejected_with_note)["mgmt"]["contributes"] is True
+
+
+# ---- compute_ai_ready_checklist 테스트 ----
+
+def _cl_by_item(checklist):
+    """체크리스트 항목명을 키로 하는 딕셔너리 반환."""
+    return {c["item"]: c for c in checklist}
+
+
+def test_ai_ready_checklist_all_pass():
+    """모든 조건 충족 행 → ai_ready True, 5개 항목 모두 passed True."""
+    row = {
+        "quality_summary": "규칙 4종 / 오류 0건 / 오류율 0.0% / 통과",
+        "rows": 100,
+        "description": "경남 청년 인구 통계 데이터셋입니다. 시군구별 연령대별 집계.",
+        "title": "경남 청년 인구 통계",
+        "theme": "인구",
+        "keywords": "청년,인구,경남",
+        "license": "CC BY 4.0",
+        "format": "csv",
+    }
+    result = compute_ai_ready_checklist(row)
+    assert result["ai_ready"] is True
+    assert len(result["checklist"]) == 5
+    for c in result["checklist"]:
+        assert c["passed"] is True, f"항목 '{c['item']}' 실패 — {c['detail']}"
+
+
+def test_ai_ready_checklist_quality_fail():
+    """품질 미통과 행 → ai_ready False, 품질 항목 passed False."""
+    row = {
+        "quality_summary": "규칙 4종 / 오류 12건 / 오류율 3.0% / 미통과",
+        "rows": 100,
+        "description": "경남 청년 인구 통계 데이터셋입니다. 시군구별 연령대별 집계.",
+        "title": "경남 청년 인구 통계",
+        "theme": "인구",
+        "keywords": "청년,인구,경남",
+        "license": "CC BY 4.0",
+        "format": "csv",
+    }
+    result = compute_ai_ready_checklist(row)
+    assert result["ai_ready"] is False
+    cl = _cl_by_item(result["checklist"])
+    assert cl["품질진단 통과"]["passed"] is False
+
+
+def test_ai_ready_checklist_rows_too_few():
+    """rows < 30 행 → ai_ready False, 규모 항목 passed False."""
+    row = {
+        "quality_summary": "규칙 4종 / 오류 0건 / 오류율 0.0% / 통과",
+        "rows": 10,
+        "description": "경남 청년 인구 통계 데이터셋입니다. 시군구별 연령대별 집계.",
+        "title": "경남 청년 인구 통계",
+        "theme": "인구",
+        "keywords": "청년,인구,경남",
+        "license": "CC BY 4.0",
+        "format": "csv",
+    }
+    result = compute_ai_ready_checklist(row)
+    assert result["ai_ready"] is False
+    cl = _cl_by_item(result["checklist"])
+    assert cl["충분한 데이터 규모 (30행 이상)"]["passed"] is False
+
+
+def test_ai_ready_checklist_description_too_short():
+    """description < 20자 행 → ai_ready False, 메타데이터 항목 passed False."""
+    row = {
+        "quality_summary": "규칙 4종 / 오류 0건 / 오류율 0.0% / 통과",
+        "rows": 100,
+        "description": "짧은설명",
+        "title": "경남 청년 인구 통계",
+        "theme": "인구",
+        "keywords": "청년,인구,경남",
+        "license": "CC BY 4.0",
+        "format": "csv",
+    }
+    result = compute_ai_ready_checklist(row)
+    assert result["ai_ready"] is False
+    cl = _cl_by_item(result["checklist"])
+    assert cl["메타데이터 충실 (제목·설명·주제·키워드)"]["passed"] is False
+
+
+def test_ai_ready_checklist_non_machine_readable_format():
+    """비기계가독 형식(HWP) 행 → ai_ready False, 형식 항목 passed False."""
+    row = {
+        "quality_summary": "규칙 4종 / 오류 0건 / 오류율 0.0% / 통과",
+        "rows": 100,
+        "description": "경남 청년 인구 통계 데이터셋입니다. 시군구별 연령대별 집계.",
+        "title": "경남 청년 인구 통계",
+        "theme": "인구",
+        "keywords": "청년,인구,경남",
+        "license": "CC BY 4.0",
+        "format": "hwp",
+    }
+    result = compute_ai_ready_checklist(row)
+    assert result["ai_ready"] is False
+    cl = _cl_by_item(result["checklist"])
+    assert cl["기계가독 형식 (CSV/JSON/Parquet 등)"]["passed"] is False
