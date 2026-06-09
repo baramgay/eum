@@ -65,13 +65,27 @@ def dataset(dataset_id: str, limit: int = 20):
     if not meta:
         return JSONResponse({"error": "not found"}, status_code=404)
     meta = meta[0]
+    # 발행기관(publisher) 이름을 tenants 테이블에서 조회해 포함시킨다
+    tenant_row = db.query("SELECT name FROM tenants WHERE tenant_id = ?", [meta["tenant_id"]])
+    meta["publisher"] = tenant_row[0]["name"] if tenant_row else meta["tenant_id"]
     # 활용 로그 기록(평가 활용도 지표 반영)
     db.execute("INSERT INTO usage_log VALUES (?,?,?)",
                [dataset_id, "view",
                 datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
     preview = db.query(f"SELECT * FROM {meta['table_name']} LIMIT {int(limit)}")
     q = db.query("SELECT * FROM quality_results WHERE dataset_id = ?", [dataset_id])
-    return {"meta": meta, "preview": preview, "quality": q[0] if q else None}
+    # quality_results.detail은 DB에 문자열로 저장되므로 파이썬 리스트로 역직렬화한다
+    quality = None
+    if q:
+        import ast
+        quality = dict(q[0])
+        raw_detail = quality.get("detail")
+        if isinstance(raw_detail, str):
+            try:
+                quality["detail"] = ast.literal_eval(raw_detail)
+            except Exception:
+                quality["detail"] = []
+    return {"meta": meta, "preview": preview, "quality": quality}
 
 
 # ---------- L3 품질 ----------

@@ -54,31 +54,99 @@ const badge = (st) => ({ok:'<span class="badge b-ok">충족</span>', warn:'<span
 async function searchCatalog() {
   const q = $('#q').value.trim();
   const rows = await api('/api/catalog' + (q ? '?q=' + encodeURIComponent(q) : ''));
-  $('#catalog').innerHTML = rows.length ? rows.map(d => `
-    <div class="ds" onclick="openDataset('${d.dataset_id}')">
+  $('#catalog').innerHTML = rows.length ? rows.map(d => {
+    const desc = d.description ? d.description.slice(0, 80) : '';
+    const kw   = d.keywords   ? d.keywords.slice(0, 30)   : '';
+    return `<div class="ds" onclick="openDataset('${d.dataset_id}')">
       <h4>${esc(d.title)}</h4>
+      ${desc ? `<div class="page-sub" style="margin:2px 0 6px;font-size:12.5px">${esc(desc)}${d.description.length > 80 ? '…' : ''}</div>` : ''}
       <div class="meta">${esc(d.theme)} · ${Number(d.rows).toLocaleString()}행 · ${esc(d.format)}</div>
       <div class="tags">
-        ${d.is_open ? '<span class="badge b-ok">개방</span>' : ''}
+        ${d.is_open  ? '<span class="badge b-ok">개방</span>'     : ''}
         ${d.ai_ready ? '<span class="badge b-ai">AI-Ready</span>' : ''}
         ${d.high_value ? '<span class="badge b-hv">고가치</span>' : ''}
-      </div></div>`).join('') : '<div class="loading">검색 결과가 없습니다.</div>';
+        ${kw ? `<span class="badge b-na">${esc(kw)}${d.keywords.length > 30 ? '…' : ''}</span>` : ''}
+      </div></div>`;
+  }).join('') : '<div class="loading">검색 결과가 없습니다.</div>';
 }
 
 async function openDataset(id) {
   const d = await api('/api/dataset/' + id);
+  const m = d.meta;
   const cols = d.preview.length ? Object.keys(d.preview[0]) : [];
   const q = d.quality;
+
+  /* 배지 행 */
+  const layerBadge = m.layer === 'gold'   ? '<span class="badge b-hv">Gold</span>'
+                   : m.layer === 'silver' ? '<span class="badge b-ai">Silver</span>'
+                   : m.layer             ? '<span class="badge b-na">Bronze</span>' : '';
+  const badges = [
+    m.is_open   ? '<span class="badge b-ok">개방</span>'     : '',
+    m.ai_ready  ? '<span class="badge b-ai">AI-Ready</span>' : '',
+    m.high_value? '<span class="badge b-hv">고가치</span>'    : '',
+    m.format    ? `<span class="badge b-na">${esc(m.format)}</span>` : '',
+    layerBadge,
+  ].filter(Boolean).join(' ');
+
+  /* DCAT 메타데이터 2열 그리드 — .ind 클래스 재사용 */
+  function row(label, value) {
+    return `<div class="ind"><div class="nm">${esc(label)}</div><div class="vl" style="font-size:13px;font-weight:400;color:var(--ink)">${esc(value ?? '')}</div></div>`;
+  }
+  const metaGrid = [
+    row('발행기관',  m.publisher),
+    row('주제 분류', m.theme),
+    row('키워드',    m.keywords),
+    row('라이선스',  m.license),
+    row('형식',      m.format),
+    row('규모',      `${Number(m.rows).toLocaleString()}행`),
+    row('수정일',    m.updated_at),
+  ].join('');
+
+  /* 품질 진단 섹션 */
+  let qualityHtml = '';
+  if (q) {
+    const passedBadge = q.passed
+      ? '<span class="badge b-ok">기준 충족</span>'
+      : '<span class="badge b-red">기준 미달</span>';
+    const detailList = Array.isArray(q.detail) && q.detail.length
+      ? q.detail.map(x => `<div class="ind"><div class="nm" style="font-size:12.5px">${esc(x.rule)}</div><div class="vl" style="font-size:12.5px">${esc(String(x.violations))}건</div></div>`).join('')
+      : '';
+    qualityHtml = `
+      <h3 style="margin:18px 0 6px">품질 진단 결과</h3>
+      <div class="note" style="margin:0 0 8px">규칙 ${q.rule_count}개 · 오류 ${q.errors}건 · 오류율 ${q.error_rate}% &nbsp; ${passedBadge}</div>
+      ${detailList ? `<div style="margin:0 0 12px">${detailList}</div>` : ''}`;
+  }
+
+  /* 스키마 배지 */
+  const schemaHtml = cols.length ? `
+    <h3 style="margin:18px 0 6px">스키마 <small style="font-weight:400;color:var(--muted)">(${cols.length}개 컬럼)</small></h3>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px">
+      ${cols.map(c => `<span class="badge b-na">${esc(c)}</span>`).join('')}
+    </div>` : '';
+
+  /* 미리보기 테이블 */
+  const previewHtml = d.preview.length ? `
+    <h3 style="margin:18px 0 6px">데이터 미리보기 <small style="font-weight:400;color:var(--muted)">(상위 ${d.preview.length}행)</small></h3>
+    <div style="overflow:auto;max-height:320px"><table><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
+    <tbody>${d.preview.map(r => `<tr>${cols.map(c => `<td>${esc(r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '';
+
   $('#modal-root').innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()">
     <div class="box">
       <button class="x" onclick="closeModal()">&times;</button>
-      <h2>${esc(d.meta.title)}</h2>
-      <div class="page-sub">${esc(d.meta.description)} · 라이선스 ${esc(d.meta.license)}</div>
-      ${q ? `<div class="note">품질진단: 규칙 ${q.rule_count}개 · 오류 ${q.errors}건 · 오류율 ${q.error_rate}% ·
-        ${q.passed ? '<span class="badge b-ok">기준 충족</span>' : '<span class="badge b-red">기준 미달(0.001%)</span>'}</div>` : ''}
-      <h3>데이터 미리보기 (상위 ${d.preview.length}행)</h3>
-      <div style="overflow:auto;max-height:360px"><table><thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
-      <tbody>${d.preview.map(r => `<tr>${cols.map(c => `<td>${esc(r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      <h2>${esc(m.title)}</h2>
+      <div style="margin:6px 0 14px">${badges}</div>
+
+      <div style="border:1px solid var(--line);border-radius:10px;padding:4px 14px;margin-bottom:16px">
+        ${metaGrid}
+      </div>
+
+      ${m.description ? `<h3 style="margin:0 0 6px">설명</h3><p style="margin:0 0 16px;font-size:13.5px;color:var(--ink)">${esc(m.description)}</p>` : ''}
+
+      ${qualityHtml}
+      ${schemaHtml}
+      ${previewHtml}
+
+      <div style="margin-top:20px"><button class="btn btn-o" onclick="closeModal()">닫기</button></div>
     </div></div>`;
 }
 const closeModal = () => $('#modal-root').innerHTML = '';
