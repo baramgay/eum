@@ -199,6 +199,7 @@ def submission_detail(submission_id: str):
     detail = submission.get_submission(submission_id)
     diag = quality.run_quality_generic(detail["meta"]["table_name"])
     detail["quality"] = diag
+    detail["recommendations"] = quality.generate_quality_recommendations(diag)
     detail["meta"]["comment_count"] = len(detail["comments"])
     detail["contribution"] = evaluation.compute_submission_contribution(detail["meta"])
     detail["ai_ready_checklist"] = evaluation.compute_ai_ready_checklist(detail["meta"])
