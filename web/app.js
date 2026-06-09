@@ -420,6 +420,13 @@ searchCatalog();
     const recsHtml = recs.length ? `
   <h4>품질개선 권고</h4>
   <ul>${recs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>` : '';
+    const cands = detail.ontology_candidates || [];
+    const candHtml = cands.length ? `
+  <h4>온톨로지 연계 후보</h4>
+  <div class="chips">${cands.map((c) =>
+    `<span class="badge b-hv" title="${esc(c.reason)}">${esc(c.obj_type)}</span>`
+  ).join(' ')}</div>
+  <p class="note">${esc(cands.map((c) => `${c.obj_type}: ${c.reason}`).join(' / '))}</p>` : '';
     modalRoot.innerHTML = `
       <div class="modal">
         <div class="box">
@@ -437,6 +444,7 @@ searchCatalog();
           <div>${(function(){const aicl=detail.ai_ready_checklist||{ai_ready:false,checklist:[]};return aicl.checklist.map((c)=>`<div class="ind"><div class="nm">${esc(c.item)}<small>${esc(c.detail)}</small></div><div class="vl">${c.passed?'<span class="badge b-ai">충족</span>':'<span class="badge b-warn">미충족</span>'}</div></div>`).join('');})()}</div>
           <h4>평가 기여도</h4>
           <div>${renderContributionRows(detail.contribution)}</div>
+          ${candHtml}
           ${recsHtml}
           <h4>센터 코멘트</h4>
           ${detail.comments.length
@@ -670,6 +678,13 @@ searchCatalog();
     const recsHtml = recs.length ? `
   <h4>품질개선 권고 <button class="btn btn-o" id="btn-save-rec">코멘트로 저장</button></h4>
   <ul>${recs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>` : '';
+    const cands = detail.ontology_candidates || [];
+    const candHtml = cands.length ? `
+  <h4>온톨로지 연계 후보</h4>
+  <div class="chips">${cands.map((c) =>
+    `<span class="badge b-hv" title="${esc(c.reason)}">${esc(c.obj_type)}</span>`
+  ).join(' ')}</div>
+  <p class="note">${esc(cands.map((c) => `${c.obj_type}: ${c.reason}`).join(' / '))}</p>` : '';
 
     modalRoot.innerHTML = `
       <div class="modal">
@@ -682,6 +697,7 @@ searchCatalog();
           <div>${(function(){const aicl=detail.ai_ready_checklist||{ai_ready:false,checklist:[]};return aicl.checklist.map((c)=>`<div class="ind"><div class="nm">${esc(c.item)}<small>${esc(c.detail)}</small></div><div class="vl">${c.passed?'<span class="badge b-ai">충족</span>':'<span class="badge b-warn">미충족</span>'}</div></div>`).join('');})()}</div>
           <h4>평가 기여도</h4>
           <div>${renderContributionRows(detail.contribution)}</div>
+          ${candHtml}
           <p><strong>권장 조치</strong> ${esc(computeRecommendedAction(mAug))}</p>
           ${recsHtml}
           ${q ? `
