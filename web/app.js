@@ -361,6 +361,8 @@ searchCatalog();
             </p>
             <p><input type="text" id="decision-note" placeholder="결정 메모(선택)"></p>
           ` : ''}
+          <h4>AI-Ready 체크리스트 ${(function(){const aicl=detail.ai_ready_checklist||{ai_ready:false,checklist:[]};return aicl.ai_ready?'<span class="badge b-ai">AI-Ready</span>':'<span class="badge b-warn">AI-Ready 아님</span>';})()}</h4>
+          <div>${(function(){const aicl=detail.ai_ready_checklist||{ai_ready:false,checklist:[]};return aicl.checklist.map((c)=>`<div class="ind"><div class="nm">${esc(c.item)}<small>${esc(c.detail)}</small></div><div class="vl">${c.passed?'<span class="badge b-ai">충족</span>':'<span class="badge b-warn">미충족</span>'}</div></div>`).join('');})()}</div>
           <h4>평가 기여도</h4>
           <div>${renderContributionRows(detail.contribution)}</div>
           <h4>센터 코멘트</h4>
@@ -599,6 +601,8 @@ searchCatalog();
           <p class="note">제출 ID: ${esc(m.submission_id)} · 제출기관: ${esc(tenantName)} · 제출일시: ${esc(m.submitted_at || '')}</p>
           <p>${esc(m.description)}</p>
           <p>${renderCenterBadges(mAug)}</p>
+          <h4>AI-Ready 체크리스트 ${(function(){const aicl=detail.ai_ready_checklist||{ai_ready:false,checklist:[]};return aicl.ai_ready?'<span class="badge b-ai">AI-Ready</span>':'<span class="badge b-warn">AI-Ready 아님</span>';})()}</h4>
+          <div>${(function(){const aicl=detail.ai_ready_checklist||{ai_ready:false,checklist:[]};return aicl.checklist.map((c)=>`<div class="ind"><div class="nm">${esc(c.item)}<small>${esc(c.detail)}</small></div><div class="vl">${c.passed?'<span class="badge b-ai">충족</span>':'<span class="badge b-warn">미충족</span>'}</div></div>`).join('');})()}</div>
           <h4>평가 기여도</h4>
           <div>${renderContributionRows(detail.contribution)}</div>
           <p><strong>권장 조치</strong> ${esc(computeRecommendedAction(mAug))}</p>
