@@ -2,7 +2,7 @@
 const $ = (s) => document.querySelector(s);
 const api = (p) => fetch(p).then(r => r.json());
 const apiPost = (p) => fetch(p, {method:'POST'}).then(r => r.json());
-const esc = (s) => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---------- 탭 전환 ---------- */
 document.querySelectorAll('#nav button').forEach(b => {

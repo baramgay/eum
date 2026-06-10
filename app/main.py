@@ -6,6 +6,7 @@ FastAPI 단일 진입점. 백엔드 모듈을 REST API로 노출하고
 import os
 import re
 import datetime
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, UploadFile, File, Form
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -16,11 +17,9 @@ from . import seed_data, quality, evaluation, ontology, nlquery, submission, pla
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB_DIR = os.path.join(BASE_DIR, "web")
 
-app = FastAPI(title="이음(EUM) 플랫폼 API", version="0.1.0")
 
-
-@app.on_event("startup")
-def _startup():
+@asynccontextmanager
+async def _lifespan(app: FastAPI):
     db.init_schema()
     # 데이터가 비어있으면 시드 + 파이프라인 자동 실행
     n = db.query("SELECT count(*) c FROM catalog")[0]["c"]
@@ -28,6 +27,10 @@ def _startup():
         seed_data.run_seed()
         quality.run_all()
         ontology.build_ontology()
+    yield
+
+
+app = FastAPI(title="이음(EUM) 플랫폼 API", version="0.1.0", lifespan=_lifespan)
 
 
 # ---------- 메타/대시보드 ----------
