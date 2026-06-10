@@ -31,6 +31,7 @@ async function loadDashboard() {
 
   $('#overall').textContent = ev.overall;
   $('#ring').style.setProperty('--p', ev.overall);
+  // a.color: server-side constant (AREAS in evaluation.py), not user input
   $('#areabars').innerHTML = ev.areas.map(a => `
     <div class="abar"><div class="top"><b>${esc(a.name)}</b><span>${a.score}점 · ${a.ok}/${a.total}</span></div>
     <div class="track"><div class="fill" style="width:${a.score}%;background:${a.color}"></div></div></div>`).join('');
@@ -186,7 +187,7 @@ async function loadOntology() {
   if (!chipsLoaded) {
     const t = await api('/api/tenants');
     $('#sgg-chips').innerHTML = '<button onclick="drawGraph(\'\')">전체</button>' +
-      t.filter(x => x.onboarded).slice(0, 9).map(x => `<button onclick="drawGraph('${x.sgg_cd}')">${esc(x.name)}</button>`).join('');
+      t.filter(x => x.onboarded).slice(0, 9).map(x => `<button onclick="drawGraph('${esc(x.sgg_cd)}')">${esc(x.name)}</button>`).join('');
     chipsLoaded = true;
   }
   drawGraph('48121'); // 창원시 중심 기본
@@ -415,7 +416,7 @@ searchCatalog();
       const res = await fetch("/api/submission", { method: "POST", body: fd });
       const data = await res.json();
       $("#register-result").innerHTML =
-        `<p class="note">등록 완료 — 자동 진단 결과: ${data.quality_summary}</p>`;
+        `<p class="note">등록 완료 — 자동 진단 결과: ${esc(data.quality_summary)}</p>`;
       e.target.reset();
       e.target.classList.add("hidden");
       uploadedTable = null;
@@ -656,12 +657,13 @@ searchCatalog();
     `).join("");
 
     const contribTotal = contribAgg.total || 0;
+    // a.color: server-side constant (AREAS in evaluation.py), not user input
     $("#center-contribution").innerHTML = (contribAgg.areas || []).map((a) => {
       const pct = contribTotal ? Math.round((a.contributing / contribTotal) * 100) : 0;
       return `
         <div class="abar">
           <div class="top"><b>${esc(a.name)}</b><span>${a.contributing}/${a.total}건 기여 (${pct}%)</span></div>
-          <div class="track"><div class="fill" style="width:${pct}%;background:${esc(a.color)}"></div></div>
+          <div class="track"><div class="fill" style="width:${pct}%;background:${a.color}"></div></div>
         </div>`;
     }).join("") || '<p class="note">집계할 제출이 없습니다.</p>';
 
