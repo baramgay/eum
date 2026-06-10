@@ -4,6 +4,7 @@
 각 데이터셋에 적용 가능한 규칙을 정의하고 위반 건수를 집계한다.
 """
 import datetime
+import json
 from . import database as db
 from .submission import _validate_table_name  # SQL injection 방지용 공유 함수 (그룹 A)
 
@@ -129,7 +130,7 @@ def run_quality(dataset_id):
     db.execute(
         "INSERT INTO quality_results VALUES (?,?,?,?,?,?,?,?)",
         [dataset_id, len(rules), checked, errors, round(rate, 5), passed,
-         str(detail), ran],
+         json.dumps(detail, ensure_ascii=False), ran],
     )
     return {
         "dataset_id": dataset_id, "table": table, "rule_count": len(rules),

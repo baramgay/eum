@@ -4,6 +4,7 @@ FastAPI 단일 진입점. 백엔드 모듈을 REST API로 노출하고
 정적 프론트엔드(SPA)를 서빙한다.
 """
 import ast
+import json
 import os
 import datetime
 from contextlib import asynccontextmanager
@@ -15,6 +16,14 @@ from . import database as db
 from . import seed_data, quality, evaluation, ontology, nlquery, submission, planning
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _parse_detail(raw: str) -> list:
+    """quality_results.detail 역직렬화 — JSON 우선, str(list) 레거시 데이터 폴백."""
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return ast.literal_eval(raw)  # 기존 str(list) 형식 레거시 데이터 처리
 WEB_DIR = os.path.join(BASE_DIR, "web")
 
 
@@ -92,10 +101,7 @@ def dataset(dataset_id: str, limit: int = 20):
         quality = dict(q[0])
         raw_detail = quality.get("detail")
         if isinstance(raw_detail, str):
-            try:
-                quality["detail"] = ast.literal_eval(raw_detail)
-            except Exception:
-                quality["detail"] = []
+            quality["detail"] = _parse_detail(raw_detail)
     return {"meta": meta, "preview": preview, "quality": quality}
 
 
