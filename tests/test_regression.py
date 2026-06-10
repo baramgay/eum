@@ -73,8 +73,8 @@ def test_ontology_graph_returns_nodes_and_edges(client):
 
 # ---------- 6. 공급자 워크플로우 ----------
 
-def test_submission_all_returns_list(client):
-    """/api/submission/all → 200, 결과가 리스트."""
-    r = client.get("/api/submission/all")
+def test_submission_all_returns_list(client, center_auth_header):
+    """/api/submission/all 센터 인증 → 200, 결과가 리스트."""
+    r = client.get("/api/submission/all", headers=center_auth_header)
     assert r.status_code == 200
     assert isinstance(r.json(), list)

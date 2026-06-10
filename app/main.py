@@ -217,7 +217,13 @@ def submission_create(
 
 
 @app.get("/api/submission")
-def submission_list(tenant_id: str = Query(...)):
+def submission_list(
+    tenant_id: str = Query(...),
+    current_user: dict = Depends(auth.get_current_user),
+):
+    # 기관 담당자는 자기 tenant_id 목록만 조회 가능
+    if current_user["role"] == "agency" and current_user["tenant_id"] != tenant_id:
+        raise HTTPException(status_code=403, detail="자신의 기관 데이터만 조회할 수 있습니다")
     return db.query(
         "SELECT s.*, "
         "(SELECT count(*) FROM consultant_comments c WHERE c.submission_id = s.submission_id) AS comment_count "
@@ -226,7 +232,7 @@ def submission_list(tenant_id: str = Query(...)):
 
 
 @app.get("/api/submission/all")
-def submission_list_all():
+def submission_list_all(current_user: dict = Depends(auth.require_center)):
     return db.query(
         "SELECT s.*, "
         "(SELECT count(*) FROM consultant_comments c WHERE c.submission_id = s.submission_id) AS comment_count "

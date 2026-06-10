@@ -3,7 +3,7 @@ import os
 import time
 
 from jose import JWTError, jwt
-from fastapi import Header, HTTPException
+from fastapi import Depends, Header, HTTPException
 
 SECRET = os.getenv("EUM_JWT_SECRET", "eum-demo-secret-2026")
 ALGORITHM = "HS256"
@@ -42,7 +42,7 @@ def get_current_user(authorization: str = Header(default="")) -> dict:
     return decode_token(authorization[7:])
 
 
-def require_center(user: dict = None) -> dict:
+def require_center(user: dict = Depends(get_current_user)) -> dict:
     """센터 역할 필요 라우트용 의존성."""
     if user["role"] != "center":
         raise HTTPException(status_code=403, detail="센터 권한이 필요합니다")

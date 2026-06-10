@@ -79,3 +79,37 @@ def test_plan_draft_invalid_type(client):
     """잘못된 type 파라미터 → 400."""
     r = client.get("/api/plan/draft?tenant_id=48121&type=invalid")
     assert r.status_code == 400
+
+
+# ---------- 6. 멀티테넌트 격리 ----------
+
+def test_submission_list_requires_auth(client):
+    """/api/submission 비인증 요청 → 401."""
+    r = client.get("/api/submission?tenant_id=48121")
+    assert r.status_code == 401
+
+
+def test_submission_list_agency_cross_tenant(client, agency_48121_auth_header):
+    """48121 기관 담당자가 48170 목록 조회 → 403."""
+    r = client.get("/api/submission?tenant_id=48170", headers=agency_48121_auth_header)
+    assert r.status_code == 403
+
+
+def test_submission_list_agency_own_tenant(client, agency_48121_auth_header):
+    """48121 기관 담당자가 자기 목록 조회 → 200."""
+    r = client.get("/api/submission?tenant_id=48121", headers=agency_48121_auth_header)
+    assert r.status_code == 200
+    assert isinstance(r.json(), list)
+
+
+def test_submission_list_all_requires_center(client, agency_48121_auth_header):
+    """/api/submission/all 기관 담당자 요청 → 403."""
+    r = client.get("/api/submission/all", headers=agency_48121_auth_header)
+    assert r.status_code == 403
+
+
+def test_submission_list_all_center_ok(client, center_auth_header):
+    """/api/submission/all 센터 요청 → 200."""
+    r = client.get("/api/submission/all", headers=center_auth_header)
+    assert r.status_code == 200
+    assert isinstance(r.json(), list)
