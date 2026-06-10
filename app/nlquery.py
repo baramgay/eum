@@ -7,6 +7,9 @@
 import re
 from . import database as db
 
+_ADMIN_SUFFIXES = ('시', '군', '구', '동', '읍', '면')
+
+
 def answer(question: str):
     q = (question or "").strip()
     ql = q.replace(" ", "")
@@ -14,7 +17,7 @@ def answer(question: str):
     sigun = None
     for name, cd in [(r["name"], r["sgg_cd"]) for r in
                      db.query("SELECT name, sgg_cd FROM tenants")]:
-        short = name[:-1]  # '창원시'->'창원'
+        short = name[:-1] if name.endswith(_ADMIN_SUFFIXES) else name  # '창원시'->'창원'
         if name in q or short in q:
             sigun = name
             break

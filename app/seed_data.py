@@ -122,9 +122,9 @@ def seed_facility():
             cap = random.choice([50, 100, 200, 300, 0])  # 0은 의도된 이상치
             rows.append((f"FAC{fid:05d}", cd, name, ftype,
                          f"{name} {ftype}", lon, lat, cap))
-    # 좌표 None은 따로 처리
-    for r in rows:
-        db.execute("INSERT INTO gold_public_facility VALUES (?,?,?,?,?,?,?,?)", list(r))
+    db.execute("INSERT INTO gold_public_facility VALUES " +
+               ",".join(["(?,?,?,?,?,?,?,?)"] * len(rows)),
+               [v for r in rows for v in r])
     return len(rows)
 
 
