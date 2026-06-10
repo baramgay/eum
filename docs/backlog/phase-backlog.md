@@ -1,70 +1,60 @@
 # 이음(EUM) 플랫폼 — 페이즈별 백로그
 
-> 작성일: 2026-06-09  
-> 기준 브랜치: `feature/공급자-워크플로우` (Phase 1 MVP 완료, Stretch A~I 포함)  
+> 작성일: 2026-06-09 / 최종 업데이트: 2026-06-10  
+> 기준 브랜치: `master` (Phase 1 전체 완료)  
 > 작성 근거: `docs/specs/plans/2026-06-08-공급자워크플로우-progress.md` 잔여 부채 섹션 및 코드 리뷰 비차단 메모 종합
 
 ---
 
-## Phase 1 잔여 (현재 MVP 개선 — 짧은 기간 내 처리 권장)
+## Phase 1 잔여 (✅ 2026-06-10 전체 완료)
 
-### 테스트 격리 (pytest 공유 DB 문제)
+### ✅ 테스트 격리 (pytest 공유 DB 문제) — 완료
 
-- **목적**: 현재 pytest가 `data/eum.duckdb`를 직접 사용해 테스트 실행 후 더미 데이터가 운영 DB에 누적된다. 테스트 전용 임시 DB를 픽스처로 격리해 운영 DB를 오염시키지 않아야 한다.
-- **예상 변경 파일**: `tests/conftest.py`(신규 — 임시 DuckDB 픽스처 정의), `tests/test_submission.py`, `tests/test_planning.py`, `tests/test_quality_generic.py`, `tests/test_api.py`, `tests/test_regression.py`, `tests/test_xss.py` (기존 픽스처 교체)
-- **위험도**: 낮음
-- **선행 조건**: 없음
-- **완료 기준**: `pytest tests/ -v` 실행 후 `data/eum.duckdb` 데이터 변화 없음, 모든 테스트가 격리된 임시 DB를 사용하도록 전환됨
+- **완료 커밋**: `b408d74` — "test: pytest 격리 설정 추가"
+- **완료 내용**: `tests/conftest.py` 신규 생성 (scope="session" 임시 DuckDB 픽스처), `center_auth_header`·`agency_48121_auth_header` 픽스처 포함. 59/59 테스트 통과, 운영 DB 오염 없음.
 
 ---
 
-### 인증 레이어 추가 (OAuth2/OIDC 또는 기본 JWT)
+### ✅ 인증 레이어 추가 (데모 JWT) — 완료
 
-- **목적**: 현재 로그인 없이 누구나 어떤 테넌트로도 전환 가능해 운영 배포 불가 상태다. 기관 담당자는 자기 테넌트 데이터만, 센터는 전체 데이터를 볼 수 있도록 인증 기반 접근 제어가 필요하다.
-- **예상 변경 파일**: `app/auth.py`(신규 — 토큰 발급·검증), `app/main.py`(미들웨어 추가 및 라우트 의존성 주입), `web/app.js`(토큰 저장·갱신·Authorization 헤더 첨부), `web/index.html`(로그인 화면 추가)
-- **위험도**: 높음 (모든 API에 영향, 기존 프런트엔드 요청 흐름 전면 변경)
-- **선행 조건**: 공공기관 신원 관리 시스템(경남도 SSO 또는 독립 IdP) 방향 결정
-- **완료 기준**: 미인증 요청 → 401 반환, 기관 담당자 토큰으로 자기 `tenant_id`만 접근 가능, 센터 토큰으로 전체 조회 가능
+- **완료 커밋**: `a98c9b3` — "feat(auth): demo JWT 인증 레이어 추가"
+- **완료 내용**: `app/auth.py` 신규 (HS256 JWT, 8시간 TTL, 데모 계정 3종), `POST /api/login`, 6개 보호 라우트에 `Depends(auth.get_current_user)`/`Depends(auth.require_center)` 의존성 주입, `web/app.js`에 로그인/로그아웃 UI + `getAuthHeaders()`, `web/index.html`에 로그인 모달. 미인증 → 401, 브라우저 E2E 검증 완료.
+- **운영 전 후속**: `EUM_JWT_SECRET` 환경변수 교체, 경남도 SSO(외부 IdP) 연동 필요.
 
 ---
 
-### 멀티테넌트 데이터 격리 강화
+### ✅ 멀티테넌트 데이터 격리 강화 — 완료
 
-- **목적**: 현재 `tenant_id` 필터에만 의존하며 라우트 레벨 소유권 검증이 없다. 기관 A 토큰으로 기관 B의 `submission_id`에 접근하는 시나리오를 차단해야 한다.
-- **예상 변경 파일**: `app/main.py`(제출 상세·결정·코멘트 라우트에 소유권 검증 추가), `app/submission.py`(`get_submission`에 `tenant_id` 소유자 확인 로직 추가)
-- **위험도**: 보통
-- **선행 조건**: 인증 레이어 추가 (토큰에서 `tenant_id` 추출 가능해야 함)
-- **완료 기준**: 기관 A 토큰으로 기관 B의 `submission_id` 접근 시 403 반환
+- **완료 커밋**: `cd28c51` — "feat(auth): 멀티테넌트 격리 완성 및 require_center 의존성 수정"
+- **완료 내용**: `GET /api/submission` 인증 필수·agency는 자기 tenant_id만 조회, `GET /api/submission/all` 센터 전용 격리. `require_center` `Depends(get_current_user)` 명시 (None 버그 수정). 멀티테넌트 격리 테스트 5개 추가, 59/59 통과.
 
 ---
 
-### esc() 속성 컨텍스트 확장 (`"` 이스케이프)
+### ✅ esc() 속성 컨텍스트 확장 (`"` 이스케이프) — 완료
 
-- **목적**: 현재 `esc()` 헬퍼는 `&`, `<`, `>` 3종만 처리한다. `href` 속성이나 이벤트 속성 값으로 삽입될 경우 `"` 미이스케이프로 인한 속성 탈출 위험이 존재한다(Stretch H `docs/security/xss-review.md`에 알려진 제약으로 기록됨).
-- **예상 변경 파일**: `web/app.js` (esc 함수 1줄 수정 — `"` → `&quot;` 치환 추가)
-- **위험도**: 낮음
-- **선행 조건**: 없음
-- **완료 기준**: `esc('"')` → `&quot;`, 기존 텍스트 노드 렌더링 정상 유지, `tests/test_xss.py`에 `"` 이스케이프 케이스 추가
+- **완료 커밋**: `8bead78` (잔여 보간 지점 esc 적용), `3d61aef` (테스트 정렬)
+- **완료 내용**: `esc()` 함수에 `"` → `&quot;` 치환 추가(4종 완전 적용), `tests/test_xss.py`에 `esc('"')`·`esc(0)`·`esc(None)` 케이스 3개 추가.
 
 ---
 
-### FastAPI lifespan 마이그레이션 (`on_event` deprecated 경고 제거)
+### ✅ FastAPI lifespan 마이그레이션 (`on_event` deprecated 경고 제거) — 완료
 
-- **목적**: `@app.on_event("startup")` 방식이 FastAPI에서 deprecated되어 pytest 실행 시 `DeprecationWarning`이 발생한다. `@asynccontextmanager lifespan` 패턴으로 전환해 경고를 제거한다.
-- **예상 변경 파일**: `app/main.py` (startup 핸들러를 lifespan 컨텍스트 매니저로 리팩터링)
-- **위험도**: 낮음
-- **선행 조건**: 없음
-- **완료 기준**: `pytest tests/ -v` 실행 시 `StarletteDeprecationWarning`/`DeprecationWarning`(on_event 관련) 0건
+- **완료 커밋**: `2cf00ec` — (lifespan 컨텍스트 매니저 전환 포함)
+- **완료 내용**: `@app.on_event("startup")` → `@asynccontextmanager lifespan` 전환. on_event 관련 DeprecationWarning 제거.
 
 ---
 
-### quality_results.detail DB 저장 형식 JSON 전환
+### ✅ quality_results.detail DB 저장 형식 JSON 전환 — 완료
 
-- **목적**: 현재 품질진단 결과의 `detail` 필드가 `str(list)` 형태로 저장되어 읽을 때 `ast.literal_eval`에 의존한다. Stretch D에서 임시 수정했으나 근본적으로 `json.dumps`/`json.loads`로 전환해야 한다.
-- **예상 변경 파일**: `app/database.py`(해당 컬럼 저장 방식 변경 또는 마이그레이션 스크립트), `app/quality.py`(`json.dumps`로 저장), `app/main.py`(`json.loads`로 파싱, `ast.literal_eval` 제거)
-- **위험도**: 보통 (기존 `str(list)` 형식으로 저장된 DB 레코드 마이그레이션 필요)
-- **선행 조건**: 없음
-- **완료 기준**: `ast.literal_eval` 사용 코드 0줄, pytest 51건 모두 통과
+- **완료 커밋**: `f991bf6` — "fix(ui,db): hide empty plan-draft block, add favicon, JSON-ify quality detail"
+- **완료 내용**: `app/quality.py`에서 `str(detail)` → `json.dumps(detail, ensure_ascii=False)`, `app/main.py`에 `_parse_detail()` 헬퍼(json.loads 우선·ast.literal_eval 레거시 폴백). 59/59 통과.
+
+---
+
+### ✅ 코드 리뷰 보안 수정 (database/submission/ontology/evaluation/nlquery/seed) — 완료
+
+- **완료 커밋**: `e075661`, `436382b`, `6a17615`, `e7b1c16`
+- **완료 내용**: DB RLock 경쟁 조건 수정, table_name SQL injection 방지, `get_submission` 404 처리, submission_decision status 검증, CSV 업로드 락, ontology None 가드, `_is_quality_passed` 헬퍼 추출, nlquery 행정명 suffix 안전 처리, seed_data 배치 INSERT 전환.
 
 ---
 
