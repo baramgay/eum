@@ -11,7 +11,7 @@ export async function GET(
   const { key } = await params
   if (!ALLOWED_KEYS.has(key)) {
     return NextResponse.json(
-      { error: `알 수 없는 액션: ${key}. 허용: ${[...ALLOWED_KEYS].join(', ')}` },
+      { error: `알 수 없는 액션: ${key}. 허용: ${Array.from(ALLOWED_KEYS).join(', ')}` },
       { status: 400 }
     )
   }

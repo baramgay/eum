@@ -16,7 +16,7 @@ export async function GET(
 
   const role       = user.user_metadata?.role as string
   const userTenant = user.user_metadata?.tenant_id as string
-  if (role === 'agency' && sub.tenant_id !== userTenant) {
+  if (role === 'agency' && sub.meta?.tenant_id !== userTenant) {
     return NextResponse.json({ error: '접근 권한이 없습니다' }, { status: 403 })
   }
 

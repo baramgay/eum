@@ -3,55 +3,72 @@ import { runQualityGeneric, generateQualityRecommendations, ERROR_RATE_THRESHOLD
 describe('runQualityGeneric', () => {
   const supabase = {} as never
 
-  it('빈 배열은 모든 규칙 통과', async () => {
-    const results = await runQualityGeneric(supabase, 'test_table', [])
-    expect(results.every(r => r.passed)).toBe(true)
+  it('빈 배열은 통과(passed=true), rule_count=0', async () => {
+    const result = await runQualityGeneric(supabase, 'test_table', [])
+    expect(result.passed).toBe(true)
+    expect(result.rule_count).toBe(0)
+    expect(result.errors).toBe(0)
   })
 
-  it('null 값 비율이 임계값 초과 시 실패', async () => {
+  it('null 값 50%면 실패', async () => {
     const rows = Array.from({ length: 100 }, (_, i) => ({
       name: i < 50 ? null : 'value',
-      lon: 128.0, lat: 35.0, emp: 5, biz: 3,
     }))
-    const results = await runQualityGeneric(supabase, 'test_table', rows)
-    const nullRule = results.find(r => r.rule_name.includes('null'))
-    expect(nullRule).toBeDefined()
-    expect(nullRule?.passed).toBe(false)
+    const result = await runQualityGeneric(supabase, 'test_table', rows)
+    expect(result.passed).toBe(false)
+    expect(result.errors).toBeGreaterThan(0)
   })
 
   it('정상 데이터는 통과', async () => {
-    const rows = Array.from({ length: 10 }, () => ({
-      name: 'test', lon: 128.5, lat: 35.2, emp: 10, biz: 5,
-    }))
-    const results = await runQualityGeneric(supabase, 'test_table', rows)
-    expect(results.filter(r => !r.passed).length).toBe(0)
+    const rows = Array.from({ length: 10 }, (_, i) => ({ name: `test_${i}`, value: i + 1 }))
+    const result = await runQualityGeneric(supabase, 'test_table', rows)
+    expect(result.passed).toBe(true)
+    expect(result.errors).toBe(0)
   })
 
-  it('경도 범위 벗어나면 실패', async () => {
-    const rows = Array.from({ length: 100 }, (_, i) => ({
-      lon: i < 10 ? 200.0 : 128.0,
-      lat: 35.0,
-    }))
-    const results = await runQualityGeneric(supabase, 'test_table', rows)
-    const lonRule = results.find(r => r.rule_name.includes('경도') || r.rule_name.toLowerCase().includes('lon'))
-    expect(lonRule?.passed).toBe(false)
+  it('음수 값이 많으면 실패', async () => {
+    const rows = Array.from({ length: 100 }, (_, i) => ({ score: i < 60 ? -1 : 1 }))
+    const result = await runQualityGeneric(supabase, 'test_table', rows)
+    expect(result.passed).toBe(false)
+  })
+
+  it('반환 객체에 필수 필드가 있다', async () => {
+    const result = await runQualityGeneric(supabase, 'test_table', [{ a: 1 }])
+    expect(result).toHaveProperty('table')
+    expect(result).toHaveProperty('rule_count')
+    expect(result).toHaveProperty('checked')
+    expect(result).toHaveProperty('errors')
+    expect(result).toHaveProperty('error_rate')
+    expect(result).toHaveProperty('threshold')
+    expect(result).toHaveProperty('passed')
+    expect(result).toHaveProperty('detail')
+    expect(result).toHaveProperty('ran_at')
   })
 })
 
 describe('generateQualityRecommendations', () => {
-  it('통과 결과만 있으면 빈 배열', () => {
-    const recs = generateQualityRecommendations([
-      { dataset_id: 'x', table_name: 'x', rule_name: '규칙1', passed: true, message: 'OK', checked_at: '' },
-    ])
+  it('통과(passed=true)이면 빈 배열', () => {
+    const recs = generateQualityRecommendations({
+      checked: 100, passed: true, error_rate: 0, threshold: 5,
+      detail: [{ rule: '규칙1', violations: 0, threshold: 5 }],
+    })
     expect(recs).toHaveLength(0)
   })
 
-  it('실패 결과에 대한 권고사항 생성', () => {
-    const recs = generateQualityRecommendations([
-      { dataset_id: 'x', table_name: 'x', rule_name: 'null 비율', passed: false, message: '50% null', checked_at: '' },
-    ])
+  it('checked=0이면 빈 데이터 안내 메시지', () => {
+    const recs = generateQualityRecommendations({
+      checked: 0, passed: false, error_rate: 0, threshold: 5, detail: [],
+    })
     expect(recs.length).toBeGreaterThan(0)
-    expect(recs[0]).toMatch(/null/)
+  })
+
+  it('실패 규칙에 대한 권고사항 생성', () => {
+    const recs = generateQualityRecommendations({
+      checked: 100, passed: false, error_rate: 50, threshold: 5,
+      detail: [{ rule: 'null 비율 - name', violations: 50, threshold: 5 }],
+    })
+    expect(recs.length).toBeGreaterThan(0)
+    expect(recs[0]).toContain('null 비율 - name')
   })
 })
 

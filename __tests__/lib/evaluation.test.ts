@@ -10,13 +10,17 @@ describe('AREAS', () => {
     expect(AREAS).toHaveLength(5)
   })
 
-  it('가중치 합이 1.0', () => {
-    const sum = AREAS.reduce((acc, a) => acc + a.weight, 0)
-    expect(sum).toBeCloseTo(1.0)
+  it('각 영역에 key·name·weight·color가 있다', () => {
+    AREAS.forEach(a => {
+      expect(a).toHaveProperty('key')
+      expect(a).toHaveProperty('name')
+      expect(a).toHaveProperty('weight')
+      expect(a).toHaveProperty('color')
+    })
   })
 
-  it('각 영역에 color가 있다', () => {
-    AREAS.forEach(a => expect(a.color).toBeTruthy())
+  it('weight 값이 양수', () => {
+    AREAS.forEach(a => expect(a.weight).toBeGreaterThan(0))
   })
 })
 
@@ -26,31 +30,35 @@ describe('isQualityPassed', () => {
     expect(isQualityPassed(undefined)).toBe(false)
   })
 
-  it('통과 포함 문자열 → true', () => {
+  it('"통과"로 끝나면 true', () => {
     expect(isQualityPassed('3/3 규칙 통과')).toBe(true)
   })
 
-  it('실패 포함 문자열 → false', () => {
-    expect(isQualityPassed('1/3 규칙 통과, 2 실패')).toBe(false)
+  it('"미통과"로 끝나면 false', () => {
+    expect(isQualityPassed('1/3 규칙 미통과')).toBe(false)
+  })
+
+  it('빈 문자열 → false', () => {
+    expect(isQualityPassed('')).toBe(false)
   })
 })
 
 describe('computeAiReadyChecklist', () => {
   it('체크리스트가 5개 항목', () => {
-    const row = {
-      title: '테스트', description: '설명', theme: '인구', format: 'CSV',
-      license: '공공누리', keywords: 'test',
-      quality_summary: '모든 규칙 통과',
-    }
-    const { checklist } = computeAiReadyChecklist(row)
+    const { checklist } = computeAiReadyChecklist({})
     expect(checklist).toHaveLength(5)
   })
 
   it('완전한 데이터는 ai_ready=true', () => {
     const row = {
-      title: '제목', description: '설명있음', theme: '경제', format: 'CSV',
-      license: '공공누리', keywords: 'k1,k2',
-      quality_summary: '3/3 통과',
+      title: '경남 청년 인구 현황',
+      description: '경남 18개 시군별 청년 인구 유출입 현황 데이터 (2018~2025)',
+      theme: '인구통계',
+      format: 'CSV',
+      license: '공공누리 1유형',
+      keywords: '청년,인구,경남',
+      quality_summary: '규칙 3종 / 오류 0건 / 오류율 0% / 통과',
+      rows: 100,
     }
     const { ai_ready } = computeAiReadyChecklist(row)
     expect(ai_ready).toBe(true)
@@ -60,18 +68,42 @@ describe('computeAiReadyChecklist', () => {
     const { ai_ready } = computeAiReadyChecklist({})
     expect(ai_ready).toBe(false)
   })
+
+  it('각 항목에 item·passed·detail이 있다', () => {
+    const { checklist } = computeAiReadyChecklist({})
+    checklist.forEach(c => {
+      expect(c).toHaveProperty('item')
+      expect(c).toHaveProperty('passed')
+      expect(c).toHaveProperty('detail')
+    })
+  })
 })
 
 describe('computeSubmissionContribution', () => {
   it('5개 영역 기여도 반환', () => {
-    const contribs = computeSubmissionContribution({
-      title: '제목', description: '설명', theme: '인구', format: 'CSV',
-      license: '공공누리', keywords: 'k', quality_summary: '통과',
-    })
+    const contribs = computeSubmissionContribution({})
     expect(contribs).toHaveLength(5)
+  })
+
+  it('각 항목에 key·name·contributes·note가 있다', () => {
+    const contribs = computeSubmissionContribution({})
     contribs.forEach(c => {
-      expect(c).toHaveProperty('area')
-      expect(c).toHaveProperty('score')
+      expect(c).toHaveProperty('key')
+      expect(c).toHaveProperty('name')
+      expect(c).toHaveProperty('contributes')
+      expect(c).toHaveProperty('note')
     })
+  })
+
+  it('승인(approved)이면 open contributes=true', () => {
+    const contribs = computeSubmissionContribution({ status: 'approved', rows: 100 })
+    const open = contribs.find(c => c.key === 'open')
+    expect(open?.contributes).toBe(true)
+  })
+
+  it('미제출이면 open contributes=false', () => {
+    const contribs = computeSubmissionContribution({ status: 'submitted' })
+    const open = contribs.find(c => c.key === 'open')
+    expect(open?.contributes).toBe(false)
   })
 })

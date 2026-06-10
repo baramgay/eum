@@ -19,11 +19,11 @@ export async function POST(
   const body: { status?: string; decision_note?: string } = await req.json()
   if (!body.status || !VALID_STATUSES.has(body.status)) {
     return NextResponse.json(
-      { error: `status는 ${[...VALID_STATUSES].join(', ')} 중 하나여야 합니다` },
+      { error: `status는 ${Array.from(VALID_STATUSES).join(', ')} 중 하나여야 합니다` },
       { status: 400 }
     )
   }
 
-  await recordDecision(supabase, id, body.status, body.decision_note ?? '')
+  await recordDecision(supabase, id, body.status as 'approved' | 'rejected', body.decision_note ?? '')
   return NextResponse.json({ ok: true, submission_id: id, status: body.status })
 }
