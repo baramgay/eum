@@ -16,6 +16,7 @@
       <button data-tab="quality">품질진단</button>
       <button data-tab="ontology">온톨로지</button>
       <button data-tab="ai">자연어 질의</button>
+      <button data-tab="submission">데이터 등록·관리</button>
     </nav>
   </div>
 </header>
@@ -55,7 +56,13 @@
     <div class="page-title">데이터 개방포털 (DCAT 카탈로그)</div>
     <div class="page-sub">메타관리시스템 기반 개방 데이터셋 검색·미리보기·품질 확인</div>
     <div class="search">
-      <input id="q" placeholder="데이터셋 검색 (예: 청년, 사업체, 시설)">
+      <input id="q" placeholder="데이터셋 검색 (예: 청년, 사업체, 시설)" onkeydown="if(event.key==='Enter')searchCatalog()">
+      <select id="sort-catalog">
+        <option value="high_value">고가치 순</option>
+        <option value="updated_at">최신 수정 순</option>
+        <option value="rows">데이터 규모 순</option>
+        <option value="title">제목 가나다 순</option>
+      </select>
       <button onclick="searchCatalog()">검색</button>
     </div>
     <div class="cards c3" id="catalog"></div>
@@ -102,7 +109,20 @@
       <button onclick="runNL()">질의</button>
     </div>
     <div class="chips" id="nlq-samples"></div>
-    <div class="card" style="margin-top:8px"><div id="nlresult" class="loading">질문을 입력하세요.</div></div>
+    <div class="card" style="margin-top:8px"><div id="nlresult"></div></div>
+  </section>
+
+  <section id="tab-submission" class="hidden">
+    <div class="page-title">데이터 등록·관리</div>
+    <div class="page-sub">기관 담당자가 데이터를 등록하고 진단·승인을 직접 결정합니다. 센터는 현황을 모니터링하고 컨설팅 의견을 남깁니다.</div>
+
+    <div class="chips" id="sub-mode-toggle">
+      <button data-mode="agency" class="active">기관 담당자 모드</button>
+      <button data-mode="center">센터(컨설팅) 모드</button>
+    </div>
+
+    <div id="sub-agency-view"></div>
+    <div id="sub-center-view" class="hidden"></div>
   </section>
 </main>
 

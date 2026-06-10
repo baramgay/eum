@@ -33,6 +33,71 @@ RULES = {
     ],
 }
 
+RULES_GENERIC_THRESHOLD = 5.0  # 임의 업로드 데이터는 데모 3종보다 기준을 완화한다 (5%)
+
+NUMERIC_TYPES = {"BIGINT", "INTEGER", "DOUBLE", "FLOAT", "DECIMAL", "HUGEINT"}
+
+
+def generic_rules(table_name: str) -> list[dict]:
+    """테이블 컬럼을 스캔해 결측치·중복·타입일관성·음수이상치 규칙을 동적으로 생성한다."""
+    cols = db.query(f"PRAGMA table_info('{table_name}')")
+    rules = []
+
+    for c in cols:
+        name, ctype = c["name"], c["type"]
+        rules.append({
+            "rule": f"결측치 비율 - {name}",
+            "sql": f'SELECT count(*) FROM {table_name} WHERE "{name}" IS NULL',
+            "threshold": RULES_GENERIC_THRESHOLD,
+        })
+        if ctype in NUMERIC_TYPES:
+            rules.append({
+                "rule": f"음수 이상치 - {name}",
+                "sql": f'SELECT count(*) FROM {table_name} WHERE "{name}" < 0',
+                "threshold": RULES_GENERIC_THRESHOLD,
+            })
+
+    col_list = ", ".join(f'"{c["name"]}"' for c in cols)
+    rules.append({
+        "rule": "중복행 비율",
+        "sql": (
+            f"SELECT count(*) - count(DISTINCT ({col_list})) "
+            f"FROM {table_name}"
+        ),
+        "threshold": RULES_GENERIC_THRESHOLD,
+    })
+    return rules
+
+
+def run_quality_generic(table_name: str) -> dict:
+    """generic_rules()로 만든 규칙을 실행해 run_quality()와 동일한 형태의 결과를 만든다."""
+    total_rows = db.query(f"SELECT count(*) c FROM {table_name}")[0]["c"]
+    rules = generic_rules(table_name)
+
+    detail = []
+    errors = 0
+    for r in rules:
+        viol = list(db.query(r["sql"])[0].values())[0]
+        errors += viol
+        detail.append({"rule": r["rule"], "violations": viol, "threshold": r["threshold"]})
+
+    checked = total_rows * len(rules) if rules else 0
+    rate = (errors / checked * 100) if checked else 0.0
+    passed = rate <= RULES_GENERIC_THRESHOLD
+
+    return {
+        "table": table_name,
+        "rule_count": len(rules),
+        "checked": checked,
+        "errors": errors,
+        "error_rate": round(rate, 4),
+        "threshold": RULES_GENERIC_THRESHOLD,
+        "passed": passed,
+        "detail": detail,
+        "ran_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
 # dataset_id -> table 매핑(카탈로그에서 가져옴)
 def _table_of(dataset_id):
     r = db.query("SELECT table_name FROM catalog WHERE dataset_id = ?", [dataset_id])
@@ -78,3 +143,30 @@ def run_all():
         if res:
             out.append(res)
     return out
+
+
+def generate_quality_recommendations(diag: dict) -> list[str]:
+    """품질진단 결과에서 개선 권고 메시지 목록을 생성한다.
+    diag: run_quality_generic() 또는 run_quality()의 반환값 구조를 따름."""
+    recs = []
+    if diag.get("checked", 0) == 0:
+        recs.append("데이터 행이 없습니다 — 유효한 데이터를 업로드해 주세요.")
+        return recs
+    if diag.get("passed", True):
+        return recs
+    for item in diag.get("detail", []):
+        viol = item.get("violations", 0)
+        rule = item.get("rule", "")
+        thresh = item.get("threshold", 0)
+        if viol > 0:
+            recs.append(
+                f"[{rule}] 위반 {viol:,}건 — 전체 {diag['checked']:,}행의 "
+                f"{viol / diag['checked'] * 100:.2f}% (기준 {thresh}%이하). "
+                f"해당 컬럼의 오류 데이터를 보완해 주세요."
+            )
+    if not recs:
+        recs.append(
+            f"오류율 {diag.get('error_rate', 0):.4f}%가 기준 {diag.get('threshold', 0)}%를 초과합니다 — "
+            "전체 데이터의 품질을 점검해 주세요."
+        )
+    return recs

@@ -81,6 +81,38 @@ def graph(center_sgg=None):
     return {"nodes": nodes, "edges": edges}
 
 
+# 온톨로지 객체 유형별 매칭 키워드
+_OBJ_TYPE_KEYWORDS = {
+    "청년인구": ["청년", "인구", "유입", "유출", "이동", "유동인구", "생활인구", "청년인구"],
+    "사업체":   ["사업체", "기업", "업체", "종사자", "고용", "산업", "제조업", "사업장"],
+    "청년인프라": ["시설", "센터", "인프라", "청년시설", "공공시설", "청년센터", "복지관"],
+    "시군":     ["시군", "시군구", "지역", "행정구역", "거주", "주소", "행정동", "읍면동"],
+}
+
+
+def recommend_ontology_candidates(meta: dict) -> list[dict]:
+    """제출 메타데이터를 키워드 분석해 온톨로지 객체 유형 후보를 추천한다.
+    meta: submissions 테이블 행 dict — title/description/theme/keywords 사용."""
+    text = " ".join([
+        str(meta.get("title") or ""),
+        str(meta.get("description") or ""),
+        str(meta.get("theme") or ""),
+        str(meta.get("keywords") or ""),
+    ]).lower()
+
+    results = []
+    for obj_type, kws in _OBJ_TYPE_KEYWORDS.items():
+        matched = [kw for kw in kws if kw in text]
+        if matched:
+            results.append({
+                "obj_type": obj_type,
+                "matched_keywords": matched,
+                "reason": f"'{', '.join(matched[:3])}' 키워드가 메타데이터에서 발견됨",
+            })
+
+    return results
+
+
 def action_settlement_priority(top=10):
     """
     액션: 청년 정착지원 우선지역 선정.

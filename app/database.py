@@ -107,3 +107,31 @@ def init_schema():
         ts          VARCHAR
     );
     """)
+    # 공급자 워크플로우 — 제출/심사 (L1~L3 확장)
+    con.execute("""
+    CREATE TABLE IF NOT EXISTS submissions (
+        submission_id   VARCHAR PRIMARY KEY,
+        tenant_id       VARCHAR,
+        title           VARCHAR,
+        description     VARCHAR,
+        theme           VARCHAR,
+        keywords        VARCHAR,
+        license         VARCHAR,
+        format          VARCHAR,
+        table_name      VARCHAR,
+        rows            BIGINT,
+        status          VARCHAR,      -- submitted / approved / rejected
+        quality_summary VARCHAR,
+        decision_note   VARCHAR,
+        submitted_at    VARCHAR,
+        decided_at      VARCHAR
+    );
+    """)
+    con.execute("""
+    CREATE TABLE IF NOT EXISTS consultant_comments (
+        comment_id      VARCHAR PRIMARY KEY,
+        submission_id   VARCHAR,
+        comment         VARCHAR,
+        created_at      VARCHAR
+    );
+    """)
