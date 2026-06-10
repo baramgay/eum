@@ -4,6 +4,75 @@ const api = (p) => fetch(p).then(r => r.json());
 const apiPost = (p) => fetch(p, {method:'POST'}).then(r => r.json());
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
+/* ---------- 인증 ---------- */
+function getAuthHeaders() {
+  const token = localStorage.getItem('eum_token');
+  return token ? { 'Authorization': 'Bearer ' + token } : {};
+}
+
+function updateAuthUI() {
+  const role = localStorage.getItem('eum_role');
+  const tenant = localStorage.getItem('eum_tenant');
+  const btnLogin = document.getElementById('btn-login');
+  const btnLogout = document.getElementById('btn-logout');
+  const label = document.getElementById('auth-user-label');
+  if (btnLogin) btnLogin.style.display = role ? 'none' : '';
+  if (btnLogout) btnLogout.style.display = role ? '' : 'none';
+  if (label) label.textContent = role === 'center' ? '센터 담당자' : (tenant ? `기관(${tenant})` : '');
+}
+
+function showLoginModal() {
+  const m = document.getElementById('login-modal');
+  if (m) { m.style.display = 'flex'; document.getElementById('login-username').focus(); }
+}
+
+function closeLoginModal() {
+  const m = document.getElementById('login-modal');
+  if (m) { m.style.display = 'none'; }
+  const err = document.getElementById('login-error');
+  if (err) { err.style.display = 'none'; err.textContent = ''; }
+}
+
+function doLogin() {
+  const u = document.getElementById('login-username').value.trim();
+  const p = document.getElementById('login-password').value;
+  if (!u || !p) return;
+  const fd = new FormData();
+  fd.append('username', u);
+  fd.append('password', p);
+  fetch('/api/login', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(d => {
+      if (d.access_token) {
+        localStorage.setItem('eum_token', d.access_token);
+        localStorage.setItem('eum_role', d.role);
+        localStorage.setItem('eum_tenant', d.tenant_id || '');
+        updateAuthUI();
+        closeLoginModal();
+        document.getElementById('login-password').value = '';
+      } else {
+        const err = document.getElementById('login-error');
+        if (err) { err.textContent = d.detail || '로그인 실패'; err.style.display = ''; }
+      }
+    })
+    .catch(() => {
+      const err = document.getElementById('login-error');
+      if (err) { err.textContent = '서버 오류가 발생했습니다'; err.style.display = ''; }
+    });
+}
+
+function doLogout() {
+  localStorage.removeItem('eum_token');
+  localStorage.removeItem('eum_role');
+  localStorage.removeItem('eum_tenant');
+  updateAuthUI();
+}
+
+function handleAuthError(r) {
+  if (r.status === 401) { showLoginModal(); return true; }
+  return false;
+}
+
 /* ---------- 탭 전환 ---------- */
 document.querySelectorAll('#nav button').forEach(b => {
   b.onclick = () => {
@@ -324,7 +393,10 @@ searchCatalog();
 
 // ---------- 데이터 등록·관리 탭 ----------
 (function () {
-  const TENANT_ID = "48121"; // 데모: 창원시 고정 (로그인 미구현 단계)
+  // 로그인된 기관 tenant_id. 미로그인이거나 센터면 null.
+  function getTenantId() {
+    return localStorage.getItem('eum_tenant') || "48121";
+  }
   let currentMode = "agency";
 
   // 파일 상단에 이미 정의된 전역 $ (querySelector)를 그대로 쓰고, $all만 추가한다
@@ -383,7 +455,7 @@ searchCatalog();
           <button data-plan="open" class="btn btn-o">공공데이터 개방계획 초안</button>
           <button data-plan="quality" class="btn btn-o">품질개선계획 초안</button>
         </div>
-        <pre id="plan-draft-output" class="sql"></pre>
+        <pre id="plan-draft-output" class="sql" style="display:none"></pre>
       </div>
     `;
 
@@ -396,9 +468,14 @@ searchCatalog();
       if (!fileInput.files.length) return;
       const fd = new FormData();
       fd.append("file", fileInput.files[0]);
-      fd.append("tenant_id", TENANT_ID);
-      const res = await fetch("/api/submission/upload", { method: "POST", body: fd });
+      fd.append("tenant_id", getTenantId());
+      const res = await fetch("/api/submission/upload", { method: "POST", body: fd, headers: getAuthHeaders() });
+      if (handleAuthError(res)) return;
       const data = await res.json();
+      if (res.status >= 400) {
+        $("#upload-result").innerHTML = `<p class="note" style="color:#d9534f">${esc(data.detail || data.error || '오류가 발생했습니다')}</p>`;
+        return;
+      }
       uploadedTable = data.table_name;
       uploadedRows = data.rows;
       $("#upload-result").innerHTML =
@@ -410,10 +487,11 @@ searchCatalog();
       e.preventDefault();
       if (!uploadedTable) return;
       const fd = new FormData(e.target);
-      fd.append("tenant_id", TENANT_ID);
+      fd.append("tenant_id", getTenantId());
       fd.append("table_name", uploadedTable);
       fd.append("rows", String(uploadedRows));
-      const res = await fetch("/api/submission", { method: "POST", body: fd });
+      const res = await fetch("/api/submission", { method: "POST", body: fd, headers: getAuthHeaders() });
+      if (handleAuthError(res)) return;
       const data = await res.json();
       $("#register-result").innerHTML =
         `<p class="note">등록 완료 — 자동 진단 결과: ${esc(data.quality_summary)}</p>`;
@@ -425,9 +503,11 @@ searchCatalog();
 
     $all("[data-plan]").forEach((btn) => {
       btn.addEventListener("click", async () => {
-        const res = await fetch(`/api/plan/draft?tenant_id=${TENANT_ID}&type=${btn.dataset.plan}`);
+        const res = await fetch(`/api/plan/draft?tenant_id=${getTenantId()}&type=${btn.dataset.plan}`);
         const data = await res.json();
-        $("#plan-draft-output").textContent = data.draft;
+        const out = $("#plan-draft-output");
+        out.textContent = data.draft;
+        out.style.display = data.draft ? "block" : "none";
       });
     });
 
@@ -435,7 +515,7 @@ searchCatalog();
   }
 
   async function loadMySubmissions() {
-    const res = await fetch(`/api/submission?tenant_id=${TENANT_ID}`);
+    const res = await fetch(`/api/submission?tenant_id=${getTenantId()}`);
     const rows = await res.json();
     const root = $("#my-submissions");
     if (!rows.length) {
@@ -463,7 +543,8 @@ searchCatalog();
   }
 
   async function openSubmissionDetail(submissionId) {
-    const res = await fetch(`/api/submission/${submissionId}`);
+    const res = await fetch(`/api/submission/${submissionId}`, { headers: getAuthHeaders() });
+    if (handleAuthError(res)) return;
     const detail = await res.json();
     const m = detail.meta;
     const modalRoot = $("#modal-root");
@@ -517,7 +598,8 @@ searchCatalog();
     const fd = new FormData();
     fd.append("status", status);
     fd.append("decision_note", note);
-    await fetch(`/api/submission/${submissionId}/decision`, { method: "POST", body: fd });
+    const res = await fetch(`/api/submission/${submissionId}/decision`, { method: "POST", body: fd, headers: getAuthHeaders() });
+    if (handleAuthError(res)) return;
     $("#modal-root").innerHTML = "";
     loadMySubmissions();
   }
@@ -623,11 +705,13 @@ searchCatalog();
   }
 
   async function loadCenterView() {
+    const authHdrs = getAuthHeaders();
     const [subRes, tenantRes, contribRes] = await Promise.all([
       fetch("/api/submission/all"),
       fetch("/api/tenants"),
-      fetch("/api/evaluation/submissions"),
+      fetch("/api/evaluation/submissions", { headers: authHdrs }),
     ]);
+    if (handleAuthError(contribRes)) return;
     centerRows = await subRes.json();
     const tenants = await tenantRes.json();
     const contribAgg = await contribRes.json();
@@ -719,7 +803,8 @@ searchCatalog();
   }
 
   async function openCenterDetail(submissionId) {
-    const res = await fetch(`/api/submission/${submissionId}`);
+    const res = await fetch(`/api/submission/${submissionId}`, { headers: getAuthHeaders() });
+    if (handleAuthError(res)) return;
     const detail = await res.json();
     const m = detail.meta;
     const q = detail.quality;
@@ -781,7 +866,8 @@ searchCatalog();
       if (!text) return;
       const fd = new FormData();
       fd.append("comment", text);
-      await fetch(`/api/submission/${submissionId}/comment`, { method: "POST", body: fd });
+      const cRes = await fetch(`/api/submission/${submissionId}/comment`, { method: "POST", body: fd, headers: getAuthHeaders() });
+      if (handleAuthError(cRes)) return;
       openCenterDetail(submissionId);
       loadCenterView();
     });
@@ -796,7 +882,8 @@ searchCatalog();
         const recText = recs.join("\n");
         const fd = new FormData();
         fd.append("comment", recText);
-        await fetch(`/api/submission/${submissionId}/comment`, { method: "POST", body: fd });
+        const sRes = await fetch(`/api/submission/${submissionId}/comment`, { method: "POST", body: fd, headers: getAuthHeaders() });
+        if (handleAuthError(sRes)) return;
         modalRoot.innerHTML = "";
         loadCenterView();
       });
