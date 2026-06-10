@@ -23,6 +23,8 @@ def build_ontology():
 
     # 2) 청년인구 객체 (시군 x 최신연도 집계) + 관계
     latest = db.query("SELECT max(year) y FROM gold_youth_population")[0]["y"]
+    if latest is None:
+        return {"objects": 0, "links": 0, "year": None}
     yp = db.query("""
         SELECT sgg_cd, sigun, sum(population) pop, sum(inflow) inf, sum(outflow) outf
         FROM gold_youth_population WHERE year = ?
@@ -120,6 +122,8 @@ def action_settlement_priority(top=10):
     점수 = 청년규모 정규화 + 산업기반 + 청년인프라 - 순유출 패널티
     """
     latest = db.query("SELECT max(year) y FROM gold_youth_population")[0]["y"]
+    if latest is None:
+        return []
     rows = db.query("""
         WITH y AS (
             SELECT sgg_cd, sigun, sum(population) pop,

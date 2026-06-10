@@ -19,13 +19,19 @@ AREAS = [
 _MACHINE_READABLE_FORMATS = {"csv", "json", "xlsx", "parquet", "tsv", "geojson"}
 
 
+def _is_quality_passed(summary: str) -> bool:
+    """quality_summary 문자열에서 통과 여부를 추출한다.
+    Phase 2에서 구조화된 필드로 전환 시 이 함수만 수정하면 됩니다."""
+    s = (summary or "").strip()
+    return s.endswith("통과") and not s.endswith("미통과")
+
+
 def compute_ai_ready_checklist(row: dict) -> dict:
     """제출(submission) 1건의 AI 친화성(AI-Ready) 체크리스트를 평가한다.
     row: submissions 테이블 행(dict) — quality_summary/rows/description/title/
          theme/keywords/license/format 포함."""
     quality_summary = str(row.get("quality_summary") or "")
-    stripped = quality_summary.rstrip()
-    quality_passed = stripped.endswith("통과") and not stripped.endswith("미통과")
+    quality_passed = _is_quality_passed(quality_summary)
     rows = row.get("rows") or 0
     description = str(row.get("description") or "").strip()
     title = str(row.get("title") or "").strip()
@@ -75,8 +81,7 @@ def compute_submission_contribution(row: dict) -> list[dict]:
     row는 submissions 테이블 행(dict) — status/quality_summary/rows/comment_count/decision_note 포함."""
     status = row.get("status")
     quality_summary = str(row.get("quality_summary") or "")
-    stripped = quality_summary.rstrip()
-    quality_passed = stripped.endswith("통과") and not stripped.endswith("미통과")
+    quality_passed = _is_quality_passed(quality_summary)
     rows = row.get("rows") or 0
     comment_count = row.get("comment_count") or 0
     has_decision_note = bool(str(row.get("decision_note") or "").strip())
