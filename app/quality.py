@@ -5,6 +5,7 @@
 """
 import datetime
 from . import database as db
+from .submission import _validate_table_name  # SQL injection 방지용 공유 함수 (그룹 A)
 
 ERROR_RATE_THRESHOLD = 0.001  # 평가편람 2026 기준 (%)
 
@@ -40,6 +41,7 @@ NUMERIC_TYPES = {"BIGINT", "INTEGER", "DOUBLE", "FLOAT", "DECIMAL", "HUGEINT"}
 
 def generic_rules(table_name: str) -> list[dict]:
     """테이블 컬럼을 스캔해 결측치·중복·타입일관성·음수이상치 규칙을 동적으로 생성한다."""
+    _validate_table_name(table_name)  # SQL injection 방지 — DuckDB PRAGMA는 파라미터 바인딩 미지원
     cols = db.query(f"PRAGMA table_info('{table_name}')")
     rules = []
 
@@ -71,6 +73,7 @@ def generic_rules(table_name: str) -> list[dict]:
 
 def run_quality_generic(table_name: str) -> dict:
     """generic_rules()로 만든 규칙을 실행해 run_quality()와 동일한 형태의 결과를 만든다."""
+    _validate_table_name(table_name)  # SQL injection 방지 (그룹 A) — generic_rules에서도 호출되지만 방어적 중복 검증
     total_rows = db.query(f"SELECT count(*) c FROM {table_name}")[0]["c"]
     rules = generic_rules(table_name)
 

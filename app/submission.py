@@ -4,11 +4,28 @@
 적재하고, 제출(submission) 상태를 관리한다.
 """
 import datetime
+import re
 import uuid
 
 import pandas as pd
 
 from . import database as db
+
+# 제출 테이블명 패턴: sub_{tenant_id}_{8자리hex}
+# 이 정규식은 quality.py 등 다른 모듈에서도 재사용된다.
+# TODO(Phase 2): connection pool 전환 시 app/utils.py로 이동 예정
+_TABLE_NAME_RE = re.compile(r"^sub_(.+)_[0-9a-f]{8}$")
+
+
+def _validate_table_name(name: str) -> str:
+    """사용 시점에 table_name을 재검증한다. 패턴 불일치 시 ValueError 발생.
+
+    SQL f-string 보간 전에 호출해 injection을 방지한다.
+    허용 패턴: sub_{tenant_id}_{8자리 소문자 hex}
+    """
+    if not _TABLE_NAME_RE.match(name):
+        raise ValueError(f"유효하지 않은 테이블명: {name!r}")
+    return name
 
 _DTYPE_MAP = {
     "int64": "BIGINT",
@@ -33,14 +50,18 @@ PREVIEW_LIMIT = 20
 
 def load_csv_to_table(file_obj, table_name: str) -> dict:
     """CSV를 읽어 스키마를 추론하고 DuckDB 테이블로 적재한 뒤 미리보기를 반환한다."""
+    _validate_table_name(table_name)  # SQL injection 방지 (그룹 A)
     df = pd.read_csv(file_obj)
     schema = infer_schema(df)
 
-    conn = db.get_conn()
-    conn.execute(f"DROP TABLE IF EXISTS {table_name}")
-    conn.register("_upload_df", df)
-    conn.execute(f"CREATE TABLE {table_name} AS SELECT * FROM _upload_df")
-    conn.unregister("_upload_df")
+    # 그룹 C: 동시 요청 시 동일 테이블명 충돌을 막기 위해 _lock으로 감싼다.
+    # TODO(Phase 2): connection pool 전환 시 재검토 — 락 범위를 DB write 단계만으로 축소 가능
+    with db._lock:
+        conn = db.get_conn()
+        conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+        conn.register(f"_upload_{table_name}", df)
+        conn.execute(f"CREATE TABLE {table_name} AS SELECT * FROM _upload_{table_name}")
+        conn.unregister(f"_upload_{table_name}")
 
     preview = db.query(f"SELECT * FROM {table_name} LIMIT {PREVIEW_LIMIT}")
     return {
@@ -95,9 +116,17 @@ def add_comment(submission_id: str, comment: str) -> str:
     return comment_id
 
 
-def get_submission(submission_id: str) -> dict:
-    """제출 상세(메타 + 미리보기 + 코멘트 이력)를 반환한다."""
-    meta = db.query("SELECT * FROM submissions WHERE submission_id = ?", [submission_id])[0]
+def get_submission(submission_id: str) -> dict | None:
+    """제출 상세(메타 + 미리보기 + 코멘트 이력)를 반환한다.
+
+    존재하지 않는 submission_id이면 None을 반환한다.
+    호출자(main.py)에서 None 여부를 확인해 404를 반환해야 한다.
+    """
+    rows = db.query("SELECT * FROM submissions WHERE submission_id = ?", [submission_id])
+    if not rows:
+        return None
+    meta = rows[0]
+    _validate_table_name(meta["table_name"])  # SQL injection 방지 (그룹 A)
     preview = db.query(f"SELECT * FROM {meta['table_name']} LIMIT {PREVIEW_LIMIT}")
     comments = db.query(
         "SELECT * FROM consultant_comments WHERE submission_id = ? ORDER BY created_at",

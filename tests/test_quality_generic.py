@@ -4,7 +4,7 @@ from app.quality import generic_rules, run_quality_generic, generate_quality_rec
 
 def _make_test_table():
     db.init_schema()
-    table = "qg_test_table"
+    table = "sub_qg_test_0000abcd"  # _validate_table_name 패턴(sub_*_8hex) 준수
     db.execute(f"DROP TABLE IF EXISTS {table}")
     db.execute(f"""
         CREATE TABLE {table} (

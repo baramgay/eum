@@ -30,9 +30,10 @@ def test_load_csv_to_table_creates_table_and_returns_preview():
         "진주시,2025,8.3\n"
     ).encode("utf-8")
 
-    result = load_csv_to_table(io.BytesIO(csv_bytes), table_name="upload_test_001")
+    tname = "sub_test_1a2b3c4d"  # _validate_table_name 패턴(sub_*_8hex) 준수
+    result = load_csv_to_table(io.BytesIO(csv_bytes), table_name=tname)
 
-    assert result["table_name"] == "upload_test_001"
+    assert result["table_name"] == tname
     assert result["rows"] == 2
     assert result["schema"] == [
         ("지역명", "VARCHAR"),
@@ -43,10 +44,10 @@ def test_load_csv_to_table_creates_table_and_returns_preview():
     assert result["preview"][0]["지역명"] == "창원시"
 
     # 실제로 테이블이 만들어졌는지 DuckDB에서 직접 확인
-    rows = db.query("SELECT count(*) c FROM upload_test_001")
+    rows = db.query(f"SELECT count(*) c FROM {tname}")
     assert rows[0]["c"] == 2
 
-    db.execute("DROP TABLE upload_test_001")
+    db.execute(f"DROP TABLE {tname}")
 
 
 def test_submissions_tables_exist_after_init_schema():

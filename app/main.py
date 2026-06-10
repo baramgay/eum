@@ -3,11 +3,11 @@
 FastAPI 단일 진입점. 백엔드 모듈을 REST API로 노출하고
 정적 프론트엔드(SPA)를 서빙한다.
 """
+import ast
 import os
-import re
 import datetime
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -78,12 +78,17 @@ def dataset(dataset_id: str, limit: int = 20):
     db.execute("INSERT INTO usage_log VALUES (?,?,?)",
                [dataset_id, "view",
                 datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
-    preview = db.query(f"SELECT * FROM {meta['table_name']} LIMIT {int(limit)}")
+    # 카탈로그 테이블명은 시드/파이프라인이 생성한 값이지만,
+    # submission 업로드 경로를 거쳤다면 sub_ 패턴일 수 있으므로
+    # submission 패턴인 경우에 한해 재검증한다 (그룹 A)
+    tname = meta["table_name"]
+    if tname.startswith("sub_"):
+        submission._validate_table_name(tname)
+    preview = db.query(f"SELECT * FROM {tname} LIMIT {int(limit)}")
     q = db.query("SELECT * FROM quality_results WHERE dataset_id = ?", [dataset_id])
     # quality_results.detail은 DB에 문자열로 저장되므로 파이썬 리스트로 역직렬화한다
     quality = None
     if q:
-        import ast
         quality = dict(q[0])
         raw_detail = quality.get("detail")
         if isinstance(raw_detail, str):
@@ -137,9 +142,8 @@ def nl(q: str = Query(...)):
 
 
 # ---------- 공급자 워크플로우 ----------
-# submission.new_table_name(tenant_id)이 생성하는 패턴(f"sub_{tenant_id}_{8자리hex}")과
-# 일치하는지 검증하기 위한 정규식 (요청마다 재컴파일하지 않도록 모듈 레벨에 둠)
-_TABLE_NAME_RE = re.compile(r"^sub_(.+)_[0-9a-f]{8}$")
+# _TABLE_NAME_RE 및 _validate_table_name 은 submission.py에 정의되어 있다.
+# main.py에서는 submission._TABLE_NAME_RE / submission._validate_table_name 을 직접 참조한다.
 
 
 @app.post("/api/submission/upload")
@@ -168,7 +172,7 @@ def submission_create(
     if not known:
         return JSONResponse({"error": "알 수 없는 tenant_id"}, status_code=400)
 
-    m = _TABLE_NAME_RE.match(table_name)
+    m = submission._TABLE_NAME_RE.match(table_name)
     if not m or m.group(1) != tenant_id:
         return JSONResponse({"error": "유효하지 않은 table_name"}, status_code=400)
 
@@ -204,6 +208,8 @@ def submission_list_all():
 @app.post("/api/submission/{submission_id}/decision")
 def submission_decision(submission_id: str, status: str = Form(...),
                          decision_note: str = Form(default="")):
+    if status not in ("approved", "rejected"):  # 그룹 B2: 허용 값 검증
+        raise HTTPException(status_code=400, detail="status must be 'approved' or 'rejected'")
     submission.record_decision(submission_id, status=status, decision_note=decision_note)
     return {"submission_id": submission_id, "status": status}
 
@@ -217,6 +223,8 @@ def submission_comment(submission_id: str, comment: str = Form(...)):
 @app.get("/api/submission/{submission_id}")
 def submission_detail(submission_id: str):
     detail = submission.get_submission(submission_id)
+    if detail is None:  # 그룹 B1: 존재하지 않는 ID → 404
+        raise HTTPException(status_code=404, detail="submission not found")
     diag = quality.run_quality_generic(detail["meta"]["table_name"])
     detail["quality"] = diag
     detail["recommendations"] = quality.generate_quality_recommendations(diag)
