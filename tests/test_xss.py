@@ -23,9 +23,19 @@ def frontend_esc(s: object) -> str:
     """web/app.js의 esc() 함수를 Python으로 재현.
 
     원본 JS:
-        const esc = (s) => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+        const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+    변환 규칙:
+      - JS `s ?? ''` 동작 모방: None만 빈 문자열로 처리 (0, False 등 falsy는 그대로 문자열화)
+      - `"` → `&quot;` 이스케이프 추가
     """
-    return str(s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    return (
+        str(s if s is not None else "")
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 # ---------- 1. XSS 페이로드 raw 저장 확인 ----------
@@ -88,3 +98,15 @@ def test_esc_handles_none():
 
 def test_esc_handles_ampersand():
     assert frontend_esc("a & b") == "a &amp; b"
+
+
+def test_esc_double_quote():
+    assert frontend_esc('"') == '&quot;'
+
+
+def test_esc_zero_not_empty():
+    assert frontend_esc(0) == '0'
+
+
+def test_esc_none_is_empty():
+    assert frontend_esc(None) == ''
