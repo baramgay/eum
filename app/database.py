@@ -10,17 +10,16 @@ import threading
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE_DIR, "data", "eum.duckdb")
 
-_lock = threading.Lock()
+_lock = threading.RLock()
 _conn = None
 
 
 def get_conn():
     """단일 DuckDB 커넥션을 반환(스레드 안전 래핑)."""
     global _conn
-    if _conn is None:
-        with _lock:
-            if _conn is None:
-                _conn = duckdb.connect(DB_PATH)
+    with _lock:
+        if _conn is None:
+            _conn = duckdb.connect(DB_PATH)
     return _conn
 
 
@@ -39,8 +38,7 @@ def execute(sql, params=None):
 
 def init_schema():
     """플랫폼 메타 스키마 생성 (멱등)."""
-    con = get_conn()
-    con.execute("""
+    execute("""
     CREATE TABLE IF NOT EXISTS tenants (
         tenant_id   VARCHAR PRIMARY KEY,
         name        VARCHAR,
@@ -50,7 +48,7 @@ def init_schema():
     );
     """)
     # DCAT 메타데이터 카탈로그 (L3)
-    con.execute("""
+    execute("""
     CREATE TABLE IF NOT EXISTS catalog (
         dataset_id  VARCHAR PRIMARY KEY,
         tenant_id   VARCHAR,
@@ -70,7 +68,7 @@ def init_schema():
     );
     """)
     # 품질 진단 결과 (L3)
-    con.execute("""
+    execute("""
     CREATE TABLE IF NOT EXISTS quality_results (
         dataset_id  VARCHAR,
         rule_count  INTEGER,
@@ -83,7 +81,7 @@ def init_schema():
     );
     """)
     # 온톨로지 객체/관계 (L4)
-    con.execute("""
+    execute("""
     CREATE TABLE IF NOT EXISTS onto_objects (
         obj_id      VARCHAR PRIMARY KEY,
         obj_type    VARCHAR,
@@ -91,7 +89,7 @@ def init_schema():
         props       VARCHAR
     );
     """)
-    con.execute("""
+    execute("""
     CREATE TABLE IF NOT EXISTS onto_links (
         src         VARCHAR,
         rel         VARCHAR,
@@ -100,7 +98,7 @@ def init_schema():
     );
     """)
     # 개방데이터 활용 로그 (평가 '활용도' 지표 산출용)
-    con.execute("""
+    execute("""
     CREATE TABLE IF NOT EXISTS usage_log (
         dataset_id  VARCHAR,
         action      VARCHAR,      -- view / download / api
@@ -108,7 +106,7 @@ def init_schema():
     );
     """)
     # 공급자 워크플로우 — 제출/심사 (L1~L3 확장)
-    con.execute("""
+    execute("""
     CREATE TABLE IF NOT EXISTS submissions (
         submission_id   VARCHAR PRIMARY KEY,
         tenant_id       VARCHAR,
@@ -127,7 +125,7 @@ def init_schema():
         decided_at      VARCHAR
     );
     """)
-    con.execute("""
+    execute("""
     CREATE TABLE IF NOT EXISTS consultant_comments (
         comment_id      VARCHAR PRIMARY KEY,
         submission_id   VARCHAR,
