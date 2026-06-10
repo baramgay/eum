@@ -390,6 +390,7 @@ loadDashboard();
 loadQuality();
 loadNLSamples();
 searchCatalog();
+updateAuthUI();
 
 // ---------- 데이터 등록·관리 탭 ----------
 (function () {

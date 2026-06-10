@@ -8,10 +8,11 @@ import json
 import os
 import datetime
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
+from fastapi import Depends, FastAPI, HTTPException, Query, UploadFile, File, Form
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from . import auth
 from . import database as db
 from . import seed_data, quality, evaluation, ontology, nlquery, submission, planning
 
@@ -40,6 +41,16 @@ async def _lifespan(app: FastAPI):
 
 
 app = FastAPI(title="이음(EUM) 플랫폼 API", version="0.1.0", lifespan=_lifespan)
+
+
+# ---------- 인증 ----------
+@app.post("/api/login")
+def login(username: str = Form(...), password: str = Form(...)):
+    user = auth.DEMO_USERS.get(username)
+    if not user or user["password"] != password:
+        raise HTTPException(status_code=401, detail="아이디 또는 비밀번호가 틀렸습니다")
+    token = auth.create_token(username)
+    return {"access_token": token, "role": user["role"], "tenant_id": user["tenant_id"]}
 
 
 # ---------- 메타/대시보드 ----------
@@ -153,7 +164,14 @@ def nl(q: str = Query(...)):
 
 
 @app.post("/api/submission/upload")
-def submission_upload(file: UploadFile = File(...), tenant_id: str = Form(...)):
+def submission_upload(
+    file: UploadFile = File(...),
+    tenant_id: str = Form(...),
+    current_user: dict = Depends(auth.get_current_user),
+):
+    # 기관 담당자는 자기 tenant_id만 업로드 가능
+    if current_user["role"] == "agency" and current_user["tenant_id"] != tenant_id:
+        raise HTTPException(status_code=403, detail="자신의 기관 데이터만 업로드할 수 있습니다")
     known = db.query("SELECT tenant_id FROM tenants WHERE tenant_id = ?", [tenant_id])
     if not known:
         return JSONResponse({"error": "알 수 없는 tenant_id"}, status_code=400)
@@ -173,7 +191,11 @@ def submission_create(
     format: str = Form(...),
     table_name: str = Form(...),
     rows: int = Form(...),
+    current_user: dict = Depends(auth.get_current_user),
 ):
+    # 기관 담당자는 자기 tenant_id만 등록 가능
+    if current_user["role"] == "agency" and current_user["tenant_id"] != tenant_id:
+        raise HTTPException(status_code=403, detail="자신의 기관 데이터만 등록할 수 있습니다")
     known = db.query("SELECT tenant_id FROM tenants WHERE tenant_id = ?", [tenant_id])
     if not known:
         return JSONResponse({"error": "알 수 없는 tenant_id"}, status_code=400)
@@ -212,8 +234,14 @@ def submission_list_all():
 
 
 @app.post("/api/submission/{submission_id}/decision")
-def submission_decision(submission_id: str, status: str = Form(...),
-                         decision_note: str = Form(default="")):
+def submission_decision(
+    submission_id: str,
+    status: str = Form(...),
+    decision_note: str = Form(default=""),
+    current_user: dict = Depends(auth.get_current_user),
+):
+    if current_user["role"] != "center":
+        raise HTTPException(status_code=403, detail="센터 권한이 필요합니다")
     if status not in ("approved", "rejected"):  # 그룹 B2: 허용 값 검증
         raise HTTPException(status_code=400, detail="status must be 'approved' or 'rejected'")
     submission.record_decision(submission_id, status=status, decision_note=decision_note)
@@ -221,16 +249,28 @@ def submission_decision(submission_id: str, status: str = Form(...),
 
 
 @app.post("/api/submission/{submission_id}/comment")
-def submission_comment(submission_id: str, comment: str = Form(...)):
+def submission_comment(
+    submission_id: str,
+    comment: str = Form(...),
+    current_user: dict = Depends(auth.get_current_user),
+):
+    if current_user["role"] != "center":
+        raise HTTPException(status_code=403, detail="센터 권한이 필요합니다")
     comment_id = submission.add_comment(submission_id, comment)
     return {"comment_id": comment_id, "submission_id": submission_id}
 
 
 @app.get("/api/submission/{submission_id}")
-def submission_detail(submission_id: str):
+def submission_detail(
+    submission_id: str,
+    current_user: dict = Depends(auth.get_current_user),
+):
     detail = submission.get_submission(submission_id)
     if detail is None:  # 그룹 B1: 존재하지 않는 ID → 404
         raise HTTPException(status_code=404, detail="submission not found")
+    # 기관 담당자는 자기 제출만 조회 가능
+    if current_user["role"] == "agency" and detail["meta"]["tenant_id"] != current_user["tenant_id"]:
+        raise HTTPException(status_code=403, detail="접근 권한이 없습니다")
     diag = quality.run_quality_generic(detail["meta"]["table_name"])
     detail["quality"] = diag
     detail["recommendations"] = quality.generate_quality_recommendations(diag)
@@ -242,8 +282,12 @@ def submission_detail(submission_id: str):
 
 
 @app.get("/api/evaluation/submissions")
-def evaluation_submission_contributions():
+def evaluation_submission_contributions(
+    current_user: dict = Depends(auth.get_current_user),
+):
     """전체 제출 목록을 대상으로 5개 영역별 기여 건수를 집계한다."""
+    if current_user["role"] != "center":
+        raise HTTPException(status_code=403, detail="센터 권한이 필요합니다")
     rows = db.query(
         "SELECT s.*, "
         "(SELECT count(*) FROM consultant_comments c WHERE c.submission_id = s.submission_id) AS comment_count "

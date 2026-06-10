@@ -29,11 +29,12 @@ def test_catalog_sort_whitelist(client):
 
 # ---------- 2. submission upload — 알 수 없는 tenant_id ----------
 
-def test_submission_upload_invalid_tenant(client):
+def test_submission_upload_invalid_tenant(client, center_auth_header):
     """알 수 없는 tenant_id로 업로드 시도 → 400, 응답 JSON에 'tenant_id' 포함."""
     csv_bytes = b"col1,col2\n1,2\n3,4"
     r = client.post(
         "/api/submission/upload",
+        headers=center_auth_header,
         data={"tenant_id": "NOT_EXIST"},
         files={"file": ("test.csv", io.BytesIO(csv_bytes), "text/csv")},
     )
@@ -43,10 +44,11 @@ def test_submission_upload_invalid_tenant(client):
 
 # ---------- 3. submission create — 유효하지 않은 table_name (SQL injection 시도) ----------
 
-def test_submission_create_invalid_table_name(client):
+def test_submission_create_invalid_table_name(client, agency_48121_auth_header):
     """SQL injection 시도 table_name → 400."""
     r = client.post(
         "/api/submission",
+        headers=agency_48121_auth_header,
         data={
             "tenant_id": "48121",
             "title": "test",
