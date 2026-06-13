@@ -27,6 +27,14 @@ interface AnalysisRun {
   created_at: string
 }
 
+interface QualityRuleDetail { rule: string; violations: number }
+interface QualitySummary {
+  passed: boolean
+  error_rate: number
+  threshold: number
+  detail: QualityRuleDetail[]
+}
+
 interface MigrationRow    { sigun: string; net: number; inflow: number; outflow: number }
 interface TrendRow        { year: number; total: number; net: number }
 interface SettlementRow   {
@@ -103,6 +111,7 @@ export default function DashboardClient() {
   const [period, setPeriod]       = useState<'month' | 'q' | 'year'>('month')
   const [usage, setUsage]         = useState<UsageData | null>(null)
   const [recentRuns, setRecentRuns] = useState<AnalysisRun[]>([])
+  const [qualityDims, setQualityDims] = useState<{ name: string; label: string; status: 'pass'|'fail'|'none' }[]>([])
 
   useEffect(() => {
     Promise.all([
@@ -124,6 +133,40 @@ export default function DashboardClient() {
     fetch('/api/analytics/runs?limit=5')
       .then(r => r.ok ? r.json() : [])
       .then(d => setRecentRuns(Array.isArray(d) ? d : []))
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/quality')
+      .then(r => r.ok ? r.json() : [])
+      .then((results: QualitySummary[]) => {
+        if (!Array.isArray(results) || results.length === 0) return
+        const dims: Record<string, { violations: number; hasRules: boolean }> = {
+          completeness: { violations: 0, hasRules: false },
+          accuracy:     { violations: 0, hasRules: false },
+          consistency:  { violations: 0, hasRules: false },
+          recency:      { violations: 0, hasRules: false },
+          metadata:     { violations: 0, hasRules: false },
+        }
+        for (const r of results) {
+          for (const d of r.detail) {
+            const n = d.rule
+            let dim = 'accuracy'
+            if (n.includes('NULL') || n.includes('결측')) dim = 'completeness'
+            else if (n.includes('연도'))                  dim = 'recency'
+            else if (n.includes('정합성'))                dim = 'consistency'
+            dims[dim].violations += d.violations
+            dims[dim].hasRules = true
+          }
+        }
+        const LABEL: Record<string, string> = {
+          completeness: '완전성', accuracy: '정확성', consistency: '일관성', recency: '최신성', metadata: '메타데이터',
+        }
+        setQualityDims(Object.entries(dims).map(([name, { violations, hasRules }]) => ({
+          name, label: LABEL[name],
+          status: !hasRules ? 'none' : violations === 0 ? 'pass' : 'fail',
+        })))
+      })
       .catch(() => {})
   }, [])
 
@@ -218,6 +261,32 @@ export default function DashboardClient() {
           )}
         </div>
       </div>
+
+      {/* 품질 신호등 위젯 */}
+      {qualityDims.length > 0 && (
+        <div className="bg-white rounded-lg border shadow-sm p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-600">데이터 품질 5영역</h3>
+            <button
+              onClick={() => router.push('/quality')}
+              className="text-xs text-blue-600 hover:underline"
+            >
+              상세 보기 →
+            </button>
+          </div>
+          <div className="flex gap-4">
+            {qualityDims.map(d => (
+              <div key={d.name} className="flex flex-col items-center gap-1 flex-1">
+                <div className={`w-4 h-4 rounded-full ${
+                  d.status === 'pass' ? 'bg-green-500' :
+                  d.status === 'fail' ? 'bg-red-500' : 'bg-gray-200'
+                }`} />
+                <span className="text-xs text-gray-600">{d.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <ScoreGauge value={data.overall} label="종합 점수" color="#2563eb" />

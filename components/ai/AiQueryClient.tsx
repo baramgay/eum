@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Search, BarChart2, Table2, HelpCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Search, BarChart2, Table2, HelpCircle, ExternalLink } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
   ResponsiveContainer, CartesianGrid, LabelList
@@ -14,6 +15,7 @@ interface QueryResult {
   rows: Record<string, unknown>[]
   hint?: string
   source?: string
+  source_url?: string
 }
 
 const EXAMPLES = [
@@ -65,6 +67,7 @@ function formatValue(v: unknown): string {
 }
 
 export default function AiQueryClient() {
+  const searchParams = useSearchParams()
   const [query, setQuery]       = useState('')
   const [result, setResult]     = useState<QueryResult | null>(null)
   const [loading, setLoading]   = useState(false)
@@ -72,6 +75,12 @@ export default function AiQueryClient() {
   const [viewMode, setViewMode] = useState<'table'|'chart'>('table')
   const [chartCol, setChartCol] = useState('')
   const [showExamples, setShowExamples] = useState(true)
+
+  useEffect(() => {
+    const q = searchParams.get('q')
+    if (q) { setQuery(q); ask(q) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function ask(q: string) {
     if (!q.trim()) return
@@ -284,8 +293,21 @@ export default function AiQueryClient() {
 
           {/* 출처 */}
           {result.source && (
-            <div className="px-4 py-2 bg-gray-50 border-t text-xs text-gray-400">
-              출처: {result.source}
+            <div className="px-4 py-2 bg-gray-50 border-t flex items-center gap-2">
+              <span className="text-xs text-gray-400">출처:</span>
+              {result.source_url ? (
+                <a
+                  href={result.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {result.source}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              ) : (
+                <span className="text-xs text-gray-500">{result.source}</span>
+              )}
             </div>
           )}
         </div>

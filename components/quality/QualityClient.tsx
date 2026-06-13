@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CheckCircle2, XCircle, MinusCircle } from 'lucide-react'
+import { CheckCircle2, XCircle, MinusCircle, AlertCircle } from 'lucide-react'
 
 interface RuleDetail { rule: string; violations: number }
 
@@ -16,6 +16,42 @@ interface QualityResult {
   passed: boolean
   detail: RuleDetail[]
   ran_at: string
+}
+
+// 5영역 품질 신호등
+interface DimSignal { name: string; label: string; status: 'pass' | 'fail' | 'none'; violations: number; total: number }
+
+function buildDimSignals(results: QualityResult[]): DimSignal[] {
+  const dims: Record<string, { violations: number; total: number }> = {
+    completeness: { violations: 0, total: 0 },
+    accuracy:     { violations: 0, total: 0 },
+    consistency:  { violations: 0, total: 0 },
+    recency:      { violations: 0, total: 0 },
+    metadata:     { violations: 0, total: 0 },
+  }
+  for (const r of results) {
+    for (const d of r.detail) {
+      const n = d.rule
+      let dim = 'accuracy'
+      if (n.includes('NULL') || n.includes('결측')) dim = 'completeness'
+      else if (n.includes('연도'))                  dim = 'recency'
+      else if (n.includes('정합성'))                dim = 'consistency'
+      dims[dim].violations += d.violations
+      dims[dim].total += r.checked / r.rule_count
+    }
+  }
+  const label: Record<string, string> = {
+    completeness: '완전성',
+    accuracy:     '정확성',
+    consistency:  '일관성',
+    recency:      '최신성',
+    metadata:     '메타데이터',
+  }
+  return Object.entries(dims).map(([name, { violations, total }]) => ({
+    name, label: label[name],
+    status: total === 0 ? 'none' : violations === 0 ? 'pass' : 'fail',
+    violations, total: Math.round(total),
+  }))
 }
 
 // 평가편람 품질 영역 지표 매핑
@@ -93,6 +129,44 @@ export default function QualityClient() {
           {running ? '실행 중...' : '전체 재검사'}
         </button>
       </div>
+
+      {/* 5영역 품질 신호등 */}
+      {totalDatasets > 0 && (
+        <div className="bg-white rounded-xl border p-4 shadow-sm">
+          <p className="text-xs font-semibold text-gray-500 mb-3">품질 5영역 신호등</p>
+          <div className="grid grid-cols-5 gap-3">
+            {buildDimSignals(results).map(sig => (
+              <div key={sig.name} className="flex flex-col items-center gap-1.5">
+                {sig.status === 'pass' ? (
+                  <CheckCircle2 className="w-7 h-7 text-green-500" />
+                ) : sig.status === 'fail' ? (
+                  <XCircle className="w-7 h-7 text-red-500" />
+                ) : (
+                  <AlertCircle className="w-7 h-7 text-gray-300" />
+                )}
+                <span className="text-xs font-medium text-gray-700">{sig.label}</span>
+                <span className={`text-xs ${
+                  sig.status === 'pass' ? 'text-green-600' :
+                  sig.status === 'fail' ? 'text-red-600' : 'text-gray-400'
+                }`}>
+                  {sig.status === 'none' ? '미측정' : sig.violations === 0 ? '이상 없음' : `${sig.violations}건`}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* 갭 리포트 */}
+          {buildDimSignals(results).some(s => s.status === 'none') && (
+            <div className="mt-3 p-2.5 bg-amber-50 rounded-lg border border-amber-200 flex items-start gap-2">
+              <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-700">
+                <strong>갭:</strong> {buildDimSignals(results).filter(s => s.status === 'none').map(s => s.label).join(', ')} 영역은 측정 규칙이 없습니다.
+                추후 해당 영역 규칙 추가를 권장합니다.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 평가편람 영역 요약 배지 */}
       {totalDatasets > 0 && (

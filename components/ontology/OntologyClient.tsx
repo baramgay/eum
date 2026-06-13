@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 
 const OntologyGraph = dynamic(() => import('./OntologyGraph'), {
   ssr: false,
@@ -27,6 +28,7 @@ type Tab = '개요' | '그래프' | '노드 목록'
 const TABS: Tab[] = ['개요', '그래프', '노드 목록']
 
 export default function OntologyClient() {
+  const router = useRouter()
   const [graph, setGraph]           = useState<OntologyGraph | null>(null)
   const [actions, setActions]       = useState<Action[]>([])
   const [building, setBuilding]     = useState(false)
@@ -36,6 +38,8 @@ export default function OntologyClient() {
   const [actionResult, setActionResult] = useState<ActionResult | null>(null)
   const [scoring, setScoring]       = useState(false)
   const [activeTab, setActiveTab]   = useState<Tab>('개요')
+  const [nodeSearch, setNodeSearch] = useState('')
+  const [selectedListNode, setSelectedListNode] = useState<OntologyNode | null>(null)
 
   async function loadGraph(sggFilter?: string) {
     setLoading(true)
@@ -69,6 +73,16 @@ export default function OntologyClient() {
   }, [])
 
   const maxScore = actionResult?.results?.[0]?.priority_score ?? 1
+
+  const filteredNodes = useMemo(() => {
+    const q = nodeSearch.trim().toLowerCase()
+    if (!q) return graph?.nodes ?? []
+    return (graph?.nodes ?? []).filter(n =>
+      n.label.toLowerCase().includes(q) ||
+      n.obj_type.toLowerCase().includes(q) ||
+      n.obj_id.toLowerCase().includes(q)
+    )
+  }, [graph, nodeSearch])
 
   return (
     <div className="space-y-5">
@@ -256,43 +270,133 @@ export default function OntologyClient() {
 
       {/* ===== 노드 목록 탭 ===== */}
       {activeTab === '노드 목록' && (
-        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b bg-gray-50 flex justify-between items-center">
-            <h3 className="font-medium text-gray-700 text-sm">
-              노드 목록 ({graph?.nodes?.length ?? 0}개)
-            </h3>
-            {(graph?.nodes?.length ?? 0) > 50 && (
-              <span className="text-xs text-gray-400">상위 50개 표시</span>
+        <div className="space-y-3">
+          {/* 노드 검색 */}
+          <div className="flex gap-2">
+            <input
+              value={nodeSearch}
+              onChange={e => { setNodeSearch(e.target.value); setSelectedListNode(null) }}
+              placeholder="레이블·타입·ID 검색..."
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            {nodeSearch && (
+              <button
+                onClick={() => { setNodeSearch(''); setSelectedListNode(null) }}
+                className="px-3 py-2 text-gray-500 border rounded-md hover:bg-gray-50 text-sm"
+              >
+                초기화
+              </button>
             )}
           </div>
-          {!graph?.nodes?.length ? (
-            <div className="px-4 py-8 text-center text-gray-400 text-sm">
-              노드가 없습니다. 온톨로지를 재구축하세요.
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {/* 노드 테이블 */}
+            <div className="md:col-span-2 bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b bg-gray-50 flex justify-between items-center">
+                <h3 className="font-medium text-gray-700 text-sm">
+                  {nodeSearch ? `검색 결과 ${filteredNodes.length}개` : `노드 목록 (${graph?.nodes?.length ?? 0}개)`}
+                </h3>
+                {filteredNodes.length > 50 && (
+                  <span className="text-xs text-gray-400">상위 50개 표시</span>
+                )}
+              </div>
+              {!graph?.nodes?.length ? (
+                <div className="px-4 py-8 text-center text-gray-400 text-sm">
+                  노드가 없습니다. 온톨로지를 재구축하세요.
+                </div>
+              ) : filteredNodes.length === 0 ? (
+                <div className="px-4 py-8 text-center text-gray-400 text-sm">
+                  검색 결과가 없습니다.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-gray-600">레이블</th>
+                        <th className="px-4 py-2 text-left text-gray-600">타입</th>
+                        <th className="px-4 py-2 text-left text-gray-600">속성 (요약)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {filteredNodes.slice(0, 50).map(n => (
+                        <tr
+                          key={n.obj_id}
+                          className={`cursor-pointer ${selectedListNode?.obj_id === n.obj_id ? 'bg-indigo-50' : 'hover:bg-gray-50'}`}
+                          onClick={() => setSelectedListNode(n)}
+                        >
+                          <td className="px-4 py-1.5 font-medium text-gray-800">{n.label}</td>
+                          <td className="px-4 py-1.5 text-indigo-600">{n.obj_type}</td>
+                          <td className="px-4 py-1.5 text-gray-400 font-mono truncate max-w-40">{n.props}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-gray-600">ID</th>
-                    <th className="px-4 py-2 text-left text-gray-600">레이블</th>
-                    <th className="px-4 py-2 text-left text-gray-600">타입</th>
-                    <th className="px-4 py-2 text-left text-gray-600">속성</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {graph.nodes.slice(0, 50).map(n => (
-                    <tr key={n.obj_id} className="hover:bg-gray-50">
-                      <td className="px-4 py-1.5 font-mono text-gray-500">{n.obj_id}</td>
-                      <td className="px-4 py-1.5 text-gray-800">{n.label}</td>
-                      <td className="px-4 py-1.5 text-indigo-600">{n.obj_type}</td>
-                      <td className="px-4 py-1.5 text-gray-400 font-mono text-xs truncate max-w-48">{n.props}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+
+            {/* 노드 상세 패널 */}
+            <div className="bg-white rounded-lg border shadow-sm p-4">
+              {selectedListNode ? (
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-800 text-sm">{selectedListNode.label}</span>
+                      <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">{selectedListNode.obj_type}</span>
+                    </div>
+                    <p className="text-xs text-gray-400 font-mono">{selectedListNode.obj_id}</p>
+                  </div>
+
+                  {selectedListNode.props && (
+                    <div>
+                      <p className="text-xs font-medium text-gray-500 mb-1.5">속성</p>
+                      <div className="space-y-1">
+                        {selectedListNode.props.split(';').filter(Boolean).map(kv => {
+                          const i = kv.indexOf('=')
+                          const k = i === -1 ? kv : kv.slice(0, i).trim()
+                          const v = i === -1 ? '' : kv.slice(i + 1).trim()
+                          return (
+                            <div key={k} className="flex justify-between text-xs">
+                              <span className="text-gray-500">{k}</span>
+                              <span className="font-medium text-gray-700">{v}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI질의 연동 버튼 */}
+                  {selectedListNode.obj_type === '시군' && (
+                    <button
+                      onClick={() => router.push(`/ai?q=${encodeURIComponent(selectedListNode.label + ' 청년 현황')}`)}
+                      className="w-full py-2 text-xs font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      AI 질의 — {selectedListNode.label} 데이터 조회 →
+                    </button>
+                  )}
+                  {selectedListNode.obj_type !== '시군' && (
+                    <button
+                      onClick={() => {
+                        const sigun = (graph?.nodes ?? []).find(n =>
+                          selectedListNode.obj_id.includes(n.obj_id.split(':')[1] ?? '') && n.obj_type === '시군'
+                        )
+                        router.push(`/ai?q=${encodeURIComponent((sigun?.label ?? '') + ' ' + selectedListNode.obj_type + ' 현황')}`)
+                      }}
+                      className="w-full py-2 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-md hover:bg-indigo-200 transition-colors"
+                    >
+                      연관 AI 질의 →
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-400 text-sm text-center py-8">
+                  노드를 클릭하면<br />상세 정보가 표시됩니다
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>
