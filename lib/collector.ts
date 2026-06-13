@@ -28,10 +28,11 @@ export function decryptAuthValue(encrypted: string): string {
   }
 }
 
-export type AuthType     = 'none' | 'api_key' | 'bearer'
-export type RespFormat   = 'json' | 'csv'
-export type ScheduleType = 'manual' | 'daily' | 'weekly' | 'monthly'
-export type JobStatus    = 'idle' | 'running' | 'success' | 'failed'
+export type AuthType      = 'none' | 'api_key' | 'bearer'
+export type RespFormat    = 'json' | 'csv' | 'xml'
+export type ScheduleType  = 'manual' | 'daily' | 'weekly' | 'monthly'
+export type JobStatus     = 'idle' | 'running' | 'success' | 'failed'
+export type PaginationType = 'none' | 'page' | 'offset' | 'cursor'
 
 export interface CollectionSource {
   source_id:    string
@@ -44,11 +45,18 @@ export interface CollectionSource {
   auth_key:     string | null
   auth_value:   string | null
   query_params: Record<string, string>
+  request_body: Record<string, unknown> | null
   resp_format:  RespFormat
   json_path:    string | null
   theme:        string | null
   keywords:     string | null
   license:      string | null
+  // 페이지네이션 설정 (공공데이터포털 기본값)
+  pagination_type:       PaginationType
+  pagination_page_param: string | null  // 기본: 'pageNo'
+  pagination_size_param: string | null  // 기본: 'numOfRows'
+  pagination_size:       number | null  // 기본: 1000
+  pagination_total_path: string | null  // JSON path to total count, 기본: '$.totalCount'
   created_at:   string
   updated_at:   string
 }
@@ -161,54 +169,183 @@ export function calcNextRunAt(scheduleType: ScheduleType): string | null {
 interface FetchResult {
   rows:     Record<string, unknown>[]
   rawCount: number
+  pagesFetched?: number
 }
 
-const MAX_ROWS = 100_000
-const FETCH_TIMEOUT_MS = 5_000
+const MAX_ROWS         = 100_000
+const FETCH_TIMEOUT_MS = 30_000  // 공공데이터 API는 느릴 수 있음
+const MAX_RETRIES      = 3
+const RETRY_DELAYS_MS  = [1_000, 2_000, 4_000]
 
-/** auth_type별 헤더 구성, resp_format별 파싱 */
-export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
+function buildHeaders(src: CollectionSource): Record<string, string> {
   const headers: Record<string, string> = {}
-
   if (src.auth_type === 'api_key' && src.auth_key && src.auth_value) {
     headers[src.auth_key] = decryptAuthValue(src.auth_value)
   } else if (src.auth_type === 'bearer' && src.auth_value) {
     headers['Authorization'] = `Bearer ${decryptAuthValue(src.auth_value)}`
   }
+  if (src.method === 'POST' && src.request_body) {
+    headers['Content-Type'] = 'application/json'
+  }
+  return headers
+}
 
-  const url = new URL(src.url)
+async function fetchOnce(
+  urlStr: string,
+  src: CollectionSource,
+  extraParams: Record<string, string> = {},
+): Promise<Response> {
+  const url = new URL(urlStr)
   if (src.query_params) {
     Object.entries(src.query_params).forEach(([k, v]) => url.searchParams.set(k, v))
   }
+  Object.entries(extraParams).forEach(([k, v]) => url.searchParams.set(k, v))
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-
-  let rows: Record<string, unknown>[]
   try {
     const res = await fetch(url.toString(), {
       method:  src.method,
-      headers,
+      headers: buildHeaders(src),
+      body:    src.method === 'POST' && src.request_body
+                 ? JSON.stringify(src.request_body)
+                 : undefined,
       signal:  controller.signal,
     })
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
-
-    if (src.resp_format === 'csv') {
-      const text = await res.text()
-      rows = parseCsv(text)
-    } else {
-      const json = await res.json()
-      rows = src.json_path ? extractByJsonPath(json, src.json_path) : (
-        Array.isArray(json) ? json as Record<string, unknown>[] : [json as Record<string, unknown>]
-      )
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().then(t => t.slice(0, 200))}`)
+    return res
   } finally {
     clearTimeout(timer)
   }
+}
 
-  const rawCount = rows.length
-  if (rows.length > MAX_ROWS) rows = rows.slice(0, MAX_ROWS)
-  return { rows, rawCount }
+async function fetchWithRetry(
+  urlStr: string,
+  src: CollectionSource,
+  extraParams: Record<string, string> = {},
+): Promise<Response> {
+  let lastErr: Error = new Error('알 수 없는 오류')
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fetchOnce(urlStr, src, extraParams)
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e))
+      const isAbort = lastErr.name === 'AbortError'
+      // AbortError(타임아웃)나 HTTP 4xx는 재시도 불필요
+      if (isAbort || lastErr.message.startsWith('HTTP 4')) throw lastErr
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, RETRY_DELAYS_MS[attempt]))
+      }
+    }
+  }
+  throw lastErr
+}
+
+async function parseResponse(res: Response, src: CollectionSource): Promise<Record<string, unknown>[]> {
+  if (src.resp_format === 'csv') {
+    const text = await res.text()
+    return parseCsv(text)
+  }
+  const json = await res.json()
+  return src.json_path
+    ? extractByJsonPath(json, src.json_path)
+    : (Array.isArray(json) ? json as Record<string, unknown>[] : [json as Record<string, unknown>])
+}
+
+/** auth_type별 헤더 구성, resp_format별 파싱, 페이지네이션 자동 처리 */
+export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
+  const paginationType = src.pagination_type ?? 'none'
+
+  // 페이지네이션 없음 또는 CSV
+  if (paginationType === 'none' || src.resp_format === 'csv') {
+    const res = await fetchWithRetry(src.url, src)
+    const rows = await parseResponse(res, src)
+    const rawCount = rows.length
+    return { rows: rows.slice(0, MAX_ROWS), rawCount }
+  }
+
+  // page 방식 (공공데이터포털 기본: pageNo + numOfRows + totalCount)
+  if (paginationType === 'page') {
+    const pageParam  = src.pagination_page_param  ?? 'pageNo'
+    const sizeParam  = src.pagination_size_param  ?? 'numOfRows'
+    const pageSize   = src.pagination_size        ?? 1000
+    const totalPath  = src.pagination_total_path  ?? '$.totalCount'
+
+    let allRows: Record<string, unknown>[] = []
+    let pageNo    = 1
+    let totalCount: number | null = null
+    let pagesFetched = 0
+
+    while (true) {
+      const extraParams: Record<string, string> = {
+        [pageParam]: String(pageNo),
+        [sizeParam]: String(pageSize),
+      }
+      const res  = await fetchWithRetry(src.url, src, extraParams)
+      const json = await res.json()
+
+      // totalCount 최초 1회 추출
+      if (totalCount === null) {
+        const totalParts = totalPath.replace(/^\$\.?/, '').split('.')
+        let cur: unknown = json
+        for (const p of totalParts) {
+          cur = (cur as Record<string, unknown>)?.[p]
+        }
+        totalCount = typeof cur === 'number' ? cur : parseInt(String(cur), 10)
+        if (isNaN(totalCount)) totalCount = null
+      }
+
+      const pageRows: Record<string, unknown>[] = src.json_path
+        ? extractByJsonPath(json, src.json_path)
+        : (Array.isArray(json) ? json as Record<string, unknown>[] : [json as Record<string, unknown>])
+
+      allRows.push(...pageRows)
+      pagesFetched++
+
+      // 종료 조건
+      const done =
+        pageRows.length === 0 ||
+        allRows.length >= MAX_ROWS ||
+        (totalCount !== null && allRows.length >= totalCount) ||
+        pageRows.length < pageSize
+
+      if (done) break
+      pageNo++
+    }
+
+    const rawCount = totalCount ?? allRows.length
+    return { rows: allRows.slice(0, MAX_ROWS), rawCount, pagesFetched }
+  }
+
+  // offset 방식
+  if (paginationType === 'offset') {
+    const offsetParam = src.pagination_page_param ?? 'offset'
+    const limitParam  = src.pagination_size_param ?? 'limit'
+    const pageSize    = src.pagination_size       ?? 1000
+
+    let allRows: Record<string, unknown>[] = []
+    let offset = 0
+    let pagesFetched = 0
+
+    while (allRows.length < MAX_ROWS) {
+      const extraParams: Record<string, string> = {
+        [offsetParam]: String(offset),
+        [limitParam]:  String(pageSize),
+      }
+      const res      = await fetchWithRetry(src.url, src, extraParams)
+      const pageRows = await parseResponse(res, src)
+      allRows.push(...pageRows)
+      pagesFetched++
+      if (pageRows.length < pageSize) break
+      offset += pageSize
+    }
+    return { rows: allRows.slice(0, MAX_ROWS), rawCount: allRows.length, pagesFetched }
+  }
+
+  // 기타: 단순 fetch
+  const res = await fetchWithRetry(src.url, src)
+  const rows = await parseResponse(res, src)
+  return { rows: rows.slice(0, MAX_ROWS), rawCount: rows.length }
 }
 
 interface DiffResult {

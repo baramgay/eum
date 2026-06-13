@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard, Database, Map, ShieldCheck, GitBranch,
   FileBarChart2, Bot, Upload, RefreshCw, Settings2, KeyRound,
-  BookOpen, Building2, Menu, X, ChevronDown, Layers, type LucideIcon,
+  BookOpen, Building2, Menu, X, ChevronDown, Layers, BarChart2, type LucideIcon,
 } from 'lucide-react'
 
 interface Tab {
@@ -30,6 +30,7 @@ const BASE_TABS: Tab[] = [
   { href: '/submission', label: '데이터 등록', icon: Upload },
   { href: '/collect',    label: '수집',       icon: RefreshCw },
   { href: '/process',    label: '가공',       icon: Settings2 },
+  { href: '/analytics',  label: '분석',       icon: BarChart2 },
   { href: '/openapi',    label: '개방 API',   icon: KeyRound },
   { href: '/manual',     label: '도움말',     icon: BookOpen },
 ]

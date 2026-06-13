@@ -73,11 +73,17 @@ export async function POST(req: Request) {
     auth_key:     (body.auth_key as string) ?? null,
     auth_value:   storedAuthValue,
     query_params: (body.query_params as object) ?? {},
+    request_body: (body.request_body as object) ?? null,
     resp_format:  (body.resp_format as string) ?? 'json',
     json_path:    (body.json_path as string) ?? null,
     theme:        (body.theme as string) ?? null,
     keywords:     (body.keywords as string) ?? null,
     license:      (body.license as string) ?? '공공누리 1유형',
+    pagination_type:       (body.pagination_type as string) ?? 'none',
+    pagination_page_param: (body.pagination_page_param as string) ?? 'pageNo',
+    pagination_size_param: (body.pagination_size_param as string) ?? 'numOfRows',
+    pagination_size:       body.pagination_size ? Number(body.pagination_size) : 1000,
+    pagination_total_path: (body.pagination_total_path as string) ?? '$.totalCount',
   })
   if (srcErr) return NextResponse.json({ error: srcErr.message }, { status: 500 })
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { applyRules, persistResult, type Rule, type Row } from '@/lib/processor'
+import { applyRules, type Rule, type Row } from '@/lib/processor'
 
 const PAGE_SIZE = 1000
 
@@ -84,7 +84,18 @@ export async function POST(
     }
 
     const result = applyRules(allRows, rules)
-    const { datasetId } = await persistResult(supabase, pipeline.tenant_id, pipeline, result)
+
+    // 결과 저장
+    const datasetId = 'proc_' + Array.from(crypto.getRandomValues(new Uint8Array(5)))
+      .map(b => b.toString(16).padStart(2, '0')).join('')
+    await supabase.from('submission_uploads').insert({
+      upload_id:   datasetId,
+      table_name:  datasetId,
+      schema_info: {},
+      preview:     result.rows.slice(0, 100),
+      row_count:   result.rows.length,
+      created_at:  new Date().toISOString(),
+    })
 
     await supabase.from('processing_runs').update({
       status:            'done',
