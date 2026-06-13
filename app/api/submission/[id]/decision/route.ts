@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { recordDecision } from '@/lib/submission'
+import { logAction } from '@/lib/audit'
+import { sendEmail, emailDecisionNotify, getTenantContactEmail, CENTER_EMAIL } from '@/lib/email'
 
 const VALID_STATUSES = new Set(['approved', 'rejected', 'review'])
 
@@ -25,5 +27,53 @@ export async function POST(
   }
 
   await recordDecision(supabase, id, body.status as 'approved' | 'rejected', body.decision_note ?? '')
+
+  // 제출 정보 조회 (감사 로그 + 이메일에 필요)
+  const { data: sub } = await supabase
+    .from('submissions').select('*').eq('submission_id', id).maybeSingle()
+
+  if (body.status === 'approved' && sub) {
+    await supabase.from('catalog').upsert({
+      dataset_id:  `ds-${id}`,
+      tenant_id:   sub.tenant_id,
+      title:       sub.title,
+      description: sub.description,
+      theme:       sub.theme,
+      keywords:    sub.keywords,
+      license:     sub.license,
+      format:      sub.format,
+      table_name:  sub.table_name,
+      rows:        sub.rows,
+      is_open:     true,
+      ai_ready:    false,
+      high_value:  false,
+      layer:       'silver',
+      updated_at:  new Date().toISOString(),
+    }, { onConflict: 'dataset_id' })
+  }
+
+  // 감사 로그 (fire-and-forget)
+  const action = body.status === 'approved' ? 'approved' : body.status === 'rejected' ? 'rejected' : 'review'
+  void logAction(
+    supabase, user, action, 'submission', id,
+    { status: 'submitted' },
+    { status: body.status, decision_note: body.decision_note },
+    req,
+  )
+
+  // 이메일 알림 — 기관 담당자에게 결과 통지 (fire-and-forget)
+  if (sub && body.status !== 'review') {
+    void (async () => {
+      const tenantEmail = await getTenantContactEmail(sub.tenant_id)
+      const to = tenantEmail ?? CENTER_EMAIL
+      const { subject, html } = emailDecisionNotify(
+        sub.title,
+        body.status as 'approved' | 'rejected',
+        body.decision_note ?? '',
+      )
+      await sendEmail(to, subject, html)
+    })()
+  }
+
   return NextResponse.json({ ok: true, submission_id: id, status: body.status })
 }

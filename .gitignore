@@ -2,9 +2,23 @@ node_modules/
 .next/
 .env.local
 .env*.local
+.env
 
 data/
 __pycache__/
 *.pyc
 .pytest_cache/
 .worktrees/
+
+# 내부 도구
+.claude/
+.agents/
+skills-lock.json
+
+# 테스트 계정 (비밀번호 포함)
+test_accounts.txt
+
+# 임시·로그
+supabase/.temp/
+*.log
+eum_dev.log

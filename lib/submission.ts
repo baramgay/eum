@@ -3,6 +3,7 @@
  * CSV 업로드, 제출 관리, 승인/반려, 코멘트
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { randomHex } from './utils'
 
 const TABLE_NAME_RE = /^sub_(.+)_[0-9a-f]{8}$/
 
@@ -12,10 +13,7 @@ export function validateTableName(name: string): string {
 }
 
 export function newTableName(tenantId: string): string {
-  const arr = new Uint8Array(4)
-  crypto.getRandomValues(arr)
-  const suffix = Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('')
-  return `sub_${tenantId}_${suffix}`
+  return `sub_${tenantId}_${randomHex(4)}`
 }
 
 export function inferSchema(rows: Record<string, unknown>[]): Array<{ name: string; type: string }> {
@@ -35,9 +33,7 @@ export async function createSubmission(
   rows: number,
   qualitySummary: string,
 ): Promise<string> {
-  const arr = new Uint8Array(16)
-  crypto.getRandomValues(arr)
-  const submissionId = Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('')
+  const submissionId = randomHex(16)
   await supabase.from('submissions').insert({
     submission_id: submissionId,
     tenant_id: meta.tenant_id, title: meta.title, description: meta.description,
@@ -52,7 +48,7 @@ export async function createSubmission(
 export async function recordDecision(
   supabase: SupabaseClient,
   submissionId: string,
-  status: 'approved' | 'rejected',
+  status: 'approved' | 'rejected' | 'review',
   decisionNote = '',
 ): Promise<void> {
   await supabase.from('submissions').update({
@@ -67,9 +63,7 @@ export async function addComment(
   submissionId: string,
   comment: string,
 ): Promise<string> {
-  const arr = new Uint8Array(16)
-  crypto.getRandomValues(arr)
-  const commentId = Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('')
+  const commentId = randomHex(16)
   await supabase.from('consultant_comments').insert({
     comment_id: commentId, submission_id: submissionId,
     comment, created_at: new Date().toISOString(),

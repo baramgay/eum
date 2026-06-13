@@ -16,8 +16,8 @@ export const RULES: Record<string, RuleEntry[]> = {
   gold_youth_population: [
     ['population 음수 금지',    sb => countWhere(sb, 'gold_youth_population', 'population', 'lt', 0)],
     ['population NULL 금지',    sb => countNull(sb,  'gold_youth_population', 'population')],
-    ['연령대 코드 유효성',       sb => countNotIn(sb, 'gold_youth_population', 'age_band', ['20-24','25-29','30-34','35-39'])],
-    ['성별 코드 유효성',         sb => countNotIn(sb, 'gold_youth_population', 'sex', ['M','F'])],
+    ['연령대 코드 유효성',       sb => countNotIn(sb, 'gold_youth_population', 'age_band', ['20-24','25-29','30-34','35-39','20-39'])],
+    ['성별 코드 유효성',         sb => countNotIn(sb, 'gold_youth_population', 'sex', ['M','F','total'])],
     ['연도 범위(2018-2025)',     sb => countYearOutOfRange(sb, 'gold_youth_population', 2018, 2025)],
     ['유입/유출 음수 금지',      sb => countTwoLt(sb, 'gold_youth_population', 'inflow', 'outflow')],
   ],
@@ -89,13 +89,10 @@ export async function runQuality(supabase: SupabaseClient, datasetId: string) {
     .from(cat.table_name).select('*', { count: 'exact', head: true })
   const total = totalRows ?? 0
 
-  let errors = 0
-  const detail: Array<{ rule: string; violations: number }> = []
-  for (const [rname, fn] of rules) {
-    const viol = await fn(supabase)
-    errors += viol
-    detail.push({ rule: rname, violations: viol })
-  }
+  const detail = await Promise.all(
+    rules.map(async ([rname, fn]) => ({ rule: rname, violations: await fn(supabase) }))
+  )
+  const errors = detail.reduce((s, r) => s + r.violations, 0)
 
   const checked = total * rules.length
   const rate    = checked ? (errors / checked) * 100 : 0
@@ -118,12 +115,8 @@ export async function runQuality(supabase: SupabaseClient, datasetId: string) {
 
 export async function runAll(supabase: SupabaseClient) {
   const { data: rows } = await supabase.from('catalog').select('dataset_id')
-  const out = []
-  for (const r of rows ?? []) {
-    const res = await runQuality(supabase, r.dataset_id)
-    if (res) out.push(res)
-  }
-  return out
+  const results = await Promise.all((rows ?? []).map(r => runQuality(supabase, r.dataset_id)))
+  return results.filter(Boolean)
 }
 
 // ─── 업로드 데이터 제네릭 품질 검사 ─────────────────────────────────────────

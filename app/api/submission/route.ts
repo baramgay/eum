@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createSubmission, newTableName, summarizeQuality, inferSchema } from '@/lib/submission'
 import { runQualityGeneric } from '@/lib/quality'
+import { parseCsv } from '@/lib/collector'
+import { randomHex } from '@/lib/utils'
+import { logAction } from '@/lib/audit'
+import { sendEmail, emailSubmissionReceived, CENTER_EMAIL } from '@/lib/email'
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -66,21 +70,9 @@ export async function POST(req: Request) {
   const tableName = newTableName(tenantId)
 
   if (file) {
-    const text    = await file.text()
-    const lines   = text.trim().split('\n')
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''))
-    uploadedData  = lines.slice(1).map(line => {
-      const vals = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''))
-      return Object.fromEntries(headers.map((h, i) => {
-        const v = vals[i] ?? ''
-        const n = Number(v)
-        return [h, v === '' ? null : isNaN(n) ? v : n]
-      }))
-    })
+    uploadedData = parseCsv(await file.text())
 
-    const arr = new Uint8Array(16)
-    crypto.getRandomValues(arr)
-    const uploadId = Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('')
+    const uploadId = randomHex(16)
 
     await supabase.from('submission_uploads').insert({
       upload_id:   uploadId,
@@ -96,6 +88,15 @@ export async function POST(req: Request) {
   const summary = summarizeQuality(diag)
   const rows    = parseInt(form.get('rows') as string ?? String(uploadedData.length), 10)
   const subId   = await createSubmission(supabase, meta, tableName, rows || uploadedData.length, summary)
+
+  // 감사 로그 (fire-and-forget)
+  void logAction(supabase, user, 'submitted', 'submission', subId, undefined, { title: meta.title, tenant_id: tenantId }, req)
+
+  // 이메일 — 센터에 새 제출 알림 (fire-and-forget)
+  void (async () => {
+    const { subject, html } = emailSubmissionReceived(tenantId, meta.title, subId)
+    await sendEmail(CENTER_EMAIL, subject, html)
+  })()
 
   return NextResponse.json({
     submission_id:   subId,
