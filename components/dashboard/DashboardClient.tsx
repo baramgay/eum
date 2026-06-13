@@ -1,18 +1,30 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ReferenceLine, ResponsiveContainer,
   LineChart, Line, CartesianGrid, Legend,
 } from 'recharts'
 
 interface AreaScore { name: string; score: number; color: string; weight: number }
-interface Indicators { overall: number; areas: AreaScore[]; summary: string }
+interface Indicators {
+  overall: number; areas: AreaScore[]; summary: string
+  pipeline?: { analysis_today: number; process_today: number }
+}
 
 interface UsageData {
   topDownloads: { datasetId: string; title: string; count: number }[]
   recentDatasets: { datasetId: string; title: string; updatedAt: string }[]
   period: string
+}
+
+interface AnalysisRun {
+  id: string
+  analysis_type: string
+  dataset_label: string
+  result_title: string | null
+  created_at: string
 }
 
 interface MigrationRow    { sigun: string; net: number; inflow: number; outflow: number }
@@ -59,13 +71,38 @@ const GRADE_COLOR = ['#6D28D9','#2563EB','#0891B2','#059669','#65A30D','#D97706'
 
 const PERIOD_LABELS: Record<string, string> = { month: '월', q: '분기', year: '연' }
 
+const ANALYSIS_TYPE_LABEL: Record<string, string> = {
+  descriptives:        '기술통계량',
+  frequencies:         '빈도 분석',
+  normality:           '정규성 검정',
+  crosstab:            '교차 분석',
+  correlation:         '상관 분석',
+  independent_ttest:   '독립표본 t-검정',
+  one_way_anova:       '일원분산분석',
+  linear_regression:   '선형 회귀분석',
+  survival:            '생존 분석',
+  timeseries_decompose:'시계열 분해',
+}
+
+function timeAgo(isoStr: string) {
+  const diffMs = Date.now() - new Date(isoStr).getTime()
+  const m = Math.floor(diffMs / 60000)
+  if (m < 1)   return '방금'
+  if (m < 60)  return `${m}분 전`
+  const h = Math.floor(m / 60)
+  if (h < 24)  return `${h}시간 전`
+  return `${Math.floor(h / 24)}일 전`
+}
+
 export default function DashboardClient() {
+  const router = useRouter()
   const [data, setData]           = useState<Indicators | null>(null)
   const [charts, setCharts]       = useState<ChartData | null>(null)
   const [settlement, setSettlement] = useState<SettlementRow[]>([])
   const [loading, setLoading]     = useState(true)
   const [period, setPeriod]       = useState<'month' | 'q' | 'year'>('month')
   const [usage, setUsage]         = useState<UsageData | null>(null)
+  const [recentRuns, setRecentRuns] = useState<AnalysisRun[]>([])
 
   useEffect(() => {
     Promise.all([
@@ -81,6 +118,13 @@ export default function DashboardClient() {
       console.error('[Dashboard] 데이터 로드 오류:', err)
       setLoading(false)
     })
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/analytics/runs?limit=5')
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setRecentRuns(Array.isArray(d) ? d : []))
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -123,6 +167,58 @@ export default function DashboardClient() {
         <h2 className="text-xl font-semibold text-gray-800">플랫폼 현황</h2>
         <p className="text-sm text-gray-500 mt-0.5">{data.summary}</p>
       </div>
+
+      {/* 파이프라인 현황 + 최근 분석 */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* 오늘의 파이프라인 현황 */}
+        <div className="bg-white rounded-lg border shadow-sm p-5">
+          <h3 className="text-sm font-semibold text-gray-600 mb-3">오늘의 파이프라인 현황</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-blue-50 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold text-blue-700">{data.pipeline?.process_today ?? 0}</p>
+              <p className="text-xs text-blue-600 mt-0.5">데이터 가공</p>
+            </div>
+            <div className="bg-violet-50 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold text-violet-700">{data.pipeline?.analysis_today ?? 0}</p>
+              <p className="text-xs text-violet-600 mt-0.5">분석 실행</p>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-3 text-right">오늘({new Date().toLocaleDateString('ko-KR')}) 기준</p>
+        </div>
+
+        {/* 최근 분석 이력 */}
+        <div className="bg-white rounded-lg border shadow-sm p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-600">최근 분석 이력</h3>
+            <button
+              onClick={() => router.push('/analytics')}
+              className="text-xs text-blue-600 hover:underline"
+            >
+              분석 탭으로 →
+            </button>
+          </div>
+          {recentRuns.length === 0 ? (
+            <p className="text-xs text-gray-400 py-4 text-center">분석 이력이 없습니다.</p>
+          ) : (
+            <ul className="space-y-2">
+              {recentRuns.map(run => (
+                <li
+                  key={run.id}
+                  className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 rounded-md px-1 py-0.5 -mx-1"
+                  onClick={() => router.push('/analytics')}
+                >
+                  <span className="inline-block mt-0.5 px-1.5 py-0.5 text-xs font-medium bg-violet-100 text-violet-700 rounded whitespace-nowrap">
+                    {ANALYSIS_TYPE_LABEL[run.analysis_type] ?? run.analysis_type}
+                  </span>
+                  <span className="text-xs text-gray-600 truncate flex-1">{run.dataset_label}</span>
+                  <span className="text-xs text-gray-400 whitespace-nowrap">{timeAgo(run.created_at)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <ScoreGauge value={data.overall} label="종합 점수" color="#2563eb" />
         {data.areas.map(a => (

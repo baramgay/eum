@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   Upload, Database, ChevronDown, ChevronRight, PlayCircle,
-  X, AlertCircle, Loader2, BarChart2, Info,
+  X, AlertCircle, Loader2, BarChart2, Info, Download, Search,
 } from 'lucide-react'
 
 // ────────────────────────────────────────────
@@ -154,6 +155,49 @@ const ANALYSIS_MENU: { group: string; items: AnalysisMenuItem[] }[] = [
       },
     ],
   },
+  {
+    group: '고급 분석',
+    items: [
+      {
+        id: 'survival',
+        label: '생존 분석 (Kaplan-Meier)',
+        desc: 'KM 생존 함수 + 중앙생존시간 + Log-rank 검정',
+        variableSlots: [
+          { key: 'duration', label: '기간(시간) 변수', multi: false, filter: ['scale'] },
+          { key: 'event',    label: '이벤트 변수 (0/1)', multi: false, filter: ['scale', 'nominal'] },
+          { key: 'group',    label: '집단 변수 (선택)', multi: false, filter: ['nominal', 'ordinal'] },
+        ],
+        options: [
+          {
+            key: 'ci_show', label: '신뢰구간 표시', type: 'select',
+            choices: [{ value: 'yes', label: '표시' }, { value: 'no', label: '숨김' }],
+            default: 'yes',
+          },
+        ],
+      },
+      {
+        id: 'timeseries_decompose',
+        label: '시계열 분해 (STL)',
+        desc: '추세·계절성·잔차 분해 — STL(Seasonal-Trend using Loess)',
+        variableSlots: [
+          { key: 'variable', label: '시계열 값 변수', multi: false, filter: ['scale'] },
+          { key: 'date_col', label: '날짜 컬럼 (선택)', multi: false, filter: ['nominal'] },
+        ],
+        options: [
+          {
+            key: 'period', label: '주기(Period)', type: 'select',
+            choices: [
+              { value: '4',  label: '4 (분기)' },
+              { value: '7',  label: '7 (주간)' },
+              { value: '12', label: '12 (월별)' },
+              { value: '52', label: '52 (주별/연간)' },
+            ],
+            default: '12',
+          },
+        ],
+      },
+    ],
+  },
 ]
 
 // ────────────────────────────────────────────
@@ -200,9 +244,13 @@ function ResultTableView({ table }: { table: ResultTable }) {
 // 메인 컴포넌트
 // ────────────────────────────────────────────
 
+interface CatalogItem { id: string; title: string; theme?: string }
+
 interface Props { role: string; tenantId: string }
 
 export default function AnalyticsClient({ role, tenantId }: Props) {
+  const searchParams = useSearchParams()
+
   const [session, setSession]   = useState<SessionState | null>(null)
   const [loading, setLoading]   = useState(false)
   const [loadError, setLoadError] = useState('')
@@ -214,6 +262,11 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
   const [running, setRunning]   = useState(false)
   const [result, setResult]     = useState<AnalysisResult | null>(null)
   const [showPreview, setShowPreview] = useState(false)
+
+  const [showCatalogPicker, setShowCatalogPicker] = useState(false)
+  const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([])
+  const [catalogSearch, setCatalogSearch] = useState('')
+  const [catalogLoading, setCatalogLoading] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -247,13 +300,9 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
     }
   }
 
-  async function handleLoadCatalog() {
-    // 카탈로그 목록에서 선택하는 간단한 prompt
-    const catalogId = window.prompt('카탈로그 ID를 입력하세요 (예: CAT-0001)')
-    if (!catalogId) return
+  async function loadCatalogById(catalogId: string, label?: string) {
     setLoading(true); setLoadError('')
     try {
-      // 카탈로그 데이터 JSON 다운로드
       const res = await fetch(`/api/catalog/${catalogId.trim()}/download?format=json`)
       if (!res.ok) throw new Error(`카탈로그 조회 실패: ${res.status}`)
       const json = await res.json()
@@ -276,7 +325,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
         })),
         total_rows: analyzeJson.total_rows,
         preview: analyzeJson.preview ?? [],
-        source_label: catalogId,
+        source_label: label ?? catalogId,
       })
       setResult(null)
       setSelectedAnalysis(null)
@@ -287,6 +336,33 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
       setLoading(false)
     }
   }
+
+  async function openCatalogPicker() {
+    setShowCatalogPicker(true)
+    setCatalogSearch('')
+    if (catalogItems.length > 0) return
+    setCatalogLoading(true)
+    try {
+      const res = await fetch('/api/catalog?page=1')
+      const json = await res.json()
+      const items: CatalogItem[] = (Array.isArray(json) ? json : json.data ?? [])
+        .map((d: Record<string, unknown>) => ({ id: String(d.id), title: String(d.title ?? d.id), theme: String(d.theme ?? '') }))
+      setCatalogItems(items)
+    } catch {
+      setCatalogItems([])
+    } finally {
+      setCatalogLoading(false)
+    }
+  }
+
+  // dataset_id URL 파라미터 자동 로드 (ProcessClient "분석으로" 버튼 연동)
+  useEffect(() => {
+    const datasetId = searchParams.get('dataset_id')
+    if (datasetId && !session) {
+      loadCatalogById(datasetId)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   // ── 변수 타입 변경 ───────────────────────────
 
@@ -349,11 +425,54 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
       })
       const json = await res.json()
       setResult(json)
+      if (json.ok) {
+        fetch('/api/analytics/runs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            analysis_type:  selectedAnalysis.id,
+            dataset_label:  session.source_label,
+            result_title:   json.title,
+            result_summary: { table_count: json.tables?.length ?? 0, total_rows: session.total_rows },
+          }),
+        }).catch(() => {})
+      }
     } catch (e) {
       setResult({ ok: false, error: String(e) })
     } finally {
       setRunning(false)
     }
+  }
+
+  // ── CSV 내보내기 ─────────────────────────────
+
+  function exportCSV() {
+    if (!result?.tables || result.tables.length === 0) return
+    const lines: string[] = []
+    for (const table of result.tables) {
+      lines.push(table.title)
+      lines.push(table.headers.join(','))
+      for (const row of table.rows) {
+        lines.push(row.map(v => {
+          const s = v === null || v === '' ? '' : String(v)
+          return s.includes(',') || s.includes('"') || s.includes('\n')
+            ? `"${s.replace(/"/g, '""')}"`
+            : s
+        }).join(','))
+      }
+      if (table.footnotes?.length) {
+        table.footnotes.forEach(fn => lines.push(`"${fn}"`))
+      }
+      lines.push('')
+    }
+    const BOM = '﻿'
+    const blob = new Blob([BOM + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${result.title ?? '분석결과'}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   // ── 변수 목록 필터 ───────────────────────────
@@ -412,14 +531,14 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(f) }}
             />
             <button
-              onClick={handleLoadCatalog}
+              onClick={openCatalogPicker}
               disabled={loading}
               className="flex-1 flex flex-col items-center gap-3 p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group"
             >
               <Database className="w-8 h-8 text-gray-400 group-hover:text-blue-500" />
               <div>
                 <p className="font-semibold text-gray-700 text-sm">카탈로그 로드</p>
-                <p className="text-xs text-gray-400 mt-0.5">등록된 데이터셋 ID 입력</p>
+                <p className="text-xs text-gray-400 mt-0.5">등록된 데이터셋 목록에서 선택</p>
               </div>
             </button>
           </div>
@@ -433,6 +552,61 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" /> {loadError}
             </div>
           )}
+        </div>
+      )}
+
+      {/* 카탈로그 picker 모달 */}
+      {showCatalogPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b">
+              <p className="font-semibold text-gray-800">카탈로그 선택</p>
+              <button onClick={() => setShowCatalogPicker(false)} className="p-1 text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-3 border-b">
+              <div className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50">
+                <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <input
+                  type="text"
+                  value={catalogSearch}
+                  onChange={e => setCatalogSearch(e.target.value)}
+                  placeholder="데이터셋 이름 검색..."
+                  className="flex-1 text-sm bg-transparent outline-none"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div className="max-h-72 overflow-y-auto">
+              {catalogLoading ? (
+                <div className="flex items-center justify-center py-8 gap-2 text-sm text-gray-400">
+                  <Loader2 className="w-4 h-4 animate-spin" /> 목록 로드 중...
+                </div>
+              ) : catalogItems.length === 0 ? (
+                <p className="text-center py-8 text-sm text-gray-400">등록된 카탈로그가 없습니다</p>
+              ) : (
+                catalogItems
+                  .filter(it => !catalogSearch || it.title.includes(catalogSearch) || it.id.includes(catalogSearch))
+                  .map(it => (
+                    <button
+                      key={it.id}
+                      onClick={() => { setShowCatalogPicker(false); loadCatalogById(it.id, it.title) }}
+                      className="w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-blue-50 transition-colors"
+                    >
+                      <p className="text-sm font-medium text-gray-800 truncate">{it.title}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{it.id}{it.theme ? ` · ${it.theme}` : ''}</p>
+                    </button>
+                  ))
+              )}
+            </div>
+            <div className="p-3 border-t bg-gray-50">
+              <p className="text-xs text-gray-400">
+                {catalogItems.length > 0 ? `${catalogItems.length}개 데이터셋` : ''}
+                {' '} · 선택하면 즉시 분석 세션에 로드됩니다
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -638,7 +812,15 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                   <div className="bg-white rounded-xl border border-gray-200 p-5">
                     {result.ok ? (
                       <>
-                        <h3 className="text-base font-bold text-gray-900 mb-4">{result.title}</h3>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-base font-bold text-gray-900">{result.title}</h3>
+                          <button
+                            onClick={exportCSV}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+                          >
+                            <Download className="w-3.5 h-3.5" /> CSV 내보내기
+                          </button>
+                        </div>
                         {result.tables?.map((t, i) => (
                           <ResultTableView key={i} table={t} />
                         ))}
