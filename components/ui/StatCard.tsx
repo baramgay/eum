@@ -1,9 +1,11 @@
+import type { ReactNode } from 'react'
+
 type Color = 'blue' | 'green' | 'amber' | 'red' | 'purple' | 'gray'
 interface StatCardProps {
   label: string
   value: string | number
   color?: Color
-  icon?: string
+  icon?: ReactNode
   trend?: string
   trendUp?: boolean
 }

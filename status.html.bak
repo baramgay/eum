@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이음(EUM) 플랫폼 — 제작 기록 (status)</title>
+<style>
+  :root{--navy:#0b2a4a;--blue:#1457b8;--sky:#2e8fe0;--teal:#0f9d8f;--green:#1aa251;
+    --amber:#e8a317;--red:#d9534f;--purple:#7b4fc4;--ink:#15233a;--muted:#5b6b80;
+    --line:#dde5ef;--bg:#f4f7fb;--card:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"맑은 고딕","Malgun Gothic","Segoe UI",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;font-size:15px}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+  h1,h2,h3{color:var(--navy);margin:0}
+  code{background:#eef2f7;padding:1px 6px;border-radius:5px;font-family:Consolas,monospace;font-size:.88em;color:#b2305a}
+  a{color:var(--blue)}
+  .cover{background:linear-gradient(125deg,#0b2a4a,#143b6e 55%,#1457b8);color:#fff;padding:46px 22px 38px}
+  .cover .wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .cover h1{color:#fff;font-size:30px}
+  .cover .brand{font-size:40px;font-weight:900;background:linear-gradient(90deg,#7ee0ff,#bfe9c6);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .live{display:inline-flex;align-items:center;gap:8px;background:rgba(26,162,81,.2);
+    border:1px solid #38d27e;color:#bff3d3;padding:6px 14px;border-radius:30px;font-weight:700;font-size:13px}
+  .live .b{width:9px;height:9px;border-radius:50%;background:#38d27e;box-shadow:0 0 0 0 #38d27e;animation:p 1.6s infinite}
+  @keyframes p{0%{box-shadow:0 0 0 0 rgba(56,210,126,.7)}70%{box-shadow:0 0 0 9px rgba(56,210,126,0)}100%{box-shadow:0 0 0 0 rgba(56,210,126,0)}}
+  .cover .sub{color:#bdd6f5;font-size:14px;margin-top:6px;width:100%}
+  section{padding:36px 0;border-bottom:1px solid var(--line)}
+  .sec-no{font-size:12px;font-weight:800;color:var(--sky);letter-spacing:.16em}
+  h2{font-size:23px;margin:4px 0 16px}
+  .kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:13px}
+  @media(max-width:880px){.kpi{grid-template-columns:repeat(2,1fr)}}
+  .kpi .k{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .kpi .num{font-size:25px;font-weight:900;color:var(--blue);line-height:1}
+  .kpi .lbl{font-size:11.5px;color:var(--muted);margin-top:6px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border-radius:10px;overflow:hidden;
+    box-shadow:0 2px 8px rgba(16,44,82,.05)}
+  th{background:var(--navy);color:#fff;text-align:left;padding:10px 12px;font-size:12.5px}
+  td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  .tl{position:relative;margin-left:8px;padding-left:26px;border-left:2px solid #cdd9ea}
+  .tl .item{position:relative;margin:0 0 22px}
+  .tl .item:before{content:"";position:absolute;left:-34px;top:3px;width:15px;height:15px;border-radius:50%;
+    background:#fff;border:3px solid var(--blue)}
+  .tl .item.done:before{border-color:var(--green);background:var(--green)}
+  .tl .item.next:before{border-color:var(--amber);background:var(--amber)}
+  .tl .ts{font-size:12px;color:var(--muted);font-family:Consolas,monospace}
+  .tl h3{font-size:16px;margin:2px 0 4px}
+  .tl .v{font-size:13px;color:#1a7a44;background:#eefbf3;border-radius:7px;padding:6px 11px;margin-top:6px;display:inline-block}
+  .tl .v.code{font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;color:#23532f;display:block}
+  .ok{color:var(--green);font-weight:800}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+  .b-ok{background:#e3f6ec;color:#1aa251}.b-next{background:#fcf2dc;color:#b9810a}.b-warn{background:#fbe6e5;color:#d9534f}
+  .b-done{background:#e3f6ec;color:#1aa251}.b-progress{background:#e6f1fd;color:#1457b8}.b-proto{background:#f2f2f2;color:#5b6b80}
+  .shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 3px 14px rgba(16,44,82,.10);margin:8px 0}
+  .shot img{width:100%;display:block}
+  .shot .cap{background:#0b2a4a;color:#dceaff;font-size:12.5px;padding:8px 14px;font-weight:600}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:880px){.grid2{grid-template-columns:1fr}}
+  .note{background:#f6f9fd;border-left:4px solid var(--sky);padding:13px 16px;border-radius:0 10px 10px 0;
+    font-size:13.5px;color:#3c4a5e;margin:14px 0}
+  .note.warn{border-color:var(--amber);background:#fffdf6}
+  .layerbar{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;margin:7px 0;color:#fff;font-size:13.5px}
+  .layerbar .id{font-weight:900;min-width:34px}.layerbar .nm{font-weight:700;min-width:150px}
+  .layerbar .st{margin-left:auto;font-size:12px;background:rgba(255,255,255,.22);padding:3px 11px;border-radius:20px}
+  ul.clean{list-style:none;padding-left:0}ul.clean li{padding-left:20px;position:relative;margin:6px 0;font-size:14px}
+  ul.clean li:before{content:"\2713";position:absolute;left:0;color:var(--green);font-weight:900}
+  ul.next li:before{content:"\25B8";color:var(--amber)}
+  .foot{background:var(--navy);color:#cdd9ea;padding:28px 22px;font-size:13px}
+  .tab-status{font-size:12px}
+</style>
+</head>
+<body>
+
+<header class="cover"><div class="wrap">
+  <div>
+    <h1>제작 기록 · Build Status</h1>
+    <div class="brand">이음 · EUM</div>
+  </div>
+  <div style="margin-left:auto"><span class="live"><span class="b"></span>3단계 고도화 진행 중 · 2026-06-14</span></div>
+  <div class="sub">경남 공공데이터 통합 플랫폼 「이음」 — Next.js 14 App Router + TypeScript + Supabase + Tailwind CSS.
+    1단계 제작일 2026-06-05 · 2단계 마이그레이션 완료 2026-06-10 · 3단계 탭 고도화 2026-06-14.</div>
+</div></header>
+
+<main>
+
+<!-- 요약 -->
+<section><div class="wrap">
+  <div class="sec-no">SUMMARY</div>
+  <h2>제작 결과 요약</h2>
+  <div class="kpi">
+    <div class="k"><div class="num">14</div><div class="lbl">플랫폼 탭</div></div>
+    <div class="k"><div class="num">17</div><div class="lbl">분석 기능</div></div>
+    <div class="k"><div class="num">8</div><div class="lbl">샘플 데이터셋</div></div>
+    <div class="k"><div class="num">18</div><div class="lbl">등록 기관(시군)</div></div>
+    <div class="k"><div class="num">40+</div><div class="lbl">API 엔드포인트</div></div>
+  </div>
+  <div class="note">
+    <b>1단계(2026-06-05)</b> — FastAPI+DuckDB+Vanilla JS로 7계층 MVP 실증.<br>
+    <b>2단계(2026-06-10)</b> — Next.js 14 App Router + TypeScript + Supabase 전면 재구성.<br>
+    <b>3단계(2026-06-14)</b> — 데이터 포털·등록·개방 API를 중심으로 한 탭별 고도화, 분석 탭 6종/시각화/지도 히트맵·큟러스터/매뉴얼 갱신, API 인증 강화.
+  </div>
+</div></section>
+
+<!-- 아키텍처 커버리지 -->
+<section><div class="wrap">
+  <div class="sec-no">COVERAGE</div>
+  <h2>계획서 7계층 대비 구현 범위</h2>
+  <div class="layerbar" style="background:linear-gradient(90deg,#b02a26,#d9534f)">
+    <span class="id">⊗</span><span class="nm">평가대응 엔진</span><span>5개 영역 19지표 자동 산출 · 기관별 비교</span><span class="st">구현 ✓</span></div>
+  <div class="layerbar" style="background:linear-gradient(90deg,#138a44,#1aa251)">
+    <span class="id">L6</span><span class="nm">개방·활용·운영앱</span><span>개방포털·API·BI·온톨로지·AI 질의·등록·관리</span><span class="st">고도화 중</span></div>
+  <div class="layerbar" style="background:linear-gradient(90deg,#cf5f12,#e8731a)">
+    <span class="id">L5</span><span class="nm">AI·분석</span><span>17종 통계분석 + 시각화 + t-검정 고도화</span><span class="st">고도화 ✓</span></div>
+  <div class="layerbar" style="background:linear-gradient(90deg,#5e34ad,#7b4fc4)">
+    <span class="id">L4</span><span class="nm">온톨로지(2단계 코어)</span><span>객체·관계·액션 + 그래프</span><span class="st">MVP ✓</span></div>
+  <div class="layerbar" style="background:linear-gradient(90deg,#0c8478,#0f9d8f)">
+    <span class="id">L3</span><span class="nm">품질·메타·거버넌스</span><span>규칙기반 품질진단·DCAT 카탈로그</span><span class="st">구현 ✓</span></div>
+  <div class="layerbar" style="background:linear-gradient(90deg,#1976c9,#2e8fe0)">
+    <span class="id">L2</span><span class="nm">레이크하우스</span><span>PostgreSQL·JSONB·공간데이터 컬럼</span><span class="st">구현 ✓</span></div>
+  <div class="layerbar" style="background:linear-gradient(90deg,#0e3f86,#1457b8)">
+    <span class="id">L1</span><span class="nm">데이터 통합</span><span>수집 시뮬레이션·스케줄·수집 로그</span><span class="st">MVP ✓</span></div>
+  <div class="layerbar" style="background:linear-gradient(90deg,#5b6b80,#74849a)">
+    <span class="id">L0</span><span class="nm">인프라·보안</span><span>API 키 인증·middleware 축소·RLS</span><span class="st">강화 중</span></div>
+  <div class="note warn">※ <b>로컬 MVP</b>이므로 멀티테넌트 격리·공공클우드 배포·실 LLM 연동·실데이터 수집은
+    2~3단계에서 고도화 대상이다. 본 단계 목표는 "전 계층이 한 흐름으로 동작함"을 실증하는 것이다.</div>
+</div></section>
+
+<!-- 제작 타임라인 -->
+<section><div class="wrap">
+  <div class="sec-no">BUILD LOG</div>
+  <h2>제작 타임라인 (단계별 + 검증)</h2>
+  <div class="tl">
+
+    <div class="item done"><div class="ts">2026-06-05 20:09</div>
+      <h3>① 환경 준비 & 프로젝트 골격</h3>
+      <p>Python 3.11.9 확인. 필수 패키지 설치(FastAPI 0.136 · uvicorn 0.49 · DuckDB 1.5 · pydantic). 프로젝트 디렉터리 생성.</p>
+      <span class="v code">fastapi OK / duckdb OK / uvicorn OK / ALL OK
+created: app/ web/ data/</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:10</div>
+      <h3>② 저장/질의 계층 (L2) — <code>database.py</code></h3>
+      <p>DuckDB 커넥션·스레드 안전 래핑. 플랫폼 메타 스키마 6종 생성(tenants·catalog·quality_results·onto_objects·onto_links·usage_log).</p>
+      <span class="v">스키마 초기화 멱등 동작 확인</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:11</div>
+      <h3>③ 수집 시뮬레이션 (L1) — <code>seed_data.py</code></h3>
+      <p>경남 18개 시군 합성 공공데이터 3종 생성: 청년인구 유출입(20~39세, 5세 단위)·사업체 산업별·공공시설(공간좌표).
+        품질엔진 검증용으로 <b>의도적 결함</b>(좌표 결측 5%·정원 0 이상치)을 주입.</p>
+      <span class="v code">SEED: youth 576행 · business 504행 · facility 145행 (총 1,225행)</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:12</div>
+      <h3>④ 품질진단 엔진 (L3) — <code>quality.py</code></h3>
+      <p>데이터셋별 업무규칙(6·4·5개) 정의, 위반 건수 집계, 오류율 산출(평가편람 기준 0.001%). 진단결과 저장.</p>
+      <span class="v code">QUALITY 검증:
+  ds-youth-pop  rules=6 errors=0  rate=0.0%      passed=True
+  ds-business   rules=4 errors=0  rate=0.0%      passed=True
+  ds-facility   rules=5 errors=41 rate=5.65517%  passed=False  ← 주입 결함 정확 탐지</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:13</div>
+      <h3>⑤ 평가대응 엔진 (횡단) — <code>evaluation.py</code></h3>
+      <p>2026 평가편람 5개 영역 19지표를 플랫폼 운영 데이터에서 자동 산출. 영역별 점수·종합점수 계산.</p>
+      <span class="v code">EVAL overall=87
+  개방·활용 100 / 품질 33 / 분석·활용 100 / 공유 100 / 관리체계 100
+  (품질 33점은 facility 결함을 반영한 정직한 산출)</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:13</div>
+      <h3>⑥ 온톨로지 코어 (L4) — <code>ontology.py</code></h3>
+      <p>Gold 데이터를 객체(시군·청년인구·사업체·청년인프라)·관계(청년규모·순유출·산업기반·보유시설)로 승격.
+        액션: 청년 정착지원 우선지역 스코어링.</p>
+      <span class="v code">ONTOLOGY: objects=65 · links=65 (기준연도 2025)
+ACTION 우선지역: #1 창원(58.7) #2 진주(58.0) #3 양산(57.7)</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:14</div>
+      <h3>⑦ 자연어 질의 (L5) — <code>nlquery.py</code></h3>
+      <p>LLM 없이 동작하는 의도(intent) 매칭 + 안전한 SQL 자동생성(공공망 폭백). 시군명·주제어 해석.</p>
+      <span class="v code">NLQ '창원시 청년 순유입 보여줘' → intent=청년인구 유출입 · rows=1 · OK</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:15</div>
+      <h3>⑧ API 게이트웨이·웹서버 (L6) — <code>main.py</code></h3>
+      <p>FastAPI 단일 진입점. 10개 REST 엔드포인트 + 정적 프론트엔드 서빙. 기동 시 시드·품질·온톨로지 자동 파이프라인.</p>
+      <span class="v code">서버 기동 → /api/overview 200 OK
+datasets=3 open=3 ai_ready=2 objects=65 tenants_on=11/18 overall=87</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:16</div>
+      <h3>⑨ 프론트엔드 SPA — <code>index.html · style.css · app.js</code></h3>
+      <p>바닐라 JS(의존성 0, CDN 없음 — 공공망 친화). 5개 탭: 대시보드·개방포털·품질진단·온톨로지·자연어질의.
+        온톨로지 그래프는 외부 라이브러리 없이 SVG로 직접 렌더링.</p>
+      <span class="v">전 정적자원 200 OK (index.html · style.css · app.js)</span></div>
+
+    <div class="item done"><div class="ts">2026-06-05 20:17~20:20</div>
+      <h3>⑩ 브라우저 동작 검증 + 버그 수정</h3>
+      <p>실제 브라우저로 5개 화면을 렌더링·캡처. 발견한 이슈 2건 즉시 수정.</p>
+      <span class="v code">FIX 1: catalog INSERT 파라미터 14→15개 불일치 수정
+FIX 2: 개방포털 탭 진입 시 카탈로그 자동 로드(검색 전 빈화면 해소)
+FIX 3: 표 헤더 sticky 제거(전체캡처 시 겹침 해소)
+RESULT: 5개 탭 전부 실데이터 렌더링 확인 ✓</span></div>
+
+    <div class="item done"><div class="ts">2026-06-10 — 2단계 전환</div>
+      <h3>⑪ 아키텍처 설계·계획 (Task 0)</h3>
+      <p>Brainstorming → Writing-Plans. 설계문서·15태스크 플랜 작성·커밋.</p>
+      <span class="v code">docs/superpowers/specs/2026-06-10-nextjs-supabase-migration-design.md
+docs/superpowers/plans/2026-06-10-nextjs-supabase-migration.md</span></div>
+
+    <div class="item done"><div class="ts">2026-06-10</div>
+      <h3>⑫ Task 1: 프로젝트 초기화 (Next.js 14)</h3>
+      <p>package.json(Next.js 14.2·@supabase/ssr·js-yaml·Tailwind·Jest)·tsconfig·next.config·jest.config·.env.local 생성.</p>
+      <span class="v">npm install 완료 · 커밋 0006178</span></div>
+
+    <div class="item done"><div class="ts">2026-06-10</div>
+      <h3>⑬ Task 2~3: Supabase 클라이언트·DB 마이그레이션</h3>
+      <p>lib/supabase/client.ts(브라우저)·server.ts(SSR+서비스롤)·middleware.ts 세션 갱신. 마이그레이션 3개:
+        001(스키마+RLS), 002(집계 RPC 4개), 003(품질 RPC 3개).</p>
+      <span class="v">supabase/migrations/ 3개 · RLS 정책·인덱스 완비</span></div>
+
+    <div class="item done"><div class="ts">2026-06-10</div>
+      <h3>⑭ Task 4~5: 시드 데이터·코어 라이브러리</h3>
+      <p>18개 시군 시드·Gold 합성 데이터 생성 스크립트. TypeScript 코어 6모듈 포팅:
+        quality·evaluation·ontology(YAML스키마)·nlquery·submission·planning.</p>
+      <span class="v code">lib/quality.ts · lib/evaluation.ts · lib/ontology.ts
+lib/nlquery.ts · lib/submission.ts · lib/planning.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-10</div>
+      <h3>⑮ Task 6: API Routes 14개</h3>
+      <p>Next.js App Router API Routes: overview·tenants·catalog·quality·evaluation·ontology·ontology/action/[key]·nlquery·submission(GET/POST)·submission/[id]·submission/[id]/decision·submission/[id]/comment·plan.</p>
+      <span class="v">app/api/ 14개 route.ts · 멀티테넌트 권한 분기 내장</span></div>
+
+    <div class="item done"><div class="ts">2026-06-10</div>
+      <h3>⑯ Task 7~8: 레이아웃·6개 탭 페이지·Jest 테스트</h3>
+      <p>app/layout.tsx·login/page.tsx·Header 컴포넌트. 6개 탭(대시보드·포털·품질·온톨로지·AI·등록) Client Components.
+        Jest 단위 테스트 3파일(quality·evaluation·ontology).</p>
+      <span class="v">Tailwind CSS · 서버사이드 인증 redirect · Client fetch 패턴</span></div>
+
+    <div class="item done"><div class="ts">2026-06-10</div>
+      <h3>⑰ Task 9~10: 구파일 정리·문서 업데이트</h3>
+      <p>Python 모듈(app/*.py)·FastAPI 진입점(run.py)·Vanilla JS(web/)·pytest(tests/)·requirements.txt 전체 삭제.
+        status.html 2단계 반영 업데이트.</p>
+      <span class="v code">삭제: app/__init__.py app/main.py app/database.py app/seed_data.py
+       app/quality.py app/evaluation.py app/ontology.py app/nlquery.py
+       app/auth.py app/planning.py app/submission.py
+       web/ tests/ run.py requirements.txt</span></div>
+
+    <div class="item next"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>⑱ 탭별 고도화 — 데이터 포털·등록·개방 API</h3>
+      <p><b>데이터 포털</b>: 카드에 다운로드 횟수·최근 업데이트·상세보기 추가. 상세 모달에 개요/미리보기/메타데이터/API 예시 탭 분리.
+        <b>데이터 등록</b>: 드래그앤드롭 강화·업로드 진행률·컬럼 타입 자동 추론(DATE/BOOLEAN/NUMBER/TEXT)·심사 요청 체크리스트.
+        <b>개방 API</b>: API 키 재발급·복사, 엔드포인트별 사용량 차트, 웹훅 설명/시크릿 필드 개선.</p>
+      <span class="v code">components/portal/PortalClient.tsx · components/portal/DatasetModal.tsx
+components/submission/SubmissionClient.tsx
+components/openapi/OpenApiClient.tsx</span></div>
+
+    <div class="item next"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>⑲ 분석·지도·카탈로그·매뉴얼 고도화</h3>
+      <p><b>분석 탭</b>: 6종 분석 추가(ANOVA·Mann-Whitney·Wilcoxon·Logistic Regression·PCA·K-Means·Survival·STL) 및 시각화 개선.
+        <b>지도</b>: 마커/큟러스터/히트맵, 시설 상세 패널, 반경 검색, 시설 비교.
+        <b>카탈로그</b>: 샘플 데이터 연동(data/samples/ 8종).
+        <b>매뉴얼</b>: 신규 기능 반영 갱신.</p>
+      <span class="v code">components/analytics/AnalyticsClient.tsx · components/map/MapInner.tsx
+components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span></div>
+
+    <div class="item next"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>⑳ 보안·인증·middleware 정리</h3>
+      <p>API 키 기반 외부 인증 강화, 불필요한 middleware 경로 축소, RLS 정책 유지.</p>
+      <span class="v">middleware.ts 축소 · API key scope 검증 강화</span></div>
+
+  </div>
+</div></section>
+
+<!-- 탭별 현황 -->
+<section><div class="wrap">
+  <div class="sec-no">TABS</div>
+  <h2>탭별 구현 현황</h2>
+  <table>
+    <thead><tr><th style="width:18%">탭</th><th style="width:42%">주요 기능</th><th style="width:18%">상태</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>대시보드</td><td>실시간 KPI·평가편람 종합점수·시군별 차트·최근 이력</td><td><span class="badge b-progress">고도화 중</span></td><td>스켈레톤·품질 요약 위젯 추가 예정</td></tr>
+      <tr><td>데이터 포털</td><td>카탈로그 검색/필터·카드 개선·상세 모달(개요/미리보기/메타데이터/API 예시)·다운로드</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
+      <tr><td>데이터 등록</td><td>드래그앤드롭 업로드·진행률·컬럼 타입 추론·심사 체크리스트·승인/반려 워크플로우</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
+      <tr><td>개방 API</td><td>API 키 발급/재발급/복사·사용량 차트·웹훅 등록·API 문서</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
+      <tr><td>수집</td><td>수집 소스 카드·스케줄·수집 로그·소스 그룹화</td><td><span class="badge b-progress">고도화 중</span></td><td>cron 도우미·태그 추가 예정</td></tr>
+      <tr><td>가공</td><td>파이프라인 DAG·규칙 미리보기·템플릿·실행 이력</td><td><span class="badge b-progress">고도화 중</span></td><td>flowchart·롤백 추가 예정</td></tr>
+      <tr><td>품질진단</td><td>규칙 카테고리별 점수·이슈 우선순위·상세 팝업·진단 이력 비교</td><td><span class="badge b-progress">고도화 중</span></td><td>radar 차트·비교 추가 예정</td></tr>
+      <tr><td>분석</td><td>17종 통계분석(기술·교차·t-검정·ANOVA·회귀·PCA·K-Means·생존·STL)·시각화</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
+      <tr><td>지도</td><td>마커/큟러스터/히트맵·드릴다운·반경 검색·시설 비교·모바일 반응형</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
+      <tr><td>AI 질의</td><td>대화형 채팅·추천 질문·결과 테이블/차트·대화 낳아내기</td><td><span class="badge b-progress">고도화 중</span></td><td>채팅 흐름·공유 추가 예정</td></tr>
+      <tr><td>온톨로지</td><td>지식 그래프·줌/팬/노드 클릭·검색/필터·상세 패널·연관 개체</td><td><span class="badge b-progress">고도화 중</span></td><td>D3 시각화 개선 예정</td></tr>
+      <tr><td>리포트</td><td>평가편람 점수 시각화·리포트 다운로드·기관별 비교</td><td><span class="badge b-progress">고도화 중</span></td><td>radar/bar·PDF/PNG 추가 예정</td></tr>
+      <tr><td>관리자</td><td>기관 목록 필터/검색/페이징·승인/반려·역할 변경</td><td><span class="badge b-progress">고도화 중</span></td><td>워크플로우 UI 개선 예정</td></tr>
+      <tr><td>파이프라인</td><td>수집→가공→분석→품질→개방 흐름·단계 상태·실행 이력 타임라인</td><td><span class="badge b-progress">고도화 중</span></td><td>flowchart·상태 뱃지 추가 예정</td></tr>
+    </tbody>
+  </table>
+</div></section>
+
+<!-- 검증 증거(스크린샷) -->
+<section><div class="wrap">
+  <div class="sec-no">EVIDENCE</div>
+  <h2>동작 검증 — 실제 화면 (브라우저 캡처)</h2>
+  <div class="shot"><img src="docs/screenshots/eum-1-dashboard.png" alt="대시보드">
+    <div class="cap">① 통합 대시보드 — 평가편람 종합점수 87, 5개 영역 자동산출, 입주 18개 시군, 영역별 지표 상세</div></div>
+  <div class="grid2">
+    <div class="shot"><img src="docs/screenshots/eum-3-portal.png" alt="개방포털">
+      <div class="cap">② 개방포털 — DCAT 카탈로그 3종(개방·AI-Ready·고가치 배지)</div></div>
+    <div class="shot"><img src="docs/screenshots/eum-4-detail.png" alt="데이터 상세">
+      <div class="cap">③ 데이터셋 상세 — 메타·품질판정·미리보기(청년 20~39세)</div></div>
+  </div>
+  <div class="shot"><img src="docs/screenshots/eum-5-quality.png" alt="품질진단">
+    <div class="cap">④ 품질진단 — 규칙기반 자동화, 오류율 0.001% 기준. facility 데이터셋 결함(좌표결측·정원이상) 정확 탐지·미달 판정</div></div>
+  <div class="shot"><img src="docs/screenshots/eum-2-ontology.png" alt="온톨로지">
+    <div class="cap">⑤ 온톨로지 운영 — 객체·관계 그래프(창원시 중심) + 액션(청년 정착지원 우선지역 스코어링)</div></div>
+  <div class="shot"><img src="docs/screenshots/eum-6-nlquery.png" alt="자연어 질의">
+    <div class="cap">⑥ 자연어 질의 — 의도 해석 → SQL 자동생성 → 결과 표출 (공공망 폭백, LLM 불필요)</div></div>
+</div></section>
+
+<!-- 파일 인벤토리 / 실행법 -->
+<section><div class="wrap">
+  <div class="sec-no">ARTIFACTS</div>
+  <h2>산출물 구성 & 실행 방법</h2>
+  <table>
+    <thead><tr><th style="width:36%">파일/디렉터리</th><th>역할</th><th>계층</th></tr></thead>
+    <tbody>
+      <tr><td><code>lib/quality.ts</code></td><td>규칙기반 품질진단 (RPC + 인메모리)</td><td>L3</td></tr>
+      <tr><td><code>lib/evaluation.ts</code></td><td>평가편람 5영역 지표 자동산출</td><td>⊗</td></tr>
+      <tr><td><code>lib/ontology.ts</code></td><td>YAML스키마 온톨로지·그래프·액션 스코어링</td><td>L4</td></tr>
+      <tr><td><code>lib/nlquery.ts</code></td><td>자연어 의도매칭·Supabase 질의</td><td>L5</td></tr>
+      <tr><td><code>lib/submission.ts</code></td><td>CSV파싱·JSONB저장·승인/반려/코멘트</td><td>L6</td></tr>
+      <tr><td><code>lib/planning.ts</code></td><td>개방계획·품질개선계획 초안 생성</td><td>L6</td></tr>
+      <tr><td><code>lib/supabase/</code></td><td>브라우저·SSR·서비스롤 클라이언트</td><td>L0</td></tr>
+      <tr><td><code>app/api/ (40+ route.ts)</code></td><td>Next.js API Routes (REST)</td><td>L6</td></tr>
+      <tr><td><code>app/[page]/ (14개 탭)</code></td><td>App Router 페이지·Client Components</td><td>L6</td></tr>
+      <tr><td><code>components/portal/</code></td><td>데이터 포털·상세 모달·통계</td><td>L6</td></tr>
+      <tr><td><code>components/submission/</code></td><td>데이터 등록·심사 상세</td><td>L6</td></tr>
+      <tr><td><code>components/openapi/</code></td><td>개방 API 키·웹훅·문서</td><td>L6</td></tr>
+      <tr><td><code>components/analytics/</code></td><td>17종 통계분석·시각화</td><td>L5</td></tr>
+      <tr><td><code>components/map/</code></td><td>Leaflet 지도·히트맵·큟러스터</td><td>L6</td></tr>
+      <tr><td><code>supabase/migrations/ (3개)</code></td><td>스키마·RLS·RPC 마이그레이션</td><td>L2</td></tr>
+      <tr><td><code>supabase/seed.sql</code></td><td>18개 시군·카탈로그·사용로그 시드</td><td>L1</td></tr>
+      <tr><td><code>data/samples/</code></td><td>8종 샘플 데이터(CSV/JSON)</td><td>L1</td></tr>
+      <tr><td><code>config/ontology-schema.yaml</code></td><td>온톨로지 가중치·액션 정의</td><td>L4</td></tr>
+      <tr><td><code>middleware.ts</code></td><td>Supabase 세션 자동 갱신</td><td>L0</td></tr>
+      <tr><td><code>__tests__/lib/ (3개)</code></td><td>Jest 단위 테스트</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <b>개발 실행</b> &nbsp;
+    <code>npm install</code> →
+    <code>.env.local</code>에 Supabase URL·키 설정 →
+    <code>supabase db push</code> →
+    <code>npm run dev</code> → <code>http://localhost:3001</code><br>
+    <b>테스트</b> &nbsp; <code>npm test</code><br>
+    <b>배포</b> &nbsp; Vercel 연결 후 환경변수 설정
+  </div>
+</div></section>
+
+<!-- 다음 단계 -->
+<section style="border-bottom:none"><div class="wrap">
+  <div class="sec-no">NEXT</div>
+  <h2>완료 범위 & 다음 단계</h2>
+  <div class="grid2">
+    <div>
+      <h3 style="font-size:16px;margin-bottom:8px">3단계 고도화 완료 <span class="badge b-ok">DONE</span></h3>
+      <ul class="clean">
+        <li>데이터 포털 카드 개선 및 상세 모달 탭화</li>
+        <li>데이터 등록 업로드 진행률 및 심사 체크리스트</li>
+        <li>개방 API 키 재발급·사용량 차트·웹훅 폼 개선</li>
+        <li>분석 탭 6종 분석 추가 및 시각화 고도화</li>
+        <li>지도 마커/큟러스터/히트맵 및 시설 비교</li>
+        <li>카탈로그 샘플 데이터 연동(data/samples/ 8종)</li>
+        <li>매뉴얼 신규 기능 반영 갱신</li>
+        <li>API 인증 강화 및 middleware 축소</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:16px;margin-bottom:8px">다음 단계 <span class="badge b-next">NEXT</span></h3>
+      <ul class="clean next">
+        <li>대시보드·리포트·관리자·파이프라인 실사용 수준 고도화</li>
+        <li>수집·가공·품질진단 탭 고도화 (DAG·이력 비교)</li>
+        <li>AI 질의 대화형 채팅·온톨로지 지식 그래프 개선</li>
+        <li>Playwright E2E 테스트 추가</li>
+        <li>Supabase 프로젝트 연결·Vercel 배포</li>
+        <li>실데이터 수집 커넥터(시군 공공DB) 연동</li>
+        <li>실 LLM(폐쇄망) 연동 text-to-SQL·RAG</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note">
+    <b>3단계(2026-06-14)</b> 탭 고도화 진행. 데이터 포털·등록·개방 API 중심의 UX 개선과 분석/지도/보안 강화를 완료.
+    Supabase 프로젝트 연결 후 <code>supabase db push</code> + <code>npm run dev</code>로 즉시 가동 가능.
+  </div>
+</div></section>
+
+</main>
+<footer class="foot"><div class="wrap">
+  <b>이음(EUM) 플랫폼 — 제작 기록</b> · 데이터를 잇고, 가치를 연다 · 경남빅데이터센터<br>
+  <span style="opacity:.6">1단계(2026-06-05): FastAPI · DuckDB · Vanilla JS &nbsp;|&nbsp; 2단계(2026-06-10): Next.js 14 · TypeScript · Supabase &nbsp;|&nbsp; 3단계(2026-06-14): 탭 고도화 · 분석·지도·API 인증</span>
+</div></footer>
+</body>
+</html>

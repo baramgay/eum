@@ -6,7 +6,8 @@ import {
   LayoutDashboard, Database, Map, ShieldCheck, GitBranch,
   FileBarChart2, Bot, Upload, RefreshCw, Settings2, KeyRound,
   Building2, BookOpen, Info, AlertTriangle, ChevronRight, ChevronLeft,
-  ArrowUpRight, Clock, type LucideIcon,
+  ArrowUpRight, Clock, BarChart2, ArrowRightLeft, Package,
+  type LucideIcon,
 } from 'lucide-react'
 
 // ─── 아이콘 맵 ──────────────────────────────────────────────────────────────
@@ -22,6 +23,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
   submission: Upload,
   collect:    RefreshCw,
   process:    Settings2,
+  pipeline:   ArrowRightLeft,
+  samples:    Package,
+  analysis:   BarChart2,
   openapi:    KeyRound,
   admin:      Building2,
 }
@@ -70,7 +74,7 @@ const SECTIONS: Section[] = [
       ]},
       { type: 'h', text: '역할(Role) 안내' },
       { type: 'roles', items: [
-        { badge: 'center', color: 'bg-blue-50 text-blue-700 ring-blue-200',  desc: '경남연구원 센터 — 모든 기능 접근, 기관 관리, 데이터 심사' },
+        { badge: 'center', color: 'bg-blue-50 text-blue-700 ring-blue-200',  desc: '경남빅데이터센터 — 모든 기능 접근, 기관 관리, 데이터 심사' },
         { badge: 'agency', color: 'bg-green-50 text-green-700 ring-green-200', desc: '입주 기관 — 데이터 등록·제출, 공개 데이터 열람' },
         { badge: 'viewer', color: 'bg-gray-50 text-gray-600 ring-gray-200',  desc: '일반 사용자 — 공개 데이터 포털, AI 질의, 지도 열람' },
       ]},
@@ -124,17 +128,25 @@ const SECTIONS: Section[] = [
     id: 'map', title: '지도',
     blocks: [
       { type: 'h', text: '경남 공공시설 위치 시각화' },
-      { type: 'p', text: '경남 18개 시군의 청년 인프라(청년센터·도서관·체육관·문화센터) 위치를 지도에서 확인합니다.' },
-      { type: 'sub', text: '마커 및 클러스터' },
+      { type: 'p', text: '경남 18개 시군의 청년 인프라(청년센터·도서관·체육관·문화센터) 위치를 카카오맵에서 확인합니다. 마커·클러스터·히트맵 3가지 레이어로 밀도와 개별 시설을 모두 살펼 수 있습니다.' },
+      { type: 'sub', text: '레이어 전환' },
       { type: 'ul', items: [
-        '마커를 클릭하면 시설명·유형·수용 인원 팝업이 표시됩니다',
-        '줌 아웃 시 근접 마커가 클러스터로 묶입니다',
+        '마커: 개별 시설을 유형별 핀으로 표시, 클릭 시 팝업 상세 확인',
+        '클러스터: 줌 아웃 시 근접 마커를 묶어 개수 표시, 밀집도를 한눈에 파악',
+        '히트맵: 시설 분포의 밀도를 색상 그라데이션으로 시각화',
+        '상단 레이어 토글 버튼으로 즉시 전환, URL에도 상태가 반영됩니다',
       ]},
-      { type: 'sub', text: '유형 필터' },
-      { type: 'p', text: '상단 필터 버튼으로 청년센터·도서관·체육관·문화센터를 선택/해제할 수 있습니다.' },
-      { type: 'sub', text: '시군 필터' },
-      { type: 'p', text: '시군 드롭다운으로 특정 시군만 표시하도록 좁힐 수 있습니다.' },
-      { type: 'tip', text: '좌측 하단 범례에서 색상별 시설 유형 구분을 확인할 수 있습니다.' },
+      { type: 'sub', text: '검색 및 카테고리 필터' },
+      { type: 'ul', items: [
+        '검색창에 시설명 또는 시군명을 입력하면 실시간으로 목록과 지도가 필터링됩니다',
+        '상단 칩 버튼으로 청년센터·도서관·체육관·문화센터를 선택/해제할 수 있습니다',
+        '"전체" 버튼을 눌러 모든 유형을 한 번에 선택하거나 해제할 수 있습니다',
+      ]},
+      { type: 'sub', text: '목록 보기' },
+      { type: 'p', text: '하단 "목록 보기" 버튼을 클릭하면 지도 위에서 필터링된 시설 목록을 슬라이드업 패널로 확인할 수 있습니다. 항목을 선택하면 해당 시설의 상세 정보를 확인할 수 있습니다.' },
+      { type: 'sub', text: 'URL 파라미터' },
+      { type: 'code', text: '/map?layer=cluster   # 클러스터 모드로 열기\n/map?layer=heatmap  # 히트맵 모드로 열기\n/map?layer=marker   # 기본 마커 모드로 열기 (기본값)' },
+      { type: 'tip', text: '레이어 상태는 브라우저 URL에 자동 저장되어 공유 링크로 전달할 수 있습니다.' },
     ],
   },
   {
@@ -219,6 +231,7 @@ const SECTIONS: Section[] = [
         '예제 버튼(회색 태그)을 클릭하면 바로 실행됩니다',
         '숫자형 데이터는 자동으로 막대 차트로 전환됩니다',
         '차트/표 전환 버튼으로 원하는 뷰를 선택합니다',
+        '대화는 브라우저 로컬 저장소에 자동 저장되며, 새 대화 추가·이름 변경·공유·내보내기·마크다운 내보내기가 가능합니다',
       ]},
       { type: 'tip', text: '특정 시군을 포함해 질문하면 해당 시군에 집중된 결과를 반환합니다. 예: "밀양시 청년 현황"' },
     ],
@@ -255,8 +268,10 @@ const SECTIONS: Section[] = [
       { type: 'sub', text: '수집 소스 등록' },
       { type: 'ul', items: [
         '"수집 소스 등록" 버튼 클릭 → 소스 설정 폼 오픈',
-        '이름, URL, 인증 방식(API 키·Bearer·없음), 수집 주기 설정',
-        '인증 값은 AES-256-CBC로 암호화 저장 (평문 노출 없음)',
+        '이름, URL, 메서드(GET/POST), 응답 형식(JSON/CSV/XML) 설정',
+        '인증 방식(API 키·Bearer·없음) 및 인증값 입력 — AES-256-CBC로 암호화 저장 (평문 노출 없음)',
+        '페이지네이션(pageNo/numOfRows 등) 및 수집 주기(manual·daily·weekly·monthly) 설정',
+        '저장 전 "연결 테스트" 버튼으로 미리보기 및 컬럼 확인 가능',
       ]},
       { type: 'sub', text: '수집 주기 옵션' },
       { type: 'ul', items: [
@@ -281,16 +296,21 @@ const SECTIONS: Section[] = [
         '파이프라인 이름, 입력 소스, 출력 테이블 지정',
         '변환 규칙을 순서대로 추가',
       ]},
-      { type: 'sub', text: '지원 변환 규칙 (8종)' },
+      { type: 'sub', text: '지원 변환 규칙 (15종)' },
       { type: 'ul', items: [
+        'select: 컬럼 포함/제외',
         'rename: 컬럼명 변경',
-        'drop: 컬럼 제거',
-        'filter_rows: 조건에 맞는 행만 유지',
-        'cast: 데이터 타입 변환 (TEXT → NUMBER 등)',
-        'fill_null: NULL 값 채우기',
-        'derive: 기존 컬럼으로 새 컬럼 계산',
-        'normalize: 0~1 정규화',
-        'deduplicate: 중복 행 제거',
+        'cast: 데이터 타입 변환 (문자/숫자/날짜)',
+        'nullfill / nulldrop: NULL 값 채우기 또는 NULL 행 제거',
+        'filter: 조건에 맞는 행만 유지',
+        'normalize: 문자열 정규화(trim·대소문자)',
+        'derive: 기존 컬럼으로 새 컬럼 계산(연도·월·일차 등)',
+        'dedup: 중복 행 제거',
+        'codemap: 코드 값 치환',
+        'concat / split: 컬럼 합치기·분리',
+        'aggregate: 그룹 집계(sum·count·mean·max·min)',
+        'join: 다른 테이블과 조인',
+        'pivot: 행·열 전환',
       ]},
       { type: 'sub', text: '실행 및 이력' },
       { type: 'p', text: '파이프라인 상세에서 "실행" 버튼을 클릭하면 즉시 실행되고, 실행 이력(시간·행 수·오류)이 기록됩니다.' },
@@ -320,10 +340,93 @@ const SECTIONS: Section[] = [
     ],
   },
   {
+    id: 'analysis', title: '분석',
+    blocks: [
+      { type: 'h', text: '데이터 분석 개요' },
+      { type: 'p', text: '이음 플랫폼의 분석 모듈은 업로드한 파일이나 카탈로그에 등록된 데이터를 별도 설치 없이 브라우저에서 통계 분석할 수 있도록 지원합니다. Python 기반 분석 엔진(pandas, scipy, statsmodels, lifelines)이 서버에서 실행되며, 결과는 표와 함께 CSV로 내보낼 수 있습니다.' },
+      { type: 'sub', text: '데이터 로드 방식' },
+      { type: 'ul', items: [
+        '파일 업로드: CSV 또는 Excel(.xlsx) 파일을 드래그앤드롭 또는 클릭으로 선택',
+        '카탈로그 선택: 등록된 데이터셋 목록에서 검색 후 선택하면 자동으로 세션에 로드',
+        '카탈로그 데이터는 catalog 테이블의 table_name 또는 submission_uploads.preview(JSONB)에서 조회됩니다',
+      ]},
+      { type: 'sub', text: '변수 매핑' },
+      { type: 'p', text: '분석 전 각 컬럼의 측정 척도를 올바르게 지정해야 합니다. 변수명 오른쪽의 배지를 클릭하면 타입을 전환할 수 있습니다.' },
+      { type: 'ul', items: [
+        '연속(scale): 평균·표준편차·상관·회귀 등 수치형 분석에 사용',
+        '명목(nominal): 성별·유형처럼 순서 없는 범주, 교차표·t-검정 집단 변수로 사용',
+        '순서(ordinal): 등급·만족도처럼 순서 있는 범주, 비모수 검정에 사용',
+      ]},
+      { type: 'sub', text: '지원 분석 목록 (17종)' },
+      { type: 'grid', items: [
+        { icon: 'analysis', name: '기술통계량', desc: '평균·표준편차·사분위수·왜도·첨도' },
+        { icon: 'analysis', name: '빈도 분석', desc: '범주별 빈도·백분율·누적' },
+        { icon: 'analysis', name: '정규성 검정', desc: 'Shapiro-Wilk / KS 검정' },
+        { icon: 'analysis', name: '교차 분석', desc: '교차표 + 카이제곱 검정 + Cramér\'s V' },
+        { icon: 'analysis', name: '카이제곱 독립성', desc: '두 범주 변수 간 독립성 검정' },
+        { icon: 'analysis', name: '상관 분석', desc: '피어슨 / 스피어만 상관계수 행렬' },
+        { icon: 'analysis', name: '독립표본 t-검정', desc: '두 집단 평균 비교, 2개 범주 선택 지원' },
+        { icon: 'analysis', name: 'ANOVA', desc: '3개 이상 집단 평균 비교 + Tukey HSD' },
+        { icon: 'analysis', name: '대응표본 t-검정', desc: '동일 대상의 두 측정값 평균 비교' },
+        { icon: 'analysis', name: 'Mann-Whitney U', desc: '비모수 독립표본 검정' },
+        { icon: 'analysis', name: 'Wilcoxon', desc: '비모수 대응표본 검정' },
+        { icon: 'analysis', name: '선형 회귀', desc: 'OLS 회귀계수·R²·VIF 다중공선성' },
+        { icon: 'analysis', name: '로지스틱 회귀', desc: '이항 분류·Odds Ratio·AIC/BIC' },
+        { icon: 'analysis', name: 'PCA', desc: '주성분분석·Scree plot·PC 산점도' },
+        { icon: 'analysis', name: 'K-Means', desc: '비지도 클러스터링·클리스터 산점도' },
+        { icon: 'analysis', name: '생존 분석', desc: 'Kaplan-Meier 생존 함수 + Log-rank' },
+        { icon: 'analysis', name: '시계열 분해', desc: 'STL 추세·계절성·잔차 분해' },
+      ]},
+      { type: 'sub', text: '결과 내보내기' },
+      { type: 'p', text: '분석 실행 후 우측 상단 "CSV 내보내기" 버튼을 클릭하면 전체 결과 테이블을 UTF-8 CSV 파일로 저장할 수 있습니다. 차트가 포함된 분석은 별도의 차트 뷰에서 시각적으로 확인할 수 있습니다.' },
+      { type: 'tip', text: '집단 변수에 3개 이상 범주가 있을 때는 독립표본 t-검정에서 비교할 2개 범주를 직접 선택해야 합니다.' },
+    ],
+  },
+  {
+    id: 'pipeline', title: '수집→가공→분석 파이프라인',
+    blocks: [
+      { type: 'h', text: '데이터 활용 흐름' },
+      { type: 'p', text: '외부 데이터를 체계적으로 수집·가공한 뒤 분석과 개방까지 연결하는 전체 파이프라인입니다. 각 단계는 실행 이력이 남으며, 품질 진단과 연동됩니다.' },
+      { type: 'flow', items: ['수집 소스 등록', '원천 데이터 수집', '가공 파이프라인', '품질 진단', '분석 및 개방'] },
+      { type: 'sub', text: '1) 수집 소스 등록' },
+      { type: 'p', text: '외부 API, 파일 URL, 주기적 Cron 등 데이터 원천을 등록합니다. API 키는 AES-256-CBC로 암호화되어 안전하게 저장됩니다.' },
+      { type: 'sub', text: '2) 원천 데이터 수집' },
+      { type: 'p', text: '수동 실행 또는 매일/매주/매월 Cron으로 데이터를 수집합니다. 수집 완료 후 자동으로 가공 단계로 넘어갈 수 있도록 파이프라인을 연결할 수 있습니다.' },
+      { type: 'sub', text: '3) 가공 파이프라인' },
+      { type: 'p', text: 'select, rename, cast, filter, derive, aggregate, join, pivot 등 15가지 규칙으로 원천 데이터를 정제·변환하여 gold 테이블이나 분석용 세션을 만듭니다.' },
+      { type: 'sub', text: '4) 품질 진단' },
+      { type: 'p', text: '가공된 데이터는 음수 금지, NULL 금지, 코드 유효성, 좌표 범위 등 사전 정의 규칙으로 자동 검사됩니다. 오류율이 기준을 초과하면 데이터 관리자에게 알림이 갑니다.' },
+      { type: 'sub', text: '5) 분석 및 개방' },
+      { type: 'p', text: '품질을 통과한 데이터는 카탈로그에 공개되거나, 분석 모듈에서 즉시 분석할 수 있습니다. 개방 API 키를 발급하면 외부 시스템 연계도 가능합니다.' },
+      { type: 'tip', text: '가공 파이프라인 실행 시 "분석으로" 버튼을 클릭하면 결과 데이터가 분석 탭의 세션으로 바로 로드됩니다.' },
+    ],
+  },
+  {
+    id: 'samples', title: '샘플 데이터',
+    blocks: [
+      { type: 'h', text: 'data/samples/ 샘플 데이터 안내' },
+      { type: 'p', text: '로컬 개발과 분석 기능 테스트를 위해 5개 주제의 샘플 CSV/JSON이 준비되어 있습니다. 카탈로그의 dataset_id(예: ds-traffic-accident)와 연결되어 있어 별도 업로드 없이 바로 분석해 볼 수 있습니다.' },
+      { type: 'grid', items: [
+        { icon: 'samples', name: '교통사고', desc: 'ds-traffic-accident · 사고 유형·상해·재산피해' },
+        { icon: 'samples', name: '상권', desc: 'ds-commercial-area · 업종별 점포·매출·종사자' },
+        { icon: 'samples', name: '대기질', desc: 'ds-air-quality · 측정소별 PM10·PM2.5·오염물질' },
+        { icon: 'samples', name: '공공의료', desc: 'ds-public-hospital · 보건소·의료원 의료인력·병상' },
+        { icon: 'samples', name: '학교/교육', desc: 'ds-school-population · 학교급별 학교 수·학생·교원' },
+      ]},
+      { type: 'sub', text: '활용 방법' },
+      { type: 'ul', items: [
+        '분석 탭 → "카탈로그 로드" → 샘플 데이터셋 선택 → 변수 타입 확인 → 분석 실행',
+        'CSV 파일을 직접 업로드하여 동일한 분석을 테스트할 수도 있습니다',
+        '상권·대기질 데이터는 시군별 비교(ANOVA, t-검정), 교통사고는 교차표, 공공의료는 기술통계에 적합합니다',
+      ]},
+      { type: 'tip', text: '샘플 데이터는 개발 환경에서 catalog/submission_uploads 미리보기로 제공되며, 운영 환경에서는 scripts/load-samples-to-catalog.mjs를 통해 DB에 적재할 수 있습니다.' },
+    ],
+  },
+  {
     id: 'admin', title: '기관 관리', role: 'center',
     blocks: [
       { type: 'h', text: '입주 기관 계정 관리 (센터 전용)' },
-      { type: 'p', text: '경남연구원 센터 계정(center)만 접근 가능한 기관 관리 기능입니다.' },
+      { type: 'p', text: '경남빅데이터센터 계정(center)만 접근 가능한 기관 관리 기능입니다.' },
       { type: 'sub', text: '기관 목록' },
       { type: 'ul', items: [
         '등록된 입주 기관 목록, 활성화 상태, 제출 건수 확인',
@@ -342,6 +445,15 @@ const SECTIONS: Section[] = [
 ]
 
 const UPDATE_LOG = [
+  { date: '2026-06-14', items: [
+    '사용 안내 — 분석·지도·수집→가공→분석·샘플 데이터 섹션 추가',
+    '분석 가이드: 17종 분석·파일/카탈로그 로드·변수 매핑·CSV 내보내기',
+    '가공 가이드: 15가지 변환 규칙(aggregate·join·pivot 등) 반영',
+    '지도 가이드: 마커/큘러스터/히트맵, 검색·필터·목록 보기, URL layer 파라미터',
+    'AI 질의 가이드: 대화 이력·차트/표 전환·마크다운 내보내기 추가',
+    '기관명 "경남빅데이터센터"로 통일',
+    'status.html 최신 상태(3단계 완료·탭별 현황·산출물) 갱신',
+  ]},
   { date: '2026-06-12', items: [
     'Qwen AI 모델 연동 (qwen-turbo) — 자연어 질의 향상',
     'Lucide SVG 아이콘 시스템 적용 — 이모지 전면 교체',
@@ -605,7 +717,7 @@ export default function ManualClient({ role }: { role: string }) {
             {/* 하단 네비게이션 */}
             <div className="mt-4 flex items-center justify-between bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm px-6 py-3.5">
               <p className="text-xs text-gray-400">
-                마지막 업데이트: 2026-06-12 · 기능 추가 시 자동 갱신
+                마지막 업데이트: 2026-06-14 · 기능 추가 시 자동 갱신
               </p>
               <div className="flex gap-2">
                 {activeIdx > 0 && (

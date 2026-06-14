@@ -170,8 +170,11 @@ export const QUALITATIVE_KEYS: Record<string, string> = {
 }
 
 async function sc(supabase: SupabaseClient, table: string, filter?: [string, boolean]) {
-  const q = supabase.from(table).select('*', { count: 'exact', head: true })
-  const r = filter ? await (q as any).eq(filter[0], filter[1]) : await q
+  let q: any = supabase.from(table).select('*', { count: 'exact', head: true })
+  if (filter) {
+    q = q.eq(filter[0], filter[1])
+  }
+  const r = await q
   return r.count ?? 0
 }
 
@@ -181,8 +184,11 @@ export async function computeIndicators(supabase: SupabaseClient, tenantId?: str
     : (table: string) => supabase.from(table).select('*', { count: 'exact', head: true })
 
   const scFiltered = async (table: string, col?: string, val?: boolean) => {
-    const q = filter(table)
-    const r = (col !== undefined) ? await (q as any).eq(col, val) : await q
+    let q: any = filter(table)
+    if (col !== undefined) {
+      q = q.eq(col, val)
+    }
+    const r = await q
     return r.count ?? 0
   }
 

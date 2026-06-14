@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ReferenceLine, ResponsiveContainer,
@@ -10,7 +10,15 @@ import {
 interface AreaScore { name: string; score: number; color: string; weight: number }
 interface Indicators {
   overall: number; areas: AreaScore[]; summary: string
-  pipeline?: { analysis_today: number; process_today: number }
+  pipeline?: {
+    collect_sources: number
+    last_run_ok: number
+    last_run_fail: number
+    rows_today: number
+    analysis_today: number
+    process_today: number
+  }
+  qualityAvg?: { passRate: number; topIssues: string[] }
 }
 
 interface UsageData {
@@ -112,6 +120,8 @@ export default function DashboardClient() {
   const [usage, setUsage]         = useState<UsageData | null>(null)
   const [recentRuns, setRecentRuns] = useState<AnalysisRun[]>([])
   const [qualityDims, setQualityDims] = useState<{ name: string; label: string; status: 'pass'|'fail'|'none' }[]>([])
+  type MigrationFilter = 'all' | 'top-in' | 'top-out' | 'city' | 'county'
+  const [migrationFilter, setMigrationFilter] = useState<MigrationFilter>('all')
 
   useEffect(() => {
     Promise.all([
@@ -177,6 +187,23 @@ export default function DashboardClient() {
       .catch(() => {})
   }, [period])
 
+  const filteredMigration = useMemo(() => {
+    if (!charts) return []
+    const rows = [...charts.migration]
+    switch (migrationFilter) {
+      case 'top-in':
+        return rows.sort((a, b) => b.net - a.net).slice(0, 10)
+      case 'top-out':
+        return rows.sort((a, b) => a.net - b.net).slice(0, 10)
+      case 'city':
+        return rows.filter(r => r.sigun.endsWith('시'))
+      case 'county':
+        return rows.filter(r => r.sigun.endsWith('군'))
+      default:
+        return rows
+    }
+  }, [charts, migrationFilter])
+
   if (loading) return (
     <div className="space-y-8 animate-pulse">
       <div className="h-6 bg-gray-200 rounded w-48" />
@@ -198,7 +225,7 @@ export default function DashboardClient() {
         <div className="h-40 bg-gray-100 rounded" />
       </div>
     </div>
-  )
+)
   if (!data)   return <div className="text-center py-12 text-red-500">데이터를 불러올 수 없습니다.</div>
 
   const maxPop = settlement[0]?.youth_pop_2025 ?? 1
@@ -217,13 +244,21 @@ export default function DashboardClient() {
         <div className="bg-white rounded-lg border shadow-sm p-5">
           <h3 className="text-sm font-semibold text-gray-600 mb-3">오늘의 파이프라인 현황</h3>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-blue-50 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-blue-700">{data.pipeline?.process_today ?? 0}</p>
-              <p className="text-xs text-blue-600 mt-0.5">데이터 가공</p>
+            <div className="bg-indigo-50 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold text-indigo-700">{data.pipeline?.collect_sources ?? 0}</p>
+              <p className="text-xs text-indigo-600 mt-0.5">수집 소스</p>
             </div>
-            <div className="bg-violet-50 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-violet-700">{data.pipeline?.analysis_today ?? 0}</p>
-              <p className="text-xs text-violet-600 mt-0.5">분석 실행</p>
+            <div className="bg-green-50 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold text-green-700">{data.pipeline?.last_run_ok ?? 0}</p>
+              <p className="text-xs text-green-600 mt-0.5">정상 수집</p>
+            </div>
+            <div className="bg-red-50 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold text-red-700">{data.pipeline?.last_run_fail ?? 0}</p>
+              <p className="text-xs text-red-600 mt-0.5">수집 실패</p>
+            </div>
+            <div className="bg-amber-50 rounded-lg p-3 text-center">
+              <p className="text-2xl font-bold text-amber-700">{(data.pipeline?.rows_today ?? 0).toLocaleString()}</p>
+              <p className="text-xs text-amber-600 mt-0.5">오늘 수집행</p>
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-3 text-right">오늘({new Date().toLocaleDateString('ko-KR')}) 기준</p>
@@ -274,7 +309,7 @@ export default function DashboardClient() {
               상세 보기 →
             </button>
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-4 mb-4">
             {qualityDims.map(d => (
               <div key={d.name} className="flex flex-col items-center gap-1 flex-1">
                 <div className={`w-4 h-4 rounded-full ${
@@ -285,6 +320,33 @@ export default function DashboardClient() {
               </div>
             ))}
           </div>
+          {data.qualityAvg && (
+            <div className="border-t pt-3">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-gray-500">품질 통과율</span>
+                <span className="text-xs font-bold text-gray-700">{data.qualityAvg.passRate.toFixed(1)}%</span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
+                <div
+                  className="h-2 rounded-full bg-green-500 transition-all"
+                  style={{ width: `${Math.min(data.qualityAvg.passRate, 100)}%` }}
+                />
+              </div>
+              {data.qualityAvg.topIssues.length > 0 && (
+                <div className="text-xs text-gray-500">
+                  주요 이슈:
+                  <ul className="inline list-none ml-1">
+                    {data.qualityAvg.topIssues.map((issue, i, arr) => (
+                      <li key={issue} className="inline">
+                        <span className="text-red-600">{issue}</span>
+                        {i < arr.length - 1 && <span className="text-gray-300 mx-1">·</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -312,15 +374,30 @@ export default function DashboardClient() {
 
           {/* 시군별 청년 순이동 */}
           <div className="bg-white rounded-lg border shadow-sm p-5">
-            <h3 className="text-base font-semibold text-gray-700 mb-0.5">
-              시군별 청년 순이동 ({charts.migYear}년)
-            </h3>
-            <p className="text-xs text-gray-400 mb-4">
-              파란색: 순유입 / 빨간색: 순유출 — 실제 주민등록 기반 산출
-            </p>
+            <div className="flex items-start justify-between flex-wrap gap-3 mb-4">
+              <div>
+                <h3 className="text-base font-semibold text-gray-700 mb-0.5">
+                  시군별 청년 순이동 ({charts.migYear}년)
+                </h3>
+                <p className="text-xs text-gray-400">
+                  파란색: 순유입 / 빨간색: 순유출 — 실제 주민등록 기반 산출
+                </p>
+              </div>
+              <select
+                value={migrationFilter}
+                onChange={e => setMigrationFilter(e.target.value as MigrationFilter)}
+                className="px-3 py-1.5 border rounded-md text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">전체 시군</option>
+                <option value="top-in">상위 순유입</option>
+                <option value="top-out">상위 순유출</option>
+                <option value="city">시 단위</option>
+                <option value="county">군 단위</option>
+              </select>
+            </div>
             <ResponsiveContainer width="100%" height={420}>
               <BarChart
-                data={charts.migration}
+                data={filteredMigration}
                 layout="vertical"
                 margin={{ top: 4, right: 40, left: 56, bottom: 4 }}
               >
@@ -328,12 +405,18 @@ export default function DashboardClient() {
                 <XAxis type="number" tickFormatter={formatK} tick={{ fontSize: 11 }} domain={['auto','auto']} />
                 <YAxis type="category" dataKey="sigun" width={52} tick={{ fontSize: 11 }} />
                 <Tooltip
-                  formatter={(v, name) => [(v as number).toLocaleString(), name === 'net' ? '순이동' : (name as string)]}
+                  formatter={(v, name, props) => {
+                    const row = props.payload as MigrationRow
+                    return [
+                      `${(v as number).toLocaleString()}명`,
+                      name === 'net' ? '순이동' : (name as string),
+                    ]
+                  }}
                   labelFormatter={l => `${l}`}
                 />
                 <ReferenceLine x={0} stroke="#9CA3AF" strokeWidth={1.5} />
                 <Bar dataKey="net" name="순이동" radius={[0, 3, 3, 0]}>
-                  {charts.migration.map(d => (
+                  {filteredMigration.map(d => (
                     <Cell key={d.sigun} fill={d.net >= 0 ? '#2563EB' : '#DC2626'} />
                   ))}
                 </Bar>
@@ -372,7 +455,7 @@ export default function DashboardClient() {
               경남 시군별 청년 정착잠재지수 종합순위
             </h3>
             <p className="text-xs text-indigo-600 mt-0.5">
-              KT/KB/KCB/주민등록 4대 데이터소스 통합 — 2018~2025 경남연구원 분석
+              KT/KB/KCB/주민등록 4대 데이터소스 통합 — 2018~2025 경남빅데이터센터 분석
             </p>
           </div>
           <div className="overflow-x-auto">

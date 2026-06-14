@@ -1,28 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { spawn } from 'child_process'
-import { join } from 'path'
+import { runAnalyzePy } from '@/lib/analyzeRunner'
 
 export const runtime = 'nodejs'
-
-function runAnalyzePy(input: object): Promise<object> {
-  return new Promise((resolve, reject) => {
-    const py = spawn('python', [join(process.cwd(), 'scripts', 'analyze.py')], {
-      env: { ...process.env, PYTHONIOENCODING: 'utf-8' },
-    })
-    let out = ''
-    let err = ''
-    py.stdout.on('data', (d: Buffer) => { out += d.toString() })
-    py.stderr.on('data', (d: Buffer) => { err += d.toString() })
-    py.on('close', (code: number) => {
-      if (code !== 0) { reject(new Error(err || `exit ${code}`)); return }
-      try { resolve(JSON.parse(out)) }
-      catch { reject(new Error(`JSON parse 실패: ${out}`)) }
-    })
-    py.stdin.write(JSON.stringify(input))
-    py.stdin.end()
-  })
-}
 
 export async function POST(req: Request) {
   const supabase = await createClient()

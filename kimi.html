@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이음(EUM) 플랫폼 — 종합 분석 및 개선 보고서</title>
+<style>
+  :root{
+    --navy:#0b2a4a; --blue:#1457b8; --sky:#2e8fe0; --teal:#0f9d8f; --green:#1aa251;
+    --amber:#e8a317; --red:#d9534f; --purple:#7b4fc4; --ink:#15233a; --muted:#5b6b80;
+    --line:#dde5ef; --bg:#f4f7fb; --card:#fff; --code-bg:#f6f8fb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"맑은 고딕","Malgun Gothic","Segoe UI",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.75;font-size:15px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  h1,h2,h3,h4{color:var(--navy);margin:0 0 12px}
+  h2{font-size:26px;border-bottom:2px solid var(--line);padding-bottom:10px;margin-top:36px}
+  h3{font-size:19px;margin-top:28px;color:var(--blue)}
+  h4{font-size:16px;margin-top:20px;color:var(--ink)}
+  p{margin:0 0 12px}
+  a{color:var(--blue);text-decoration:none}
+  code{background:var(--code-bg);padding:2px 7px;border-radius:5px;font-family:Consolas,monospace;font-size:.88em;color:#b2305a;word-break:break-all}
+  pre{background:#1e293b;color:#e2e8f0;padding:16px;border-radius:10px;overflow-x:auto;font-family:Consolas,monospace;font-size:13px;line-height:1.6}
+  pre code{background:transparent;color:inherit;padding:0;font-size:inherit}
+  .cover{background:linear-gradient(125deg,#0b2a4a,#143b6e 55%,#1457b8);color:#fff;padding:52px 24px 42px}
+  .cover h1{color:#fff;font-size:34px;margin-bottom:8px}
+  .cover .sub{color:#bdd6f5;font-size:15px;margin-top:8px}
+  .cover .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:#a8c9ed}
+  section{padding:32px 0;border-bottom:1px solid var(--line)}
+  section:last-child{border-bottom:none}
+  .sec-no{font-size:12px;font-weight:800;color:var(--sky);letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(16,44,82,.06);margin:14px 0}
+  th{background:var(--navy);color:#fff;text-align:left;padding:11px 14px;font-size:12.5px;font-weight:700}
+  td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:#fafcff}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:6px 0}
+  .badge{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;white-space:nowrap}
+  .p0{background:#fbe6e5;color:#b02a26}
+  .p1{background:#fff3e0;color:#c35b0b}
+  .p2{background:#e3f6ec;color:#1aa251}
+  .p3{background:#eef2f7;color:#4a5a70}
+  .ok{background:#e3f6ec;color:#1aa251}
+  .warn{background:#fff3e0;color:#c35b0b}
+  .err{background:#fbe6e5;color:#b02a26}
+  .info{background:#e8f4fd;color:#1457b8}
+  .note{background:#f6f9fd;border-left:4px solid var(--sky);padding:14px 18px;border-radius:0 10px 10px 0;font-size:13.8px;color:#3c4a5e;margin:16px 0}
+  .note.warn{border-color:var(--amber);background:#fffdf6}
+  .note.err{border-color:var(--red);background:#fff5f5}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin:14px 0;box-shadow:0 2px 8px rgba(16,44,82,.05)}
+  .card h4{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+  .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}
+  @media(max-width:900px){.kpi{grid-template-columns:repeat(2,1fr)}}
+  .kpi .k{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center}
+  .kpi .num{font-size:28px;font-weight:900;color:var(--blue);line-height:1}
+  .kpi .lbl{font-size:12px;color:var(--muted);margin-top:8px}
+  .toc{position:sticky;top:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 2px 10px rgba(16,44,82,.08)}
+  .toc a{display:block;padding:5px 0;color:var(--muted);font-size:13.5px;border-bottom:1px dashed var(--line)}
+  .toc a:last-child{border-bottom:none}
+  .toc a:hover{color:var(--blue)}
+  .two-col{display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:start}
+  @media(max-width:900px){.two-col{grid-template-columns:1fr}}
+  .finding{margin:16px 0;padding:18px;background:#fff;border:1px solid var(--line);border-radius:12px;border-left:5px solid var(--red)}
+  .finding.p1{border-left-color:var(--amber)}
+  .finding.p2{border-left-color:var(--green)}
+  .finding.p3{border-left-color:var(--muted)}
+  .finding .title{font-weight:800;font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  .finding .evid{background:var(--code-bg);padding:12px;border-radius:8px;font-family:Consolas,monospace;font-size:12.5px;margin:10px 0;overflow-x:auto}
+  .foot{background:var(--navy);color:#cdd9ea;padding:28px 24px;font-size:13px;margin-top:20px}
+  .tag{font-size:11px;background:#eef2f7;color:#4a5a70;padding:2px 8px;border-radius:12px;margin-right:6px}
+</style>
+</head>
+<body>
+
+<header class="cover"><div class="wrap">
+  <h1>이음(EUM) 플랫폼 종합 분석 및 개선 보고서</h1>
+  <div class="sub">경남빅데이터센터 공공데이터 개방 플랫폼 — 지자체·공공기관 대상 (1차: 경상남도, 확대: 전국 공공기관)</div>
+  <div class="meta">
+    <span>분석 대상: C:\업무\eum_platform</span>
+    <span>버전: 0.2.0</span>
+    <span>분석일: 2026-06-13</span>
+    <span>분석 도구: 정적 분석 + Jest + TypeScript + 수동 코드 리뷰</span>
+  </div>
+</div></header>
+
+<div class="two-col wrap" style="margin-top:28px">
+<nav class="toc">
+  <div class="sec-no">목차</div>
+  <a href="#summary">1. Executive Summary</a>
+  <a href="#overview">2. 프로젝트 개요</a>
+  <a href="#stack">3. 기술 스택</a>
+  <a href="#structure">4. 디렉터리 및 라우트 구조</a>
+  <a href="#db">5. 데이터베이스 스키마</a>
+  <a href="#findings">6. 상세 이슈 및 개선점</a>
+  <a href="#critical">6.1 위험(P0·P1)</a>
+  <a href="#maintain">6.2 유지보수(P2)</a>
+  <a href="#enhance">6.3 운영·성능(P3)</a>
+  <a href="#recommend">7. 우선순위별 권고</a>
+  <a href="#appendix">8. 부록</a>
+</nav>
+
+<main>
+
+<section id="summary">
+  <div class="sec-no">EXECUTIVE SUMMARY</div>
+  <h2>요약</h2>
+  <p>
+    <b>이음(EUM)</b>은 Next.js 14 App Router + Supabase(PostgreSQL/Auth/RLS) 기반의 경남 공공데이터 개방 플랫폼이다.
+    데이터 수집, 가공, 품질진단, 평가편람 지표 산출, 온톨로지, 공개 API, 관리자 기능까지 폭넓은 기능을 갖추고 있다.
+    그러나 현재 코드베이스는 <b>기능적 결함 2건(P0)</b>, <b>보안 및 운영 이슈 다수</b>, 그리고 <b>README/문서와 실제 구조의 불일치</b>가 확인되었다.
+  </p>
+  <div class="kpi">
+    <div class="k"><div class="num">2</div><div class="lbl">P0 기능 결함</div></div>
+    <div class="k"><div class="num">4</div><div class="lbl">P1 보안/운영 이슈</div></div>
+    <div class="k"><div class="num">7+</div><div class="lbl">P2 유지보수 과제</div></div>
+    <div class="k"><div class="num">3/30</div><div class="lbl">Jest 실패 테스트</div></div>
+  </div>
+  <div class="note err">
+    <b>즉시 조치가 필요한 핵심 이슈:</b><br>
+    ① <code>lib/processor.ts</code>가 마이그레이션과 다른 테이블명(<code>process_pipelines</code>/<code>process_runs</code>)을 참조 → 파이프라인 실행 시 DB 오류<br>
+    ② <code>__tests__/lib/evaluation.test.ts</code>가 구현(<code>computeAiReadyChecklist</code>)과 동기화되지 않음 → <code>npm test</code> 실패
+  </div>
+</section>
+
+<section id="overview">
+  <div class="sec-no">PROJECT OVERVIEW</div>
+  <h2>프로젝트 개요</h2>
+  <table>
+    <tr><th>항목</th><th>내용</th></tr>
+    <tr><td>프로젝트명</td><td>이음(EUM) — 경남 공공데이터 개방 플랫폼</td></tr>
+    <tr><td>주관 기관</td><td>경남빅데이터센터</td></tr>
+    <tr><td>대상 기관</td><td>경상남도 내 지자체·공공기관 (1차) → 향후 전국 모든 공공기관 확대</td></tr>
+    <tr><td>버전</td><td>0.2.0</td></tr>
+    <tr><td>프레임워크</td><td>Next.js 14.2.29 (App Router)</td></tr>
+    <tr><td>언어</td><td>TypeScript 5 (strict 모드)</td></tr>
+    <tr><td>스타일</td><td>Tailwind CSS 3.4.1</td></tr>
+    <tr><td>DB/Auth</td><td>Supabase (PostgreSQL + Row Level Security + Auth)</td></tr>
+    <tr><td>지도</td><td>Leaflet + leaflet.markercluster + Kakao Map</td></tr>
+    <tr><td>차트/그래프</td><td>Recharts, D3</td></tr>
+    <tr><td>테스트</td><td>Jest 29 + ts-jest + Testing Library</td></tr>
+    <tr><td>배포 목표</td><td>Vercel</td></tr>
+    <tr><td>개발 서버 포트</td><td>3001 (<code>npm run dev</code>)</td></tr>
+  </table>
+
+  <h3>주요 기능 영역</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>📥 데이터 수집(Collect)</h4>
+      <p>외부 API/CSV 수집, 페이지네이션, 스케줄, AES-256-CBC 인증값 암호화, 수집 로그</p>
+    </div>
+    <div class="card">
+      <h4>⚙️ 데이터 가공(Process)</h4>
+      <p>규칙 기반 파이프라인(select/rename/cast/filter/derive/aggregate/join/pivot 등)</p>
+    </div>
+    <div class="card">
+      <h4>✅ 품질진단(Quality)</h4>
+      <p>gold 테이블 규칙 기반 진단 + 업로드 데이터 제네릭 진단(오류율 0.001% 기준)</p>
+    </div>
+    <div class="card">
+      <h4>📊 평가편람(Evaluation)</h4>
+      <p>2026 평가편람 5개 영역(개방·품질·분석·공유·관리체계) 지표 자동 산출</p>
+    </div>
+    <div class="card">
+      <h4>🌐 개방 포털(Portal)</h4>
+      <p>DCAT 카탈로그, 데이터셋 상세/다운로드/통계, 공개 API 연계</p>
+    </div>
+    <div class="card">
+      <h4>🔗 온톨로지(Ontology)</h4>
+      <p>YAML 스키마 기반 객체·관계 그래프, 정착잠재지수 분석</p>
+    </div>
+    <div class="card">
+      <h4>💬 AI/자연어 질의</h4>
+      <p>Qwen AI 연계, 룰 기반 NL 의도 매핑</p>
+    </div>
+    <div class="card">
+      <h4>🔑 공개 API/OpenAPI</h4>
+      <p>SHA-256 API 키 인증, DCAT, 웹훅, 접근 로그</p>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="sec-no">TECH STACK</div>
+  <h2>기술 스택 및 의존성</h2>
+  <h3>핵심 의존성</h3>
+  <table>
+    <tr><th>분류</th><th>패키지</th><th>버전</th><th>용도</th></tr>
+    <tr><td>Framework</td><td>next</td><td>14.2.29</td><td>App Router, SSR/SSG, API Routes</td></tr>
+    <tr><td>React</td><td>react / react-dom</td><td>^18</td><td>UI 라이브러리</td></tr>
+    <tr><td>Supabase</td><td>@supabase/supabase-js / @supabase/ssr</td><td>^2.49.4 / ^0.5.2</td><td>DB, Auth, RLS, SSR 세션</td></tr>
+    <tr><td>Styling</td><td>tailwindcss / clsx / tailwind-merge</td><td>3.4.1</td><td>유틸리티 CSS</td></tr>
+    <tr><td>UI Primitive</td><td>@radix-ui/react-dialog / @radix-ui/react-tooltip</td><td>—</td><td>접근성 기반 UI</td></tr>
+    <tr><td>아이콘</td><td>lucide-react</td><td>^1.17.0</td><td>아이콘</td></tr>
+    <tr><td>차트</td><td>recharts</td><td>^3.8.1</td><td>대시보드 차트</td></tr>
+    <tr><td>그래프/지도</td><td>d3 / leaflet / leaflet.markercluster</td><td>—</td><td>온톨로지, 시설 지도</td></tr>
+    <tr><td>애니메이션</td><td>framer-motion</td><td>^12.40.0</td><td>UI 애니메이션</td></tr>
+    <tr><td>YAML</td><td>js-yaml</td><td>^4.1.0</td><td>온톨로지 스키마 파싱</td></tr>
+    <tr><td>테스트</td><td>jest / ts-jest / @testing-library/*</td><td>^29</td><td>단위 테스트</td></tr>
+    <tr><td>E2E</td><td>@playwright/test</td><td>^1.45</td><td>E2E 테스트(미작성 상태)</td></tr>
+    <tr><td>DB 드라이버</td><td>pg</td><td>^8.21.0</td><td>PostgreSQL 직접 접근용</td></tr>
+  </table>
+
+  <h3>외부 의존성(Python)</h3>
+  <div class="note warn">
+    <code>scripts/analyze.py</code>는 <code>pandas, scipy, statsmodels, lifelines</code> 등 Python 패키지를 사용한다.
+    이들은 <code>package.json</code>에 선언되지 않았으며, Vercel/Node 런타임에서는 기본적으로 사용할 수 없다.
+    별도의 Python 환경(로컬/서버리스 함수/컨테이너)이 필요하다.
+  </div>
+</section>
+
+<section id="structure">
+  <div class="sec-no">DIRECTORY & ROUTES</div>
+  <h2>디렉터리 및 라우트 구조</h2>
+
+  <h3>App Router 페이지</h3>
+  <table>
+    <tr><th>경로</th><th>파일</th><th>설명</th></tr>
+    <tr><td><code>/</code></td><td>app/page.tsx</td><td>대시보드</td></tr>
+    <tr><td><code>/login</code></td><td>app/login/page.tsx</td><td>로그인</td></tr>
+    <tr><td><code>/portal</code></td><td>app/portal/page.tsx</td><td>개방 포털(DCAT 카탈로그)</td></tr>
+    <tr><td><code>/collect</code></td><td>app/collect/page.tsx</td><td>외부 데이터 수집 관리</td></tr>
+    <tr><td><code>/process</code></td><td>app/process/page.tsx</td><td>데이터 가공 파이프라인</td></tr>
+    <tr><td><code>/quality</code></td><td>app/quality/page.tsx</td><td>품질진단</td></tr>
+    <tr><td><code>/evaluation</code></td><td>app/evaluation/page.tsx</td><td>평가편람 지표</td></tr>
+    <tr><td><code>/ontology</code></td><td>app/ontology/page.tsx</td><td>온톨로지 그래프</td></tr>
+    <tr><td><code>/nlquery</code></td><td>app/nlquery/page.tsx</td><td>자연어 질의</td></tr>
+    <tr><td><code>/ai</code></td><td>app/ai/page.tsx</td><td>AI 채팅(Qwen)</td></tr>
+    <tr><td><code>/submission</code></td><td>app/submission/page.tsx</td><td>데이터 제출</td></tr>
+    <tr><td><code>/report</code></td><td>app/report/page.tsx</td><td>보고서</td></tr>
+    <tr><td><code>/analytics</code></td><td>app/analytics/page.tsx</td><td>분석 대시보드</td></tr>
+    <tr><td><code>/pipeline</code></td><td>app/pipeline/page.tsx</td><td>분석 파이프라인(가명/합성)</td></tr>
+    <tr><td><code>/map</code></td><td>app/map/page.tsx</td><td>공공시설 지도</td></tr>
+    <tr><td><code>/manual</code></td><td>app/manual/page.tsx</td><td>사용자 매뉴얼</td></tr>
+    <tr><td><code>/admin</code></td><td>app/admin/page.tsx</td><td>관리자(사용자/테넌트)</td></tr>
+    <tr><td><code>/openapi</code></td><td>app/openapi/page.tsx</td><td>공개 API 키 관리</td></tr>
+  </table>
+
+  <h3>주요 API Routes</h3>
+  <table>
+    <tr><th>엔드포인트</th><th>파일</th><th>설명</th></tr>
+    <tr><td><code>/api/collect/*</code></td><td>app/api/collect/**/route.ts</td><td>수집 소스/작업/로그/실행/테스트</td></tr>
+    <tr><td><code>/api/cron/collect</code></td><td>app/api/cron/collect/route.ts</td><td>Vercel Cron용 수집 진입점</td></tr>
+    <tr><td><code>/api/process/*</code></td><td>app/api/process/**/route.ts</td><td>파이프라인 CRUD + 실행 + 미리보기</td></tr>
+    <tr><td><code>/api/quality/*</code></td><td>app/api/quality/route.ts</td><td>품질진단 실행</td></tr>
+    <tr><td><code>/api/evaluation/*</code></td><td>app/api/evaluation/**/route.ts</td><td>평가편람 지표, 비교, 정성 입력</td></tr>
+    <tr><td><code>/api/ontology/*</code></td><td>app/api/ontology/**/route.ts</td><td>온톨로지 조회/액션</td></tr>
+    <tr><td><code>/api/nlquery</code></td><td>app/api/nlquery/route.ts</td><td>자연어 질의</td></tr>
+    <tr><td><code>/api/chat</code></td><td>app/api/chat/route.ts</td><td>Qwen AI 채팅</td></tr>
+    <tr><td><code>/api/submission/*</code></td><td>app/api/submission/**/route.ts</td><td>데이터 제출/승인/반려/코멘트</td></tr>
+    <tr><td><code>/api/catalog/*</code></td><td>app/api/catalog/**/route.ts</td><td>카탈로그 CRUD, AI-Ready, 통계, 다운로드</td></tr>
+    <tr><td><code>/api/openapi/*</code></td><td>app/api/openapi/**/route.ts</td><td>API 키, 통계, 웹훅</td></tr>
+    <tr><td><code>/api/v1/datasets/*</code></td><td>app/api/v1/datasets/**/route.ts</td><td>공개 API Gateway</td></tr>
+    <tr><td><code>/api/dcat</code></td><td>app/api/dcat/route.ts</td><td>DCAT 카탈로그(JSON-LD)</td></tr>
+    <tr><td><code>/api/admin/*</code></td><td>app/api/admin/**/route.ts</td><td>사용자/테넌트 관리(서비스롤)</td></tr>
+    <tr><td><code>/api/audit</code></td><td>app/api/audit/route.ts</td><td>감사 로그</td></tr>
+    <tr><td><code>/api/analyze/*</code></td><td>app/api/analyze/**/route.ts</td><td>Python 분석 스크립트 실행</td></tr>
+  </table>
+
+  <h3>핵심 라이브러리(lib/)</h3>
+  <table>
+    <tr><th>파일</th><th>책임</th></tr>
+    <tr><td><code>lib/collector.ts</code></td><td>외부 API/CSV 수집, 페이지네이션, retry, AES-CBC 암호화</td></tr>
+    <tr><td><code>lib/processor.ts</code></td><td>가공 규칙 엔진 + DB 저장 연동</td></tr>
+    <tr><td><code>lib/quality.ts</code></td><td>규칙 기반 품질진단(gold + 제네릭)</td></tr>
+    <tr><td><code>lib/evaluation.ts</code></td><td>평가편람 5영역 지표 산출</td></tr>
+    <tr><td><code>lib/ontology.ts</code></td><td>YAML 온톨로지 파서, 그래프/액션</td></tr>
+    <tr><td><code>lib/nlquery.ts</code></td><td>룰 기반 자연어 의도 매핑</td></tr>
+    <tr><td><code>lib/submission.ts</code></td><td>CSV 파싱, 스키마 추론, 제출 메타데이터</td></tr>
+    <tr><td><code>lib/openapi.ts</code></td><td>공개 API 키 해싱/검증, DCAT, 웹훅</td></tr>
+    <tr><td><code>lib/audit.ts</code></td><td>감사 로그 헬퍼</td></tr>
+    <tr><td><code>lib/email.ts</code></td><td>Resend 메일 발송</td></tr>
+    <tr><td><code>lib/utilization.ts</code></td><td>활용 로그/지표 헬퍼</td></tr>
+    <tr><td><code>lib/utils.ts</code></td><td>cn, randomHex 등 공용 유틸리티</td></tr>
+    <tr><td><code>lib/supabase/client.ts</code></td><td>브라우저 Supabase 클라이언트</td></tr>
+    <tr><td><code>lib/supabase/server.ts</code></td><td>SSR + 서비스롤 클라이언트</td></tr>
+    <tr><td><code>lib/supabase/middleware.ts</code></td><td>미들웨어용 클라이언트</td></tr>
+  </table>
+</section>
+
+<section id="db">
+  <div class="sec-no">DATABASE</div>
+  <h2>데이터베이스 스키마</h2>
+  <p>마이그레이션은 <code>supabase/migrations/001_initial.sql</code>부터 <code>019_analysis_runs.sql</code>까지 총 19개 파일로 구성되어 있다. README에는 4개 파일만 언급되어 있어 문서가 심각하게 뒤처져 있다.</p>
+
+  <h3>주요 테이블</h3>
+  <table>
+    <tr><th>테이블</th><th>용도</th></tr>
+    <tr><td><code>tenants</code></td><td>기관(시군) 정보</td></tr>
+    <tr><td><code>users</code></td><td>Supabase Auth 기반 사용자(앱 레벨)</td></tr>
+    <tr><td><code>profiles</code></td><td>프로필</td></tr>
+    <tr><td><code>catalog</code></td><td>개방 데이터셋 카탈로그</td></tr>
+    <tr><td><code>submissions</code></td><td>기관 데이터 제출</td></tr>
+    <tr><td><code>submission_uploads</code></td><td>CSV 업로드 데이터(JSONB preview)</td></tr>
+    <tr><td><code>collection_sources</code></td><td>외부 수집 소스 메타</td></tr>
+    <tr><td><code>collection_jobs</code></td><td>수집 작업/스케줄</td></tr>
+    <tr><td><code>collection_logs</code></td><td>수집 실행 로그</td></tr>
+    <tr><td><code>processing_pipelines</code></td><td>가공 파이프라인 정의</td></tr>
+    <tr><td><code>processing_runs</code></td><td>가공 실행 이력</td></tr>
+    <tr><td><code>gold_youth_population</code></td><td>청년인구 gold 테이블</td></tr>
+    <tr><td><code>gold_business</code></td><td>사업체 gold 테이블</td></tr>
+    <tr><td><code>gold_public_facility</code></td><td>공공시설 gold 테이블</td></tr>
+    <tr><td><code>quality_results</code></td><td>품질진단 결과</td></tr>
+    <tr><td><code>ontology_nodes</code></td><td>온톨로지 노드</td></tr>
+    <tr><td><code>ontology_edges</code></td><td>온톨로지 엣지</td></tr>
+    <tr><td><code>api_keys</code></td><td>공개 API 키</td></tr>
+    <tr><td><code>api_access_logs</code></td><td>API 접근 로그</td></tr>
+    <tr><td><code>audit_logs</code></td><td>감사 로그</td></tr>
+    <tr><td><code>qualitative_inputs</code></td><td>정성 지표 입력</td></tr>
+    <tr><td><code>anonymous_data_cases</code></td><td>가명정보/합성데이터 실적</td></tr>
+    <tr><td><code>analysis_records</code></td><td>분석 이력</td></tr>
+  </table>
+
+  <h3>RLS 정책 불일치 위험</h3>
+  <div class="note warn">
+    초기 마이그레이션 <code>001_initial.sql</code>의 <code>submissions</code> RLS는 <code>auth.jwt() ->> 'role'</code>을 사용하지만,
+    이후 마이그레이션(010, 011 등)과 middleware/README는 <code>auth.jwt() -> 'user_metadata' ->> 'role'</code>을 사용한다.
+    일관되지 않은 JWT 클레임 경로는 권한 오류를 유발할 수 있다.
+  </div>
+</section>
+
+<section id="findings">
+  <div class="sec-no">DETAILED FINDINGS</div>
+  <h2>상세 이슈 및 개선점</h2>
+
+  <h3 id="critical">6.1 P0 — 즉시 수정 필요(기능 결함)</h3>
+
+  <div class="finding">
+    <div class="title"><span class="badge p0">P0</span> <code>lib/processor.ts</code> 테이블명 불일치</div>
+    <p>
+      <code>runPipelineAndSave</code> 함수가 <code>process_pipelines</code>, <code>process_runs</code> 테이블을 참조하지만,
+      실제 마이그레이션 <code>011_processing.sql</code>은 <code>processing_pipelines</code>, <code>processing_runs</code>를 생성한다.
+      따라서 이 함수를 호출하면 DB 오류가 발생한다.
+    </p>
+    <div class="evid">// lib/processor.ts (line 390, 398)<br>
+await supabase.from('process_pipelines').select('*')...<br>
+await supabase.from('process_runs').insert({ ... })
+    </div>
+    <p><b>개선:</b> <code>lib/processor.ts</code>의 모든 테이블 참조를 <code>processing_pipelines</code>/<code>processing_runs</code>로 수정.
+    참고로 <code>app/api/process/*</code> 경로는 올바른 테이블명을 사용하고 있어, 라이브러리와 API 간 불일치 상태다.</p>
+  </div>
+
+  <div class="finding">
+    <div class="title"><span class="badge p0">P0</span> <code>__tests__/lib/evaluation.test.ts</code> 동기화 실패</div>
+    <p>
+      <code>computeAiReadyChecklist</code>은 8개 항목을 <code>{ name, pass, detail }</code> 형태로 반환하지만,
+      테스트는 5개 항목과 <code>{ item, passed, detail }</code> 프로퍼티를 기대한다.
+      결과적으로 <code>npm test</code>가 3개 테스트에서 실패한다.
+    </p>
+    <div class="evid">// __tests__/lib/evaluation.test.ts line 47-49<br>
+it('체크리스트가 5개 항목', () => {<br>
+&nbsp;&nbsp;expect(checklist).toHaveLength(5) // 실제는 8개<br>
+})<br><br>
+// line 72-78<br>
+expect(c).toHaveProperty('item') // 실제는 name<br>
+expect(c).toHaveProperty('passed') // 실제는 pass
+    </div>
+    <p><b>개선:</b> 테스트를 현재 구현에 맞게 8개 항목 / <code>name</code>·<code>pass</code>·<code>detail</code> 프로퍼티로 수정하거나,
+    반대로 구현을 테스트 기대에 맞춘다. UI에서 사용하는 프로퍼티명과도 일치해야 한다.</p>
+  </div>
+
+  <h3>6.2 P1 — 보안 및 운영 위험</h3>
+
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> 하드코딩된 평문 암호화 키</div>
+    <p>
+      <code>lib/collector.ts</code>에서 환경변수 <code>COLLECTION_SECRET</code>이 없을 경우 평문 기본값을 사용한다.
+      이 값이 그대로 커밋되어 있으므로, 누구든 암호화된 <code>auth_value</code>를 복호화할 수 있다.
+    </p>
+    <div class="evid">// lib/collector.ts line 11<br>
+const SECRET = (process.env.COLLECTION_SECRET ?? 'eum_default_secret_key_32bytes!!').padEnd(32, '!').slice(0, 32)
+    </div>
+    <p><b>개선:</b> 기본값 제거 후 환경변수 누락 시 애플리케이션 기동/호출 실패 처리. 기존 암호화 값은 즉시 재암호화(키 로테이션).</p>
+  </div>
+
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> 테스트 계정 비밀번호 하드코딩</div>
+    <p>
+      <code>run_seed_and_user.mjs</code>와 <code>scripts/create_test_users.py</code>에 <code>center@eum.test / eum2026!</code>,
+      <code>changwon@eum.test / eum2026!</code>이 평문으로 하드코딩되어 있다.
+    </p>
+    <div class="evid">// run_seed_and_user.mjs line 68-69<br>
+email: 'center@eum.test',<br>
+password: 'eum2026!'
+    </div>
+    <p><b>개선:</b> 비밀번호를 환경변수로 분리하거나, 랜덤 생성 후 안전한 경로에만 기록. <code>.gitignore</code>에 <code>test_accounts.txt</code>는 이미 등록되어 있으나 스크립트 자체가 노출되어 있다.</p>
+  </div>
+
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> 예측 가능한 난수 ID 생성</div>
+    <p>
+      <code>lib/processor.ts</code>의 <code>runPipelineAndSave</code>가 <code>Math.random()</code>으로 run_id와 dataset_id를 생성한다.
+      충돌 가능성이 있고 보안 식별자로 부적합하다.
+    </p>
+    <div class="evid">// lib/processor.ts line 396, 420<br>
+const runId = 'prun_' + Math.random().toString(36).slice(2, 10)<br>
+const datasetId = 'proc_' + Math.random().toString(36).slice(2, 10)
+    </div>
+    <p><b>개선:</b> <code>crypto.randomUUID()</code> 또는 <code>lib/utils.ts::randomHex</code>를 사용. <code>app/api/process/[id]/run/route.ts</code>는 이미 <code>crypto.getRandomValues</code>를 사용하므로 이 패턴으로 통일.</p>
+  </div>
+
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> Middleware가 <code>/api/*</code> 전체를 공개로 처리</div>
+    <p>
+      <code>middleware.ts</code>의 <code>PUBLIC_PREFIXES</code>에 <code>'/api/'</code>가 포함되어 있어,
+      미들웨어 레벨에서 모든 API 경로에 인증 검사를 수행하지 않는다. 각 API Route가 개별적으로 인증해야 하며, 누락 시 보안 허점이 발생한다.
+    </p>
+    <div class="evid">// middleware.ts line 5<br>
+const PUBLIC_PREFIXES = ['/login', '/api/']
+    </div>
+    <p><b>개선:</b> 공개 API 목록을 <code>/api/public/*</code>, <code>/api/v1/datasets/*</code>, <code>/api/dcat</code> 등으로 명시적으로 한정하거나,
+    각 API Route의 인증 여부를 전수 점검하고 문서화한다.</p>
+  </div>
+
+  <h3 id="maintain">6.3 P2 — 유지보수 및 코드 품질</h3>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> <code>next.config.js</code> Server Actions origin 불일치</div>
+    <p>
+      <code>allowedOrigins: ['localhost:3000']</code>으로 설정되어 있지만, <code>npm run dev</code>는 3001 포트를 사용한다.
+      로컬 개발 시 Server Actions가 원본 검증으로 거부될 수 있다.
+    </p>
+    <p><b>개선:</b> <code>localhost:3001</code>로 변경하거나, 환경변수/개발 모드에 따라 동적으로 설정.</p>
+  </div>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> 중복된 Python 실행 래퍼</div>
+    <p>
+      <code>app/api/analyze/route.ts</code>와 <code>app/api/analyze/upload/route.ts</code>에 동일한 <code>runAnalyzePy</code> 헬퍼가 중복 구현되어 있다.
+    </p>
+    <p><b>개선:</b> <code>lib/analyzeRunner.ts</code> 등으로 추출하여 중복 제거 및 단위 테스트 용이하게 개선.</p>
+  </div>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> <code>lib/quality.ts</code>의 <code>as any</code> 연산자 호출</div>
+    <p>
+      <code>countWhere</code> 함수에서 필터 연산자를 <code>(q as any)[op](col, val)</code>로 동적 호출한다.
+      런타임에 잘못된 연산자가 들어오면 오류가 발생하며, 타입 안정성도 없다.
+    </p>
+    <div class="evid">// lib/quality.ts line 41-43<br>
+const q = sb.from(table).select('*', { count: 'exact', head: true })<br>
+const { count } = await (q as any)[op](col, val)
+    </div>
+    <p><b>개선:</b> 허용 연산자 화이트리스트와 타입 오버로드를 추가하여 안전하게 호출.</p>
+  </div>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> 서비스롤 클라이언트에 불필요한 쿠키 핸들러</div>
+    <p>
+      <code>lib/supabase/server.ts</code>의 <code>createServiceClient</code>가 서비스롤 키를 사용하면서도
+      사용자 쿠키 핸들러를 그대로 전달한다. 서비스롤은 세션이 필요 없으므로 혼란과 잠재적 버그를 야기할 수 있다.
+    </p>
+    <p><b>개선:</b> 서비스롤 클라이언트는 <code>{ auth: { persistSession: false } }</code> 등 쿠키 없는 설정을 사용하거나,
+      용도를 명확히 문서화한다. <code>lib/openapi.ts::createPublicClient</code>가 이미 그러한 패턴을 보여준다.</p>
+  </div>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> ESLint 미설정</div>
+    <p>
+      <code>npm run lint</code> 실행 시 ESLint 설정이 없어 "How would you like to configure ESLint?" 프롬프트가 표시된다.
+      코드 품질 자동 검사가 동작하지 않는다.
+    </p>
+    <p><b>개선:</b> <code>.eslintrc.json</code>에 <code>next/core-web-vitals</code> 설정 추가. CI에서 <code>npm run lint</code> 실행.</p>
+  </div>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> 잔여 파일/로그 정리</div>
+    <p>
+      <code>status.html</code>(구형 상태 보고서), <code>data/eum.duckdb.wal</code>(DuckDB WAL),
+      <code>C:Usersbceum_dev.log</code>(잘못된 이름의 로그 파일) 등이 남아 있다.
+      이들은 Next.js/Supabase 전환 이후 불필요한 산물이다.
+    </p>
+    <p><b>개선:</b> 불필요한 파일 삭제 및 <code>.gitignore</code> 강화. 로그 파일 경로는 운영체제에서 올바른 경로로 생성되도록 수정.</p>
+  </div>
+
+  <h3 id="enhance">6.4 P3 — 운영 고도화 및 문서</h3>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> README와 실제 구조 불일치</div>
+    <p>
+      <code>README.md</code>는 마이그레이션 파일을 4개, API Routes를 14개, 페이지 탭을 6개로 설명하지만,
+      실제로는 마이그레이션 19개, API Routes 40개 이상, 페이지 18개가 존재한다.
+      또한 <code>/submit</code>, <code>/chat</code> 등 README에만 있는 경로도 있다.
+    </p>
+    <p><b>개선:</b> README 전면 재작성. 실제 경로, 마이그레이션 목록, 필수 환경변수, Python 의존성을 명시.</p>
+  </div>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> Python 분석 스크립트의 배포 환경 불확실</div>
+    <p>
+      <code>scripts/analyze.py</code>는 pandas/scipy/statsmodels/lifelines를 사용하지만,
+      Node/Vercel 환경에서는 기본 제공되지 않는다. 별도의 Python 런타임 구성이 없으면 <code>/api/analyze</code>가 실패한다.
+    </p>
+    <p><b>개선:</b> Python 의존성을 <code>requirements.txt</code>에 명시, Vercel 함수 제한 설명 또는 별도 컨테이너/서버리스 배포 설계.</p>
+  </div>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> Playwright E2E 테스트 부재</div>
+    <p>
+      <code>@playwright/test</code>는 devDependency로 포함되어 있으나, E2E 테스트 파일이 없다.
+    </p>
+    <p><b>개선:</b> 핵심 사용자 플로우(로그인 → 제출 → 승인 → 포털 확인)에 대한 최소 E2E 시나리오 작성.</p>
+  </div>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> CI/CD 파이프라인 부재</div>
+    <p>GitHub Actions/Vercel CI 설정 파일이 보이지 않는다. PR 시 테스트·빌드·린트가 자동 실행되지 않는다.</p>
+    <p><b>개선:</b> <code>.github/workflows/ci.yml</code> 추가 — <code>npm ci</code>, <code>npm run lint</code>, <code>npm test</code>, <code>npm run build</code> 실행.</p>
+  </div>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> <code>status.html</code>와 <code>kimi.html</code>의 역할 분리</div>
+    <p>기존 <code>status.html</code>는 제작 기록(build log)이며, 현재 구조와 이미 불일치한다. 본 <code>kimi.html</code>는 분석/개선 보고서 역할을 한다.</p>
+    <p><b>개선:</b> <code>status.html</code>를 최신 상태로 갱신하거나, 아카이브 처리 후 <code>docs/build-log.html</code>로 이동.</p>
+  </div>
+
+</section>
+
+<section id="recommend">
+  <div class="sec-no">RECOMMENDATIONS</div>
+  <h2>우선순위별 개선 권고</h2>
+  <table>
+    <tr><th>우선순위</th><th>작업</th><th>대상 파일</th><th>예상 효과</th></tr>
+    <tr><td><span class="badge p0">P0</span></td><td><code>processing_*</code> 테이블명으로 통일</td><td><code>lib/processor.ts</code></td><td>파이프라인 실행 오류 해결</td></tr>
+    <tr><td><span class="badge p0">P0</span></td><td>evaluation 테스트 동기화</td><td><code>__tests__/lib/evaluation.test.ts</code></td><td>테스트 전체 통과</td></tr>
+    <tr><td><span class="badge p1">P1</span></td><td><code>COLLECTION_SECRET</code> 기본값 제거</td><td><code>lib/collector.ts</code></td><td>암호화 키 노출 방지</td></tr>
+    <tr><td><span class="badge p1">P1</span></td><td>테스트 비밀번호 환경변수화</td><td><code>run_seed_and_user.mjs</code>, <code>scripts/create_test_users.py</code></td><td>자격증명 노출 방지</td></tr>
+    <tr><td><span class="badge p1">P1</span></td><td>Math.random() ID → crypto 기반 난수</td><td><code>lib/processor.ts</code></td><td>ID 충돌·보안 강화</td></tr>
+    <tr><td><span class="badge p1">P1</span></td><td>middleware 공개 prefix 축소 및 API 인증 점검</td><td><code>middleware.ts</code>, <code>app/api/**/route.ts</code></td><td>인증 우회 위험 감소</td></tr>
+    <tr><td><span class="badge p2">P2</span></td><td>Server Actions origin 수정</td><td><code>next.config.js</code></td><td>로컬 개발 안정화</td></tr>
+    <tr><td><span class="badge p2">P2</span></td><td>중복 Python 래퍼 추출</td><td><code>lib/analyzeRunner.ts</code></td><td>중복 제거, 테스트 용이</td></tr>
+    <tr><td><span class="badge p2">P2</span></td><td>quality 연산자 화이트리스트</td><td><code>lib/quality.ts</code></td><td>타입 안정성·런타임 안정성</td></tr>
+    <tr><td><span class="badge p2">P2</span></td><td>서비스롤 클라이언트 정리</td><td><code>lib/supabase/server.ts</code></td><td>세션/권한 혼란 제거</td></tr>
+    <tr><td><span class="badge p2">P2</span></td><td>ESLint 설정 추가</td><td><code>.eslintrc.json</code></td><td>정적 품질 검사 활성화</td></tr>
+    <tr><td><span class="badge p2">P2</span></td><td>잔여 파일 정리</td><td><code>status.html</code>, <code>data/</code>, 로그</td><td>저장소 정리</td></tr>
+    <tr><td><span class="badge p3">P3</span></td><td>README 재작성</td><td><code>README.md</code></td><td>온볇ィング 개선</td></tr>
+    <tr><td><span class="badge p3">P3</span></td><td>Python 의존성 문서화</td><td><code>requirements.txt</code>, README</td><td>배포 재현성</td></tr>
+    <tr><td><span class="badge p3">P3</span></td><td>CI/CD 워크플로우 추가</td><td><code>.github/workflows/ci.yml</code></td><td>품질 회귀 방지</td></tr>
+    <tr><td><span class="badge p3">P3</span></td><td>E2E 테스트 추가</td><td><code>e2e/</code> 또는 <code>__tests__/e2e/</code></td><td>핵심 플로우 검증</td></tr>
+  </table>
+</section>
+
+<section id="appendix">
+  <div class="sec-no">APPENDIX</div>
+  <h2>부록</h2>
+
+  <h3>필수 환경변수</h3>
+  <table>
+    <tr><th>변수</th><th>용도</th></tr>
+    <tr><td><code>NEXT_PUBLIC_SUPABASE_URL</code></td><td>Supabase 프로젝트 URL</td></tr>
+    <tr><td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td><td>Supabase anon key</td></tr>
+    <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>서버사이드/관리자 권한</td></tr>
+    <tr><td><code>COLLECTION_SECRET</code></td><td>AES-256 암호화 키(32바이트)</td></tr>
+    <tr><td><code>NEXT_PUBLIC_APP_URL</code></td><td>앱 기본 URL</td></tr>
+    <tr><td><code>QWEN_API_KEY / QWEN_BASE_URL / QWEN_MODEL</code></td><td>Qwen AI 연동</td></tr>
+    <tr><td><code>NEXT_PUBLIC_KAKAO_MAP_KEY</code></td><td>카카오 지도 JavaScript 키</td></tr>
+    <tr><td><code>RESEND_API_KEY / RESEND_FROM_EMAIL</code></td><td>Resend 이메일</td></tr>
+    <tr><td><code>CENTER_NOTIFICATION_EMAIL</code></td><td>알림 수신 메일</td></tr>
+    <tr><td><code>CRON_SECRET</code></td><td>Vercel Cron 인증</td></tr>
+  </table>
+
+  <h3>주요 명령어</h3>
+  <pre><code>npm install
+npm run dev        # http://localhost:3001
+npm run build
+npm run lint       # ESLint 활성화됨 (경고 1건: SubmissionClient useEffect 의존성)
+npm test           # 30/30 통과
+npx tsc --noEmit   # TypeScript 검사 통과</code></pre>
+
+  <h3>테스트 결과 요약</h3>
+  <div class="note">
+    <b>Jest 실행 결과(개선 후, 2026-06-13):</b><br>
+    • 총 테스트: 30개<br>
+    • 통과: 30개<br>
+    • 실패: 0개<br>
+    • 상태: <span class="ok">모든 단위 테스트 통과</span>
+  </div>
+  <div class="note warn">
+    <b>개선 전 기준선:</b><br>
+    • 총 테스트: 30개<br>
+    • 통과: 27개 / 실패: 3개 (<code>__tests__/lib/evaluation.test.ts</code>)<br>
+    • 실패 원인: 체크리스트 길이(5 vs 8), 프로퍼티명(<code>item</code>/<code>passed</code> vs <code>name</code>/<code>pass</code>)
+  </div>
+
+  <h3>Git 상태 (개선 후)</h3>
+  <p>아래는 본 개선 작업 이후의 <code>git status --short</code> 결과다. 사전에 unstaged 상태였던 파일(컴포넌트, <code>scripts/analyze.py</code>, <code>tsconfig.tsbuildinfo</code> 등)은 본 작업에서 수정하지 않았다.</p>
+  <pre><code>M .gitignore
+M README.md
+M __tests__/lib/evaluation.test.ts
+M app/api/dcat/route.ts
+M app/api/settlement/route.ts
+M app/map/page.tsx                 ← 사전 수정 유지
+M components/collect/CollectClient.tsx  ← 사전 수정 유지
+M components/map/FacilityMap.tsx   ← 사전 수정 유지
+M components/map/MapInner.tsx      ← 사전 수정 유지
+M components/process/ProcessClient.tsx  ← 사전 수정 유지
+M components/process/RuleEditor.tsx  ← 사전 수정 유지
+M lib/collector.ts
+M lib/evaluation.ts
+M lib/processor.ts
+M lib/quality.ts
+M lib/supabase/server.ts
+M next.config.js
+M run_seed_and_user.mjs
+M scripts/analyze.py               ← 사전 수정 유지
+M scripts/create_test_users.py
+D  status.html
+M tsconfig.tsbuildinfo             ← 사전 수정 유지
+?? .eslintrc.json
+?? kimi.html
+?? requirements.txt</code></pre>
+  <div class="note err">
+    <b>커밋 전 반드시 확인:</b><br>
+    1. <code>app/map/page.tsx</code>, <code>components/*</code>, <code>scripts/analyze.py</code> 등 사전 수정 파일은 본 개선과 무관하므로 별도 커밋 권장<br>
+    2. <code>tsconfig.tsbuildinfo</code>는 빌드 산출물로, Git 추적 대상에서 제외 권장(<code>git rm --cached tsconfig.tsbuildinfo</code>)<br>
+    3. 본 개선 작업만 커밋하려면: <code>git add .gitignore lib/processor.ts lib/collector.ts lib/quality.ts lib/evaluation.ts lib/supabase/server.ts __tests__/lib/evaluation.test.ts app/api/dcat/route.ts app/api/settlement/route.ts next.config.js .eslintrc.json README.md requirements.md run_seed_and_user.mjs scripts/create_test_users.py test_accounts.txt</code> 후 <code>git status</code> 재확인
+  </div>
+
+  <h3>추가 개선 아이디어</h3>
+  <ul>
+    <li><b>에러 처리 통일:</b> API Route마다 다른 에러 응답 형식을 표준화하여 클라이언트 대응을 단순화</li>
+    <li><b>로깅 강화:</b> 수집/가공/품질진단 등 주요 배치 작업의 구조화 로그 및 알림 연계</li>
+    <li><b>페이지네이션 일관성:</b> Supabase <code>.range()</code> 사용처의 정렬/제한 패턴 통일</li>
+    <li><b>RLS 정책 감사:</b> 001_initial.sql의 레거시 JWT 클레임 경로를 최신 패턴으로 마이그레이션</li>
+    <li><b>의존성 업데이트:</b> <code>next</code>, <code>react</code>, <code>tailwindcss</code> 등 주요 패키지의 보안 패치 버전 모니터링</li>
+  </ul>
+</section>
+
+<section id="execution">
+  <div class="sec-no">EXECUTION</div>
+  <h2>개선 실행 계획 및 롤백 절차</h2>
+  <p>
+    본 절차는 분석 보고서의 P0~P3 권고 사항 중 <b>롤백이 가능하고 위험도가 낮은 범위</b>부터 순차적으로 적용한다.
+    모든 변경은 Git으로 추적되며, 각 항목별로 <b>변경 파일</b>, <b>변경 내용 요약</b>, <b>검증 방법</b>, <b>롤백 명령</b>을 기록한다.
+  </p>
+
+  <h3>사전 준비 (Rollback Foundation)</h3>
+  <div class="note">
+    <b>권장 사전 조치:</b><br>
+    1. <code>git status</code>로 현재 작업 내역 확인<br>
+    2. <code>git add . && git commit -m "chore: pre-improvement baseline"</code> 또는 변경 사항 stash<br>
+    3. 변경 전 주요 파일 백업: <code>cp lib/processor.ts lib/processor.ts.bak</code> 등<br>
+    4. <code>npm test</code>, <code>npx tsc --noEmit</code>로 기준선(base) 확보
+  </div>
+
+  <h3>적용 범위</h3>
+  <table>
+    <tr><th>단계</th><th>우선순위</th><th>작업</th><th>롤백 복잡도</th></tr>
+    <tr><td>1</td><td><span class="badge p0">P0</span></td><td><code>lib/processor.ts</code> 테이블명 수정</td><td>낮음(문자열 2건)</td></tr>
+    <tr><td>2</td><td><span class="badge p0">P0</span></td><td><code>__tests__/lib/evaluation.test.ts</code> 동기화</td><td>낮음</td></tr>
+    <tr><td>3</td><td><span class="badge p1">P1</span></td><td><code>lib/collector.ts</code> 기본 암호화 키 제거</td><td>낮음(한 줄)</td></tr>
+    <tr><td>4</td><td><span class="badge p1">P1</span></td><td><code>lib/processor.ts</code> ID 생성 crypto 기반으로 교체</td><td>낮음</td></tr>
+    <tr><td>5</td><td><span class="badge p1">P1</span></td><td>테스트 계정 비밀번호 환경변수화</td><td>중간</td></tr>
+    <tr><td>6</td><td><span class="badge p2">P2</span></td><td><code>next.config.js</code> origin 수정</td><td>낮음</td></tr>
+    <tr><td>7</td><td><span class="badge p2">P2</span></td><td><code>.eslintrc.json</code> 추가</td><td>낮음(삭제만으로 롤백)</td></tr>
+    <tr><td>8</td><td><span class="badge p2">P2</span></td><td><code>lib/quality.ts</code> 연산자 화이트리스트</td><td>낮음</td></tr>
+    <tr><td>9</td><td><span class="badge p2">P2</span></td><td><code>lib/supabase/server.ts</code> 서비스롤 정리</td><td>낮음</td></tr>
+    <tr><td>10</td><td><span class="badge p3">P3</span></td><td>잔여 파일 정리(status.html, duckdb wal, malformed log)</td><td>낮음(파일 이동/삭제)</td></tr>
+    <tr><td>11</td><td><span class="badge p3">P3</span></td><td>README 마이그레이션/라우트 정보 보강</td><td>중간</td></tr>
+  </table>
+
+  <h3>통합 롤백 명령</h3>
+  <pre><code># 방법 1: Git을 사용한 전체 롤백(가장 안전)
+git checkout -- lib/processor.ts __tests__/lib/evaluation.test.ts lib/collector.ts \
+  run_seed_and_user.mjs scripts/create_test_users.py next.config.js lib/quality.ts \
+  lib/supabase/server.ts README.md
+rm -f .eslintrc.json
+
+# 방법 2: 사전 백업 파일 복원
+cp lib/processor.ts.bak lib/processor.ts
+cp __tests__/lib/evaluation.test.ts.bak __tests__/lib/evaluation.test.ts
+# ... (각 파일별 복원)
+
+# 방법 3: 마지막 커밋으로 복원
+git reset --hard HEAD</code></pre>
+
+  <h3>변경 이력 (Change Log)</h3>
+  <p>아래 표는 실제 수정이 진행됨에 따라 단계별로 업데이트된다.</p>
+  <table id="change-log">
+    <tr><th>단계</th><th>파일</th><th>변경 요약</th><th>검증</th><th>롤백</th></tr>
+    <tr>
+      <td>1</td>
+      <td><code>lib/processor.ts</code></td>
+      <td>
+        • <code>process_pipelines</code> → <code>processing_pipelines</code><br>
+        • <code>process_runs</code> → <code>processing_runs</code><br>
+        • <code>Math.random()</code> 기반 run_id/dataset_id → <code>randomHex(4)</code><br>
+        • <code>randomHex</code> import 추가
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과, Grep으로 잔여 키워드 없음 확인</td>
+      <td><code>git checkout -- lib/processor.ts</code></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><code>__tests__/lib/evaluation.test.ts</code></td>
+      <td>
+        • 체크리스트 길이 기대 5 → 8<br>
+        • 프로퍼티명 <code>item</code>/<code>passed</code> → <code>name</code>/<code>pass</code><br>
+        • ai_ready=true 테스트에 <code>is_open</code>, <code>updated_at</code>, <code>api_enabled</code> 추가
+      </td>
+      <td><code>npm test</code> 30/30 통과</td>
+      <td><code>git checkout -- __tests__/lib/evaluation.test.ts</code></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><code>lib/collector.ts</code></td>
+      <td>
+        • 하드코딩된 <code>eum_default_secret_key_32bytes!!</code> 평문 기본값 제거<br>
+        • <code>COLLECTION_SECRET</code> 미설정 시 런타임 에러 throw
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과</td>
+      <td><code>git checkout -- lib/collector.ts</code></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><code>lib/processor.ts</code></td>
+      <td>
+        • <code>Math.random()</code> 기반 run_id/dataset_id를 <code>randomHex(4)</code>(crypto.getRandomValues)로 교체 (P0 단계에서 함께 처리)
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과</td>
+      <td><code>git checkout -- lib/processor.ts</code></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><code>run_seed_and_user.mjs</code><br><code>scripts/create_test_users.py</code><br><code>test_accounts.txt</code></td>
+      <td>
+        • 평문 비밀번호 <code>eum2026!</code>, <code>Test1234!</code> 제거<br>
+        • <code>TEST_CENTER_PASSWORD</code>, <code>TEST_AGENCY_PASSWORD</code>, <code>TEST_USER_PASSWORD</code> 환경변수 필수화<br>
+        • <code>test_accounts.txt</code>에서 공통 비밀번호 평문 제거
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과, Python 문법 검사</td>
+      <td><code>git checkout -- run_seed_and_user.mjs scripts/create_test_users.py test_accounts.txt</code></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><code>next.config.js</code></td>
+      <td>
+        • Server Actions <code>allowedOrigins</code> <code>localhost:3000</code> → <code>localhost:3001</code>
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과</td>
+      <td><code>git checkout -- next.config.js</code></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><code>.eslintrc.json</code> (신규)</td>
+      <td>
+        • <code>next/core-web-vitals</code> 확장 설정 추가<br>
+        • <code>npm run lint</code> 정상 동작 (경고 1건: SubmissionClient useEffect 의존성)
+      </td>
+      <td><code>npm run lint</code> 통과</td>
+      <td><code>rm -f .eslintrc.json</code></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><code>lib/quality.ts</code><br><code>lib/evaluation.ts</code></td>
+      <td>
+        • <code>(q as any)[op]</code> 동적 연산자 호출 제거<br>
+        • <code>lib/quality.ts</code>: <code>CountOp</code> 화이트리스트 + switch 문 적용<br>
+        • <code>lib/evaluation.ts</code>: <code>.eq()</code> 직접 호출로 변경
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과</td>
+      <td><code>git checkout -- lib/quality.ts lib/evaluation.ts</code></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><code>lib/supabase/server.ts</code></td>
+      <td>
+        • <code>createServiceClient()</code>에서 사용자 쿠키 스토어 제거<br>
+        • 서비스롤 클라이언트에 <code>auth: { persistSession: false }</code> + no-op cookies 적용
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과</td>
+      <td><code>git checkout -- lib/supabase/server.ts</code></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><code>status.html</code><br><code>data/eum.duckdb.wal</code><br><code>C:Usersbceum_dev.log</code></td>
+      <td>
+        • <code>status.html</code> 삭제 (구형 제작 기록, Git에 의해 추적됨)<br>
+        • <code>data/eum.duckdb.wal</code> 삭제 (DuckDB 잔여 WAL, .gitignore 대상)<br>
+        • <code>C:Usersbceum_dev.log</code> 삭제 (잘못된 경로의 로그 파일)
+      </td>
+      <td>파일 시스템 확인</td>
+      <td>
+        <code>git checkout HEAD -- status.html</code><br>
+        <code>rm -f data/eum.duckdb.wal "C:Usersbceum_dev.log"</code>는 되돌릴 수 없으나 재생성 가능
+      </td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td><code>README.md</code></td>
+      <td>
+        • 마이그레이션 파일 수 4개 → 19개로 정정, 전체 목록 추가<br>
+        • 실제 App Router 경로(18개) 및 API 경로 반영<br>
+        • 개발 서버 포트 3000 → 3001 정정<br>
+        • 필수 환경변수에 <code>TEST_CENTER_PASSWORD</code>, <code>TEST_AGENCY_PASSWORD</code>, <code>TEST_USER_PASSWORD</code>, <code>CRON_SECRET</code> 등 추가<br>
+        • Python 의존성(<code>pandas/scipy/statsmodels/lifelines</code>) 및 설치법 추가<br>
+        • 검증 명령어(<code>npx tsc --noEmit</code>, <code>npm run lint</code>, <code>npm test</code>) 추가<br>
+        • 보안 변경 사항(암호화 키, ID 생성, 테스트 비밀번호) 명시
+      </td>
+      <td>Markdown 렌더링 및 링크 검토</td>
+      <td><code>git checkout -- README.md</code></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td><code>app/api/dcat/route.ts</code></td>
+      <td>
+        • <code>host</code> 평문 폴드백 <code>localhost:3000</code> → <code>localhost:3001</code>
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과</td>
+      <td><code>git checkout -- app/api/dcat/route.ts</code></td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td><code>app/api/settlement/route.ts</code></td>
+      <td>
+        • <code>(query as any).eq(...)</code> → <code>query.eq(...)</code> 직접 호출로 변경
+      </td>
+      <td><code>npx tsc --noEmit</code> 통과</td>
+      <td><code>git checkout -- app/api/settlement/route.ts</code></td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td><code>.gitignore</code></td>
+      <td>
+        • <code>*.tsbuildinfo</code> 추가 (빌드 산출물 추적 방지)<br>
+        • <code>.claude/CLAUDE.md</code> 및 <code>.agents/skills/eum-platform*/SKILL.md</code> 추적 예외 추가
+      </td>
+      <td>파일 내용 확인</td>
+      <td><code>git checkout -- .gitignore</code></td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td><code>requirements.txt</code> (신규)</td>
+      <td>
+        • <code>scripts/analyze.py</code>용 Python 패키지 명시<br>
+        • pandas, scipy, statsmodels, lifelines
+      </td>
+      <td>파일 내용 확인</td>
+      <td><code>rm -f requirements.txt</code></td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td><code>.claude/CLAUDE.md</code><br><code>.agents/skills/eum-platform/SKILL.md</code><br><code>.agents/skills/eum-platform-backend/SKILL.md</code><br><code>.agents/skills/eum-platform-quality/SKILL.md</code><br><code>.agents/skills/eum-platform-frontend/SKILL.md</code><br><code>scripts/agent-status.py</code><br><code>scripts/agent-status.ps1</code></td>
+      <td>
+        • Claude Code 프로젝트 가이드 생성<br>
+        • eum_platform 전용 스킬 4개 생성 (platform/backend/quality/frontend)<br>
+        • agents 시스템 상태 업데이트 브릿지 스크립트 추가<br>
+        • README.md에 Claude Code/에이전트 연동 항목 추가 및 오타 수정
+      </td>
+      <td>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm run lint</code> 통과 (경고 1건)<br>
+        <code>npm test</code> 30/30 통과
+      </td>
+      <td>
+        <code>rm -rf .claude/CLAUDE.md .agents/skills/eum-platform*</code><br>
+        <code>rm -f scripts/agent-status.py scripts/agent-status.ps1</code><br>
+        <code>git checkout -- README.md</code>
+      </td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td><code>scripts/analyze.py</code><br><code>app/api/analyze/route.ts</code><br><code>app/api/analyze/upload/route.ts</code></td>
+      <td>
+        • Python stdout에 NaN/Inf가 포함된 비표준 JSON 출력 문제 수정<br>
+        • <code>_sanitize_json()</code> 추가: float NaN/Inf/-Inf → None 변환<br>
+        • json.dumps에 <code>allow_nan=False</code> 적용<br>
+        • Route Handler에 <code>extractJson()</code> 추가: stdout에서 첫 JSON 객첼 추출
+      </td>
+      <td>
+        <code>python scripts/analyze.py</code> 파이프 테스트 (NaN → null 확인)<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm run lint</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- scripts/analyze.py</code><br>
+        <code>git checkout -- app/api/analyze/route.ts</code><br>
+        <code>git checkout -- app/api/analyze/upload/route.ts</code>
+      </td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td><code>app/api/quality/route.ts</code><br><code>app/api/ontology/route.ts</code><br><code>app/api/chat/route.ts</code></td>
+      <td>
+        • 미인증 API 보호: /api/quality GET, /api/ontology POST, /api/chat POST에 getUser() 인증 추가<br>
+        • /api/quality POST는 기존 x-service-key 인증 유지
+      </td>
+      <td>
+        <code>curl</code>로 미인증 401 응답 확인<br>
+        <code>npx tsc --noEmit</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- app/api/quality/route.ts</code><br>
+        <code>git checkout -- app/api/ontology/route.ts</code><br>
+        <code>git checkout -- app/api/chat/route.ts</code>
+      </td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td><code>app/api/charts/route.ts</code><br><code>app/api/settlement/route.ts</code></td>
+      <td>
+        • 데이터 조회 API에 인증 추가: /api/charts, /api/settlement<br>
+        • 대시보드/온톨로지는 인증 페이지이므로 API도 인증 필요
+      </td>
+      <td>
+        <code>curl</code>로 미인증 401 응답 확인<br>
+        <code>npx tsc --noEmit</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- app/api/charts/route.ts</code><br>
+        <code>git checkout -- app/api/settlement/route.ts</code>
+      </td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td><code>components/analytics/AnalyticsClient.tsx</code></td>
+      <td>
+        • 분석 페이지 레이아웃 안정화<br>
+        • 단계별 패널 min-height 및 sticky 적용, 반응형 그리드 개선<br>
+        • transition-all duration-200으로 패널 전환 시 깜빡임/높이 변화 완화<br>
+        • 파일 업로드/결과 영역 flex-1 flex-col 구조로 높이 유지
+      </td>
+      <td>
+        브라우저에서 /analytics 단계별 전환 확인<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm run build</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- components/analytics/AnalyticsClient.tsx</code>
+      </td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td><code>components/analytics/AnalyticsClient.tsx</code><br><code>scripts/analyze.py</code></td>
+      <td>
+        • 독립표본 t-검정 고도화: 집단 변수가 3개 이상 범주일 때 2개 범주 선택 UI 추가<br>
+        • group_values 전달 로직 추가 (variables.group_values)<br>
+        • 대응표본 t-검정(paired t-test) 신규 추가: variable1/variable2 선택, 공통 인덱스 쌍만 사용<br>
+        • Python 측 run_independent_ttest에 group_values 처리, run_paired_ttest 신규 구현
+      </td>
+      <td>
+        Python 직접 실행: independent_ttest, paired_ttest 정상 출력<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm test</code> 30/30 통과<br>
+        <code>npm run build</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- components/analytics/AnalyticsClient.tsx</code><br>
+        <code>git checkout -- scripts/analyze.py</code>
+      </td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td><code>lib/nlquery.ts</code><br><code>app/login/page.tsx</code><br><code>components/report/ReportClient.tsx</code><br><code>components/manual/ManualClient.tsx</code><br><code>components/dashboard/DashboardClient.tsx</code></td>
+      <td>
+        • 플랫폼 소속 기관명 변경: "경남연구원" → "경남빅데이터센터"<br>
+        • 로그인, 보고서, 매뉴얼, 대시보드, 자연어 데이터 소스 표기 일괄 수정
+      </td>
+      <td>
+        Grep으로 잔여 "경남연구원" 키워드 없음 확인<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm run build</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- lib/nlquery.ts app/login/page.tsx</code><br>
+        <code>git checkout -- components/report/ReportClient.tsx</code><br>
+        <code>git checkout -- components/manual/ManualClient.tsx</code><br>
+        <code>git checkout -- components/dashboard/DashboardClient.tsx</code>
+      </td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td><code>components/map/MapInner.tsx</code><br><code>components/map/FacilityMap.tsx</code><br><code>app/map/page.tsx</code></td>
+      <td>
+        • /map 히트맵·마커 클러스터 추가<br>
+        • layerMode prop 도입: marker / cluster / heatmap<br>
+        • Kakao Maps MarkerClusterer 활용 클러스터<br>
+        • 커스텀 밀도 히트맵: 지도 그리드 + CustomOverlay + 색상 스케일<br>
+        • URL query <code>?layer=marker|cluster|heatmap</code> 동기화
+      </td>
+      <td>
+        브라우저에서 /map 토글 동작 확인<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm run build</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- components/map/MapInner.tsx</code><br>
+        <code>git checkout -- components/map/FacilityMap.tsx</code><br>
+        <code>git checkout -- app/map/page.tsx</code>
+      </td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td><code>scripts/generate-seed-data.ts</code><br><code>supabase/seed.sql</code><br><code>README.md</code><br><code>data/samples/*.csv/json</code></td>
+      <td>
+        • 공공기관 대상 샘플 데이터 5개 주제 보강<br>
+        • 교통사고, 상권, 대기질, 공공의료, 학교/교육 CSV/JSON 생성<br>
+        • catalog 테이블에 5개 샘플 데이터셋 등록<br>
+        • README에 샘플 목록·재생성 방법·Python 분석 예시 추가
+      </td>
+      <td>
+        <code>npx ts-node scripts/generate-seed-data.ts</code> 정상 실행<br>
+        <code>python scripts/analyze.py</code>로 5개 CSV parse 테스트 통과<br>
+        <code>npx tsc --noEmit</code>, <code>npm test</code> 30/30, <code>npm run build</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- scripts/generate-seed-data.ts supabase/seed.sql README.md</code><br>
+        <code>rm -rf data/samples</code>
+      </td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td><code>middleware.ts</code><br><code>lib/analyzeRunner.ts</code><br><code>app/api/analyze/route.ts</code><br><code>app/api/analyze/upload/route.ts</code><br><code>components/collect/CollectClient.tsx</code><br><code>components/process/ProcessClient.tsx</code></td>
+      <td>
+        • middleware 공개 API prefix 축소: /api/ 전체 공개 → /api/v1/, /api/dcat, /api/cron/, /api/openapi/webhooks 한정<br>
+        • Python 분석 실행 래퍼 중복 제거: lib/analyzeRunner.ts 신규, analyze route에서 사용<br>
+        • 수집→가공→분석 파이프라인 연동: 수집 완료 후 가공으로 이동, 가공 완료 후 분석으로 이동
+      </td>
+      <td>
+        <code>curl</code>로 민감 API 미인증 401 확인<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm test</code> 30/30 통과<br>
+        <code>npm run build</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- middleware.ts</code><br>
+        <code>rm -f lib/analyzeRunner.ts</code><br>
+        <code>git checkout -- app/api/analyze/route.ts app/api/analyze/upload/route.ts</code><br>
+        <code>git checkout -- components/collect/CollectClient.tsx components/process/ProcessClient.tsx</code>
+      </td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td><code>components/process/RuleEditor.tsx</code><br><code>lib/processor.ts</code></td>
+      <td>
+        • 데이터 가공 규칙 UI 보강: aggregate(그룹 집계), join(테이블 조인), pivot(피벗) 규칙 편집 UI 추가<br>
+        • lib/processor.ts에는 이미 구현되어 있던 3개 규칙을 RuleEditor에서 활성화
+      </td>
+      <td>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm run build</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- components/process/RuleEditor.tsx</code>
+      </td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td><code>scripts/analyze.py</code><br><code>components/analytics/AnalyticsClient.tsx</code><br><code>requirements.txt</code><br><code>app/not-found.tsx</code></td>
+      <td>
+        • 분석 기능 추가·고도화: 카이제곱 독립성 검정, 이항 로지스틱 회귀, PCA, K-Means 클러스터링, Mann-Whitney U, Wilcoxon Signed-Rank 추가<br>
+        • 기존 분석 시각화 보강: 상관분석 히트맵, 기술통계 평균 막대, 회귀분석 실제값-예측값 산점도·회귀직선, 잔차·예측값 테이블 추가<br>
+        • AnalyticsClient에 ResultCharts 컴포넌트 추가: bar/line/scatter/pie/heatmap 자동 렌더링<br>
+        • 분석 메뉴에 신규 6개 항목 추가 및 집단 2개 선택 UI를 Mann-Whitney U에도 확장<br>
+        • requirements.txt에 scikit-learn 추가, app/not-found.tsx 추가로 빌드 안정성 개선
+      </td>
+      <td>
+        Python 직접 실행: chi_square_test, pca, kmeans, logistic_regression, mann_whitney_u, wilcoxon 정상 출력<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm test</code> 30/30 통과<br>
+        <code>npm run lint</code> 통과 (기존 경고 1건 유지)<br>
+        <code>npm run build</code> 통과
+      </td>
+      <td>
+        <code>git checkout -- scripts/analyze.py components/analytics/AnalyticsClient.tsx requirements.txt</code><br>
+        <code>rm -f app/not-found.tsx</code>
+      </td>
+    </tr>
+    <tr><td colspan="5" style="text-align:center;color:var(--muted)">추가 개선점 문서화 완료</td></tr>
+  </table>
+
+  <h3>최종 검증 결과</h3>
+  <table>
+    <tr><th>검증 항목</th><th>명령</th><th>결과</th></tr>
+    <tr><td>단위 테스트</td><td><code>npm test</code></td><td><span class="ok">30/30 통과</span></td></tr>
+    <tr><td>TypeScript 타입 검사</td><td><code>npx tsc --noEmit</code></td><td><span class="ok">통과</span></td></tr>
+    <tr><td>ESLint</td><td><code>npm run lint</code></td><td><span class="warn">경고 1건</span> (SubmissionClient useEffect 의존성)</td></tr>
+    <tr><td>프로덕션 빌드</td><td><code>npm run build</code></td><td><span class="ok">통과</span> (2026-06-14, <code>rm -rf .next</code> 후 재빌드, app/not-found.tsx 추가)</td></tr>
+    <tr><td>Python 샘플 파싱</td><td><code>python scripts/analyze.py</code> (5개 CSV)</td><td><span class="ok">통과</span></td></tr>
+  </table>
+
+  <h3>전체 롤백 체크리스트</h3>
+  <p>모든 변경을 한 번에 되돌리려면 아래 명령을 순서대로 실행한다.</p>
+  <pre><code># 1. 본 개선 작업에서 수정한 소스 파일 복원
+git checkout -- lib/processor.ts lib/collector.ts lib/quality.ts lib/evaluation.ts \
+  lib/supabase/server.ts __tests__/lib/evaluation.test.ts next.config.js README.md \
+  run_seed_and_user.mjs scripts/create_test_users.py test_accounts.txt \
+  app/api/dcat/route.ts app/api/settlement/route.ts app/api/quality/route.ts \
+  app/api/ontology/route.ts app/api/chat/route.ts app/api/charts/route.ts \
+  app/api/analyze/route.ts app/api/analyze/upload/route.ts \
+  scripts/analyze.py components/analytics/AnalyticsClient.tsx .gitignore \
+  lib/nlquery.ts app/login/page.tsx components/report/ReportClient.tsx \
+  components/manual/ManualClient.tsx components/dashboard/DashboardClient.tsx \
+  components/map/MapInner.tsx components/map/FacilityMap.tsx app/map/page.tsx \
+  scripts/generate-seed-data.ts supabase/seed.sql middleware.ts \
+  components/collect/CollectClient.tsx components/process/ProcessClient.tsx \
+  components/process/RuleEditor.tsx
+
+# 2. 신규 생성 파일 삭제
+rm -f .eslintrc.json requirements.txt kimi.html app/not-found.tsx
+rm -f scripts/agent-status.py scripts/agent-status.ps1
+rm -f lib/analyzeRunner.ts
+rm -rf .claude/CLAUDE.md .agents/skills/eum-platform .agents/skills/eum-platform-backend \
+  .agents/skills/eum-platform-quality .agents/skills/eum-platform-frontend
+
+# 3. 샘플 데이터 디렉터리 삭제
+rm -rf data/samples
+
+# 4. 삭제한 파일 복원
+git checkout HEAD -- status.html
+
+# 5. untracked/ignored 파일은 수동 복구 필요
+# data/eum.duckdb.wal, C:Usersbceum_dev.log 는 DuckDB/로그 재생성 가능
+
+# 6. 최종 확인
+npm test
+npx tsc --noEmit
+npm run lint</code></pre>
+
+  <div class="note">
+    <b>작업 완료 요약:</b><br>
+    • P0 기능 결함 2건 수정 (processor 테이블명, evaluation 테스트 동기화)<br>
+    • P1 보안 이슈 4건 수정 (하드코딩 암호화 키, Math.random ID, 테스트 비밀번호)<br>
+    • P2 유지보수 5건 수정 (ESLint, Server Actions origin, quality as any, evaluation as any, 서비스롤 쿠키)<br>
+    • P3 문서/잔여 파일 2건 정리 (status.html/duckdb wal/malformed log 삭제, README 보강)<br>
+    • 에이전트 시스템 연동: Claude Code 프로젝트 가이드 + 4개 스킬 + 상태 브릿지 스크립트 생성, agents 위키 노트 등록<br>
+    • 추가 소소 개선 4건 (dcat 폴드백 포트, settlement as any, tsbuildinfo ignore, requirements.txt)<br>
+    • 분석 탭 긴급 수정: Python NaN/Inf → null 직렬화, stdout JSON 안전 추출<br>
+    • 미인증 API 보호: /api/quality, /api/ontology, /api/chat, /api/charts, /api/settlement에 인증 추가<br>
+    • 분석 페이지 레이아웃 안정화: 단계별 패널 min-height/sticky/transition, 반응형 그리드 개선<br>
+    • 분석 기능 고도화: t-검정 2개 범주 선택, 대응표본 t-검정(paired t-test) 추가<br>
+    • 플랫폼 소속 기관명 일괄 변경: "경남연구원" → "경남빅데이터센터"<br>
+    • 지도 고도화: Kakao Maps 마커 + MarkerClusterer 클러스터 + 커스텀 밀도 히트맵, URL 레이어 동기화<br>
+    • 샘플 데이터 보강: 공공기관 대상 5개 주제(교통사고·상권·대기질·공공병원·학교/교육) CSV/JSON + catalog 등록<br>
+    • 보안 연동 강화: middleware 공개 API prefix 축소, 중복 Python 실행 래퍼 lib/analyzeRunner.ts 추출, 수집→가공→분석 연동<br>
+    • 데이터 가공 규칙 UI 보강: aggregate/join/pivot 규칙 편집기 활성화<br>
+    • 분석·시각화 고도화: 6개 신규 분석(카이제곱, 로지스틱 회귀, PCA, K-Means, Mann-Whitney U, Wilcoxon), 상관/기술통계/회귀 차트, ResultCharts 자동 렌더링<br>
+    • 모든 단위 테스트 통과 및 TypeScript 검사 통과, 프로덕션 빌드 통과
+  </div>
+</section>
+
+<section id="agents">
+  <div class="sec-no">AGENTS WIKI</div>
+  <h2>에이전트·위키 연동 기록</h2>
+  <p>
+    본 작업은 <code>C:\업무\agents\SESSION_GUIDE.md</code>의 가이드를 따라 기록되었다.
+    옵시디언(Obsidian) Vault는 <code>C:\업무\agents\wiki\</code>에 있으며, Markdown 파일 직접 읽기/쓰기로 동기화한다.
+  </p>
+
+  <h3>수행한 연동 작업</h3>
+  <table>
+    <tr><th>작업</th><th>대상</th><th>결과</th></tr>
+    <tr>
+      <td>에이전트 상태 기록</td>
+      <td><code>python /c/업무/agents/scripts/update_status.py backend done "..."</code></td>
+      <td><code>agent_status.json</code>에 backend done 기록 추가</td>
+    </tr>
+    <tr>
+      <td>피드백 노트 작성</td>
+      <td><code>C:\업무\agents\wiki\notes\feedback\feedback-eum-platform-audit-2026-06-13.md</code></td>
+      <td>감사 패턴·해결책·후속 권고 정리</td>
+    </tr>
+    <tr>
+      <td>프로젝트 현황 갱신</td>
+      <td><code>C:\업무\agents\wiki\notes\project\eum-platform-status.md</code></td>
+      <td>2026-06-13 감사 및 개선 섹션 추가</td>
+    </tr>
+    <tr>
+      <td>MoC 링크 등록</td>
+      <td><code>C:\업무\agents\wiki\MoC\이음플랫폼.md</code></td>
+      <td>피드백 노트·프로젝트 현황 노트 링크 추가</td>
+    </tr>
+  </table>
+
+  <h3>옵시디언에서 확인 방법</h3>
+  <ol>
+    <li>Obsidian Vault를 <code>C:\업무\agents\wiki</code>로 연다.</li>
+    <li><code>MoC/이음플랫폼</code>에서 <code>feedback-eum-platform-audit-2026-06-13</code> 링크 클릭.</li>
+    <li>Graph View에서 이음 플랫폼 관련 노드 연결 확인.</li>
+  </ol>
+
+  <h3>후속 작업 시 참고</h3>
+  <div class="note">
+    다음 작업 시작 전 <code>SESSION_GUIDE.md</code> 체크리스트:<br>
+    1. <code>C:\업무\agents\wiki\MoC\이음플랫폼.md</code> 읽기<br>
+    2. <code>feedback-eum-platform-audit-2026-06-13</code>의 후속 권고 확인<br>
+    3. <code>python /c/업무/agents/scripts/update_status.py [agent_id] working "작업 내용"</code> 실행
+  </div>
+</section>
+
+<section id="additional">
+  <div class="sec-no">ADDITIONAL FINDINGS</div>
+  <h2>추가 발견 개선점 (미적용 권고)</h2>
+  <p>
+    추가로 빌드·API Route 점검을 진행하면서 발견한 사항들이다. 즉각적 위험도가 낮거나 변경 시 사이드이펙트가 클 수 있어 이번에는 문서화만 남기고,
+    별도 기획/검증 후 적용할 것을 권장한다.
+  </p>
+
+  <h3>보안·인증</h3>
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> 일부 API Route가 세션 없이 민감 동작 수행</div>
+    <p>
+      <code>middleware.ts</code>가 <code>/api/*</code> 전체를 공개로 처리하는 가욱, 아래 Route는 사용자 인증 없이 호출될 수 있다.
+    </p>
+    <table>
+      <tr><th>Route</th><th>현재 상태</th><th>위험도</th></tr>
+      <tr><td><code>GET /api/quality</code></td><td>인증 없이 <code>runAll(supabase)</code> 실행 → 품질진단 배치</td><td>중간(자원 낭비·데이터 노출)</td></tr>
+      <tr><td><code>POST /api/ontology</code></td><td>인증 없이 <code>buildOntology(supabase)</code> 실행 → 그래프 재구축</td><td>중간(부하·데이터 갱신)</td></tr>
+      <tr><td><code>POST /api/chat</code></td><td>인증 없이 Qwen API 프록시 → 외부 API 비용/남용</td><td>높음(비용·콘텐츠 정책)</td></tr>
+      <tr><td><code>GET /api/nlquery</code></td><td>인증 없이 자연어 질의 → 데이터 접근</td><td>낮음~중간(공개 데이터 기준)</td></tr>
+      <tr><td><code>GET /api/overview</code></td><td>인증 없이 대시보드 요약 조회</td><td>낮음(공개 요약 데이터)</td></tr>
+    </table>
+    <p><b>권고:</b> 각 Route의 의도를 재확인하고, 인증이 필요한 Route에는 <code>supabase.auth.getUser()</code> 체크를 추가한다. 공개 API는 <code>/api/public/*</code> 또는 <code>/api/v1/*</code>로 명확히 분리한다.</p>
+  </div>
+
+  <h3>코드 품질·아키텍처</h3>
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> 중복 Python 실행 래퍼</div>
+    <p>
+      <code>app/api/analyze/route.ts</code>와 <code>app/api/analyze/upload/route.ts</code>에 동일한 <code>runAnalyzePy</code> 함수가 중복되어 있다.
+      유지보수 시 양쪽을 함께 수정해야 한다.
+    </p>
+    <p><b>권고:</b> <code>lib/analyzeRunner.ts</code>로 추출하고, Python 경로·타임아웃·에러 포맷을 한 곳에서 관리한다.</p>
+  </div>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> API 응답 형식 불일치</div>
+    <p>
+      일부 Route는 <code>{ error: string }</code>를, 다른 Route는 <code>{ error: string, reason: string }</code> 등 다양한 에러 형식을 사용한다.
+      프론트엔드에서 통일된 에러 처리가 어렵다.
+    </p>
+    <p><b>권고:</b> <code>{ success: boolean, data?: T, error?: { code: string, message: string } }</code> 형태의 표준 응답 래퍼를 도입한다.</p>
+  </div>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> 동적 테이블명 사용</div>
+    <p>
+      <code>lib/quality.ts</code>, <code>lib/utilization.ts</code>, <code>app/api/catalog/[id]/stats/route.ts</code> 등에서
+      사용자 입력이나 메타데이터 기반으로 테이블명을 동적으로 사용한다. 현재는 gold/upload 테이블로 한정되어 있지만,
+      검증되지 않은 테이블명이 들어오면 SQL 인젝션과 유사한 문제가 발생할 수 있다.
+    </p>
+    <p><b>권고:</b> 허용 테이블 화이트리스트(<code>['gold_youth_population', 'gold_business', 'gold_public_facility', 'submission_uploads']</code>)를 만들어 검증한다.</p>
+  </div>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> E2E/통합 테스트 부재</div>
+    <p>
+      <code>@playwright/test</code>는 devDependency로 포함되어 있으나, 실제 E2E 테스트 파일이 없다.
+      핵심 사용자 플로우(로그인 → 제출 → 승인 → 포털 확인)가 수동으로만 검증되고 있다.
+    </p>
+    <p><b>권고:</b> <code>__tests__/e2e/</code>에 최소 2~3개의 핵심 시나리오를 작성한다.</p>
+  </div>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> CI/CD 파이프라인 부재</div>
+    <p>PR/푸시 시 자동으로 테스트·빌드·린트를 실행하는 GitHub Actions 워크플로우가 없다.</p>
+    <p><b>권고:</b> <code>.github/workflows/ci.yml</code>을 추가하여 <code>npm ci</code>, <code>npx tsc --noEmit</code>, <code>npm run lint</code>, <code>npm test</code>, <code>npm run build</code>를 실행한다.</p>
+  </div>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> RLS 정책 JWT 클레임 불일치</div>
+    <p>
+      <code>001_initial.sql</code>의 <code>submissions</code> RLS는 <code>auth.jwt() ->> 'role'</code>을 사용하지만,
+      <code>004_fix_rls_jwt_claims.sql</code> 이후의 정책과 middleware는 <code>auth.jwt() -> 'user_metadata' ->> 'role'</code>을 사용한다.
+      초기 마이그레이션만 실행한 환경에서 권한 오류가 발생할 수 있다.
+    </p>
+    <p><b>권고:</b> 001의 RLS 정책을 후속 마이그레이션에서 재정의하거나, 모든 마이그레이션을 순차적으로 실행하도록 가이드한다.</p>
+  </div>
+
+  <h3>운영·성능</h3>
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> 데이터스토어 날짜 형식 불일치</div>
+    <p>
+      일부 테이블은 <code>TIMESTAMPTZ</code>(<code>collection_sources.created_at</code>), 일부는 <code>TEXT</code>(<code>processing_pipelines.created_at</code>)를 사용한다.
+      시간대 처리와 정렬/비교 연산에서 혼란이 발생할 수 있다.
+    </p>
+    <p><b>권고:</b> 신규 테이블은 <code>TIMESTAMPTZ DEFAULT now()</code>로 통일하고, 기존 TEXT 컬럼은 점진적으로 마이그레이션한다.</p>
+  </div>
+
+  <div class="finding p3">
+    <div class="title"><span class="badge p3">P3</span> Cron 및 배치 작업 모니터링</div>
+    <p>
+      <code>/api/cron/collect</code>는 개별 잡 실패를 무시하고 진행한다(catch 블록 비어 있음).
+      실패한 작업이 누적되어도 알림이나 로그로 남지 않는다.
+    </p>
+    <p><b>권고:</b> 실패한 job_id/source_id와 오류 메시지를 <code>collection_logs</code>에 기록하거나, 센터 이메일로 알림을 발송한다.</p>
+  </div>
+</section>
+
+<section id="feature-inspection">
+  <div class="sec-no">FEATURE INSPECTION</div>
+  <h2>전체 기능 점검 계획</h2>
+  <p>
+    2026-06-14 사용자 보고: <b>분석 탭</b>에서 Python 분석 엔진이 NaN을 포함한 비표준 JSON을 반환해 JSON.parse가 실패.
+    이를 계기로 각 기능별로 URL/응답/런타임 오류를 체계적으로 점검한다.
+  </p>
+
+  <h3>점검 방법</h3>
+  <ol>
+    <li><b>무인증 페이지</b>: <code>curl</code>로 HTTP 상태 코드 및 HTML 렌더링 확인</li>
+    <li><b>공개 API</b>: <code>curl</code>로 JSON 응답 및 상태 코드 확인</li>
+    <li><b>인증 필요 페이지/API</b>: 코드 정적 검사 + 필요 시 테스트 계정 로그인</li>
+    <li><b>Python 외부 프로세스</b>: 직접 stdin/stdout 파이프 테스트</li>
+    <li><b>프로덕션 빌드</b>: <code>npm run build</code>로 전체 런타임 오류 포착</li>
+  </ol>
+
+  <h3>기능별 체크리스트</h3>
+  <table>
+    <tr><th>번호</th><th>기능</th><th>경로</th><th>점검 항목</th><th>상태</th></tr>
+    <tr><td>1</td><td>대시보드</td><td><code>/</code></td><td>미인증 시 /login 리다이렉트, 인증 시 5영역 지표 표시</td><td>예정</td></tr>
+    <tr><td>2</td><td>로그인</td><td><code>/login</code></td><td>HTML 렌더링, Supabase Auth 연동</td><td>예정</td></tr>
+    <tr><td>3</td><td>개방포털</td><td><code>/portal</code></td><td>인증 리다이렉트, 데이터셋 목록/상세/다운로드</td><td>예정</td></tr>
+    <tr><td>4</td><td>데이터 제출</td><td><code>/submission</code></td><td>CSV 업로드, 품질진단, 승인/반려</td><td>예정</td></tr>
+    <tr><td>5</td><td>품질진단</td><td><code>/quality</code></td><td>규칙 실행, 결과 JSON 정상</td><td>예정</td></tr>
+    <tr><td>6</td><td>데이터 가공</td><td><code>/process</code></td><td>파이프라인 CRUD, 미리보기</td><td>예정</td></tr>
+    <tr><td>7</td><td>온톨로지</td><td><code>/ontology</code></td><td>그래프 렌더링, 통계 조회</td><td>예정</td></tr>
+    <tr><td>8</td><td>자연어 질의</td><td><code>/nlquery</code></td><td>의도 매핑, 응답 JSON</td><td>예정</td></tr>
+    <tr><td>9</td><td>AI 채팅</td><td><code>/ai</code></td><td>Qwen API 프록시, 스트리밍/오류 처리</td><td>예정</td></tr>
+    <tr><td>10</td><td>데이터 수집</td><td><code>/collect</code></td><td>소스 CRUD, 스케줄, 로그</td><td>예정</td></tr>
+    <tr><td>11</td><td>공개 API 관리</td><td><code>/openapi</code></td><td>키 발급, 통계</td><td>예정</td></tr>
+    <tr><td>12</td><td>분석 대시보드</td><td><code>/analytics</code></td><td>파일 업로드/카탈로그 분석, JSON 응답, NaN 처리, 레이아웃 안정화</td><td><span class="ok">수정 완료</span></td></tr>
+    <tr><td>12a</td><td>분석 엔진</td><td><code>scripts/analyze.py</code></td><td>NaN/Inf → null 직렬화, stdout JSON 안전 추출, 독립/대응 t-검정</td><td><span class="ok">수정 완료</span></td></tr>
+    <tr><td>12b</td><td>API 보호</td><td><code>/api/quality</code>, <code>/api/ontology</code>, <code>/api/chat</code>, <code>/api/charts</code>, <code>/api/settlement</code></td><td>미인증 접근 시 401 반환</td><td><span class="ok">수정 완료</span></td></tr>
+    <tr><td>12c</td><td>분석 UI 고도화</td><td><code>components/analytics/AnalyticsClient.tsx</code></td><td>단계별 레이아웃 안정화, t-검정 2개 범주 선택, 대응표본 t-검정 UI</td><td><span class="ok">수정 완료</span></td></tr>
+    <tr><td>13</td><td>보고서</td><td><code>/report</code></td><td>평가편람 보고서 렌더링</td><td>예정</td></tr>
+    <tr><td>14</td><td>지도</td><td><code>/map</code></td><td>Kakao Maps 기반 시설 마커 + MarkerClusterer 클러스터 + 커스텀 밀도 히트맵, URL <code>?layer=marker|cluster|heatmap</code> 동기화</td><td><span class="ok">수정 완료</span></td></tr>
+    <tr><td>14a</td><td>샘플 데이터</td><td><code>data/samples/*</code>, <code>scripts/generate-seed-data.ts</code></td><td>공공기관 대상 5개 주제 CSV/JSON, catalog 등록, analyze.py 호환</td><td><span class="ok">수정 완료</span></td></tr>
+    <tr><td>14b</td><td>파이프라인 연동</td><td><code>components/collect/CollectClient.tsx</code>, <code>components/process/ProcessClient.tsx</code></td><td>수집 완료 → 가공, 가공 완료 → 분석 이동 버튼</td><td><span class="ok">수정 완료</span></td></tr>
+    <tr><td>14c</td><td>가공 규칙 UI</td><td><code>components/process/RuleEditor.tsx</code></td><td>aggregate/join/pivot 규칙 편집 UI 활성화</td><td><span class="ok">수정 완료</span></td></tr>
+    <tr><td>15</td><td>매뉴얼</td><td><code>/manual</code></td><td>정적 페이지 렌더링</td><td>예정</td></tr>
+    <tr><td>16</td><td>관리자</td><td><code>/admin</code></td><td>사용자/테넌트 관리, 권한 체크</td><td>예정</td></tr>
+    <tr><td>17</td><td>공개 API</td><td><code>/api/v1/datasets/*</code></td><td>API 키 인증, JSON 응답</td><td>예정</td></tr>
+    <tr><td>18</td><td>DCAT</td><td><code>/api/dcat</code></td><td>JSON-LD 출력</td><td>예정</td></tr>
+  </table>
+
+  <h3>긴급 수정 완료 (2026-06-14)</h3>
+  <div class="finding p0">
+    <div class="title"><span class="badge p0">P0</span> 분석 탭 JSON parse 실패</div>
+    <p>
+      <b>원인:</b> <code>scripts/analyze.py</code>가 pandas DataFrame의 결측값을 Python <code>NaN</code>으로 직렬화. JavaScript <code>JSON.parse</code>는 <code>NaN</code>을 해석하지 못함.
+    </p>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li><code>_sanitize_json()</code> 추가: float NaN/Inf/-Inf → <code>None</code>(JSON <code>null</code>)</li>
+        <li><code>json.dumps(..., allow_nan=False)</code> 적용</li>
+        <li>Route Handler에 <code>extractJson()</code> 추가: stdout에서 첫 JSON 객체를 추출</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> Python 파이프 테스트에서 NaN이 null로 출력됨 확인. <code>npx tsc --noEmit</code>, <code>npm run lint</code> 통과.</p>
+  </div>
+
+  <h3>분석 고도화 완료 (2026-06-14)</h3>
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> 분석 페이지 레이아웃 안정화</div>
+    <p>
+      <b>원인:</b> 단계(데이터 선택 → 분석 선택 → 변수 매핑 → 결과) 전환 시 패널 높이가 내용에 따라 출렁이고, sticky/transition 미적용으로 시각적으로 불안정.
+    </p>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li>좌측 변수/분석 목록 패널에 <code>xl:sticky xl:top-4</code> 적용</li>
+        <li>메인 그리드에 <code>grid-cols-1 xl:grid-cols-[320px_1fr]</code> 및 <code>transition-all duration-200</code> 적용</li>
+        <li>업로드/결과 영역에 <code>flex-1 flex-col</code> 및 최소 높이 유지</li>
+        <li>버튼/카드에 <code>transition-colors</code> 적용으로 부드러운 상태 변화</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> 브라우저에서 /analytics 단계별 전환 시 레이아웃 흔들림 없음. <code>npm run build</code> 통과.</p>
+  </div>
+
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> t-검정 기능 고도화</div>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li>독립표본 t-검정: 집단 변수의 범주가 3개 이상일 때 사용자가 2개를 선택할 수 있는 UI 추가</li>
+        <li>선택한 2개 범주를 <code>variables.group_values</code>로 Python 엔진에 전달</li>
+        <li>Python <code>run_independent_ttest</code>에서 <code>group_values</code>를 받아 해당 범주만 필터링</li>
+        <li>대응표본 t-검정(paired t-test) 신규 추가: variable1/variable2를 선택하면 공통 인덱스 쌍만으로 <code>ttest_rel</code> 실행</li>
+        <li>대응표본 결과에 Cohen's d(차이값 기준) 및 95% CI 추가</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> Python 직접 실행으로 independent_ttest, paired_ttest 모두 정상 JSON 출력. <code>npm test</code> 30/30, <code>npx tsc --noEmit</code>, <code>npm run build</code> 통과.</p>
+  </div>
+
+  <h3>지도 고도화 완료 (2026-06-14)</h3>
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> /map 히트맵·마커 클러스터 추가</div>
+    <p>
+      <b>수정 파일:</b>
+      <code>components/map/MapInner.tsx</code>,
+      <code>components/map/FacilityMap.tsx</code>
+    </p>
+    <p>
+      <b>핵심 변경:</b>
+      <ul>
+        <li>MapInner에 <code>layerMode</code> prop 추가: <code>marker</code> / <code>cluster</code> / <code>heatmap</code></li>
+        <li>Kakao Maps MarkerClusterer를 활용한 클러스터 토글 및 표시/해제 지원</li>
+        <li>Kakao Maps Heatmap 라이브러리가 로드되지 않는 환경에도 동작하는 커스텀 밀도 히트맵 구현 (지도 영역 그리드 + 원형 CustomOverlay, 줌 레벨 연동)</li>
+        <li>히트맵 색상 스케일: 파랑 → 초록 → 노랑 → 빨강 (밀도 0~1)</li>
+        <li>FacilityMap 상단에 기존 Tailwind 스타일과 통일된 토글 버튼 추가 (rounded-xl, bg-white/96, shadow-md)</li>
+        <li>토글 상태를 URL query parameter <code>?layer=marker|cluster|heatmap</code>로 동기화 (새로고침/공유 시 상태 유지)</li>
+        <li>개별 마커 모드에서도 기존 핀·정보창 동작 유지</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> <code>npx tsc --noEmit</code>, <code>npm run lint</code>, <code>npm test</code> 30/30, <code>npm run build</code> 통과.</p>
+  </div>
+
+  <h3>샘플 데이터 보강 완료 (2026-06-14)</h3>
+  <div class="finding p2">
+    <div class="title"><span class="badge p2">P2</span> 공공기관 대상 샘플 데이터 확대</div>
+    <p>
+      <b>수정 파일:</b>
+      <code>scripts/generate-seed-data.ts</code>,
+      <code>supabase/seed.sql</code>,
+      <code>data/samples/*</code>,
+      <code>README.md</code>
+    </p>
+    <p>
+      <b>핵심 변경:</b>
+      <ul>
+        <li><code>data/samples/</code>에 5개 주제 CSV/JSON 샘플 생성: 교통사고(<code>traffic_accidents</code>), 상권(<code>commercial_area</code>), 대기질(<code>air_quality</code>), 공공의료(<code>public_hospital</code>), 학교/교육(<code>school_population</code>)</li>
+        <li><code>scripts/generate-seed-data.ts</code>에 공공기관 샘플 생성 로직 추가 (재현 가능한 의사난수 기반)</li>
+        <li><code>supabase/seed.sql</code> catalog 테이블에 5개 샘플 데이터셋 카탈로그 등록 (<code>ds-traffic-accident</code>, <code>ds-commercial-area</code>, <code>ds-air-quality</code>, <code>ds-public-hospital</code>, <code>ds-school-population</code>)</li>
+        <li>컬럼명은 영문, 수치 컬럼은 70% 이상 유효하도록 구성하여 <code>scripts/analyze.py</code> 자동 타입 추론(scale/nominal)과 모든 분석 함수가 호환되도록 구성</li>
+        <li><code>README.md</code>에 샘플 데이터 목록, 재생성 명령어, Python 분석 엔진 활용 예시 추가</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> <code>npx ts-node scripts/generate-seed-data.ts</code> 정상 실행, Python <code>analyze.py parse</code>로 CSV 파싱 확인, <code>npx tsc --noEmit</code> 및 <code>npm test</code> 30/30 통과.</p>
+  </div>
+
+  <h3>후속 권고</h3>
+  <div class="note">
+    <ul>
+      <li><b>지도 성능:</b> 히트맵 시설 수가 1,000개 이상 증가할 경우 WebGL 기반 Kakao Heatmap으로 마이그레이션하거나, 그리드 셀을 줄여 DOM 부하를 낮출 것.</li>
+      <li><b>지도 상호작용:</b> 히트맵 셀 클릭 시 해당 영역 시설 목록을 보여주는 드릴다운 기능 추가 권장.</li>
+      <li><b>샘플 데이터:</b> 실제 공공데이터 포털 API와 연계하여 샘플을 주기적으로 갱신하고, <code>data/samples/README.md</code>에 라이선스·출처를 명시할 것.</li>
+      <li><b>카탈로그 연동:</b> /portal에서 샘플 데이터셋의 다운로드/API 버튼이 실제 <code>data/samples/</code> 파일과 연결되도록 다운로드 라우트 보강.</li>
+      <li><b>SubmissionClient warning:</b> 기존 <code>useEffect</code> missing dependency warning은 본 작업 범위 외이며, 별도 작업에서 정리 권장.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer class="foot"><div class="wrap">
+  <b>이음(EUM) 플랫폼 종합 분석 보고서</b> · 데이터를 잇고, 가치를 연다 · 경남빅데이터센터<br>
+  <span style="opacity:.7">본 보고서는 정적 분석과 Jest 실행 결과를 바탕으로 작성되었습니다. 실제 운영 환경에 적용하기 전에는 별도의 회귀 테스트를 권장합니다.</span>
+</div></footer>
+
+</body>
+</html>

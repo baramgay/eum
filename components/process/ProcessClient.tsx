@@ -1,10 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { Rule } from '@/lib/processor'
 import RuleEditor from './RuleEditor'
 import toast from 'react-hot-toast'
-import { Settings2 } from 'lucide-react'
+import { Settings2, BarChart2, Search, Play, History } from 'lucide-react'
+import { StatCard, Badge, EmptyState } from '@/components/ui'
 
 interface Pipeline {
   id: string
@@ -47,6 +49,8 @@ const SOURCE_KIND_LABEL: Record<string, string> = {
 }
 
 export default function ProcessClient({ role, tenantId }: Props) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [pipelines, setPipelines]     = useState<Pipeline[]>([])
   const [loading, setLoading]         = useState(true)
   const [showForm, setShowForm]       = useState(false)
@@ -54,8 +58,13 @@ export default function ProcessClient({ role, tenantId }: Props) {
   const [runningId, setRunningId]     = useState<string | null>(null)
   const [runResult, setRunResult]     = useState<{ id: string; result: RunResult } | null>(null)
   const [runsMap, setRunsMap]         = useState<Record<string, RunRecord[]>>({})
+  const [search, setSearch]           = useState('')
+
+  // collect_source 파라미터로 pre-fill
+  const collectSource = searchParams?.get('collect_source') ?? ''
   const [form, setForm]               = useState({
-    name: '', description: '', source_kind: 'upload', source_dataset_id: '',
+    name: '', description: '', source_kind: collectSource ? 'catalog' : 'upload',
+    source_dataset_id: collectSource,
   })
 
   const load = useCallback(async () => {
@@ -68,6 +77,16 @@ export default function ProcessClient({ role, tenantId }: Props) {
   }, [role, tenantId])
 
   useEffect(() => { load() }, [load])
+  useEffect(() => { if (collectSource) setShowForm(true) }, [collectSource])
+
+  const filteredPipelines = pipelines.filter(p =>
+    (p.name + ' ' + (p.description ?? '') + ' ' + p.source_dataset_id).toLowerCase().includes(search.toLowerCase())
+  )
+
+  const totalRules = pipelines.reduce((sum, p) => sum + (p.rules?.length ?? 0), 0)
+  const recentRuns = Object.values(runsMap).flat()
+  const doneRuns   = recentRuns.filter(r => r.status === 'done').length
+  const failedRuns = recentRuns.filter(r => r.status === 'failed').length
 
   async function loadRuns(pipelineId: string) {
     const res = await fetch(`/api/process/${pipelineId}`)
@@ -169,6 +188,29 @@ export default function ProcessClient({ role, tenantId }: Props) {
         </button>
       </div>
 
+      {/* 통계 카드 */}
+      {!loading && pipelines.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard label="총 파이프라인" value={pipelines.length} color="blue" icon={<Settings2 className="w-4 h-4" />} />
+          <StatCard label="총 규칙" value={totalRules} color="purple" icon="🔧" />
+          <StatCard label="성공 실행" value={doneRuns} color="green" icon={<Play className="w-4 h-4" />} />
+          <StatCard label="실패 실행" value={failedRuns} color="red" icon={<History className="w-4 h-4" />} />
+        </div>
+      )}
+
+      {/* 검색 */}
+      {!showForm && pipelines.length > 0 && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="파이프라인명, 설명, 소스 식별자 검색"
+            className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      )}
+
       {/* 생성 폼 */}
       {showForm && (
         <form
@@ -245,14 +287,27 @@ export default function ProcessClient({ role, tenantId }: Props) {
       {/* 실행 결과 알림 */}
       {runResult && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-700 flex items-start justify-between">
-          <span>
-            실행 완료 — 입력 {runResult.result.input_rows.toLocaleString()}행
-            → 출력 {runResult.result.output_rows.toLocaleString()}행,
-            오류 {runResult.result.error_rows}건
-          </span>
+          <div className="flex items-center gap-3 flex-wrap">
+            <span>
+              실행 완료 — 입력 {runResult.result.input_rows.toLocaleString()}행
+              → 출력 {runResult.result.output_rows.toLocaleString()}행
+              {runResult.result.error_rows > 0 && (
+                <span className="text-red-500 ml-1">오류 {runResult.result.error_rows}건</span>
+              )}
+            </span>
+            {runResult.result.dataset_id && (
+              <button
+                onClick={() => router.push(`/analytics?dataset_id=${runResult.result.dataset_id}`)}
+                className="flex items-center gap-1 px-3 py-1 bg-violet-600 text-white text-xs rounded hover:bg-violet-700"
+              >
+                <BarChart2 className="w-3 h-3" />
+                분석으로
+              </button>
+            )}
+          </div>
           <button
             onClick={() => setRunResult(null)}
-            className="text-green-500 hover:text-green-700 ml-4 text-xs"
+            className="text-green-500 hover:text-green-700 ml-4 text-xs shrink-0"
           >
             닫기
           </button>
@@ -261,24 +316,19 @@ export default function ProcessClient({ role, tenantId }: Props) {
 
       {/* 파이프라인 목록 */}
       {pipelines.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-lg border">
-          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-            <Settings2 className="w-7 h-7 text-blue-400" />
-          </div>
-          <h3 className="text-base font-semibold text-gray-700 mb-1">등록된 파이프라인이 없습니다</h3>
-          <p className="text-sm text-gray-400 mb-5 max-w-xs leading-relaxed">
-            규칙 기반 ETL 파이프라인으로 데이터를 자동으로 변환·정제합니다
-          </p>
-          <button
-            onClick={() => setShowForm(true)}
-            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            첫 파이프라인 만들기
-          </button>
+        <EmptyState
+          icon="🔧"
+          title="등록된 파이프라인이 없습니다"
+          description="규칙 기반 ETL 파이프라인으로 데이터를 자동으로 변환·정제합니다"
+          action={{ label: '첫 파이프라인 만들기', onClick: () => setShowForm(true) }}
+        />
+      ) : filteredPipelines.length === 0 ? (
+        <div className="text-center py-16 text-gray-400 text-sm">
+          검색 조건에 맞는 파이프라인이 없습니다.
         </div>
       ) : (
         <div className="grid gap-4">
-          {pipelines.map(p => (
+          {filteredPipelines.map(p => (
             <div key={p.id} className="bg-white rounded-lg border shadow-sm">
               {/* 카드 헤더 */}
               <div className="p-4 flex items-start justify-between gap-4">
@@ -288,11 +338,9 @@ export default function ProcessClient({ role, tenantId }: Props) {
                     <div className="text-xs text-gray-500 mt-0.5 truncate">{p.description}</div>
                   )}
                   <div className="flex flex-wrap gap-2 mt-1.5 text-xs text-gray-400">
-                    <span className="bg-gray-100 px-2 py-0.5 rounded font-mono">
-                      {SOURCE_KIND_LABEL[p.source_kind] ?? p.source_kind}
-                    </span>
+                    <Badge variant="gray">{SOURCE_KIND_LABEL[p.source_kind] ?? p.source_kind}</Badge>
                     <span className="font-mono truncate max-w-[180px]">{p.source_dataset_id}</span>
-                    <span>규칙 {p.rules.length}개</span>
+                    <Badge variant="purple">규칙 {p.rules.length}개</Badge>
                   </div>
                 </div>
                 <div className="flex gap-1.5 shrink-0">

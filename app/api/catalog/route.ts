@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
   const theme    = req.nextUrl.searchParams.get('theme') ?? ''
   const isOpen   = req.nextUrl.searchParams.get('open')
   const aiReady  = req.nextUrl.searchParams.get('ai_ready')
+  const tenantId = req.nextUrl.searchParams.get('tenant_id') ?? ''
   const page     = parseInt(req.nextUrl.searchParams.get('page') ?? '1', 10)
   const pageSize = 20
 
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest) {
   if (theme)              query = query.eq('theme', theme) as typeof query
   if (isOpen === 'true')  query = query.eq('is_open', true) as typeof query
   if (aiReady === 'true') query = query.eq('ai_ready', true) as typeof query
+  if (tenantId)           query = query.eq('tenant_id', tenantId) as typeof query
 
   const { data, count, error } = await query
 

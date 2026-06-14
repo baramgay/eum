@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import {
   BarChart2, FlaskConical, Target, Plus, Trash2, Save,
   CheckCircle, AlertTriangle, Clock, ExternalLink, FileText,
+  Layers,
 } from 'lucide-react'
+import PipelineFlow from './PipelineFlow'
 
 // ────── 타입 ──────
 interface AnalysisRecord {
@@ -24,7 +26,8 @@ interface Targets {
   quality_pass_goal: number; synthetic_goal: number; analysis_goal: number
 }
 
-type Tab = 'analysis' | 'synthetic' | 'targets' | 'qualitative'
+type PerformanceTab = 'analysis' | 'synthetic' | 'targets' | 'qualitative'
+type MainTab = 'flow' | 'performance'
 
 interface QualInput {
   key: string; name: string
@@ -710,7 +713,7 @@ function QualitativeTab() {
 }
 
 // ────── 메인 컴포넌트 ──────
-const TABS: { key: Tab; label: string; Icon: React.ElementType; color: string }[] = [
+const PERFORMANCE_TABS: { key: PerformanceTab; label: string; Icon: React.ElementType; color: string }[] = [
   { key: 'analysis',    label: '분석 실적',      Icon: BarChart2,    color: 'purple' },
   { key: 'synthetic',   label: '가명·합성 실적',  Icon: FlaskConical, color: 'blue' },
   { key: 'qualitative', label: '정성지표 입력',   Icon: FileText,     color: 'indigo' },
@@ -725,26 +728,32 @@ const ACTIVE_STYLE: Record<string, string> = {
 }
 
 export default function PipelineClient() {
-  const [tab, setTab] = useState<Tab>('analysis')
+  const [mainTab, setMainTab] = useState<MainTab>('flow')
+  const [perfTab, setPerfTab] = useState<PerformanceTab>('analysis')
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-800">실적 관리 파이프라인</h2>
+        <h2 className="text-xl font-semibold text-gray-800">데이터 파이프라인</h2>
         <p className="text-sm text-gray-500 mt-0.5">
-          평가편람 정량 지표에 직접 기여하는 실적을 등록하고 관리합니다.
+          데이터가 수집·가공·분석·품질진단을 거쳐 개방되는 전체 흐름을 관리합니다.
         </p>
       </div>
 
       <div className="flex gap-1 border-b border-gray-200">
-        {TABS.map(({ key, label, Icon, color }) => {
-          const active = tab === key
+        {[
+          { key: 'flow', label: '데이터 처리 흐름', Icon: Layers },
+          { key: 'performance', label: '실적 관리', Icon: BarChart2 },
+        ].map(({ key, label, Icon }) => {
+          const active = mainTab === key
           return (
             <button
               key={key}
-              onClick={() => setTab(key)}
+              onClick={() => setMainTab(key as MainTab)}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px ${
-                active ? ACTIVE_STYLE[color] : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                active
+                  ? 'border-blue-600 text-blue-700 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -754,12 +763,43 @@ export default function PipelineClient() {
         })}
       </div>
 
-      <div>
-        {tab === 'analysis'    && <AnalysisTab />}
-        {tab === 'synthetic'   && <SyntheticTab />}
-        {tab === 'qualitative' && <QualitativeTab />}
-        {tab === 'targets'     && <TargetsTab />}
-      </div>
+      {mainTab === 'flow' && <PipelineFlow />}
+
+      {mainTab === 'performance' && (
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-base font-semibold text-gray-800">평가편람 실적 관리</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              평가편람 정량 지표에 직접 기여하는 실적을 등록하고 관리합니다.
+            </p>
+          </div>
+
+          <div className="flex gap-1 border-b border-gray-200">
+            {PERFORMANCE_TABS.map(({ key, label, Icon, color }) => {
+              const active = perfTab === key
+              return (
+                <button
+                  key={key}
+                  onClick={() => setPerfTab(key)}
+                  className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px ${
+                    active ? ACTIVE_STYLE[color] : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+
+          <div>
+            {perfTab === 'analysis'    && <AnalysisTab />}
+            {perfTab === 'synthetic'   && <SyntheticTab />}
+            {perfTab === 'qualitative' && <QualitativeTab />}
+            {perfTab === 'targets'     && <TargetsTab />}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

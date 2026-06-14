@@ -39,7 +39,7 @@ export async function answer(supabase: SupabaseClient, question: string) {
       sigun,
       columns: ['sigun','시군구분','순위','정착잠재지수','청년인구','순유입이동량','월평균소득','생활인구지수'],
       rows,
-      source: '2018~2025 KT/KB/KCB/주민등록 통합 분석 (경남연구원)',
+      source: '2018~2025 KT/KB/KCB/주민등록 통합 분석 (경남빅데이터센터)',
       source_url: 'https://data.go.kr',
     }
   }
@@ -63,7 +63,7 @@ export async function answer(supabase: SupabaseClient, question: string) {
       sigun,
       columns: ['sigun','시설유형','개수'],
       rows,
-      source: '공공데이터포털 시설 현황 (경남연구원 정제)',
+      source: '공공데이터포털 시설 현황 (경남빅데이터센터 정제)',
       source_url: 'https://data.go.kr',
     }
   }
@@ -98,7 +98,7 @@ export async function answer(supabase: SupabaseClient, question: string) {
       sigun,
       columns: ['sigun','청년인구','유입','유출','순이동'],
       rows,
-      source: `${yr ?? ''} 주민등록인구 및 KT 이동인구 (경남연구원)`,
+      source: `${yr ?? ''} 주민등록인구 및 KT 이동인구 (경남빅데이터센터)`,
       source_url: 'https://jumin.mois.go.kr',
     }
   }
@@ -131,7 +131,7 @@ export async function answer(supabase: SupabaseClient, question: string) {
       sigun,
       columns: ['sigun','사업체수','종사자수'],
       rows,
-      source: `${yr ?? ''} 통계청 전국사업체조사 (경남연구원 정제)`,
+      source: `${yr ?? ''} 통계청 전국사업체조사 (경남빅데이터센터 정제)`,
       source_url: 'https://kostat.go.kr',
     }
   }
@@ -156,7 +156,7 @@ export async function answer(supabase: SupabaseClient, question: string) {
       sigun,
       columns: ['sigun','월평균소득','평균신용점수','1인당대출','3개월카드'],
       rows,
-      source: '2018~2025 KCB 신용융합 데이터 (경남연구원)',
+      source: '2018~2025 KCB 신용융합 데이터 (경남빅데이터센터)',
       source_url: 'https://data.go.kr',
     }
   }

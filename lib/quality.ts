@@ -37,10 +37,20 @@ export const RULES: Record<string, RuleEntry[]> = {
 }
 
 // ─── 집계 헬퍼 ───────────────────────────────────────────────────────────────
-async function countWhere(sb: SupabaseClient, table: string, col: string, op: string, val: number) {
-  const q = sb.from(table).select('*', { count: 'exact', head: true })
-  const { count } = await (q as any)[op](col, val)
-  return count ?? 0
+type CountOp = 'lt' | 'lte' | 'gt' | 'gte' | 'eq' | 'neq'
+
+async function countWhere(sb: SupabaseClient, table: string, col: string, op: CountOp, val: number) {
+  const base = sb.from(table).select('*', { count: 'exact', head: true })
+  let res: { count: number | null }
+  switch (op) {
+    case 'lt':  res = await base.lt(col, val); break
+    case 'lte': res = await base.lte(col, val); break
+    case 'gt':  res = await base.gt(col, val); break
+    case 'gte': res = await base.gte(col, val); break
+    case 'eq':  res = await base.eq(col, val); break
+    case 'neq': res = await base.neq(col, val); break
+  }
+  return res.count ?? 0
 }
 async function countNull(sb: SupabaseClient, table: string, col: string) {
   const { count } = await sb.from(table).select('*', { count: 'exact', head: true }).is(col, null)

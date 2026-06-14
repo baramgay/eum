@@ -44,9 +44,9 @@ describe('isQualityPassed', () => {
 })
 
 describe('computeAiReadyChecklist', () => {
-  it('체크리스트가 5개 항목', () => {
+  it('체크리스트가 8개 항목', () => {
     const { checklist } = computeAiReadyChecklist({})
-    expect(checklist).toHaveLength(5)
+    expect(checklist).toHaveLength(8)
   })
 
   it('완전한 데이터는 ai_ready=true', () => {
@@ -59,6 +59,9 @@ describe('computeAiReadyChecklist', () => {
       keywords: '청년,인구,경남',
       quality_summary: '규칙 3종 / 오류 0건 / 오류율 0% / 통과',
       rows: 100,
+      is_open: true,
+      updated_at: new Date().toISOString(),
+      api_enabled: true,
     }
     const { ai_ready } = computeAiReadyChecklist(row)
     expect(ai_ready).toBe(true)
@@ -69,11 +72,11 @@ describe('computeAiReadyChecklist', () => {
     expect(ai_ready).toBe(false)
   })
 
-  it('각 항목에 item·passed·detail이 있다', () => {
+  it('각 항목에 name·pass·detail이 있다', () => {
     const { checklist } = computeAiReadyChecklist({})
     checklist.forEach(c => {
-      expect(c).toHaveProperty('item')
-      expect(c).toHaveProperty('passed')
+      expect(c).toHaveProperty('name')
+      expect(c).toHaveProperty('pass')
       expect(c).toHaveProperty('detail')
     })
   })

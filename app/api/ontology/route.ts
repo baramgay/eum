@@ -4,6 +4,10 @@ import { buildOntology, getGraph, listActions } from '@/lib/ontology'
 
 export async function POST() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  }
   return NextResponse.json(await buildOntology(supabase))
 }
 

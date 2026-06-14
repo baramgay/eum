@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { Rule, Row, ProcessError } from '@/lib/processor'
+import type { AggFunc, Rule, Row, ProcessError } from '@/lib/processor'
 import PreviewPanel from './PreviewPanel'
 
 interface RuleEditorProps {
@@ -26,6 +26,17 @@ const RULE_TYPES: { value: RuleType; label: string }[] = [
   { value: 'codemap',   label: '코드 치환' },
   { value: 'concat',    label: '컬럼 합치기' },
   { value: 'split',     label: '컬럼 분리' },
+  { value: 'aggregate', label: '그룹 집계' },
+  { value: 'join',      label: '테이블 조인' },
+  { value: 'pivot',     label: '피벗' },
+]
+
+const AGG_OPTIONS: { value: AggFunc; label: string }[] = [
+  { value: 'sum',   label: '합계' },
+  { value: 'count', label: '건수' },
+  { value: 'mean',  label: '평균' },
+  { value: 'max',   label: '최대' },
+  { value: 'min',   label: '최소' },
 ]
 
 function defaultRule(type: RuleType): Rule {
@@ -42,6 +53,9 @@ function defaultRule(type: RuleType): Rule {
     case 'codemap':   return { type: 'codemap',   column: '', map: {}, fallback: 'keep' }
     case 'concat':    return { type: 'concat',    target: '', sources: [], separator: ' ' }
     case 'split':     return { type: 'split',     column: '', separator: ',', targets: [] }
+    case 'aggregate': return { type: 'aggregate', groupBy: [], column: '', agg: 'sum', target: '' }
+    case 'join':      return { type: 'join',      datasetId: '', on: '', how: 'left' }
+    case 'pivot':     return { type: 'pivot',     index: '', columns: '', values: '', agg: 'sum' }
   }
 }
 
@@ -234,6 +248,74 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
             placeholder="결과 컬럼명들 (쉼표 구분)"
             value={rule.targets.join(',')}
             onChange={e => onChange({ ...rule, targets: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
+        </div>
+      )
+    case 'aggregate':
+      return (
+        <div className="flex flex-col gap-1 text-xs">
+          <input className="border rounded px-2 py-1 w-full"
+            placeholder="그룹 기준 컬럼 (쉼표 구분)"
+            value={rule.groupBy.join(',')}
+            onChange={e => onChange({ ...rule, groupBy: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
+          <div className="flex gap-1">
+            <select className="border rounded px-2 py-1"
+              value={rule.agg}
+              onChange={e => onChange({ ...rule, agg: e.target.value as AggFunc })}>
+              {AGG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <input className="border rounded px-2 py-1 flex-1" placeholder="집계할 컬럼"
+              value={rule.column}
+              onChange={e => onChange({ ...rule, column: e.target.value })} />
+            <input className="border rounded px-2 py-1 flex-1" placeholder="결과 컬럼명 (비우면 자동)"
+              value={rule.target ?? ''}
+              onChange={e => onChange({ ...rule, target: e.target.value })} />
+          </div>
+        </div>
+      )
+    case 'join':
+      return (
+        <div className="flex flex-col gap-1 text-xs">
+          <div className="bg-amber-50 border border-amber-200 rounded px-2 py-1 text-amber-700 text-[10px]">
+            서버 실행 시 처리됩니다 (미리보기에서는 건너뜁니다)
+          </div>
+          <div className="flex gap-1">
+            <input className="border rounded px-2 py-1 flex-1" placeholder="조인할 데이터셋 ID"
+              value={rule.datasetId}
+              onChange={e => onChange({ ...rule, datasetId: e.target.value })} />
+            <select className="border rounded px-2 py-1"
+              value={rule.how}
+              onChange={e => onChange({ ...rule, how: e.target.value as 'left' | 'inner' | 'right' })}>
+              <option value="left">LEFT JOIN</option>
+              <option value="inner">INNER JOIN</option>
+              <option value="right">RIGHT JOIN</option>
+            </select>
+          </div>
+          <input className="border rounded px-2 py-1 w-full" placeholder="조인 키 컬럼"
+            value={rule.on}
+            onChange={e => onChange({ ...rule, on: e.target.value })} />
+        </div>
+      )
+    case 'pivot':
+      return (
+        <div className="flex flex-col gap-1 text-xs">
+          <div className="flex gap-1">
+            <input className="border rounded px-2 py-1 flex-1" placeholder="인덱스 컬럼"
+              value={rule.index}
+              onChange={e => onChange({ ...rule, index: e.target.value })} />
+            <input className="border rounded px-2 py-1 flex-1" placeholder="피벗 컬럼 (새 헤더)"
+              value={rule.columns}
+              onChange={e => onChange({ ...rule, columns: e.target.value })} />
+          </div>
+          <div className="flex gap-1">
+            <input className="border rounded px-2 py-1 flex-1" placeholder="값 컬럼"
+              value={rule.values}
+              onChange={e => onChange({ ...rule, values: e.target.value })} />
+            <select className="border rounded px-2 py-1"
+              value={rule.agg}
+              onChange={e => onChange({ ...rule, agg: e.target.value as AggFunc })}>
+              {AGG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
         </div>
       )
   }

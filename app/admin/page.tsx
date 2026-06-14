@@ -11,7 +11,7 @@ export default async function AdminPage() {
 
   const { data: tenants } = await supabase
     .from('tenants')
-    .select('tenant_id, name, gov_type, sgg_cd, onboarded')
+    .select('tenant_id, name, gov_type, sgg_cd, onboarded, status, created_at')
     .order('gov_type', { ascending: false })
     .order('name')
 

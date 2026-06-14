@@ -2,9 +2,16 @@ import { createClient } from '@supabase/supabase-js'
 
 const URL         = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+const CENTER_PASSWORD = process.env.TEST_CENTER_PASSWORD
+const AGENCY_PASSWORD = process.env.TEST_AGENCY_PASSWORD
 
 if (!URL || !SERVICE_KEY) {
   console.error('환경변수 NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY 필요')
+  process.exit(1)
+}
+
+if (!CENTER_PASSWORD || !AGENCY_PASSWORD) {
+  console.error('환경변수 TEST_CENTER_PASSWORD, TEST_AGENCY_PASSWORD 필요')
   process.exit(1)
 }
 
@@ -66,7 +73,7 @@ else console.log('  ✓ catalog 완료')
 console.log('▶ 테스트 사용자 생성...')
 const { data: user, error: e3 } = await supabase.auth.admin.createUser({
   email: 'center@eum.test',
-  password: 'eum2026!',
+  password: CENTER_PASSWORD,
   email_confirm: true,
   user_metadata: { role: 'center', tenant_id: '48000', name: '경남센터 관리자' }
 })
@@ -80,7 +87,7 @@ if (e3) {
 // agency 테스트 사용자
 const { data: user2, error: e4 } = await supabase.auth.admin.createUser({
   email: 'changwon@eum.test',
-  password: 'eum2026!',
+  password: AGENCY_PASSWORD,
   email_confirm: true,
   user_metadata: { role: 'agency', tenant_id: '48121', name: '창원시 담당자' }
 })
@@ -92,5 +99,5 @@ if (e4) {
 }
 
 console.log('\n✅ 완료!')
-console.log('  center 계정: center@eum.test / eum2026!')
-console.log('  agency 계정: changwon@eum.test / eum2026!')
+console.log('  center 계정: center@eum.test (TEST_CENTER_PASSWORD 환경변수 참조)')
+console.log('  agency 계정: changwon@eum.test (TEST_AGENCY_PASSWORD 환경변수 참조)')

@@ -1,9 +1,10 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
-import { FileText, AlertTriangle, CheckCircle, MinusCircle, Building2, Target, Download, ListTodo } from 'lucide-react'
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { FileText, AlertTriangle, CheckCircle, MinusCircle, Building2, Target, Download, ListTodo, Image as ImageIcon } from 'lucide-react'
+import html2canvas from 'html2canvas'
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis,
-  ResponsiveContainer, Tooltip
+  ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell,
 } from 'recharts'
 import CompareClient from './CompareClient'
 
@@ -148,6 +149,31 @@ export default function ReportClient({ role }: Props) {
     URL.revokeObjectURL(url)
   }
 
+  const reportRef = useRef<HTMLDivElement>(null)
+  const [downloadingPng, setDownloadingPng] = useState(false)
+
+  async function downloadPNG() {
+    if (!reportRef.current || !data) return
+    setDownloadingPng(true)
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+      })
+      const url = canvas.toDataURL('image/png')
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `평가리포트_${today}.png`
+      a.click()
+    } catch (e) {
+      console.error('[Report] PNG 다운로드 실패:', e)
+      alert('PNG 저장에 실패했습니다.')
+    } finally {
+      setDownloadingPng(false)
+    }
+  }
+
   if (loading && reportMode === 'report') return (
     <div className="flex items-center justify-center py-20 gap-3 text-gray-400">
       <div className="w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" />
@@ -201,7 +227,7 @@ export default function ReportClient({ role }: Props) {
       <div className="flex items-start justify-between print:hidden">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">데이터 관리 역량 평가편람 대응 리포트</h2>
-          <p className="text-sm text-gray-500 mt-1">경남연구원 이음(EUM) 플랫폼 · 산출일: {today}</p>
+          <p className="text-sm text-gray-500 mt-1">경남빅데이터센터 이음(EUM) 플랫폼 · 산출일: {today}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap justify-end">
           {/* center 역할 — 기관 선택 드롭다운 */}
@@ -221,13 +247,23 @@ export default function ReportClient({ role }: Props) {
             </div>
           )}
           {data && reportMode === 'report' && (
-            <button
-              onClick={downloadCSV}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200"
-            >
-              <Download className="w-4 h-4" />
-              증빙 CSV
-            </button>
+            <>
+              <button
+                onClick={downloadCSV}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200"
+              >
+                <Download className="w-4 h-4" />
+                증빙 CSV
+              </button>
+              <button
+                onClick={downloadPNG}
+                disabled={downloadingPng}
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 text-sm rounded-md hover:bg-indigo-100 disabled:opacity-50"
+              >
+                <ImageIcon className="w-4 h-4" />
+                {downloadingPng ? '생성 중...' : 'PNG 저장'}
+              </button>
+            </>
           )}
           <button
             onClick={() => window.print()}
@@ -261,9 +297,23 @@ export default function ReportClient({ role }: Props) {
       {/* 기관 비교 모드 */}
       {reportMode === 'compare' && <CompareClient />}
 
+      {/* 리포트 요약 배너 */}
+      {reportMode === 'report' && data && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800 print:hidden">
+          <p>
+            <strong>{selectedTenantName ?? '전체 집계'}</strong> 기준{' '}
+            <strong>{today}</strong> 자동 산출 결과, 종합 점수는{' '}
+            <strong>{actualPoints}점</strong>
+            {bonusScore > 0 && ` (가점 포함 ${grandTotal}점)`}입니다.
+            {' '}5개 영역 중 <strong>{data.areas.filter(a => a.score >= 60).length}개</strong>가 양호하고,
+            {' '}우선 개선 액션은 <strong>{actionItems.length}개</strong> 식별되었습니다.
+          </p>
+        </div>
+      )}
+
       {/* 리포트 모드 */}
       {reportMode === 'report' && data && (
-        <>
+        <div ref={reportRef} className="space-y-8 print:space-y-6">
           {/* 인쇄용 제목 (화면에선 숨김) */}
           <div className="hidden print:block">
             <h2 className="text-xl font-bold">데이터 관리 역량 평가편람 대응 리포트</h2>
@@ -330,6 +380,31 @@ export default function ReportClient({ role }: Props) {
                 </RadarChart>
               </ResponsiveContainer>
             </div>
+          </div>
+
+          {/* 영역별 점수 bar 차트 */}
+          <div className="bg-white rounded-xl border shadow-sm p-5">
+            <p className="text-sm font-semibold text-gray-700 mb-1">영역별 점수 분포</p>
+            <p className="text-xs text-gray-400 mb-4">가중치 적용 전 영역 만점 기준 점수</p>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart
+                data={data.areas.map(a => ({ name: a.name, score: a.score, weight: a.weight, color: a.color }))}
+                margin={{ top: 4, right: 20, left: 20, bottom: 4 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                <Tooltip
+                  formatter={(v, name, props) => [`${v}점 / 가중치 ${props.payload.weight}점`, name as string]}
+                />
+                <Legend />
+                <Bar dataKey="score" name="영역 점수" radius={[4, 4, 0, 0]}>
+                  {data.areas.map((a, i) => (
+                    <Cell key={`cell-${i}`} fill={a.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
           {/* 목표 대비 현황 패널 */}
@@ -469,7 +544,7 @@ export default function ReportClient({ role }: Props) {
           <div className="hidden print:block text-center text-xs text-gray-400 mt-8 border-t pt-4">
             경상남도 · 이음(EUM) 공공데이터 개방 플랫폼 · {today} 자동 산출
           </div>
-        </>
+        </div>
       )}
     </div>
   )

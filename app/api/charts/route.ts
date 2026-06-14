@@ -5,6 +5,10 @@ export const revalidate = 300  // 5분 캐시
 
 export async function GET() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  }
 
   // 3개 쿼리 병렬 실행
   const [yrRes, allPopRes, subRes] = await Promise.all([

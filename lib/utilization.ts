@@ -169,8 +169,9 @@ export function detectDateColumn(
 // ─── 소스 종류 판별 ───────────────────────────────────────────────────────────
 
 export function resolveSourceKind(
-  tableName: string,
+  tableName: string | null | undefined,
 ): 'gold' | 'upload' | 'unknown' {
+  if (!tableName) return 'unknown'
   if (tableName.startsWith('gold_')) return 'gold'
   if (tableName.startsWith('sub_')) return 'upload'
   return 'unknown'

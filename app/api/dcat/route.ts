@@ -17,7 +17,7 @@ export async function GET() {
   }
 
   const headerStore = await headers()
-  const host   = headerStore.get('host') ?? 'localhost:3000'
+  const host   = headerStore.get('host') ?? 'localhost:3001'
   const proto  = headerStore.get('x-forwarded-proto') ?? 'http'
   const baseUrl = `${proto}://${host}`
 

@@ -4,8 +4,11 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { inferSchema } from '@/lib/submission'
+import { randomHex } from './utils'
 
 export type Row = Record<string, unknown>
+
+export type AggFunc = 'sum' | 'count' | 'mean' | 'max' | 'min'
 
 export type Rule =
   | { type: 'select';    mode: 'include' | 'exclude'; columns: string[] }
@@ -20,6 +23,9 @@ export type Rule =
   | { type: 'codemap';   column: string; map: Record<string, string>; fallback?: 'keep' | 'null' }
   | { type: 'concat';    target: string; sources: string[]; separator: string }
   | { type: 'split';     column: string; separator: string; targets: string[] }
+  | { type: 'aggregate'; groupBy: string[]; column: string; agg: AggFunc; target?: string }
+  | { type: 'join';      datasetId: string; on: string; how: 'left' | 'inner' | 'right' }
+  | { type: 'pivot';     index: string; columns: string; values: string; agg: AggFunc }
 
 export interface ProcessError {
   rowIndex: number
@@ -270,6 +276,63 @@ function applySplit(
   })
 }
 
+function applyAggregate(rows: Row[], rule: Extract<Rule, { type: 'aggregate' }>): Row[] {
+  const groups = new Map<string, Row[]>()
+  for (const row of rows) {
+    const key = rule.groupBy.map(k => JSON.stringify(row[k])).join('|')
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key)!.push(row)
+  }
+  const targetCol = rule.target ?? `${rule.agg}_${rule.column}`
+  const result: Row[] = []
+  for (const gRows of groups.values()) {
+    const baseRow: Row = Object.fromEntries(rule.groupBy.map(k => [k, gRows[0][k]]))
+    if (rule.agg === 'count') {
+      baseRow[targetCol] = gRows.length
+    } else {
+      const vals = gRows.map(r => Number(r[rule.column])).filter(n => !isNaN(n))
+      switch (rule.agg) {
+        case 'sum':  baseRow[targetCol] = vals.reduce((a, b) => a + b, 0); break
+        case 'mean': baseRow[targetCol] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null; break
+        case 'max':  baseRow[targetCol] = vals.length ? Math.max(...vals) : null; break
+        case 'min':  baseRow[targetCol] = vals.length ? Math.min(...vals) : null; break
+      }
+    }
+    result.push(baseRow)
+  }
+  return result
+}
+
+function applyPivot(rows: Row[], rule: Extract<Rule, { type: 'pivot' }>): Row[] {
+  const groups = new Map<string, Row>()
+  const sumMap = new Map<string, Map<string, { sum: number; cnt: number }>>()
+  for (const row of rows) {
+    const idx = String(row[rule.index] ?? '')
+    const colKey = String(row[rule.columns] ?? '')
+    const val = Number(row[rule.values])
+    if (!groups.has(idx)) { groups.set(idx, { [rule.index]: row[rule.index] }); sumMap.set(idx, new Map()) }
+    const g = groups.get(idx)!
+    const sm = sumMap.get(idx)!
+    if (!sm.has(colKey)) sm.set(colKey, { sum: 0, cnt: 0 })
+    const acc = sm.get(colKey)!
+    const n = isNaN(val) ? 0 : val
+    switch (rule.agg) {
+      case 'count': g[colKey] = (Number(g[colKey]) || 0) + 1; break
+      case 'sum':   g[colKey] = (Number(g[colKey]) || 0) + n; break
+      case 'max':   g[colKey] = g[colKey] == null ? n : Math.max(Number(g[colKey]), n); break
+      case 'min':   g[colKey] = g[colKey] == null ? n : Math.min(Number(g[colKey]), n); break
+      case 'mean':  acc.sum += n; acc.cnt += 1; break
+    }
+  }
+  if (rule.agg === 'mean') {
+    for (const [idx, sm] of sumMap) {
+      const g = groups.get(idx)!
+      for (const [colKey, { sum, cnt }] of sm) { g[colKey] = cnt ? sum / cnt : null }
+    }
+  }
+  return Array.from(groups.values())
+}
+
 // ─── 메인 함수 ─────────────────────────────────────────────────────────────────
 
 export function applyRules(data: Row[], rules: Rule[]): ProcessResult {
@@ -291,6 +354,9 @@ export function applyRules(data: Row[], rules: Rule[]): ProcessResult {
       case 'codemap':   rows = applyCodemap(rows, rule); break
       case 'concat':    rows = applyConcat(rows, rule); break
       case 'split':     rows = applySplit(rows, rule, i, errors); break
+      case 'aggregate': rows = applyAggregate(rows, rule); break
+      case 'join':      /* server-side only: 서버 실행 시 처리, 미리보기에서는 skip */ break
+      case 'pivot':     rows = applyPivot(rows, rule); break
     }
   }
 
@@ -322,15 +388,15 @@ export async function runPipelineAndSave(
   pipelineId: string,
 ): Promise<PipelineRunResult> {
   const { data: pipeline, error: pErr } = await supabase
-    .from('process_pipelines')
+    .from('processing_pipelines')
     .select('*')
     .eq('id', pipelineId)
     .maybeSingle()
   if (pErr || !pipeline) throw new Error(pErr?.message ?? '파이프라인을 찾을 수 없습니다')
 
-  const runId = 'prun_' + Math.random().toString(36).slice(2, 10)
+  const runId = 'prun_' + randomHex(4)
 
-  await supabase.from('process_runs').insert({
+  await supabase.from('processing_runs').insert({
     id:          runId,
     pipeline_id: pipelineId,
     tenant_id:   pipeline.tenant_id,
@@ -352,7 +418,7 @@ export async function runPipelineAndSave(
 
     const result = applyRules(sourceRows, pipeline.rules as Rule[])
     const schema = inferSchema(result.rows)
-    const datasetId = 'proc_' + Math.random().toString(36).slice(2, 10)
+    const datasetId = 'proc_' + randomHex(4)
 
     await supabase.from('submission_uploads').insert({
       upload_id:   datasetId,
@@ -363,7 +429,7 @@ export async function runPipelineAndSave(
       created_at:  new Date().toISOString(),
     })
 
-    await supabase.from('process_runs').update({
+    await supabase.from('processing_runs').update({
       status:            'done',
       finished_at:       new Date().toISOString(),
       input_rows:        result.inputRows,
@@ -382,7 +448,7 @@ export async function runPipelineAndSave(
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
-    await supabase.from('process_runs').update({
+    await supabase.from('processing_runs').update({
       status:      'failed',
       finished_at: new Date().toISOString(),
       error_msg:   msg,

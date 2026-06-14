@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import DatasetModal from './DatasetModal'
+import { Download, Calendar, Eye, Database, X, Building2 } from 'lucide-react'
 
 interface CatalogItem {
   dataset_id: string
@@ -17,6 +19,7 @@ interface CatalogItem {
   is_open?: boolean
   ai_ready?: boolean
   api_enabled?: boolean
+  download_count?: number
 }
 
 interface CatalogResponse {
@@ -25,6 +28,11 @@ interface CatalogResponse {
   page: number
   pageSize: number
   themes?: string[]
+}
+
+interface UsageSummary {
+  topDownloads: { datasetId: string; title: string; count: number }[]
+  recentDatasets: { datasetId: string; title: string; updatedAt: string }[]
 }
 
 const SORT_OPTIONS = [
@@ -49,6 +57,11 @@ function SkeletonCard() {
 }
 
 export default function PortalClient() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const tenantId = searchParams.get('tenant_id') ?? ''
+  const highlightId = searchParams.get('highlight') ?? ''
+
   const [items, setItems]               = useState<CatalogItem[]>([])
   const [total, setTotal]               = useState(0)
   const [page, setPage]                 = useState(1)
@@ -61,6 +74,8 @@ export default function PortalClient() {
   const [onlyAiReady, setOnlyAiReady]   = useState(false)
   const [loading, setLoading]           = useState(true)
   const [selectedDataset, setSelectedDataset] = useState<CatalogItem | null>(null)
+  const [usage, setUsage]               = useState<UsageSummary | null>(null)
+  const [tenantName, setTenantName]     = useState('')
 
   // 검색 디바운스 (300ms)
   useEffect(() => {
@@ -76,6 +91,32 @@ export default function PortalClient() {
     setPage(1)
   }, [activeTheme, sort])
 
+  // 사용량 통계 로드
+  useEffect(() => {
+    fetch('/api/usage?period=month')
+      .then(r => r.json())
+      .then((d: UsageSummary) => setUsage(d))
+      .catch(() => setUsage(null))
+  }, [])
+
+  // URL highlight 데이터셋 자동 열기
+  useEffect(() => {
+    if (!highlightId) return
+    fetch(`/api/catalog/${encodeURIComponent(highlightId)}`)
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
+      .then((d: CatalogItem) => setSelectedDataset(d))
+      .catch(() => {})
+  }, [highlightId])
+
+  // 기관 필터 이름 로드
+  useEffect(() => {
+    if (!tenantId) { setTenantName(''); return }
+    fetch(`/api/tenants/${tenantId}`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json() })
+      .then((d: { name?: string }) => setTenantName(d.name ?? tenantId))
+      .catch(() => setTenantName(tenantId))
+  }, [tenantId])
+
   // 데이터 패치
   useEffect(() => {
     setLoading(true)
@@ -83,26 +124,45 @@ export default function PortalClient() {
     if (query.trim())  params.set('q', query.trim())
     if (activeTheme)   params.set('theme', activeTheme)
     if (onlyAiReady)   params.set('ai_ready', 'true')
+    if (tenantId)      params.set('tenant_id', tenantId)
 
     fetch(`/api/catalog?${params}`)
       .then(r => r.json())
       .then((d: CatalogResponse | CatalogItem[]) => {
-        // 구버전 응답(배열) 호환 처리
+        let fetched: CatalogItem[] = []
+        let fetchedTotal = 0
+        let fetchedPage = page
+        let fetchedPageSize = 20
+        let fetchedThemes: string[] | undefined
+
         if (Array.isArray(d)) {
-          setItems(d)
-          setTotal(d.length)
-          setPageSize(20)
+          fetched = d
+          fetchedTotal = d.length
+          fetchedPageSize = 20
         } else {
-          setItems(d.items ?? [])
-          setTotal(d.total ?? 0)
-          setPage(d.page ?? 1)
-          setPageSize(d.pageSize ?? 20)
-          if (d.themes && d.themes.length > 0) setThemes(d.themes)
+          fetched = d.items ?? []
+          fetchedTotal = d.total ?? 0
+          fetchedPage = d.page ?? 1
+          fetchedPageSize = d.pageSize ?? 20
+          fetchedThemes = d.themes
         }
+
+        // 사용량 맵핑
+        const countMap = new Map(usage?.topDownloads.map(u => [u.datasetId, u.count]))
+        const enriched = fetched.map(item => ({
+          ...item,
+          download_count: countMap.get(item.dataset_id) ?? 0,
+        }))
+
+        setItems(enriched)
+        setTotal(fetchedTotal)
+        setPage(fetchedPage)
+        setPageSize(fetchedPageSize)
+        if (fetchedThemes && fetchedThemes.length > 0) setThemes(fetchedThemes)
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [query, sort, activeTheme, page, onlyAiReady])
+  }, [query, sort, activeTheme, page, onlyAiReady, usage, tenantId])
 
   const totalPages = Math.ceil(total / pageSize)
 
@@ -114,7 +174,22 @@ export default function PortalClient() {
 
       {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800">데이터 포털</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-semibold text-gray-800">데이터 포털</h2>
+          {tenantId && (
+            <span className="inline-flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200">
+              <Building2 className="w-3 h-3" />
+              {tenantName || tenantId}
+              <button
+                onClick={() => router.push('/portal')}
+                className="hover:text-blue-900"
+                title="기관 필터 해제"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+        </div>
         <span className="text-sm text-gray-400">
           {loading ? '로딩 중...' : `전체 ${total.toLocaleString()}개 데이터셋`}
         </span>
@@ -194,7 +269,7 @@ export default function PortalClient() {
             <div
               key={item.dataset_id}
               onClick={() => setSelectedDataset(item)}
-              className="bg-white rounded-lg border p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white rounded-lg border p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col"
             >
               <div className="flex items-start justify-between mb-2">
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
@@ -204,13 +279,47 @@ export default function PortalClient() {
               </div>
               <h3 className="font-medium text-gray-800 text-sm mb-1">{item.title}</h3>
               {item.description && (
-                <p className="text-xs text-gray-500 line-clamp-2">{item.description}</p>
+                <p className="text-xs text-gray-500 line-clamp-2 mb-2">{item.description}</p>
               )}
-              <div className="mt-3 flex items-center justify-between gap-1 flex-wrap">
-                <span className="text-xs text-gray-400">
-                  {item.rows != null ? `${item.rows.toLocaleString()}행` : ''}
-                </span>
-                <div className="flex items-center gap-1 flex-wrap justify-end">
+              {item.keywords && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {item.keywords.split(',').map(k => k.trim()).filter(Boolean).slice(0, 3).map(k => (
+                    <button
+                      key={k}
+                      onClick={e => { e.stopPropagation(); setSearchInput(k); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                      className="text-[10px] bg-gray-100 text-gray-600 hover:bg-gray-200 px-1.5 py-0.5 rounded"
+                    >
+                      #{k}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* 메타 뱃지 행 */}
+              <div className="mt-auto space-y-2">
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <Database className="w-3.5 h-3.5" />
+                    {item.rows != null ? `${item.rows.toLocaleString()}행` : '—'}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Download className="w-3.5 h-3.5" />
+                    {(item.download_count ?? 0).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {item.updated_at
+                      ? new Date(item.updated_at).toLocaleDateString('ko-KR')
+                      : '—'}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Eye className="w-3.5 h-3.5" />
+                    상세보기
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 flex-wrap justify-end pt-1">
                   {item.ai_ready && (
                     <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
                       AI-Ready

@@ -8,7 +8,11 @@ import { randomHex } from './utils'
 import { runAll } from './quality'
 
 // ─── auth_value 암호화/복호화 ──────────────────────────────────────────────
-const SECRET = (process.env.COLLECTION_SECRET ?? 'eum_default_secret_key_32bytes!!').padEnd(32, '!').slice(0, 32)
+const rawSecret = process.env.COLLECTION_SECRET
+if (!rawSecret) {
+  throw new Error('COLLECTION_SECRET 환경변수가 설정되지 않았습니다. 32바이트 이상의 AES-256 키를 설정해 주세요.')
+}
+const SECRET = rawSecret.padEnd(32, '!').slice(0, 32)
 
 export function encryptAuthValue(plain: string): string {
   const iv = randomBytes(16)

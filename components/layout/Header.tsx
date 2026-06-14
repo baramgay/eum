@@ -25,7 +25,7 @@ const BASE_TABS: Tab[] = [
   { href: '/quality',    label: '품질',       icon: ShieldCheck },
   { href: '/ontology',   label: '온톨로지',   icon: GitBranch },
   { href: '/report',     label: '리포트',     icon: FileBarChart2 },
-  { href: '/pipeline',   label: '실적 관리',  icon: Layers },
+  { href: '/pipeline',   label: '파이프라인',  icon: Layers },
   { href: '/ai',         label: 'AI 질의',    icon: Bot },
   { href: '/submission', label: '데이터 등록', icon: Upload },
   { href: '/collect',    label: '수집',       icon: RefreshCw },
@@ -48,7 +48,7 @@ export default function Header({ userEmail, role }: HeaderProps) {
   const tabs = role === 'center' ? [...BASE_TABS, CENTER_TAB] : BASE_TABS
 
   function isActive(href: string) {
-    return href === '/' ? pathname === '/' : pathname.startsWith(href)
+    return href === '/' ? pathname === '/' : (pathname ?? '').startsWith(href)
   }
 
   async function signOut() {

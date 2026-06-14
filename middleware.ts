@@ -2,7 +2,14 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // 인증 없이 접근 가능한 경로
-const PUBLIC_PREFIXES = ['/login', '/api/']
+// 주의: /api/ 전체를 공개로 열면 모든 API 인증이 각 route에만 의존하므로 명시적으로 한정
+const PUBLIC_PREFIXES = [
+  '/login',
+  '/api/v1/',              // 공개 데이터 포털 API
+  '/api/dcat',             // DCAT 메타데이터 (공공데이터 표준)
+  '/api/cron/',            // Vercel Cron (CRON_SECRET 자체 인증)
+  '/api/openapi/webhooks', // 웹훅 수신 (각 route에서 인증)
+]
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })

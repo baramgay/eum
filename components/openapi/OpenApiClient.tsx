@@ -1,7 +1,10 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
-import { KeyRound, Bell } from 'lucide-react'
+import { KeyRound, Bell, Copy, Check, RefreshCw, Trash2, Terminal, BarChart3 } from 'lucide-react'
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+} from 'recharts'
 
 interface ApiKey {
   key_id: string
@@ -20,6 +23,7 @@ interface Webhook {
   events: string[]
   is_active: boolean
   created_at: string
+  description?: string | null
 }
 
 interface Stats {
@@ -29,6 +33,11 @@ interface Stats {
   avgResponseMs: number | null
 }
 
+interface UsagePoint {
+  name: string
+  다운로드: number
+}
+
 const ALL_EVENTS = [
   'dataset.created',
   'dataset.updated',
@@ -36,10 +45,40 @@ const ALL_EVENTS = [
   'dataset.rejected',
 ]
 
+const ENDPOINTS = [
+  {
+    method: 'GET',
+    path: '/api/v1/datasets',
+    desc: '개방 데이터셋 목록 조회 (페이지네이션 지원)',
+    params: 'page, per_page(최대 100)',
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/datasets/{id}',
+    desc: '데이터셋 메타데이터 조회',
+    params: '',
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/datasets/{id}/data',
+    desc: '데이터셋 다운로드 (CSV / JSON)',
+    params: 'format=csv|json, limit(최대 10000), offset',
+  },
+  {
+    method: 'GET',
+    path: '/api/dcat',
+    desc: 'DCAT 3.0 LD+JSON 카탈로그 (인증 불필요)',
+    params: '',
+  },
+]
+
+const API_BASE = typeof window !== 'undefined' ? window.location.origin : ''
+
 export default function OpenApiClient() {
   const [keys, setKeys] = useState<ApiKey[]>([])
   const [webhooks, setWebhooks] = useState<Webhook[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
+  const [usage, setUsage] = useState<{ topDownloads: { datasetId: string; title: string; count: number }[] } | null>(null)
   const [tab, setTab] = useState<'keys' | 'webhooks' | 'docs'>('keys')
   const [loading, setLoading] = useState(true)
 
@@ -53,6 +92,8 @@ export default function OpenApiClient() {
   // 웹훅 등록 폼
   const [showWHForm, setShowWHForm] = useState(false)
   const [whUrl, setWhUrl] = useState('')
+  const [whDesc, setWhDesc] = useState('')
+  const [whSecret, setWhSecret] = useState('')
   const [whEvents, setWhEvents] = useState<string[]>([])
   const [whCreating, setWhCreating] = useState(false)
 
@@ -61,10 +102,12 @@ export default function OpenApiClient() {
       fetch('/api/openapi/keys').then(r => r.json()),
       fetch('/api/openapi/webhooks').then(r => r.json()),
       fetch('/api/openapi/stats').then(r => r.json()),
-    ]).then(([k, w, s]) => {
+      fetch('/api/usage?period=month').then(r => r.json()),
+    ]).then(([k, w, s, u]) => {
       setKeys(Array.isArray(k) ? k : [])
       setWebhooks(Array.isArray(w) ? w : [])
       setStats(s && typeof s === 'object' && !('error' in s) ? s : null)
+      setUsage(u && typeof u === 'object' && !('error' in u) ? u : null)
       setLoading(false)
     })
 
@@ -94,6 +137,22 @@ export default function OpenApiClient() {
     setKeyCreating(false)
   }
 
+  const rotateKey = async (key: ApiKey) => {
+    if (!confirm(`"${key.name}" 키를 재발급하시겠습니까? 기존 키는 즉시 폐기됩니다.`)) return
+    await deleteKeyInternal(key.key_id, false)
+    const r = await fetch('/api/openapi/keys', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: `${key.name} (재발급)`, description: key.description ?? undefined }),
+    })
+    const d = await r.json()
+    if (r.ok) {
+      setNewPlain(d.key)
+      toast.success('API 키가 재발급되었습니다. 즉시 복사하여 보관하세요.')
+      loadAll()
+    }
+  }
+
   const toggleKey = async (keyId: string, current: boolean) => {
     await fetch(`/api/openapi/keys/${keyId}`, {
       method: 'PATCH',
@@ -103,12 +162,16 @@ export default function OpenApiClient() {
     fetch('/api/openapi/keys').then(r => r.json()).then(k => setKeys(Array.isArray(k) ? k : []))
   }
 
-  const deleteKey = async (keyId: string) => {
-    if (!confirm('API 키를 삭제하시겠습니까?')) return
+  const deleteKeyInternal = async (keyId: string, notify = true) => {
     await fetch(`/api/openapi/keys/${keyId}`, { method: 'DELETE' })
-    toast('API 키가 삭제되었습니다.')
+    if (notify) toast('API 키가 삭제되었습니다.')
     fetch('/api/openapi/keys').then(r => r.json()).then(k => setKeys(Array.isArray(k) ? k : []))
     fetch('/api/openapi/stats').then(r => r.json()).then(s => { if (s && !s.error) setStats(s) })
+  }
+
+  const deleteKey = async (keyId: string) => {
+    if (!confirm('API 키를 삭제하시겠습니까?')) return
+    await deleteKeyInternal(keyId)
   }
 
   const createWebhook = async (e: React.FormEvent) => {
@@ -118,11 +181,18 @@ export default function OpenApiClient() {
     const r = await fetch('/api/openapi/webhooks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: whUrl.trim(), events: whEvents }),
+      body: JSON.stringify({
+        url: whUrl.trim(),
+        events: whEvents,
+        description: whDesc.trim() || undefined,
+        secret: whSecret.trim() || undefined,
+      }),
     })
     if (r.ok) {
       setShowWHForm(false)
       setWhUrl('')
+      setWhDesc('')
+      setWhSecret('')
       setWhEvents([])
       toast.success('웹훅이 등록되었습니다.')
       fetch('/api/openapi/webhooks').then(r2 => r2.json()).then(w => setWebhooks(Array.isArray(w) ? w : []))
@@ -136,11 +206,19 @@ export default function OpenApiClient() {
       prev.includes(ev) ? prev.filter(x => x !== ev) : [...prev, ev]
     )
 
+  const usageChartData: UsagePoint[] = useMemo(() => {
+    if (!usage?.topDownloads?.length) return []
+    return usage.topDownloads.map(u => ({
+      name: u.title.length > 10 ? u.title.slice(0, 10) + '…' : u.title,
+      다운로드: u.count,
+    }))
+  }, [usage])
+
   if (loading) return (
     <div className="space-y-6 animate-pulse">
       <div className="h-6 bg-gray-200 rounded w-40" />
-      <div className="grid grid-cols-3 gap-4">
-        {Array.from({ length: 3 }).map((_, i) => (
+      <div className="grid grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="bg-white rounded-lg border p-4 text-center">
             <div className="h-8 bg-gray-200 rounded w-16 mx-auto mb-2" />
             <div className="h-3 bg-gray-100 rounded w-20 mx-auto" />
@@ -175,7 +253,7 @@ export default function OpenApiClient() {
 
       {/* 통계 카드 */}
       {stats && (
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: '활성 API 키', value: stats.activeKeys, color: 'blue' },
             { label: '30일 요청 수', value: stats.requestsLast30d.toLocaleString(), color: 'green' },
@@ -221,10 +299,13 @@ export default function OpenApiClient() {
                   {newPlain}
                 </code>
                 <button
-                  onClick={() => navigator.clipboard.writeText(newPlain)}
-                  className="text-xs text-green-700 border border-green-300 px-2 py-1.5 rounded hover:bg-green-100"
+                  onClick={() => {
+                    navigator.clipboard.writeText(newPlain)
+                    toast.success('API 키를 복사했습니다')
+                  }}
+                  className="text-xs text-green-700 border border-green-300 px-2 py-1.5 rounded hover:bg-green-100 flex items-center gap-1"
                 >
-                  복사
+                  <Copy className="w-3.5 h-3.5" /> 복사
                 </button>
                 <button
                   onClick={() => setNewPlain(null)}
@@ -247,7 +328,7 @@ export default function OpenApiClient() {
 
           {showKeyForm && (
             <form onSubmit={createKey} className="bg-white rounded-lg border p-4 space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">키 이름 *</label>
                   <input
@@ -307,8 +388,8 @@ export default function OpenApiClient() {
             )}
             {keys.map(k => (
               <div key={k.key_id} className="bg-white rounded-lg border shadow-sm p-4">
-                <div className="flex items-start justify-between">
-                  <div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
                     <div className="font-medium text-gray-800">{k.name}</div>
                     {k.description && (
                       <div className="text-xs text-gray-500 mt-0.5">{k.description}</div>
@@ -316,12 +397,12 @@ export default function OpenApiClient() {
                     <div className="text-xs text-gray-400 font-mono mt-0.5">
                       {k.key_prefix}••••••••
                     </div>
-                    <div className="text-xs text-gray-400 mt-0.5 flex gap-3">
+                    <div className="text-xs text-gray-400 mt-0.5 flex flex-wrap gap-3">
                       <span>{k.last_used_at ? `마지막 사용: ${k.last_used_at.slice(0, 10)}` : '미사용'}</span>
                       <span>누적 호출: {k.call_count.toLocaleString()}회</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full ${
                         k.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
@@ -329,19 +410,27 @@ export default function OpenApiClient() {
                     >
                       {k.is_active ? '활성' : '비활성'}
                     </span>
-                    <button
-                      onClick={() => toggleKey(k.key_id, k.is_active)}
-                      className="text-xs text-blue-600 hover:underline"
-                    >
-                      {k.is_active ? '비활성화' : '활성화'}
-                    </button>
-                    <button
-                      onClick={() => deleteKey(k.key_id)}
-                      className="text-xs text-red-500 hover:underline"
-                    >
-                      삭제
-                    </button>
                   </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t">
+                  <button
+                    onClick={() => toggleKey(k.key_id, k.is_active)}
+                    className="text-xs px-2 py-1 rounded border hover:bg-gray-50 text-gray-600"
+                  >
+                    {k.is_active ? '비활성화' : '활성화'}
+                  </button>
+                  <button
+                    onClick={() => rotateKey(k)}
+                    className="text-xs px-2 py-1 rounded border hover:bg-gray-50 text-blue-600 flex items-center gap-1"
+                  >
+                    <RefreshCw className="w-3 h-3" /> 재발급
+                  </button>
+                  <button
+                    onClick={() => deleteKey(k.key_id)}
+                    className="text-xs px-2 py-1 rounded border hover:bg-red-50 text-red-500 flex items-center gap-1 ml-auto"
+                  >
+                    <Trash2 className="w-3 h-3" /> 삭제
+                  </button>
                 </div>
               </div>
             ))}
@@ -363,15 +452,35 @@ export default function OpenApiClient() {
 
           {showWHForm && (
             <form onSubmit={createWebhook} className="bg-white rounded-lg border p-4 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">URL *</label>
+                  <input
+                    value={whUrl}
+                    onChange={e => setWhUrl(e.target.value)}
+                    required
+                    type="url"
+                    placeholder="https://your-server.com/webhook"
+                    className="w-full border rounded px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">설명 (선택)</label>
+                  <input
+                    value={whDesc}
+                    onChange={e => setWhDesc(e.target.value)}
+                    placeholder="웹훅 용도"
+                    className="w-full border rounded px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">URL *</label>
+                <label className="block text-xs text-gray-500 mb-1">시크릿 키 (선택, 서명 검증용)</label>
                 <input
-                  value={whUrl}
-                  onChange={e => setWhUrl(e.target.value)}
-                  required
-                  type="url"
-                  placeholder="https://your-server.com/webhook"
-                  className="w-full border rounded px-3 py-2 text-sm"
+                  value={whSecret}
+                  onChange={e => setWhSecret(e.target.value)}
+                  placeholder="whsec_xxxxxxxx"
+                  className="w-full border rounded px-3 py-2 text-sm font-mono"
                 />
               </div>
               <div>
@@ -416,7 +525,7 @@ export default function OpenApiClient() {
                 </div>
                 <h3 className="text-base font-semibold text-gray-700 mb-1">등록된 웹훅이 없습니다</h3>
                 <p className="text-sm text-gray-400 mb-5 max-w-xs leading-relaxed">
-                  데이터셋 이벤트 발생 시 지정한 URL로 실시간 알림을 보냅니다
+                  데이터셋 이벤트 발생 시 지정한 URL로 실시간 알림을 별냅니다
                 </p>
                 <button
                   onClick={() => setShowWHForm(true)}
@@ -428,8 +537,9 @@ export default function OpenApiClient() {
             )}
             {webhooks.map(w => (
               <div key={w.webhook_id} className="bg-white rounded-lg border shadow-sm p-4 flex items-start justify-between">
-                <div>
+                <div className="min-w-0">
                   <div className="text-sm font-medium text-gray-700 break-all">{w.url}</div>
+                  {w.description && <div className="text-xs text-gray-500 mt-0.5">{w.description}</div>}
                   <div className="flex flex-wrap gap-1 mt-1.5">
                     {w.events.map(ev => (
                       <span key={ev} className="text-xs bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-mono">
@@ -457,35 +567,30 @@ export default function OpenApiClient() {
       {/* API 문서 탭 */}
       {tab === 'docs' && (
         <div className="bg-white rounded-lg border shadow-sm p-6 space-y-6">
+          {/* 사용량 차트 */}
+          <div>
+            <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" /> 엔드포인트별 사용량 (최근 30일)
+            </h3>
+            {usageChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={usageChartData} margin={{ top: 4, right: 16, left: 0, bottom: 24 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-20} textAnchor="end" />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <Tooltip />
+                  <Bar dataKey="다운로드" fill="#1457b8" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-center py-8 text-gray-400 text-sm">최근 30일간 사용량 데이터가 없습니다.</div>
+            )}
+          </div>
+
           <div>
             <h3 className="font-semibold text-gray-700 mb-3">공개 API 엔드포인트</h3>
             <div className="space-y-4">
-              {[
-                {
-                  method: 'GET',
-                  path: '/api/v1/datasets',
-                  desc: '개방 데이터셋 목록 조회 (페이지네이션 지원)',
-                  params: 'page, per_page(최대 100)',
-                },
-                {
-                  method: 'GET',
-                  path: '/api/v1/datasets/{id}',
-                  desc: '데이터셋 메타데이터 조회',
-                  params: '',
-                },
-                {
-                  method: 'GET',
-                  path: '/api/v1/datasets/{id}/data',
-                  desc: '데이터셋 다운로드 (CSV / JSON)',
-                  params: 'format=csv|json, limit(최대 10000), offset',
-                },
-                {
-                  method: 'GET',
-                  path: '/api/dcat',
-                  desc: 'DCAT 3.0 LD+JSON 카탈로그 (인증 불필요)',
-                  params: '',
-                },
-              ].map(ep => (
+              {ENDPOINTS.map(ep => (
                 <div key={ep.path} className="flex gap-3 items-start">
                   <span className="bg-green-100 text-green-700 text-xs font-mono px-2 py-0.5 rounded shrink-0 mt-0.5">
                     {ep.method}
@@ -511,11 +616,11 @@ export default function OpenApiClient() {
               <pre className="text-xs font-mono bg-gray-900 text-green-300 rounded p-3 overflow-x-auto">
 {`# 헤더 방식 (권장)
 curl -H "x-api-key: eum_xxxxxx" \\
-  https://eum.gni.re.kr/api/v1/datasets
+  ${API_BASE}/api/v1/datasets
 
 # CSV 다운로드
 curl -H "x-api-key: eum_xxxxxx" \\
-  "https://eum.gni.re.kr/api/v1/datasets/youth_pop/data?format=csv" \\
+  "${API_BASE}/api/v1/datasets/youth_pop/data?format=csv" \\
   -o youth_pop.csv`}
               </pre>
             </div>

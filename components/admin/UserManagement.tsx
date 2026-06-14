@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Trash2, RefreshCw, UserCog } from 'lucide-react'
+import { Plus, Trash2, RefreshCw, UserCog, Building2, Filter } from 'lucide-react'
+
+interface Tenant { tenant_id: string; name: string; gov_type: string | null }
 
 interface UserRecord {
   id: string
@@ -39,6 +41,8 @@ export default function UserManagement() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [editingRole, setEditingRole] = useState<Record<string, string>>({})
   const [form, setForm] = useState({ email: '', password: '', role: 'agency', tenant_id: '' })
+  const [tenants, setTenants] = useState<Tenant[]>([])
+  const [roleFilter, setRoleFilter] = useState<'all' | 'center' | 'agency' | 'viewer'>('all')
 
   const loadUsers = useCallback(async () => {
     setLoading(true); setError('')
@@ -50,6 +54,13 @@ export default function UserManagement() {
   }, [])
 
   useEffect(() => { loadUsers() }, [loadUsers])
+
+  useEffect(() => {
+    fetch('/api/tenants')
+      .then(r => r.json())
+      .then((d: Tenant[]) => setTenants(Array.isArray(d) ? d : []))
+      .catch(() => setTenants([]))
+  }, [])
 
   async function createUser(e: React.FormEvent) {
     e.preventDefault()
@@ -150,13 +161,22 @@ export default function UserManagement() {
             </div>
             {form.role === 'agency' && (
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">기관 코드</label>
-                <input
-                  value={form.tenant_id}
-                  onChange={e => setForm(p => ({ ...p, tenant_id: e.target.value }))}
-                  placeholder="예: 48121"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <label className="block text-xs font-medium text-gray-600 mb-1">소속 기관</label>
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <select
+                    value={form.tenant_id}
+                    onChange={e => setForm(p => ({ ...p, tenant_id: e.target.value }))}
+                    className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">기관 선택</option>
+                    {tenants.map(t => (
+                      <option key={t.tenant_id} value={t.tenant_id}>
+                        {t.name} ({t.tenant_id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
             <div className="md:col-span-2">
@@ -175,9 +195,25 @@ export default function UserManagement() {
         <div className="text-red-600 text-sm bg-red-50 px-3 py-2 rounded">{error}</div>
       )}
 
+      <div className="flex items-center gap-2">
+        <Filter className="w-4 h-4 text-gray-400" />
+        <select
+          value={roleFilter}
+          onChange={e => setRoleFilter(e.target.value as typeof roleFilter)}
+          className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="all">모든 역할</option>
+          <option value="center">센터 관리자</option>
+          <option value="agency">기관</option>
+          <option value="viewer">열람자</option>
+        </select>
+      </div>
+
       <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
         <div className="px-4 py-3 bg-gray-50 border-b">
-          <span className="text-sm font-medium text-gray-700">총 {users.length}명</span>
+          <span className="text-sm font-medium text-gray-700">
+            총 {roleFilter === 'all' ? users.length : users.filter(u => u.role === roleFilter).length}명
+          </span>
         </div>
         {loading ? (
           <div className="px-4 py-8 text-center text-gray-400 text-sm">불러오는 중...</div>
@@ -200,7 +236,7 @@ export default function UserManagement() {
                     등록된 사용자가 없습니다.
                   </td>
                 </tr>
-              ) : users.map(u => (
+              ) : users.filter(u => roleFilter === 'all' || u.role === roleFilter).map(u => (
                 <tr key={u.id} className="hover:bg-gray-50">
                   <td className="px-4 py-2 text-gray-800">
                     {u.email}

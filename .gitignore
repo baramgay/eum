@@ -4,15 +4,24 @@ node_modules/
 .env*.local
 .env
 
+# TypeScript 빌드 정보
+*.tsbuildinfo
+
+
 data/
 __pycache__/
 *.pyc
 .pytest_cache/
 .worktrees/
 
-# 내부 도구
+# 낭비 도구
 .claude/
+!.claude/CLAUDE.md
 .agents/
+!.agents/skills/eum-platform/
+!.agents/skills/eum-platform-backend/
+!.agents/skills/eum-platform-quality/
+!.agents/skills/eum-platform-frontend/
 skills-lock.json
 
 # 테스트 계정 (비밀번호 포함)

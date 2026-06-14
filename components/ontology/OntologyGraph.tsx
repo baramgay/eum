@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import * as d3 from 'd3'
+import { RotateCcw, Filter } from 'lucide-react'
 
 interface OntologyNode { obj_id: string; label: string; obj_type: string; props: string }
 interface OntologyEdge { src: string; rel: string; dst: string; weight: number }
@@ -46,12 +47,49 @@ interface Props {
   edges: OntologyEdge[]
   width?: number
   height?: number
+  selectedId?: string | null
+  onSelect?: (node: OntologyNode | null) => void
+  onDoubleClick?: (node: OntologyNode) => void
+  relationFilter?: string[]
 }
 
-export default function OntologyGraph({ nodes, edges, width = 900, height = 600 }: Props) {
+export default function OntologyGraph({
+  nodes, edges, width = 900, height = 600,
+  selectedId, onSelect, onDoubleClick, relationFilter
+}: Props) {
   const svgRef   = useRef<SVGSVGElement>(null)
   const simRef   = useRef<d3.Simulation<SimNode, SimLink> | null>(null)
+  const gRef     = useRef<d3.Selection<SVGGElement, unknown, null, undefined> | null>(null)
+  const zoomRef  = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null)
   const [selected, setSelected] = useState<OntologyNode | null>(null)
+  const [activeRels, setActiveRels] = useState<Set<string>>(() => new Set(Object.keys(EDGE_COLORS)))
+
+  // sync external selectedId
+  useEffect(() => {
+    if (selectedId === undefined) return
+    const node = nodes.find(n => n.obj_id === selectedId) ?? null
+    setSelected(node)
+  }, [selectedId, nodes])
+
+  // sync relationFilter prop
+  useEffect(() => {
+    if (relationFilter) setActiveRels(new Set(relationFilter))
+  }, [relationFilter])
+
+  const resetZoom = useCallback(() => {
+    if (!svgRef.current || !zoomRef.current) return
+    const svg = d3.select(svgRef.current)
+    svg.transition().duration(500).call(zoomRef.current.transform as any, d3.zoomIdentity)
+  }, [])
+
+  const toggleRel = useCallback((rel: string) => {
+    setActiveRels(prev => {
+      const next = new Set(prev)
+      if (next.has(rel)) next.delete(rel)
+      else next.add(rel)
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     if (!svgRef.current || nodes.length === 0) return
@@ -62,19 +100,19 @@ export default function OntologyGraph({ nodes, edges, width = 900, height = 600 
     svg.selectAll('*').remove()
 
     const g = svg.append('g')
+    gRef.current = g
 
-    // zoom/pan
-    svg.call(
-      d3.zoom<SVGSVGElement, unknown>()
-        .scaleExtent([0.2, 4])
-        .on('zoom', event => g.attr('transform', event.transform))
-    )
+    zoomRef.current = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.2, 4])
+      .on('zoom', event => g.attr('transform', event.transform))
+
+    svg.call(zoomRef.current)
 
     const simNodes: SimNode[] = nodes.map(n => ({ ...n }))
     const nodeMap = new Map(simNodes.map(n => [n.obj_id, n]))
 
     const simLinks: SimLink[] = edges
-      .filter(e => nodeMap.has(e.src) && nodeMap.has(e.dst))
+      .filter(e => activeRels.has(e.rel) && nodeMap.has(e.src) && nodeMap.has(e.dst))
       .map(e => ({ source: e.src, target: e.dst, rel: e.rel, weight: e.weight }))
 
     // arrowhead marker
@@ -116,10 +154,17 @@ export default function OntologyGraph({ nodes, edges, width = 900, height = 600 
               d.fx = null; d.fy = null
             })
         )
-        .on('click', (_event, d) => setSelected({ ...d }))
+        .on('click', (_event, d) => {
+          const n = { ...d }
+          setSelected(n)
+          onSelect?.(n)
+        })
+        .on('dblclick', (_event, d) => {
+          onDoubleClick?.({ ...d })
+        })
 
     node.append('circle')
-      .attr('r', 14)
+      .attr('r', d => d.obj_type === '시군' ? 18 : 14)
       .attr('fill', d => NODE_COLORS[d.obj_type] ?? DEFAULT_NODE_COLOR)
       .attr('stroke', '#fff')
       .attr('stroke-width', 2)
@@ -139,7 +184,7 @@ export default function OntologyGraph({ nodes, edges, width = 900, height = 600 
         .id(d => d.obj_id).distance(110).strength(0.5))
       .force('charge', d3.forceManyBody<SimNode>().strength(-350))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collide', d3.forceCollide<SimNode>(28))
+      .force('collide', d3.forceCollide<SimNode>(d => d.obj_type === '시군' ? 32 : 28))
 
     sim.on('tick', () => {
       link
@@ -153,12 +198,38 @@ export default function OntologyGraph({ nodes, edges, width = 900, height = 600 
     simRef.current = sim
 
     return () => { sim.stop() }
-  }, [nodes, edges, width, height])
+  }, [nodes, edges, width, height, activeRels, onSelect, onDoubleClick])
 
   const selectedProps = selected ? parseProps(selected.props) : {}
 
   return (
     <div className="space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-gray-500 flex items-center gap-1"><Filter className="w-3.5 h-3.5" /> 관계 필터</span>
+          {Object.keys(EDGE_COLORS).map(rel => (
+            <button
+              key={rel}
+              onClick={() => toggleRel(rel)}
+              className={`text-[11px] px-2 py-0.5 rounded-full border transition-colors ${
+                activeRels.has(rel)
+                  ? 'text-gray-700 border-gray-300'
+                  : 'text-gray-400 border-gray-200 line-through'
+              }`}
+              style={{ backgroundColor: activeRels.has(rel) ? `${EDGE_COLORS[rel]}33` : 'transparent' }}
+            >
+              {rel}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={resetZoom}
+          className="flex items-center gap-1 px-2.5 py-1 text-xs text-gray-600 border rounded-md hover:bg-gray-50"
+        >
+          <RotateCcw className="w-3.5 h-3.5" /> 초기 위치
+        </button>
+      </div>
+
       <div className="relative bg-gray-900 rounded-lg overflow-hidden" style={{ height }}>
         {/* legend */}
         <div className="absolute top-3 right-3 bg-black/60 text-white text-xs rounded-lg p-3 space-y-1.5 z-10">
@@ -205,7 +276,7 @@ export default function OntologyGraph({ nodes, edges, width = 900, height = 600 
               <span className="font-medium text-gray-800">{selected.label}</span>
               <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{selected.obj_type}</span>
             </div>
-            <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-xs">닫기</button>
+            <button onClick={() => { setSelected(null); onSelect?.(null) }} className="text-gray-400 hover:text-gray-600 text-xs">닫기</button>
           </div>
           {Object.keys(selectedProps).length > 0 ? (
             <table className="text-xs w-full">

@@ -1,7 +1,76 @@
 import { createClient } from '@/lib/supabase/server'
 import { resolveSourceKind, toCSV } from '@/lib/utilization'
+import { readFile } from 'fs/promises'
+import { join } from 'path'
 
 const CHUNK = 1000
+
+// 카탈로그에 등록된 샘플 데이터셋은 DB에 preview가 없을 수 있으므로
+// 로컬 data/samples/ 파일을 폴백한다. (로컬 개발/데모용)
+const SAMPLE_FILE_MAP: Record<string, string> = {
+  'ds-traffic-accident': 'data/samples/traffic_accidents.csv',
+  'ds-commercial-area': 'data/samples/commercial_area.csv',
+  'ds-air-quality': 'data/samples/air_quality.csv',
+  'ds-public-hospital': 'data/samples/public_hospital.csv',
+  'ds-school-population': 'data/samples/school_population.csv',
+}
+
+function parseCsvLine(line: string): string[] {
+  const cells: string[] = []
+  let i = 0
+  let cur = ''
+  let inQuote = false
+  while (i < line.length) {
+    const ch = line[i]
+    if (inQuote) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') {
+          cur += '"'
+          i += 2
+          continue
+        }
+        inQuote = false
+      } else {
+        cur += ch
+      }
+    } else {
+      if (ch === '"') {
+        inQuote = true
+      } else if (ch === ',') {
+        cells.push(cur)
+        cur = ''
+      } else {
+        cur += ch
+      }
+    }
+    i++
+  }
+  cells.push(cur)
+  return cells
+}
+
+async function loadSampleRows(id: string): Promise<Record<string, unknown>[] | null> {
+  const relPath = SAMPLE_FILE_MAP[id]
+  if (!relPath) return null
+  try {
+    const fullPath = join(process.cwd(), relPath)
+    const text = await readFile(fullPath, 'utf-8')
+    const lines = text.split(/\r?\n/).filter(l => l.trim() !== '')
+    if (lines.length < 2) return null
+    const headers = parseCsvLine(lines[0])
+    const rows: Record<string, unknown>[] = []
+    for (let idx = 1; idx < lines.length; idx++) {
+      const cells = parseCsvLine(lines[idx])
+      if (cells.length < headers.length) continue
+      const row: Record<string, unknown> = {}
+      headers.forEach((h, i) => { row[h] = cells[i] ?? '' })
+      rows.push(row)
+    }
+    return rows
+  } catch {
+    return null
+  }
+}
 
 export async function GET(
   req: Request,
@@ -36,16 +105,27 @@ export async function GET(
   })
 
   if (kind !== 'gold') {
-    // upload: preview JSONB (already bounded, no streaming needed)
-    const { data: upload, error: upErr } = await supabase
-      .from('submission_uploads')
-      .select('preview')
-      .eq('table_name', tableName)
-      .maybeSingle()
-    if (upErr) return new Response(JSON.stringify({ error: upErr.message }), { status: 500 })
-    const rows = ((upload?.preview ?? []) as unknown[]).filter(
-      (r): r is Record<string, unknown> => typeof r === 'object' && r !== null,
-    )
+    // 1) DB에 preview가 있는 경우 우선 사용
+    let rows: Record<string, unknown>[] = []
+    if (tableName) {
+      const { data: upload, error: upErr } = await supabase
+        .from('submission_uploads')
+        .select('preview')
+        .eq('table_name', tableName)
+        .maybeSingle()
+      if (upErr) return new Response(JSON.stringify({ error: upErr.message }), { status: 500 })
+      rows = ((upload?.preview ?? []) as unknown[]).filter(
+        (r): r is Record<string, unknown> => typeof r === 'object' && r !== null,
+      )
+    }
+    // 2) preview가 없거나 table_name이 없으면 로컬 샘플 파일 폴백
+    if (rows.length === 0) {
+      const sampleRows = await loadSampleRows(id)
+      if (sampleRows) rows = sampleRows
+    }
+    if (rows.length === 0) {
+      return new Response(JSON.stringify({ error: '데이터를 불러올 수 없습니다. 업로드된 preview 또는 샘플 파일이 없습니다.' }), { status: 404 })
+    }
     if (format === 'json') {
       return new Response(JSON.stringify(rows, null, 2), {
         headers: {

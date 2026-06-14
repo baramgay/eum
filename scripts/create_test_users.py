@@ -9,10 +9,14 @@ import os
 
 SUPABASE_URL     = os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "")
 SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
-DEFAULT_PASSWORD = os.environ.get("TEST_USER_PASSWORD", "Test1234!")
+DEFAULT_PASSWORD = os.environ.get("TEST_USER_PASSWORD", "")
 
 if not SUPABASE_URL or not SERVICE_ROLE_KEY:
     print("환경변수 NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY 필요")
+    sys.exit(1)
+
+if not DEFAULT_PASSWORD:
+    print("환경변수 TEST_USER_PASSWORD 필요 (테스트 계정용 안전한 비밀번호)")
     sys.exit(1)
 
 USERS = [

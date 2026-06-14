@@ -95,7 +95,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          경남연구원 GNI · 데이터 허브 플랫폼
+          경남빅데이터센터 GNI · 데이터 허브 플랫폼
         </p>
       </div>
     </div>

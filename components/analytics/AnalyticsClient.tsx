@@ -1,11 +1,15 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
   Upload, Database, ChevronDown, ChevronRight, PlayCircle,
   X, AlertCircle, Loader2, BarChart2, Info, Download, Search,
 } from 'lucide-react'
+import {
+  ResponsiveContainer, BarChart, Bar, LineChart, Line, ScatterChart, Scatter,
+  PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+} from 'recharts'
 
 // ────────────────────────────────────────────
 // 타입
@@ -24,12 +28,14 @@ interface SessionState {
   total_rows: number
   preview: Record<string, unknown>[]
   source_label: string
+  column_values: Record<string, string[]>
 }
 
 interface AnalysisResult {
   ok: boolean
   title?: string
   tables?: ResultTable[]
+  charts?: ChartSpec[]
   error?: string
 }
 
@@ -38,6 +44,17 @@ interface ResultTable {
   headers: string[]
   rows: (string | number | null)[][]
   footnotes?: string[]
+}
+
+interface ChartSpec {
+  type: 'bar' | 'line' | 'scatter' | 'pie' | 'heatmap'
+  title: string
+  data: Record<string, unknown>[]
+  xKey?: string
+  yKey?: string
+  valueKey?: string
+  stackKeys?: string[]
+  groupKey?: string
 }
 
 // ────────────────────────────────────────────
@@ -104,6 +121,15 @@ const ANALYSIS_MENU: { group: string; items: AnalysisMenuItem[] }[] = [
         ],
       },
       {
+        id: 'chi_square_test',
+        label: '카이제곱 독립성 검정',
+        desc: '두 범주 변수 간 독립성 검정 + 히트맵',
+        variableSlots: [
+          { key: 'variable1', label: '변수 1', multi: false, filter: ['nominal', 'ordinal'] },
+          { key: 'variable2', label: '변수 2', multi: false, filter: ['nominal', 'ordinal'] },
+        ],
+      },
+      {
         id: 'correlation',
         label: '상관 분석',
         desc: '피어슨 / 스피어만 상관계수 행렬',
@@ -139,10 +165,37 @@ const ANALYSIS_MENU: { group: string; items: AnalysisMenuItem[] }[] = [
           { key: 'factor',    label: '요인 변수', multi: false, filter: ['nominal', 'ordinal'] },
         ],
       },
+      {
+        id: 'paired_ttest',
+        label: '대응표본 t-검정',
+        desc: '동일 대상의 두 측정값 평균 비교',
+        variableSlots: [
+          { key: 'variable1', label: '첫 번째 변수', multi: false, filter: ['scale'] },
+          { key: 'variable2', label: '두 번째 변수', multi: false, filter: ['scale'] },
+        ],
+      },
+      {
+        id: 'mann_whitney_u',
+        label: 'Mann-Whitney U 검정',
+        desc: '비모수 독립표본 검정 (중앙값 비교)',
+        variableSlots: [
+          { key: 'dependent', label: '종속 변수', multi: false, filter: ['scale'] },
+          { key: 'group',     label: '집단 변수', multi: false, filter: ['nominal', 'ordinal'] },
+        ],
+      },
+      {
+        id: 'wilcoxon_signed_rank',
+        label: 'Wilcoxon Signed-Rank 검정',
+        desc: '비모수 대응표본 검정',
+        variableSlots: [
+          { key: 'variable1', label: '첫 번째 변수', multi: false, filter: ['scale'] },
+          { key: 'variable2', label: '두 번째 변수', multi: false, filter: ['scale'] },
+        ],
+      },
     ],
   },
   {
-    group: '회귀',
+    group: '회귀·분류',
     items: [
       {
         id: 'linear_regression',
@@ -153,11 +206,55 @@ const ANALYSIS_MENU: { group: string; items: AnalysisMenuItem[] }[] = [
           { key: 'predictors', label: '예측 변수', multi: true,  filter: ['scale'] },
         ],
       },
+      {
+        id: 'logistic_regression',
+        label: '이항 로지스틱 회귀',
+        desc: 'Odds Ratio·AIC/BIC·예측확률',
+        variableSlots: [
+          { key: 'dependent',  label: '종속 변수(0/1)', multi: false, filter: ['scale', 'nominal'] },
+          { key: 'predictors', label: '예측 변수',       multi: true,  filter: ['scale'] },
+        ],
+      },
     ],
   },
   {
     group: '고급 분석',
     items: [
+      {
+        id: 'pca',
+        label: '주성분분석(PCA)',
+        desc: '차원 축소·Scree plot·PC 산점도',
+        variableSlots: [{ key: 'variables', label: '분석 변수', multi: true, filter: ['scale'] }],
+        options: [
+          {
+            key: 'n_components', label: '추출 성분 수', type: 'select',
+            choices: [
+              { value: '2', label: '2개' },
+              { value: '3', label: '3개' },
+              { value: '4', label: '4개' },
+            ],
+            default: '2',
+          },
+        ],
+      },
+      {
+        id: 'kmeans_clustering',
+        label: 'K-Means 클러스터링',
+        desc: '비지도 클러스터링·클러스터 산점도',
+        variableSlots: [{ key: 'variables', label: '분석 변수', multi: true, filter: ['scale'] }],
+        options: [
+          {
+            key: 'k', label: '클러스터 수(k)', type: 'select',
+            choices: [
+              { value: '2', label: '2' },
+              { value: '3', label: '3' },
+              { value: '4', label: '4' },
+              { value: '5', label: '5' },
+            ],
+            default: '3',
+          },
+        ],
+      },
       {
         id: 'survival',
         label: '생존 분석 (Kaplan-Meier)',
@@ -209,7 +306,7 @@ function ResultTableView({ table }: { table: ResultTable }) {
     <div className="mb-4">
       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{table.title}</p>
       <div className="overflow-x-auto rounded-lg border border-gray-200">
-        <table className="w-full text-sm">
+        <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               {table.headers.map((h, i) => (
@@ -241,10 +338,212 @@ function ResultTableView({ table }: { table: ResultTable }) {
 }
 
 // ────────────────────────────────────────────
+// 서브컴포넌트: 결과 차트
+// ────────────────────────────────────────────
+
+const CHART_COLORS = ['#3B82F6', '#F59E0B', '#10B981', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+
+function formatTick(value: unknown): string {
+  if (typeof value === 'number') {
+    if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
+    if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(1)}k`
+    if (Math.abs(value) >= 1) return value.toFixed(value % 1 === 0 ? 0 : 1)
+    return value.toFixed(3)
+  }
+  return String(value ?? '')
+}
+
+function HeatmapChart({ chart }: { chart: ChartSpec }) {
+  const data = chart.data
+  const valueKey = chart.valueKey ?? 'value'
+  const xValues = useMemo(() => Array.from(new Set(data.map(d => String(d.x)))), [data])
+  const yValues = useMemo(() => Array.from(new Set(data.map(d => String(d.y)))), [data])
+  const values = data.map(d => Number(d[valueKey] ?? NaN)).filter(v => !Number.isNaN(v))
+  const min = values.length ? Math.min(...values) : 0
+  const max = values.length ? Math.max(...values) : 0
+  const range = max - min || 1
+
+  const cellSize = 36
+  const labelWidth = 90
+  const labelHeight = 32
+  const width = Math.max(280, labelWidth + xValues.length * cellSize + 16)
+  const height = labelHeight + yValues.length * cellSize + 24
+
+  const colorFor = (v: number | null) => {
+    if (v === null || Number.isNaN(v)) return '#F3F4F6'
+    const t = range === 0 ? 0.5 : (v - min) / range
+    // 파랑 → 흰색 → 빨강
+    if (t < 0.5) {
+      const s = t * 2
+      return `rgb(${Math.round(59 + (255 - 59) * s)}, ${Math.round(130 + (255 - 130) * s)}, ${Math.round(246 + (255 - 246) * s)})`
+    }
+    const s = (t - 0.5) * 2
+    return `rgb(${Math.round(255 + (239 - 255) * s)}, ${Math.round(255 + (68 - 255) * s)}, ${Math.round(255 + (68 - 255) * s)})`
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <svg width={width} height={height} className="block">
+        <text x={4} y={labelHeight - 8} className="text-xs fill-gray-500">{chart.yKey ?? 'y'}</text>
+        {xValues.map((x, i) => (
+          <text key={x} x={labelWidth + i * cellSize + cellSize / 2} y={labelHeight - 6} textAnchor="middle" className="text-[10px] fill-gray-500">{x}</text>
+        ))}
+        {yValues.map((y, j) => (
+          <text key={y} x={labelWidth - 8} y={labelHeight + j * cellSize + cellSize / 2 + 4} textAnchor="end" className="text-[10px] fill-gray-500">{y}</text>
+        ))}
+        {data.map((d, i) => {
+          const xi = xValues.indexOf(String(d.x))
+          const yj = yValues.indexOf(String(d.y))
+          if (xi < 0 || yj < 0) return null
+          const v = d[valueKey] as number | null
+          return (
+            <g key={i}>
+              <rect
+                x={labelWidth + xi * cellSize}
+                y={labelHeight + yj * cellSize}
+                width={cellSize - 2}
+                height={cellSize - 2}
+                fill={colorFor(v)}
+                stroke="#E5E7EB"
+                strokeWidth={0.5}
+              />
+              {v !== null && !Number.isNaN(v) && (
+                <text
+                  x={labelWidth + xi * cellSize + (cellSize - 2) / 2}
+                  y={labelHeight + yj * cellSize + (cellSize - 2) / 2 + 4}
+                  textAnchor="middle"
+                  className="text-[9px] fill-gray-700"
+                >
+                  {formatTick(v)}
+                </text>
+              )}
+            </g>
+          )
+        })}
+      </svg>
+      <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+        <span>{formatTick(min)}</span>
+        <div className="w-24 h-2 rounded" style={{ background: 'linear-gradient(to right, #3B82F6, #FFFFFF, #EF4444)' }} />
+        <span>{formatTick(max)}</span>
+      </div>
+    </div>
+  )
+}
+
+function ResultCharts({ charts }: { charts: ChartSpec[] }) {
+  return (
+    <div className="space-y-6 mt-6">
+      {charts.map((chart, idx) => {
+        const data = chart.data ?? []
+        if (data.length === 0) return null
+
+        return (
+          <div key={idx} className="bg-gray-50 rounded-xl border border-gray-100 p-4">
+            <p className="text-xs font-semibold text-gray-600 mb-3">{chart.title}</p>
+            {chart.type === 'heatmap' && <HeatmapChart chart={chart} />}
+
+            {chart.type === 'bar' && (
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey={chart.xKey ?? 'name'} tick={{ fontSize: 11 }} interval={0} angle={data.length > 8 ? 30 : 0} height={data.length > 8 ? 50 : 30} />
+                  <YAxis tickFormatter={formatTick} tick={{ fontSize: 11 }} />
+                  <Tooltip formatter={(v: unknown) => [formatTick(v), chart.yKey ?? '값']} />
+                  {chart.stackKeys && chart.stackKeys.length > 0 ? (
+                    chart.stackKeys.map((k, i) => <Bar key={k} dataKey={k} stackId="a" fill={CHART_COLORS[i % CHART_COLORS.length]} />)
+                  ) : (
+                    <Bar dataKey={chart.yKey ?? 'value'} fill={CHART_COLORS[0]} radius={[4, 4, 0, 0]} />
+                  )}
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+
+            {chart.type === 'line' && (
+              <ResponsiveContainer width="100%" height={280}>
+                <LineChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey={chart.xKey ?? 'name'} tick={{ fontSize: 11 }} />
+                  <YAxis tickFormatter={formatTick} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  {chart.yKey ? (
+                    <Line type="monotone" dataKey={chart.yKey} stroke={CHART_COLORS[0]} strokeWidth={2} dot={{ r: 3 }} />
+                  ) : (
+                    Object.keys(data[0] ?? {}).filter(k => k !== chart.xKey).map((k, i) => (
+                      <Line key={k} type="monotone" dataKey={k} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2} dot={{ r: 3 }} />
+                    ))
+                  )}
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+
+            {chart.type === 'scatter' && (
+              <ResponsiveContainer width="100%" height={320}>
+                <ScatterChart margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" dataKey={chart.xKey ?? 'x'} name={chart.xKey ?? 'x'} tickFormatter={formatTick} tick={{ fontSize: 11 }} />
+                  <YAxis type="number" dataKey={chart.yKey ?? 'y'} name={chart.yKey ?? 'y'} tickFormatter={formatTick} tick={{ fontSize: 11 }} />
+                  <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v: unknown) => formatTick(v)} />
+                  {chart.groupKey ? (
+                    (() => {
+                      const groups = Array.from(new Set(data.map(d => String(d[chart.groupKey!]))))
+                      return groups.map((g, i) => (
+                        <Scatter
+                          key={g}
+                          name={g}
+                          data={data.filter(d => String(d[chart.groupKey!]) === g)}
+                          fill={CHART_COLORS[i % CHART_COLORS.length]}
+                        />
+                      ))
+                    })()
+                  ) : (
+                    <Scatter data={data} fill={CHART_COLORS[0]} />
+                  )}
+                  <Legend />
+                </ScatterChart>
+              </ResponsiveContainer>
+            )}
+
+            {chart.type === 'pie' && (
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={data}
+                    dataKey={chart.yKey ?? 'value'}
+                    nameKey={chart.xKey ?? 'name'}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={2}
+                    label={({ name, percent }) => `${name ?? ''}: ${((percent ?? 0) * 100).toFixed(0)}%`}
+                  >
+                    {data.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+
+// ────────────────────────────────────────────
 // 메인 컴포넌트
 // ────────────────────────────────────────────
 
 interface CatalogItem { id: string; title: string; theme?: string }
+
+interface RunItem {
+  id: string
+  analysis_type: string
+  dataset_label: string
+  result_title?: string
+  created_at: string
+}
 
 interface Props { role: string; tenantId: string }
 
@@ -257,6 +556,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
 
   const [selectedAnalysis, setSelectedAnalysis] = useState<AnalysisMenuItem | null>(null)
   const [assigned, setAssigned] = useState<Record<string, string[]>>({})
+  const [groupValues, setGroupValues] = useState<string[]>([])
   const [optValues, setOptValues] = useState<Record<string, string>>({})
 
   const [running, setRunning]   = useState(false)
@@ -267,6 +567,10 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([])
   const [catalogSearch, setCatalogSearch] = useState('')
   const [catalogLoading, setCatalogLoading] = useState(false)
+  const [catalogError, setCatalogError] = useState('')
+
+  const [runs, setRuns] = useState<RunItem[]>([])
+  const [runsLoading, setRunsLoading] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -289,6 +593,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
         total_rows: json.total_rows,
         preview: json.preview ?? [],
         source_label: file.name,
+        column_values: (json.column_values as Record<string, string[]>) ?? {},
       })
       setResult(null)
       setSelectedAnalysis(null)
@@ -304,9 +609,26 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
     setLoading(true); setLoadError('')
     try {
       const res = await fetch(`/api/catalog/${catalogId.trim()}/download?format=json`)
-      if (!res.ok) throw new Error(`카탈로그 조회 실패: ${res.status}`)
-      const json = await res.json()
-      const rows: unknown[] = Array.isArray(json) ? json : json.rows ?? []
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '')
+        throw new Error(`카탈로그 조회 실패: ${res.status} ${errText.slice(0, 200)}`)
+      }
+      const text = await res.text()
+      let rows: unknown[] = []
+      try {
+        const parsed = JSON.parse(text)
+        rows = Array.isArray(parsed) ? parsed : (parsed.rows ?? [])
+      } catch {
+        // NDJSON(줄 단위 JSON) 폭포 응답 지원
+        rows = text
+          .split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+          .map(line => JSON.parse(line))
+      }
+      if (rows.length === 0) {
+        throw new Error('카탈로그에 데이터가 없습니다.')
+      }
 
       const sessionId = crypto.randomUUID().replace(/-/g, '')
       const analyzeRes = await fetch('/api/analyze', {
@@ -326,6 +648,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
         total_rows: analyzeJson.total_rows,
         preview: analyzeJson.preview ?? [],
         source_label: label ?? catalogId,
+        column_values: (analyzeJson.column_values as Record<string, string[]>) ?? {},
       })
       setResult(null)
       setSelectedAnalysis(null)
@@ -340,29 +663,61 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
   async function openCatalogPicker() {
     setShowCatalogPicker(true)
     setCatalogSearch('')
+    setCatalogError('')
     if (catalogItems.length > 0) return
     setCatalogLoading(true)
     try {
       const res = await fetch('/api/catalog?page=1')
+      if (!res.ok) throw new Error(`목록 조회 실패: ${res.status}`)
       const json = await res.json()
-      const items: CatalogItem[] = (Array.isArray(json) ? json : json.data ?? [])
-        .map((d: Record<string, unknown>) => ({ id: String(d.id), title: String(d.title ?? d.id), theme: String(d.theme ?? '') }))
+      const rawItems = Array.isArray(json) ? json : json.items ?? json.data ?? []
+      const items: CatalogItem[] = rawItems
+        .map((d: Record<string, unknown>) => ({
+          id: String(d.dataset_id ?? d.id),
+          title: String(d.title ?? d.dataset_id ?? d.id),
+          theme: String(d.theme ?? ''),
+        }))
+        .filter((it: CatalogItem) => it.id && it.id !== 'undefined')
       setCatalogItems(items)
-    } catch {
+      if (items.length === 0) {
+        setCatalogError('등록된 카탈로그가 없습니다. 관리자가 샘플 데이터를 적재한 후 다시 확인해 주세요.')
+      }
+    } catch (e) {
       setCatalogItems([])
+      setCatalogError(`카탈로그 목록을 불러오지 못했습니다: ${String(e)}`)
     } finally {
       setCatalogLoading(false)
     }
   }
 
+  async function loadRuns() {
+    setRunsLoading(true)
+    try {
+      const res = await fetch('/api/analytics/runs?limit=5')
+      if (!res.ok) throw new Error(`이력 조회 실패: ${res.status}`)
+      const json = await res.json()
+      const items: RunItem[] = Array.isArray(json) ? json : (json.items ?? [])
+      setRuns(items)
+    } catch {
+      setRuns([])
+    } finally {
+      setRunsLoading(false)
+    }
+  }
+
   // dataset_id URL 파라미터 자동 로드 (ProcessClient "분석으로" 버튼 연동)
   useEffect(() => {
-    const datasetId = searchParams.get('dataset_id')
+    const datasetId = searchParams?.get('dataset_id')
     if (datasetId && !session) {
       loadCatalogById(datasetId)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams])
+
+  // 최근 분석 이력 로드
+  useEffect(() => {
+    loadRuns()
+  }, [])
 
   // ── 변수 타입 변경 ───────────────────────────
 
@@ -387,6 +742,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
   function selectAnalysis(item: AnalysisMenuItem) {
     setSelectedAnalysis(item)
     setAssigned({})
+    setGroupValues([])
     setResult(null)
     const defaults: Record<string, string> = {}
     item.options?.forEach(o => { defaults[o.key] = o.default })
@@ -413,15 +769,16 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
     if (!session || !selectedAnalysis) return
     setRunning(true); setResult(null)
     try {
+      const payload: Record<string, unknown> = {
+        session_id: session.session_id,
+        analysis_type: selectedAnalysis.id,
+        variables: { ...assigned, group_values: groupValues },
+        options: optValues,
+      }
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session_id: session.session_id,
-          analysis_type: selectedAnalysis.id,
-          variables: assigned,
-          options: optValues,
-        }),
+        body: JSON.stringify(payload),
       })
       const json = await res.json()
       setResult(json)
@@ -435,7 +792,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
             result_title:   json.title,
             result_summary: { table_count: json.tables?.length ?? 0, total_rows: session.total_rows },
           }),
-        }).catch(() => {})
+        }).then(() => loadRuns()).catch(() => {})
       }
     } catch (e) {
       setResult({ ok: false, error: String(e) })
@@ -584,10 +941,23 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                   <Loader2 className="w-4 h-4 animate-spin" /> 목록 로드 중...
                 </div>
               ) : catalogItems.length === 0 ? (
-                <p className="text-center py-8 text-sm text-gray-400">등록된 카탈로그가 없습니다</p>
+                <div className="text-center py-8 px-4">
+                  <p className="text-sm text-gray-500 font-medium">등록된 카탈로그가 없습니다</p>
+                  {catalogError ? (
+                    <p className="text-xs text-red-600 mt-2">{catalogError}</p>
+                  ) : (
+                    <p className="text-xs text-gray-400 mt-2">
+                      데이터 관리자가 샘플 또는 업로드 데이터를 먼저 등록해야 합니다.
+                    </p>
+                  )}
+                </div>
               ) : (
                 catalogItems
-                  .filter(it => !catalogSearch || it.title.includes(catalogSearch) || it.id.includes(catalogSearch))
+                  .filter(it => {
+                    if (!catalogSearch) return true
+                    const q = catalogSearch.toLowerCase()
+                    return it.title.toLowerCase().includes(q) || it.id.toLowerCase().includes(q) || (it.theme?.toLowerCase().includes(q) ?? false)
+                  })
                   .map(it => (
                     <button
                       key={it.id}
@@ -612,9 +982,9 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
 
       {/* 메인 분석 화면 */}
       {session && (
-        <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr] gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr] gap-4 items-start transition-all duration-200">
           {/* ── 왼쪽 패널 ── */}
-          <div className="space-y-4">
+          <div className="space-y-4 xl:sticky xl:top-4">
             {/* 세션 정보 */}
             <div className="bg-white rounded-xl border border-gray-200 p-4">
               <div className="flex items-center justify-between mb-3">
@@ -662,11 +1032,11 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
             </div>
 
             {/* 변수 목록 */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1">
                 <Info className="w-3.5 h-3.5" /> 변수 목록 (타입 클릭 변경)
               </p>
-              <div className="space-y-1 max-h-64 overflow-y-auto pr-1">
+              <div className="space-y-1 max-h-64 min-h-[120px] overflow-y-auto pr-1">
                 {session.columns.map(col => (
                   <div key={col.name} className="flex items-center justify-between gap-2 py-1">
                     <span className="text-sm text-gray-700 truncate flex-1">{col.name}</span>
@@ -688,9 +1058,9 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
             </div>
 
             {/* 분석 메뉴 */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">분석 선택</p>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
                 {ANALYSIS_MENU.map(group => (
                   <div key={group.group}>
                     <p className="text-xs font-semibold text-gray-400 mb-1.5">{group.group}</p>
@@ -713,12 +1083,45 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                 ))}
               </div>
             </div>
+
+            {/* 최근 분석 이력 */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">최근 분석</p>
+                <button
+                  onClick={loadRuns}
+                  disabled={runsLoading}
+                  className="text-xs text-blue-600 hover:text-blue-700 disabled:opacity-50"
+                >
+                  {runsLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : '새로고침'}
+                </button>
+              </div>
+              {runs.length === 0 ? (
+                <p className="text-xs text-gray-400">
+                  {runsLoading ? '불러오는 중...' : '아직 분석 이력이 없습니다.'}
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                  {runs.map(run => (
+                    <div key={run.id} className="text-xs border-b border-gray-50 last:border-0 pb-2 last:pb-0">
+                      <p className="font-medium text-gray-700 truncate">
+                        {ANALYSIS_MENU.flatMap(g => g.items).find(i => i.id === run.analysis_type)?.label ?? run.analysis_type}
+                      </p>
+                      <p className="text-gray-400 truncate">{run.dataset_label}</p>
+                      <p className="text-gray-300 mt-0.5">
+                        {new Date(run.created_at).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* ── 오른쪽 패널 ── */}
           <div className="space-y-4">
             {!selectedAnalysis && (
-              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
+              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400 min-h-[320px] flex flex-col items-center justify-center">
                 <BarChart2 className="w-10 h-10 mx-auto mb-3 opacity-30" />
                 <p className="text-sm">왼쪽에서 분석 방법을 선택하세요</p>
               </div>
@@ -731,7 +1134,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                   <h2 className="text-base font-bold text-gray-900 mb-1">{selectedAnalysis.label}</h2>
                   <p className="text-sm text-gray-500 mb-4">{selectedAnalysis.desc}</p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {selectedAnalysis.variableSlots.map(slot => {
                       const cols = filteredCols(slot.filter)
                       const sel  = assigned[slot.key] ?? []
@@ -748,7 +1151,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                               {slot.filter.map(f => typeLabel[f]).join('·')} 변수만 표시
                             </p>
                           )}
-                          <div className="border border-gray-200 rounded-lg overflow-hidden max-h-48 overflow-y-auto">
+                          <div className="border border-gray-200 rounded-lg overflow-hidden max-h-48 min-h-[96px] overflow-y-auto">
                             {cols.length === 0 && (
                               <p className="p-3 text-xs text-gray-400">해당 타입 변수 없음</p>
                             )}
@@ -776,6 +1179,50 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                     })}
                   </div>
 
+                  {/* t-검정/Mann-Whitney: 집단 변수가 3개 이상 범주일 때 2개 선택 */}
+                  {(selectedAnalysis?.id === 'independent_ttest' || selectedAnalysis?.id === 'mann_whitney_u') && session && (() => {
+                    const groupVar = assigned.group?.[0]
+                    if (!groupVar) return null
+                    const values = session.column_values[groupVar] ?? []
+                    if (values.length <= 2) return null
+                    return (
+                      <div className="mt-4 p-4 bg-amber-50/50 border border-amber-100 rounded-lg">
+                        <p className="text-xs font-semibold text-amber-800 mb-2 flex items-center gap-1">
+                          <Info className="w-3.5 h-3.5" /> 비교할 범주 2개 선택 (필수)
+                        </p>
+                        <p className="text-xs text-amber-600 mb-2">
+                          집단 변수 「{groupVar}」에 {values.length}개 범주가 있습니다. 비교할 2개를 선택하세요.
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {values.map(v => {
+                            const selected = groupValues.includes(v)
+                            return (
+                              <button
+                                key={v}
+                                onClick={() => {
+                                  setGroupValues(prev => {
+                                    if (prev.includes(v)) return prev.filter(x => x !== v)
+                                    if (prev.length >= 2) return [...prev.slice(1), v]
+                                    return [...prev, v]
+                                  })
+                                }}
+                                className={`text-xs px-3 py-1.5 rounded-full border transition-colors
+                                  ${selected
+                                    ? 'bg-amber-100 border-amber-300 text-amber-900 font-medium'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                              >
+                                {v}
+                              </button>
+                            )
+                          })}
+                        </div>
+                        {groupValues.length === 2 && (
+                          <p className="text-xs text-amber-700 mt-2">선택됨: {groupValues.join(' vs ')}</p>
+                        )}
+                      </div>
+                    )
+                  })()}
+
                   {/* 옵션 */}
                   {selectedAnalysis.options && selectedAnalysis.options.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-4">
@@ -798,7 +1245,11 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
 
                   <button
                     onClick={runAnalysis}
-                    disabled={running}
+                    disabled={running || ((selectedAnalysis?.id === 'independent_ttest' || selectedAnalysis?.id === 'mann_whitney_u') && (() => {
+                      const groupVar = assigned.group?.[0]
+                      const values = groupVar ? (session?.column_values[groupVar] ?? []) : []
+                      return values.length > 2 && groupValues.length !== 2
+                    })())}
                     className="mt-5 flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                   >
                     {running
@@ -809,7 +1260,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
 
                 {/* 결과 */}
                 {result && (
-                  <div className="bg-white rounded-xl border border-gray-200 p-5">
+                  <div className="bg-white rounded-xl border border-gray-200 p-5 min-h-[200px]">
                     {result.ok ? (
                       <>
                         <div className="flex items-center justify-between mb-4">
@@ -824,6 +1275,11 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                         {result.tables?.map((t, i) => (
                           <ResultTableView key={i} table={t} />
                         ))}
+                        {result.charts && result.charts.length > 0 && (
+                          <div className="mt-2 pt-4 border-t border-gray-100">
+                            <ResultCharts charts={result.charts} />
+                          </div>
+                        )}
                       </>
                     ) : (
                       <div className="flex items-start gap-2 text-red-700 bg-red-50 rounded-lg p-4">
