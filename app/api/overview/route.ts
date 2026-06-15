@@ -1,10 +1,15 @@
-import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { computeIndicators } from '@/lib/evaluation'
+import { jsonOk } from '@/lib/api'
+
+function formatDate(d: Date) {
+  return d.toISOString().slice(0, 10)
+}
 
 export async function GET() {
   const supabase = await createClient()
-  const today    = new Date().toISOString().slice(0, 10)
+  const today    = formatDate(new Date())
+  const sevenAgo = formatDate(new Date(Date.now() - 6 * 24 * 60 * 60 * 1000))
 
   const [
     ev,
@@ -12,6 +17,7 @@ export async function GET() {
     { count: processToday },
     { count: collectSources },
     { data: collectLogsToday },
+    { data: collectLogs7d },
     { data: qualityAll },
   ] = await Promise.all([
     computeIndicators(supabase),
@@ -19,12 +25,31 @@ export async function GET() {
     supabase.from('processing_runs').select('*', { count: 'exact', head: true }).gte('started_at', today).eq('status', 'done'),
     supabase.from('collection_sources').select('*', { count: 'exact', head: true }),
     supabase.from('collection_logs').select('status,rows_fetched').gte('started_at', today),
+    supabase.from('collection_logs').select('started_at,status,rows_fetched').gte('started_at', `${sevenAgo}T00:00:00`).lte('started_at', `${today}T23:59:59`),
     supabase.from('quality_results').select('passed,error_rate,detail'),
   ])
 
   const lastRunOk   = collectLogsToday?.filter(l => l.status === 'done').length ?? 0
   const lastRunFail = collectLogsToday?.filter(l => l.status === 'error' || l.status === 'failed').length ?? 0
   const rowsToday   = collectLogsToday?.reduce((sum, l) => sum + (l.rows_fetched ?? 0), 0) ?? 0
+
+  const trendMap = new Map<string, { date: string; runs: number; rows: number; ok: number; fail: number }>()
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const key = formatDate(d)
+    trendMap.set(key, { date: key, runs: 0, rows: 0, ok: 0, fail: 0 })
+  }
+  for (const l of collectLogs7d ?? []) {
+    const key = (l.started_at ?? '').slice(0, 10)
+    if (!trendMap.has(key)) continue
+    const entry = trendMap.get(key)!
+    entry.runs += 1
+    entry.rows += l.rows_fetched ?? 0
+    if (l.status === 'done') entry.ok += 1
+    else if (l.status === 'error' || l.status === 'failed') entry.fail += 1
+  }
+  const trend = Array.from(trendMap.values())
 
   const qualityPass  = qualityAll?.filter(r => r.passed).length ?? 0
   const qualityTotal = qualityAll?.length ?? 0
@@ -41,7 +66,7 @@ export async function GET() {
     .map(([rule]) => rule)
 
   const s = ev.summary as Record<string, number>
-  return NextResponse.json({
+  return jsonOk({
     overall: ev.overall,
     areas:   ev.areas,
     summary: `데이터셋 ${s.datasets}개 · 개방 ${s.open}개 · AI-Ready ${s.ai_ready}개 · 입주기관 ${s.tenants_on}/${s.tenants_total}`,
@@ -57,5 +82,6 @@ export async function GET() {
       passRate: Math.round(passRate * 10) / 10,
       topIssues,
     },
+    trend,
   })
 }

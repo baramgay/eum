@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { jsonError, jsonOk } from '@/lib/api'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -8,7 +8,7 @@ export async function GET(_req: Request, { params }: Params) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return jsonError('Unauthorized', 401)
   }
 
   const { data, error } = await supabase
@@ -18,11 +18,11 @@ export async function GET(_req: Request, { params }: Params) {
     .maybeSingle()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return jsonError(error.message, 500)
   }
   if (!data) {
-    return NextResponse.json({ error: '데이터셋을 찾을 수 없습니다' }, { status: 404 })
+    return jsonError('데이터셋을 찾을 수 없습니다', 404)
   }
 
-  return NextResponse.json(data)
+  return jsonOk(data)
 }

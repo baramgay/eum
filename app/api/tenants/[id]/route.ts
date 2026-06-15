@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { logAction } from '@/lib/audit'
+import { jsonError, jsonOk } from '@/lib/api'
 
 async function requireCenter(supabase: Awaited<ReturnType<typeof createClient>>) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -15,7 +15,7 @@ export async function GET(
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  if (!user) return jsonError('인증이 필요합니다', 401)
 
   const { data, error } = await supabase
     .from('tenants')
@@ -23,9 +23,9 @@ export async function GET(
     .eq('tenant_id', id)
     .maybeSingle()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  if (!data) return NextResponse.json({ error: '기관을 찾을 수 없습니다' }, { status: 404 })
-  return NextResponse.json(data)
+  if (error) return jsonError(error.message, 500)
+  if (!data) return jsonError('기관을 찾을 수 없습니다', 404)
+  return jsonOk(data)
 }
 
 export async function PATCH(
@@ -35,7 +35,7 @@ export async function PATCH(
   const { id } = await params
   const supabase = await createClient()
   if (!await requireCenter(supabase))
-    return NextResponse.json({ error: '센터 권한이 필요합니다' }, { status: 403 })
+    return jsonError('센터 권한이 필요합니다', 403)
 
   const body: { onboarded?: boolean; name?: string; sgg_cd?: string; status?: 'pending' | 'approved' | 'rejected' } = await req.json()
   const update: Record<string, unknown> = {}
@@ -50,8 +50,8 @@ export async function PATCH(
   }
 
   const { error } = await supabase.from('tenants').update(update).eq('tenant_id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
-  return NextResponse.json({ ok: true })
+  if (error) return jsonError(error.message, 400)
+  return jsonOk({ ok: true })
 }
 
 export async function DELETE(
@@ -62,10 +62,10 @@ export async function DELETE(
   const supabase = await createClient()
   const user = await requireCenter(supabase)
   if (!user)
-    return NextResponse.json({ error: '센터 권한이 필요합니다' }, { status: 403 })
+    return jsonError('센터 권한이 필요합니다', 403)
 
   const { error } = await supabase.from('tenants').delete().eq('tenant_id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error) return jsonError(error.message, 400)
   void logAction(supabase, user, 'deleted_tenant', 'tenant', id)
-  return NextResponse.json({ ok: true })
+  return jsonOk({ ok: true })
 }

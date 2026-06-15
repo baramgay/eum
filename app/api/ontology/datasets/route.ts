@@ -1,11 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { jsonError, jsonOk } from '@/lib/api'
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return jsonError('인증이 필요합니다', 401)
   }
 
   const { searchParams } = new URL(req.url)
@@ -13,7 +14,7 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get('type') ?? ''
 
   if (!label && !type) {
-    return NextResponse.json([])
+    return jsonOk([])
   }
 
   const filters: string[] = []
@@ -34,8 +35,8 @@ export async function GET(req: NextRequest) {
     .limit(10)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return jsonError(error.message, 500)
   }
 
-  return NextResponse.json(data ?? [])
+  return jsonOk(data ?? [])
 }

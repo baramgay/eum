@@ -77,9 +77,9 @@
     <h1>제작 기록 · Build Status</h1>
     <div class="brand">이음 · EUM</div>
   </div>
-  <div style="margin-left:auto"><span class="live"><span class="b"></span>3단계 고도화 완료 · 2026-06-14</span></div>
+  <div style="margin-left:auto"><span class="live"><span class="b"></span>3단계 고도화 1차 마무리 · 2026-06-15</span></div>
   <div class="sub">경남 공공데이터 통합 플랫폼 「이음」 — Next.js 14 App Router + TypeScript + Supabase + Tailwind CSS.
-    1단계 제작일 2026-06-05 · 2단계 마이그레이션 완료 2026-06-10 · 3단계 탭 고도화 2026-06-14.</div>
+    1단계 제작일 2026-06-05 · 2단계 마이그레이션 완료 2026-06-10 · 3단계 탭 고도화 2026-06-14~15 · 에이전트·위키·롤백 지점 준비.</div>
 </div></header>
 
 <main>
@@ -98,7 +98,7 @@
   <div class="note">
     <b>1단계(2026-06-05)</b> — FastAPI+DuckDB+Vanilla JS로 7계층 MVP 실증.<br>
     <b>2단계(2026-06-10)</b> — Next.js 14 App Router + TypeScript + Supabase 전면 재구성.<br>
-    <b>3단계(2026-06-14)</b> — 데이터 포털·등록·개방 API를 중심으로 한 탭별 고도화, 분석 탭 17종/시각화/지도 마커·큘러스터·히트맵/매뉴얼·status.html 갱신, API 인증 강화.
+    <b>3단계(2026-06-14)</b> — 데이터 포털·등록·개방 API를 중심으로 한 탭별 고도화, 분석 탭 17종/시각화/지도 마커·큘러스터·히트맵/매뉴얼·status.html 갱신, API 인증 강화, 대시보드 7일 트렌드 추가. 에이전트 스킬·위키·롤백 지점 준비.
   </div>
 </div></section>
 
@@ -273,7 +273,7 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
   <table>
     <thead><tr><th style="width:18%">탭</th><th style="width:42%">주요 기능</th><th style="width:18%">상태</th><th>비고</th></tr></thead>
     <tbody>
-      <tr><td>대시보드</td><td>실시간 KPI·평가편람 종합점수·시군별 차트·최근 이력</td><td><span class="badge b-progress">고도화 중</span></td><td>스켈레톤·품질 요약 위젯 추가 예정</td></tr>
+      <tr><td>대시보드</td><td>실시간 KPI·평가편람 종합점수·시군별 차트·최근 이력·<b>7일 수집 트렌드 차트</b></td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
       <tr><td>데이터 포털</td><td>카탈로그 검색/필터·카드 개선·상세 모달(개요/미리보기/메타데이터/API 예시)·다운로드</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
       <tr><td>데이터 등록</td><td>드래그앤드롭 업로드·진행률·컬럼 타입 추론·심사 체크리스트·승인/반려 워크플로우</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
       <tr><td>개방 API</td><td>API 키 발급/재발급/복사·사용량 차트·웹훅 등록·API 문서</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
@@ -351,6 +351,22 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
   </div>
 </div></section>
 
+<!-- 운영 자산 -->
+<section><div class="wrap">
+  <div class="sec-no">OPS</div>
+  <h2>에이전트·위키·롤백 자산</h2>
+  <div class="note">
+    <b>멀티 에이전트 연동</b> — 프로젝트 스킬 5종(<code>.agents/skills/eum-platform*.md</code>) 생성.
+    <code>C:\업무\agents</code> 시스템의 <code>backend · frontend · dba · security · tester-*</code> 에이전트 메모리에
+    이음 플랫폼 지식 등록, 위키 MoC <code>이음플랫폼.md</code> 및 노트 갱신.
+  </div>
+  <ul class="clean">
+    <li>SESSION_GUIDE 준수: orchestrator → lead-dev → 담당 에이전트 체인, 위키 read/write 루프 적용</li>
+    <li>롤백 지점: git tag <code>rollback/2026-06-14-tab-enhancements</code> (fa40acf6) — <code>git reset --hard rollback/2026-06-14-tab-enhancements</code>로 복원</li>
+    <li>검증 체인: <code>npx tsc --noEmit</code> · <code>npm run lint</code> · <code>npm test</code> · <code>npm run build</code></li>
+  </ul>
+</div></section>
+
 <!-- 다음 단계 -->
 <section style="border-bottom:none"><div class="wrap">
   <div class="sec-no">NEXT</div>
@@ -364,7 +380,7 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
         <li>개방 API 키 재발급·사용량 차트·웹훅 폼 개선</li>
         <li>분석 탭 6종 분석 추가 및 시각화 고도화</li>
         <li>지도 마커/큟러스터/히트맵 및 시설 비교</li>
-        <li>카탈로그 샘플 데이터 연동(data/samples/ 8종)</li>
+        <li>카탈로그 샘플 데이터 연동(data/samples/ 5종)</li>
         <li>매뉴얼/도움말 신규 기능 반영 갱신</li>
         <li>status.html 최신 상태(탭별 현황·산출물) 갱신</li>
         <li>API 인증 강화 및 middleware 축소</li>
@@ -384,7 +400,8 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
     </div>
   </div>
   <div class="note">
-    <b>3단계(2026-06-14)</b> 탭 고도화 완료. 데이터 포털·등록·개방 API 중심의 UX 개선과 분석/지도/매뉴얼/보안 강화를 완료.
+    <b>3단계(2026-06-14~15)</b> 탭 고도화 1차 마무리. 데이터 포털·등록·개방 API 중심의 UX 개선과 분석/지도/대시보드/매뉴얼/보안 강화 완료.
+    수집·가공·품질진단·AI 질의·온톨로지·리포트·관리자·파이프라인은 추가 고도화 예정.
     Supabase 프로젝트 연결 후 <code>supabase db push</code> + <code>npm run dev</code>로 즉시 가동 가능.
   </div>
 </div></section>
@@ -392,7 +409,7 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
 </main>
 <footer class="foot"><div class="wrap">
   <b>이음(EUM) 플랫폼 — 제작 기록</b> · 데이터를 잇고, 가치를 연다 · 경남빅데이터센터<br>
-  <span style="opacity:.6">1단계(2026-06-05): FastAPI · DuckDB · Vanilla JS &nbsp;|&nbsp; 2단계(2026-06-10): Next.js 14 · TypeScript · Supabase &nbsp;|&nbsp; 3단계(2026-06-14): 탭 고도화 · 분석·지도·API 인증</span>
+  <span style="opacity:.6">1단계(2026-06-05): FastAPI · DuckDB · Vanilla JS &nbsp;|&nbsp; 2단계(2026-06-10): Next.js 14 · TypeScript · Supabase &nbsp;|&nbsp; 3단계(2026-06-14~15): 탭 고도화 · 분석·지도·대시보드·API 인증</span>
 </div></footer>
 </body>
 </html>

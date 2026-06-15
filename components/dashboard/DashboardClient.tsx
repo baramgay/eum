@@ -8,6 +8,14 @@ import {
 } from 'recharts'
 
 interface AreaScore { name: string; score: number; color: string; weight: number }
+interface TrendRow {
+  date: string
+  runs: number
+  rows: number
+  ok: number
+  fail: number
+}
+
 interface Indicators {
   overall: number; areas: AreaScore[]; summary: string
   pipeline?: {
@@ -19,6 +27,7 @@ interface Indicators {
     process_today: number
   }
   qualityAvg?: { passRate: number; topIssues: string[] }
+  trend?: TrendRow[]
 }
 
 interface UsageData {
@@ -262,6 +271,33 @@ export default function DashboardClient() {
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-3 text-right">오늘({new Date().toLocaleDateString('ko-KR')}) 기준</p>
+        </div>
+
+        {/* 최근 7일 수집 트렌드 */}
+        <div className="bg-white rounded-lg border shadow-sm p-5">
+          <h3 className="text-sm font-semibold text-gray-600 mb-3">최근 7일 수집 트렌드</h3>
+          {data.trend && data.trend.length > 0 ? (
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={data.trend} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v: string) => v.slice(5)} />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <Tooltip
+                    formatter={(value, name) => {
+                      const label = name === 'ok' ? '정상' : name === 'fail' ? '실패' : name === 'rows' ? '수집 행' : String(name)
+                      return [typeof value === 'number' ? value.toLocaleString() : value, label]
+                    }}
+                    labelFormatter={(label) => String(label)}
+                  />
+                  <Line type="monotone" dataKey="ok" stroke="#16a34a" strokeWidth={2} dot={false} name="정상" />
+                  <Line type="monotone" dataKey="fail" stroke="#dc2626" strokeWidth={2} dot={false} name="실패" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="text-xs text-gray-400 py-4 text-center">최근 수집 이력이 없습니다.</p>
+          )}
         </div>
 
         {/* 최근 분석 이력 */}

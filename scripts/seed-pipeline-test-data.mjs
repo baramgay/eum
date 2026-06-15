@@ -34,13 +34,17 @@ const SAMPLES = [
 async function ensureTenant() {
   const { data } = await supabase.from('tenants').select('tenant_id').eq('tenant_id', TEST_TENANT).maybeSingle()
   if (!data) {
-    await supabase.from('tenants').insert({
+    const { error } = await supabase.from('tenants').insert({
       tenant_id: TEST_TENANT,
       name: '파이프라인 테스트 기관',
-      description: 'UI/UX 검증용 테스트 기관',
-      is_active: true,
-      created_at: new Date().toISOString(),
+      gov_type: '시군',
+      sgg_cd: '99999',
+      onboarded: true,
     })
+    if (error) {
+      console.error('  ❌ 테스트 기관 생성 오류:', error.message)
+      throw error
+    }
     console.log(`  ✓ 테스트 기관 생성: ${TEST_TENANT}`)
   }
 }
@@ -188,6 +192,7 @@ async function seedAnalysisRecords() {
       result_summary: '테스트 분석 실적입니다.',
       policy_applied: true,
       performed_at: new Date().toISOString().slice(0, 10),
+      created_at: new Date().toISOString(),
     })
     if (error) {
       console.error(`  ❌ ${r.title} 분석 실적 생성 오류:`, error.message)
