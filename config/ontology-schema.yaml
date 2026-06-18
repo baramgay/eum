@@ -3,7 +3,123 @@
 # app/ontology.py가 서버 시작 시 한 번 로드한다.
 
 # 공공시설 필터 (gold_public_facility.ftype 값)
+# 기존 단일 필터는 액션 스코어링 하위 호환을 위해 유지합니다.
 facility_filter: "청년센터"
+
+# 온톨로지에 포함할 공공시설 유형 목록
+facility_filters:
+  - "청년센터"
+  - "도서관"
+  - "체육관"
+  - "문화센터"
+  - "복지관"
+  - "공연장"
+  - "청년공간"
+  - "스포츠센터"
+  - "문화회관"
+  - "박물관"
+  - "체육공원"
+  - "복지센터"
+  - "관광지"
+
+# data/samples/ JSON을 기반으로 생성할 도메인 노드/관계 정의
+# metrics가 정의된 도메인은 lib/ontology/core.ts가 선언형으로 집계·노드 생성한다.
+sample_domains:
+  traffic:
+    name: "교통안전"
+    relation: "교통위험"
+    metrics:
+      - { key: fatalities, label: "사망", aggregate: sum }
+      - { key: injuries, label: "부상", aggregate: sum }
+      - { key: property_damage, label: "재산피해", aggregate: sum }
+  commercial:
+    name: "상권"
+    relation: "상권규모"
+    metrics:
+      - { key: store_count, label: "점포", aggregate: sum }
+      - { key: sales_amount, label: "매출", aggregate: sum }
+      - { key: employee_count, label: "종사자", aggregate: sum }
+  air:
+    name: "대기환경"
+    relation: "대기질"
+    metrics:
+      - { key: pm10, label: "PM10", aggregate: avg, fractionDigits: 1 }
+      - { key: pm25, label: "PM25", aggregate: avg, fractionDigits: 1 }
+      - { key: no2, label: "NO2", aggregate: avg, fractionDigits: 3 }
+      - { key: o3, label: "O3", aggregate: avg, fractionDigits: 3 }
+      - { key: co, label: "CO", aggregate: avg, fractionDigits: 3 }
+      - { key: so2, label: "SO2", aggregate: avg, fractionDigits: 3 }
+  hospital:
+    name: "공공의료"
+    relation: "의료기반"
+    metrics:
+      - { key: beds, label: "병상", aggregate: sum }
+      - { key: doctors, label: "의사", aggregate: sum }
+      - { key: nurses, label: "간호사", aggregate: sum }
+  school:
+    name: "교육인프라"
+    relation: "교육기반"
+    metrics:
+      - { key: school_count, label: "학교", aggregate: sum }
+      - { key: students, label: "학생", aggregate: sum }
+      - { key: teachers, label: "교원", aggregate: sum }
+  culture:
+    name: "문화시설"
+    relation: "문화기반"
+    metrics:
+      - { key: facilities, label: "시설", aggregate: sum }
+      - { key: seats, label: "좌석", aggregate: sum }
+      - { key: events, label: "행사", aggregate: sum }
+  welfare:
+    name: "복지시설"
+    relation: "복지기반"
+    metrics:
+      - { key: centers, label: "센터", aggregate: sum }
+      - { key: beneficiaries, label: "수혜자", aggregate: sum }
+      - { key: budget, label: "예산", aggregate: sum }
+  sports:
+    name: "체육시설"
+    relation: "체육기반"
+    metrics:
+      - { key: gyms, label: "체육관", aggregate: sum }
+      - { key: fields, label: "운동장", aggregate: sum }
+      - { key: members, label: "회원", aggregate: sum }
+  transport:
+    name: "대중교통"
+    relation: "교통기반"
+    metrics:
+      - { key: bus_routes, label: "버스노선", aggregate: sum }
+      - { key: bus_stops, label: "정류장", aggregate: sum }
+      - { key: subway_stations, label: "지하철", aggregate: sum }
+  housing:
+    name: "주택"
+    relation: "주택기반"
+    metrics:
+      - { key: total_houses, label: "총주택", aggregate: avg }
+      - { key: apt_houses, label: "아파트", aggregate: avg }
+      - { key: avg_price, label: "평균가격", aggregate: avg }
+  water:
+    name: "수질환경"
+    relation: "수질"
+    metrics:
+      - { key: bod, label: "BOD", aggregate: avg, fractionDigits: 2 }
+      - { key: cod, label: "COD", aggregate: avg, fractionDigits: 2 }
+      - { key: tn, label: "TN", aggregate: avg, fractionDigits: 2 }
+      - { key: tp, label: "TP", aggregate: avg, fractionDigits: 3 }
+  safety:
+    name: "공공안전"
+    relation: "안전기반"
+    metrics:
+      - { key: cctvs, label: "CCTV", aggregate: sum }
+      - { key: fire_stations, label: "소방서", aggregate: sum }
+      - { key: safety_cases, label: "안전사례", aggregate: sum }
+  tourism:
+    name: "관광"
+    relation: "관광기반"
+    metrics:
+      - { key: attractions, label: "관광지", aggregate: sum }
+      - { key: visitors, label: "방문객", aggregate: sum }
+      - { key: revenue, label: "수익", aggregate: sum }
 
 # 액션 정의 — 각 항목은 ontology.py의 _score_action()이 읽는다.
 # weights 합계가 1.0이어야 한다.
@@ -93,3 +209,115 @@ keyword_mapping:
     - 농촌
     - 경남
     - 지자체
+  교통안전:
+    - 교통
+    - 사고
+    - 교통사고
+    - 안전
+    - 부상
+    - 사망
+    - 교통위험
+  상권:
+    - 상권
+    - 상점
+    - 매출
+    - 소매
+    - 음식
+    - 서비스
+    - 점포
+    - 자영업
+  대기환경:
+    - 대기
+    - 공기
+    - 미세먼지
+    - 초미세먼지
+    - pm10
+    - pm25
+    - 오염
+    - 환경
+  공공의료:
+    - 의료
+    - 병원
+    - 보건소
+    - 의료원
+    - 병상
+    - 의사
+    - 간호사
+    - 공공의료
+  교육인프라:
+    - 교육
+    - 학교
+    - 학생
+    - 교사
+    - 학급
+    - 초등학교
+    - 중학교
+    - 고등학교
+  도서관:
+    - 도서관
+    - 책
+    - 독서
+    - 문헌
+  체육관:
+    - 체육관
+    - 운 동
+    - 스포츠
+    - 체육
+  문화센터:
+    - 문화센터
+    - 문화
+    - 공연
+    - 전시
+  문화시설:
+    - 문화시설
+    - 문화
+    - 공연장
+    - 전시
+    - 공연
+    - 문화회관
+  복지시설:
+    - 복지시설
+    - 복지관
+    - 사회복지
+    - 복지
+    - 취약계층
+  체육시설:
+    - 체육시설
+    - 체육관
+    - 스포츠센터
+    - 운 동
+    - 스포츠
+    - 체육
+  대중교통:
+    - 대중교통
+    - 버스
+    - 지하철
+    - 교통
+    - 버스정류장
+    - 노선
+  주택:
+    - 주택
+    - 아파트
+    - 주거
+    - 주택시장
+    - 부동산
+    - 집값
+  수질환경:
+    - 수질
+    - 물환경
+    - BOD
+    - COD
+    - 하천
+  공공안전:
+    - 공공안전
+    - CCTV
+    - 소방
+    - 안전
+    - 소방서
+    - 범죄
+  관광:
+    - 관광
+    - 여행
+    - 관광지
+    - 방문객
+    - 숙박

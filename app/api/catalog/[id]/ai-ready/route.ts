@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { computeAiReadyChecklist } from '@/lib/evaluation'
 
 export async function GET(
@@ -10,9 +10,11 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: '인증 필요' }, { status: 401 })
 
-  const { data, error } = await supabase
+  const service = await createServiceClient()
+  const { data, error } = await service
     .from('catalog').select('*').eq('dataset_id', params.id).single()
   if (error || !data) return NextResponse.json({ error: '데이터셋 없음' }, { status: 404 })
 
-  return NextResponse.json(computeAiReadyChecklist(data as Record<string, unknown>))
+  const result = await computeAiReadyChecklist(data as Record<string, unknown>, service)
+  return NextResponse.json(result)
 }

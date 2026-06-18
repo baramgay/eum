@@ -4,13 +4,105 @@
  * 업로드 데이터: 인메모리 JSON 배열 대상 제네릭 검사
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { contractToRuleFns, isQualityContract } from './quality-contract'
 
 export const ERROR_RATE_THRESHOLD = 0.001
 export const GENERIC_THRESHOLD    = 5.0
 
+export type QualityArea = 'completeness' | 'accuracy' | 'consistency' | 'recency' | 'metadata'
+
+export interface RuleDetail {
+  rule: string
+  violations: number
+  area?: QualityArea
+}
+
+export interface QualityResult {
+  dataset_id: string
+  table: string
+  rule_count: number
+  checked: number
+  errors: number
+  error_rate: number
+  threshold: number
+  passed: boolean
+  detail: RuleDetail[]
+  ran_at: string
+}
+
+export type Severity = 'critical' | 'high' | 'medium' | 'low'
+
+export interface QualityIssue {
+  area: QualityArea
+  areaLabel: string
+  datasetId: string
+  table: string
+  rule: string
+  violations: number
+  severity: Severity
+  recommendation: string
+}
+
+export function getIssueSeverity(violations: number, checkedPerRule: number): Severity {
+  if (checkedPerRule <= 0) return violations > 0 ? 'high' : 'low'
+  const ratio = violations / checkedPerRule
+  if (ratio >= 0.5 || violations >= 10000) return 'critical'
+  if (ratio >= 0.01 || violations >= 1000) return 'high'
+  if (ratio >= 0.001 || violations >= 100) return 'medium'
+  return 'low'
+}
+
+export interface QualityHistoryRow {
+  id: string
+  dataset_id: string
+  table_name: string
+  rule_count: number
+  checked: number
+  errors: number
+  error_rate: number
+  passed: boolean
+  detail: RuleDetail[]
+  ran_at: string
+}
+
+const AREA_LABEL: Record<QualityArea, string> = {
+  completeness: '완전성',
+  accuracy:     '정확성',
+  consistency:  '일관성',
+  recency:      '최신성',
+  metadata:     '메타데이터',
+}
+
+export function getAreaLabel(area: QualityArea): string {
+  return AREA_LABEL[area]
+}
+
+export function inferArea(ruleName: string): QualityArea {
+  const n = ruleName
+  if (n.includes('NULL') || n.includes('결측') || n.includes('누락')) return 'completeness'
+  if (n.includes('연도') || n.includes('최신') || n.includes('기간')) return 'recency'
+  if (n.includes('정합성') || n.includes('중복') || n.includes('일관')) return 'consistency'
+  if (n.includes('메타') || n.includes('코드') || n.includes('유효성')) return 'metadata'
+  return 'accuracy'
+}
+
 // 각 규칙: [규칙명, 위반 집계 함수]
 type RuleFn = (sb: SupabaseClient) => Promise<number>
 type RuleEntry = [string, RuleFn]
+
+// 허용된 gold 테이블 목록 — SQL injection 방어용 화이트리스트
+const ALLOWED_GOLD_TABLES = new Set([
+  'gold_youth_population',
+  'gold_business',
+  'gold_public_facility',
+])
+
+export function assertAllowedTable(tableName: string | null | undefined): string {
+  if (!tableName || (!ALLOWED_GOLD_TABLES.has(tableName) && !tableName.startsWith('sub_'))) {
+    throw new Error(`허용되지 않은 테이블: ${tableName}`)
+  }
+  return tableName
+}
 
 export const RULES: Record<string, RuleEntry[]> = {
   gold_youth_population: [
@@ -89,18 +181,28 @@ async function countLatOutOfRange(sb: SupabaseClient) {
 }
 
 // ─── 메인 품질 함수 ──────────────────────────────────────────────────────────
-export async function runQuality(supabase: SupabaseClient, datasetId: string) {
+export async function runQuality(supabase: SupabaseClient, datasetId: string): Promise<QualityResult | null> {
   const { data: cat } = await supabase
-    .from('catalog').select('table_name').eq('dataset_id', datasetId).single()
-  if (!cat || !RULES[cat.table_name]) return null
+    .from('catalog').select('table_name, quality_contract').eq('dataset_id', datasetId).single()
+  if (!cat) return null
 
-  const rules = RULES[cat.table_name]
+  // 데이터 품질 계약이 있으면 우선 사용, 없으면 기존 하드코딩 규칙 폴드백
+  const rules: RuleEntry[] = isQualityContract(cat.quality_contract)
+    ? contractToRuleFns(cat.table_name, cat.quality_contract)
+    : RULES[cat.table_name]
+
+  if (!rules || rules.length === 0) return null
+  const safeTable = assertAllowedTable(cat.table_name)
   const { count: totalRows } = await supabase
-    .from(cat.table_name).select('*', { count: 'exact', head: true })
+    .from(safeTable).select('*', { count: 'exact', head: true })
   const total = totalRows ?? 0
 
   const detail = await Promise.all(
-    rules.map(async ([rname, fn]) => ({ rule: rname, violations: await fn(supabase) }))
+    rules.map(async ([rname, fn]) => ({
+      rule: rname,
+      violations: await fn(supabase),
+      area: inferArea(rname),
+    }))
   )
   const errors = detail.reduce((s, r) => s + r.violations, 0)
 
@@ -115,6 +217,14 @@ export async function runQuality(supabase: SupabaseClient, datasetId: string) {
     error_rate: Math.round(rate * 100000) / 100000,
     passed, detail, ran_at: ranAt,
   })
+
+  // 이력 저장(비교·추이 분석용)
+  await supabase.from('quality_history').insert({
+    dataset_id: datasetId, table_name: cat.table_name, rule_count: rules.length,
+    checked, errors, error_rate: Math.round(rate * 100000) / 100000,
+    passed, detail, ran_at: ranAt,
+  })
+
   return {
     dataset_id: datasetId, table: cat.table_name,
     rule_count: rules.length, checked, errors,
@@ -123,10 +233,192 @@ export async function runQuality(supabase: SupabaseClient, datasetId: string) {
   }
 }
 
-export async function runAll(supabase: SupabaseClient) {
+export async function runAll(supabase: SupabaseClient): Promise<QualityResult[]> {
   const { data: rows } = await supabase.from('catalog').select('dataset_id')
   const results = await Promise.all((rows ?? []).map(r => runQuality(supabase, r.dataset_id)))
-  return results.filter(Boolean)
+  return results.filter(Boolean) as QualityResult[]
+}
+
+export async function getLatestResults(supabase: SupabaseClient): Promise<QualityResult[]> {
+  const { data } = await supabase
+    .from('quality_results')
+    .select('*')
+    .order('ran_at', { ascending: false })
+  return (data ?? []).map(r => ({
+    dataset_id: r.dataset_id,
+    table: r.table_name ?? 'unknown',
+    rule_count: r.rule_count ?? 0,
+    checked: r.checked ?? 0,
+    errors: r.errors ?? 0,
+    error_rate: r.error_rate ?? 0,
+    threshold: ERROR_RATE_THRESHOLD,
+    passed: r.passed ?? false,
+    detail: Array.isArray(r.detail) ? r.detail.map((d: unknown) => ({
+      rule: (d as RuleDetail).rule ?? '',
+      violations: (d as RuleDetail).violations ?? 0,
+      area: ((d as RuleDetail).area ?? inferArea((d as RuleDetail).rule ?? '')) as QualityArea,
+    })) : [],
+    ran_at: r.ran_at ?? new Date().toISOString(),
+  }))
+}
+
+export async function getQualityHistory(
+  supabase: SupabaseClient,
+  datasetId?: string,
+  limit = 100,
+): Promise<QualityHistoryRow[]> {
+  let q = supabase
+    .from('quality_history')
+    .select('*')
+    .order('ran_at', { ascending: false })
+    .limit(limit)
+  if (datasetId) q = q.eq('dataset_id', datasetId)
+  const { data } = await q
+  return (data ?? []).map(h => ({
+    id: h.id,
+    dataset_id: h.dataset_id,
+    table_name: h.table_name ?? 'unknown',
+    rule_count: h.rule_count ?? 0,
+    checked: h.checked ?? 0,
+    errors: h.errors ?? 0,
+    error_rate: h.error_rate ?? 0,
+    passed: h.passed ?? false,
+    detail: Array.isArray(h.detail) ? h.detail.map((d: unknown) => ({
+      rule: (d as RuleDetail).rule ?? '',
+      violations: (d as RuleDetail).violations ?? 0,
+      area: ((d as RuleDetail).area ?? inferArea((d as RuleDetail).rule ?? '')) as QualityArea,
+    })) : [],
+    ran_at: h.ran_at ?? new Date().toISOString(),
+  }))
+}
+
+export interface CompareResult {
+  current: QualityHistoryRow | null
+  previous: QualityHistoryRow | null
+  deltaErrors: number
+  deltaRate: number
+  improved: boolean
+}
+
+export async function getQualityCompare(
+  supabase: SupabaseClient,
+  datasetId: string,
+): Promise<CompareResult> {
+  const rows = await getQualityHistory(supabase, datasetId, 2)
+  const current = rows[0] ?? null
+  const previous = rows[1] ?? null
+  return {
+    current,
+    previous,
+    deltaErrors: (current?.errors ?? 0) - (previous?.errors ?? 0),
+    deltaRate: (current?.error_rate ?? 0) - (previous?.error_rate ?? 0),
+    improved: (current?.error_rate ?? Infinity) < (previous?.error_rate ?? Infinity),
+  }
+}
+
+export function buildQualityIssues(results: QualityResult[]): QualityIssue[] {
+  const issues: QualityIssue[] = []
+  for (const r of results) {
+    for (const d of r.detail) {
+      if (d.violations > 0) {
+        const area = d.area ?? inferArea(d.rule)
+        const checkedPerRule = r.rule_count > 0 ? r.checked / r.rule_count : 0
+        issues.push({
+          area,
+          areaLabel: AREA_LABEL[area],
+          datasetId: r.dataset_id,
+          table: r.table,
+          rule: d.rule,
+          violations: d.violations,
+          severity: getIssueSeverity(d.violations, checkedPerRule),
+          recommendation: makeRecommendation(area, d.rule, d.violations, r.checked),
+        })
+      }
+    }
+  }
+  return issues.sort((a, b) => b.violations - a.violations)
+}
+
+function makeRecommendation(area: QualityArea, rule: string, violations: number, checked: number): string {
+  const pct = checked > 0 ? (violations / checked * 100).toFixed(4) : '0.0000'
+  switch (area) {
+    case 'completeness':
+      return `[${rule}] ${violations.toLocaleString()}건 결측(${pct}%) — 원본에서 누락된 값을 보완하거나 수집 파이프라인에 NOT NULL 검증을 추가하세요.`
+    case 'accuracy':
+      return `[${rule}] ${violations.toLocaleString()}건 정확성 위반(${pct}%) — 범위·부호·단위를 재확인하고 이상치를 정제하세요.`
+    case 'consistency':
+      return `[${rule}] ${violations.toLocaleString()}건 일관성 위반(${pct}%) — 컬럼 간 정합성 규칙을 확인하고 중복/모순 데이터를 제거하세요.`
+    case 'recency':
+      return `[${rule}] ${violations.toLocaleString()}건 최신성 위반(${pct}%) — 연도·기간 범위를 확인하고 최신 데이터로 갱신하세요.`
+    case 'metadata':
+      return `[${rule}] ${violations.toLocaleString()}건 메타데이터 위반(${pct}%) — 코드값·표준 용어를 확인하여 메타데이터를 정비하세요.`
+  }
+}
+
+export function buildAreaSignals(results: QualityResult[]) {
+  const dims: Record<QualityArea, { violations: number; checked: number; rules: number }> = {
+    completeness: { violations: 0, checked: 0, rules: 0 },
+    accuracy:     { violations: 0, checked: 0, rules: 0 },
+    consistency:  { violations: 0, checked: 0, rules: 0 },
+    recency:      { violations: 0, checked: 0, rules: 0 },
+    metadata:     { violations: 0, checked: 0, rules: 0 },
+  }
+  for (const r of results) {
+    for (const d of r.detail) {
+      const area = d.area ?? inferArea(d.rule)
+      dims[area].violations += d.violations
+      dims[area].checked += Math.max(1, Math.round(r.checked / r.rule_count))
+      dims[area].rules += 1
+    }
+  }
+  return (Object.keys(dims) as QualityArea[]).map(name => {
+    const v = dims[name]
+    const hasRules = v.rules > 0
+    return {
+      name,
+      label: AREA_LABEL[name],
+      status: hasRules ? (v.violations === 0 ? 'pass' : 'fail') : 'none' as 'pass' | 'fail' | 'none',
+      violations: v.violations,
+      checked: v.checked,
+      rules: v.rules,
+    }
+  })
+}
+
+export interface AreaComparisonRow {
+  area: QualityArea
+  label: string
+  current: number
+  previous: number
+  delta: number
+}
+
+function areaViolationsFromDetail(detail: RuleDetail[], checkedPerRule: number): Record<QualityArea, number> {
+  const counts: Record<QualityArea, number> = {
+    completeness: 0, accuracy: 0, consistency: 0, recency: 0, metadata: 0,
+  }
+  for (const d of detail) {
+    const area = d.area ?? inferArea(d.rule)
+    counts[area] += d.violations
+  }
+  return counts
+}
+
+export function buildAreaComparison(
+  current: QualityHistoryRow | null,
+  previous: QualityHistoryRow | null,
+): AreaComparisonRow[] {
+  const currentCheckedPerRule = current && current.rule_count > 0 ? current.checked / current.rule_count : 0
+  const previousCheckedPerRule = previous && previous.rule_count > 0 ? previous.checked / previous.rule_count : 0
+  const cur = current ? areaViolationsFromDetail(current.detail, currentCheckedPerRule) : null
+  const prev = previous ? areaViolationsFromDetail(previous.detail, previousCheckedPerRule) : null
+  return (Object.keys(AREA_LABEL) as QualityArea[]).map(area => ({
+    area,
+    label: AREA_LABEL[area],
+    current: cur?.[area] ?? 0,
+    previous: prev?.[area] ?? 0,
+    delta: (cur?.[area] ?? 0) - (prev?.[area] ?? 0),
+  }))
 }
 
 // ─── 업로드 데이터 제네릭 품질 검사 ─────────────────────────────────────────

@@ -6,6 +6,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { inferSchema } from './submission'
 import { randomHex } from './utils'
 import { runAll } from './quality'
+import {
+  isPublicDataPortalUrl,
+  normalizePublicDataPortalResponse,
+  parseXmlOrJson,
+} from './collector/adapters/public-data-portal'
 
 // ─── auth_value 암호화/복호화 ──────────────────────────────────────────────
 const rawSecret = process.env.COLLECTION_SECRET
@@ -245,15 +250,30 @@ async function fetchWithRetry(
   throw lastErr
 }
 
+function parsePayload(text: string, src: CollectionSource): unknown {
+  if (src.resp_format === 'xml') {
+    return parseXmlOrJson(text)
+  }
+  return JSON.parse(text)
+}
+
+function extractRows(payload: unknown, src: CollectionSource): Record<string, unknown>[] {
+  if (src.json_path) {
+    return extractByJsonPath(payload, src.json_path)
+  }
+  if (isPublicDataPortalUrl(src.url)) {
+    return normalizePublicDataPortalResponse(payload)
+  }
+  return Array.isArray(payload) ? payload as Record<string, unknown>[] : [payload as Record<string, unknown>]
+}
+
 async function parseResponse(res: Response, src: CollectionSource): Promise<Record<string, unknown>[]> {
+  const text = await res.text()
   if (src.resp_format === 'csv') {
-    const text = await res.text()
     return parseCsv(text)
   }
-  const json = await res.json()
-  return src.json_path
-    ? extractByJsonPath(json, src.json_path)
-    : (Array.isArray(json) ? json as Record<string, unknown>[] : [json as Record<string, unknown>])
+  const payload = parsePayload(text, src)
+  return extractRows(payload, src)
 }
 
 /** auth_type별 헤더 구성, resp_format별 파싱, 페이지네이션 자동 처리 */
@@ -285,13 +305,14 @@ export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
         [pageParam]: String(pageNo),
         [sizeParam]: String(pageSize),
       }
-      const res  = await fetchWithRetry(src.url, src, extraParams)
-      const json = await res.json()
+      const res     = await fetchWithRetry(src.url, src, extraParams)
+      const text    = await res.text()
+      const payload = parsePayload(text, src)
 
       // totalCount 최초 1회 추출
       if (totalCount === null) {
         const totalParts = totalPath.replace(/^\$\.?/, '').split('.')
-        let cur: unknown = json
+        let cur: unknown = payload
         for (const p of totalParts) {
           cur = (cur as Record<string, unknown>)?.[p]
         }
@@ -299,9 +320,7 @@ export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
         if (isNaN(totalCount)) totalCount = null
       }
 
-      const pageRows: Record<string, unknown>[] = src.json_path
-        ? extractByJsonPath(json, src.json_path)
-        : (Array.isArray(json) ? json as Record<string, unknown>[] : [json as Record<string, unknown>])
+      const pageRows = extractRows(payload, src)
 
       allRows.push(...pageRows)
       pagesFetched++
@@ -343,6 +362,47 @@ export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
       if (pageRows.length < pageSize) break
       offset += pageSize
     }
+    return { rows: allRows.slice(0, MAX_ROWS), rawCount: allRows.length, pagesFetched }
+  }
+
+  // cursor 방식
+  if (paginationType === 'cursor') {
+    const cursorParam    = src.pagination_page_param ?? 'cursor'
+    const limitParam     = src.pagination_size_param ?? 'limit'
+    const pageSize       = src.pagination_size       ?? 1000
+    const nextCursorPath = src.pagination_total_path ?? null
+
+    let allRows: Record<string, unknown>[] = []
+    let cursor: string | null = ''
+    let pagesFetched = 0
+
+    while (allRows.length < MAX_ROWS) {
+      const extraParams: Record<string, string> = { [limitParam]: String(pageSize) }
+      if (cursor) extraParams[cursorParam] = cursor
+
+      const res     = await fetchWithRetry(src.url, src, extraParams)
+      const text    = await res.text()
+      const payload = parsePayload(text, src)
+      const pageRows = extractRows(payload, src)
+
+      allRows.push(...pageRows)
+      pagesFetched++
+
+      if (pageRows.length < pageSize) break
+
+      if (nextCursorPath) {
+        const parts = nextCursorPath.replace(/^\$\.?/, '').split('.')
+        let cur: unknown = payload
+        for (const p of parts) {
+          cur = (cur as Record<string, unknown>)?.[p]
+        }
+        cursor = cur ? String(cur) : null
+        if (!cursor) break
+      } else {
+        break
+      }
+    }
+
     return { rows: allRows.slice(0, MAX_ROWS), rawCount: allRows.length, pagesFetched }
   }
 

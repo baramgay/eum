@@ -19,10 +19,10 @@ export default function DatasetStats({ datasetId }: { datasetId: string }) {
   }, [datasetId])
 
   if (loading) {
-    return <div className="text-center py-8 text-gray-400 text-sm">통계 산출 중...</div>
+    return <div className="text-center py-8 text-gray-400 dark:text-gray-300 text-sm">통계 산출 중...</div>
   }
   if (!stats || stats.rowCount === 0) {
-    return <div className="text-center py-8 text-gray-400 text-sm">통계 데이터가 없습니다.</div>
+    return <div className="text-center py-8 text-gray-400 dark:text-gray-300 text-sm">통계 데이터가 없습니다.</div>
   }
 
   return (
@@ -41,31 +41,31 @@ export default function DatasetStats({ datasetId }: { datasetId: string }) {
       {/* 컬럼 기초 통계 테이블 */}
       <div className="overflow-x-auto rounded border text-xs">
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 dark:bg-gray-950">
             <tr>
               {['컬럼', '타입', '건수', 'NULL', '고유값', '최솟값', '최댓값', '평균'].map(h => (
-                <th key={h} className="px-3 py-1.5 text-left text-gray-600 font-medium whitespace-nowrap">{h}</th>
+                <th key={h} className="px-3 py-1.5 text-left text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {stats.columns.map(c => (
-              <tr key={c.name} className="hover:bg-gray-50">
-                <td className="px-3 py-1.5 font-mono text-gray-700 max-w-[120px] truncate">{c.name}</td>
+              <tr key={c.name} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                <td className="px-3 py-1.5 font-mono text-gray-700 dark:text-gray-300 max-w-[120px] truncate">{c.name}</td>
                 <td className="px-3 py-1.5">
                   <span className={`px-1.5 py-0.5 rounded text-xs ${
                     c.type === 'number' ? 'bg-blue-100 text-blue-700'
                     : c.type === 'date' ? 'bg-green-100 text-green-700'
                     : c.type === 'boolean' ? 'bg-purple-100 text-purple-700'
-                    : 'bg-gray-100 text-gray-600'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                   }`}>{c.type}</span>
                 </td>
-                <td className="px-3 py-1.5 text-gray-600">{c.count.toLocaleString()}</td>
-                <td className="px-3 py-1.5 text-gray-400">{c.nullCount}</td>
-                <td className="px-3 py-1.5 text-gray-600">{c.uniqueCount.toLocaleString()}</td>
-                <td className="px-3 py-1.5 text-gray-600">{c.min?.toLocaleString() ?? '—'}</td>
-                <td className="px-3 py-1.5 text-gray-600">{c.max?.toLocaleString() ?? '—'}</td>
-                <td className="px-3 py-1.5 text-gray-600">{c.mean != null ? c.mean.toFixed(1) : '—'}</td>
+                <td className="px-3 py-1.5 text-gray-600 dark:text-gray-400">{c.count.toLocaleString()}</td>
+                <td className="px-3 py-1.5 text-gray-400 dark:text-gray-300">{c.nullCount}</td>
+                <td className="px-3 py-1.5 text-gray-600 dark:text-gray-400">{c.uniqueCount.toLocaleString()}</td>
+                <td className="px-3 py-1.5 text-gray-600 dark:text-gray-400">{c.min?.toLocaleString() ?? '—'}</td>
+                <td className="px-3 py-1.5 text-gray-600 dark:text-gray-400">{c.max?.toLocaleString() ?? '—'}</td>
+                <td className="px-3 py-1.5 text-gray-600 dark:text-gray-400">{c.mean != null ? c.mean.toFixed(1) : '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -75,7 +75,7 @@ export default function DatasetStats({ datasetId }: { datasetId: string }) {
       {/* 시계열 분포 */}
       {stats.timeseries && stats.timeseries.length > 1 && (
         <div>
-          <p className="text-xs font-medium text-gray-500 mb-2">시계열 분포 ({stats.dateColumn})</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">시계열 분포 ({stats.dateColumn})</p>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={stats.timeseries} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -94,7 +94,7 @@ export default function DatasetStats({ datasetId }: { datasetId: string }) {
         .slice(0, 2)
         .map(c => (
           <div key={c.name}>
-            <p className="text-xs font-medium text-gray-500 mb-2">{c.name} 히스토그램</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{c.name} 히스토그램</p>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={c.histogram} margin={{ top: 4, right: 8, left: 0, bottom: 4 }}>
                 <XAxis dataKey="bin" tick={{ fontSize: 9 }} />

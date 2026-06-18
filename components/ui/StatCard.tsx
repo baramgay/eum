@@ -19,14 +19,14 @@ const colorMap: Record<Color, string> = {
 }
 export default function StatCard({ label, value, color = 'blue', icon, trend, trendUp }: StatCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
       <div className="flex items-start justify-between">
-        <p className="text-sm text-gray-500">{label}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
         {icon && <span className="text-xl">{icon}</span>}
       </div>
       <p className={`text-3xl font-bold mt-2 ${colorMap[color]}`}>{value}</p>
       {trend && (
-        <p className={`text-xs mt-1 ${trendUp ? 'text-green-600' : 'text-red-500'}`}>
+        <p className={`text-xs mt-1 ${trendUp ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
           {trendUp ? '▲' : '▼'} {trend}
         </p>
       )}

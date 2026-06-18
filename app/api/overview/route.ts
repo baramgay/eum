@@ -1,13 +1,23 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { computeIndicators } from '@/lib/evaluation'
 import { jsonOk } from '@/lib/api'
+import { unstable_cache } from 'next/cache'
+
+const getCachedIndicators = unstable_cache(
+  async () => {
+    const supabase = await createServiceClient()
+    return computeIndicators(supabase)
+  },
+  ['overview-indicators'],
+  { revalidate: 60, tags: ['overview'] }
+)
 
 function formatDate(d: Date) {
   return d.toISOString().slice(0, 10)
 }
 
 export async function GET() {
-  const supabase = await createClient()
+  const supabase = await createServiceClient()
   const today    = formatDate(new Date())
   const sevenAgo = formatDate(new Date(Date.now() - 6 * 24 * 60 * 60 * 1000))
 
@@ -20,7 +30,7 @@ export async function GET() {
     { data: collectLogs7d },
     { data: qualityAll },
   ] = await Promise.all([
-    computeIndicators(supabase),
+    getCachedIndicators(),
     supabase.from('analysis_runs').select('*', { count: 'exact', head: true }).gte('created_at', today),
     supabase.from('processing_runs').select('*', { count: 'exact', head: true }).gte('started_at', today).eq('status', 'done'),
     supabase.from('collection_sources').select('*', { count: 'exact', head: true }),
@@ -83,5 +93,9 @@ export async function GET() {
       topIssues,
     },
     trend,
+  }, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+    },
   })
 }

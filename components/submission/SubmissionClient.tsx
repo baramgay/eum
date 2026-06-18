@@ -1,10 +1,19 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import SubmissionDetail from './SubmissionDetail'
-import { Upload, CheckCircle2, AlertCircle, FileSpreadsheet, Loader2, Search, Filter } from 'lucide-react'
+import {
+  Upload, CheckCircle2, AlertCircle, FileSpreadsheet, Loader2, Search, Filter,
+  ArrowUpDown, X,
+} from 'lucide-react'
 import toast from 'react-hot-toast'
-import { StatCard, Badge, EmptyState } from '@/components/ui'
+import PageHeader from '@/components/ui/PageHeader'
+import Card from '@/components/ui/Card'
+import StatCard from '@/components/ui/StatCard'
+import Badge from '@/components/ui/Badge'
+import Btn from '@/components/ui/Btn'
+import EmptyState from '@/components/ui/EmptyState'
+import Skeleton from '@/components/ui/Skeleton'
 
 interface Submission {
   submission_id: string; title: string; status: string; tenant_id: string
@@ -14,6 +23,8 @@ interface Submission {
 
 interface Props { role: string; tenantId: string }
 
+type Sort = 'newest' | 'oldest' | 'title'
+
 const STATUS_LABEL: Record<string, string> = {
   submitted: '검토 대기',
   review:    '검토 중',
@@ -21,12 +32,26 @@ const STATUS_LABEL: Record<string, string> = {
   rejected:  '반려',
 }
 
-const STATUS_COLOR: Record<string, string> = {
-  submitted: 'bg-yellow-100 text-yellow-700',
-  review:    'bg-blue-100 text-blue-700',
-  approved:  'bg-green-100 text-green-700',
-  rejected:  'bg-red-100 text-red-700',
+const STATUS_VARIANT: Record<string, 'amber' | 'blue' | 'green' | 'red' | 'gray'> = {
+  submitted: 'amber',
+  review:    'blue',
+  approved:  'green',
+  rejected:  'red',
 }
+
+const STATUS_OPTIONS = [
+  { value: 'all', label: '전체' },
+  { value: 'submitted', label: '검토 대기' },
+  { value: 'review', label: '검토 중' },
+  { value: 'approved', label: '승인' },
+  { value: 'rejected', label: '반려' },
+]
+
+const SORT_OPTIONS: { value: Sort; label: string }[] = [
+  { value: 'newest', label: '최신순' },
+  { value: 'oldest', label: '오래된순' },
+  { value: 'title', label: '제목순' },
+]
 
 const CHECKLIST = [
   { key: 'title', label: '데이터셋 제목이 명확하게 작성되었습니다.' },
@@ -59,6 +84,7 @@ function inferType(values: string[]): string {
 export default function SubmissionClient({ role, tenantId }: Props) {
   const [items, setItems]       = useState<Submission[]>([])
   const [loading, setLoading]   = useState(true)
+  const [error, setError]       = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [showForm, setShowForm] = useState(false)
@@ -77,13 +103,21 @@ export default function SubmissionClient({ role, tenantId }: Props) {
   const [formTouched, setFormTouched] = useState(false)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [sort, setSort] = useState<Sort>('newest')
 
   const loadList = useCallback(async () => {
     setLoading(true)
-    const params = role === 'center' ? '?all=true' : `?tenant_id=${tenantId}`
-    const r = await fetch(`/api/submission${params}`)
-    setItems(await r.json())
-    setLoading(false)
+    setError(null)
+    try {
+      const params = role === 'center' ? '?all=true' : `?tenant_id=${tenantId}`
+      const r = await fetch(`/api/submission${params}`)
+      if (!r.ok) throw new Error('목록을 불러오지 못했습니다.')
+      setItems(await r.json())
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '데이터를 불러오는 중 오류가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
   }, [role, tenantId])
 
   function parseCSVPreview(file: File) {
@@ -193,21 +227,32 @@ export default function SubmissionClient({ role, tenantId }: Props) {
 
   useEffect(() => { loadList() }, [loadList])
 
-  const filteredItems = items.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || item.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  const filteredItems = useMemo(() => {
+    const result = items.filter(item => {
+      const matchesSearch = item.title.toLowerCase().includes(search.toLowerCase())
+      const matchesStatus = statusFilter === 'all' || item.status === statusFilter
+      return matchesSearch && matchesStatus
+    })
+    result.sort((a, b) => {
+      if (sort === 'newest') return new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()
+      if (sort === 'oldest') return new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime()
+      if (sort === 'title') return a.title.localeCompare(b.title, 'ko-KR')
+      return 0
+    })
+    return result
+  }, [items, search, statusFilter, sort])
 
-  const stats = {
+  const stats = useMemo(() => ({
     total: items.length,
     pending: items.filter(i => i.status === 'submitted').length,
     review:  items.filter(i => i.status === 'review').length,
     approved: items.filter(i => i.status === 'approved').length,
     rejected: items.filter(i => i.status === 'rejected').length,
-  }
+  }), [items])
 
   const allChecked = CHECKLIST.every(c => checks[c.key])
+
+  const canSubmit = allChecked && !uploading
 
   return (
     <div className="space-y-4">
@@ -220,96 +265,78 @@ export default function SubmissionClient({ role, tenantId }: Props) {
         />
       )}
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800">데이터 등록 관리</h2>
-        {role !== 'center' && (
-          <button onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
+      <PageHeader
+        title="데이터 등록 관리"
+        subtitle={role === 'center' ? '기관별 데이터셋 등록 신청을 심사합니다.' : '기관의 데이터셋 등록 신청 현황을 관리합니다.'}
+        action={role !== 'center' && (
+          <Btn onClick={() => setShowForm(!showForm)} variant={showForm ? 'secondary' : 'primary'}>
             {showForm ? '취소' : '데이터 등록'}
-          </button>
+          </Btn>
         )}
-      </div>
+      />
 
       {/* 통계 카드 */}
-      {!loading && items.length > 0 && (
+      {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <StatCard label="총 제출" value={stats.total} color="blue" icon={<FileSpreadsheet className="w-4 h-4" />} />
-          <StatCard label="검토 대기" value={stats.pending} color="amber" icon={<AlertCircle className="w-4 h-4" />} />
-          <StatCard label="검토 중" value={stats.review} color="purple" icon={<Filter className="w-4 h-4" />} />
-          <StatCard label="승인" value={stats.approved} color="green" icon={<CheckCircle2 className="w-4 h-4" />} />
-          <StatCard label="반려" value={stats.rejected} color="red" icon={<AlertCircle className="w-4 h-4" />} />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-[110px]" />
+          ))}
         </div>
-      )}
-
-      {/* 검색·필터 */}
-      {!showForm && items.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="데이터셋 제목 검색"
-              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm"
-          >
-            <option value="all">전체 상태</option>
-            <option value="submitted">검토 대기</option>
-            <option value="review">검토 중</option>
-            <option value="approved">승인</option>
-            <option value="rejected">반려</option>
-          </select>
+      ) : items.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <StatCard label="총 제출" value={stats.total} color="blue" icon={<FileSpreadsheet className="w-5 h-5" />} />
+          <StatCard label="검토 대기" value={stats.pending} color="amber" icon={<AlertCircle className="w-5 h-5" />} />
+          <StatCard label="검토 중" value={stats.review} color="purple" icon={<Filter className="w-5 h-5" />} />
+          <StatCard label="승인" value={stats.approved} color="green" icon={<CheckCircle2 className="w-5 h-5" />} />
+          <StatCard label="반려" value={stats.rejected} color="red" icon={<AlertCircle className="w-5 h-5" />} />
         </div>
-      )}
+      ) : null}
 
       {showForm && (
-        <div className="bg-white rounded-lg border p-5 shadow-sm">
-          <h3 className="font-medium text-gray-800 mb-4">데이터셋 등록</h3>
+        <Card>
+          <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-4">데이터셋 등록</h3>
           <form ref={formRef} onSubmit={handleUpload} className="space-y-4">
             <input type="hidden" name="tenant_id" value={tenantId} />
             <div className="grid md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">제목 *</label>
-                <input name="title" required placeholder="데이터셋 제목"
+                <label htmlFor="submission-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">제목 <span className="text-red-500">*</span></label>
+                <input id="submission-title" name="title" required placeholder="데이터셋 제목"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">주제 *</label>
-                <input name="theme" required placeholder="예: 인구통계"
+                <label htmlFor="submission-theme" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">주제 <span className="text-red-500">*</span></label>
+                <input id="submission-theme" name="theme" required placeholder="예: 인구통계"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">포맷</label>
-                <select name="format"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <label htmlFor="submission-format" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">포맷</label>
+                <select id="submission-format" name="format"
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900">
                   <option value="CSV">CSV</option>
                   <option value="JSON">JSON</option>
                   <option value="XLSX">XLSX</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">라이선스 *</label>
-                <input name="license" required placeholder="공공누리 1유형" defaultValue="공공누리 1유형"
+                <label htmlFor="submission-license" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">라이선스 <span className="text-red-500">*</span></label>
+                <input id="submission-license" name="license" required placeholder="공공누리 1유형" defaultValue="공공누리 1유형"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">설명 *</label>
-              <textarea name="description" required rows={2} placeholder="데이터셋 설명 (20자 이상)"
+              <label htmlFor="submission-description" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">설명 <span className="text-red-500">*</span></label>
+              <textarea id="submission-description" name="description" required rows={3} placeholder="데이터셋 설명 (20자 이상)"
                 onChange={refreshChecks}
-                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">최소 20자 이상 입력해 주세요.</p>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">CSV 파일 *</label>
-              <div
+              <label htmlFor="submission-csv-file" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">CSV 파일 <span className="text-red-500">*</span></label>
+              <button
+                type="button"
                 onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={e => {
@@ -325,27 +352,11 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                   }
                 }}
                 onClick={() => fileInputRef.current?.click()}
-                className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
-                  isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                className={`w-full relative border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
+                  isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                 }`}
               >
-                <input
-                  ref={fileInputRef}
-                  type="file" name="file" accept=".csv"
-                  className="hidden"
-                  onChange={e => {
-                    const file = e.target.files?.[0]
-                    if (file) {
-                      if (file.name.endsWith('.csv')) {
-                        parseCSVPreview(file)
-                      } else {
-                        toast.error('CSV 파일만 업로드할 수 있습니다.')
-                        e.target.value = ''
-                      }
-                    }
-                  }}
-                />
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-500 dark:text-gray-300 text-sm">
                   {filePreview
                     ? <span className="text-blue-600 font-medium flex items-center justify-center gap-1">
                         <FileSpreadsheet className="w-4 h-4" /> {filePreview.fileName} · {filePreview.rowCount.toLocaleString()}행
@@ -353,19 +364,38 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                     : <><span className="text-blue-600 font-medium">CSV 파일을 클릭하거나 드래그</span>하여 올려주세요</>
                   }
                 </p>
-              </div>
+              </button>
+              <input
+                id="submission-csv-file"
+                ref={fileInputRef}
+                type="file" name="file" accept=".csv"
+                className="hidden"
+                onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    if (file.name.endsWith('.csv')) {
+                      parseCSVPreview(file)
+                    } else {
+                      toast.error('CSV 파일만 업로드할 수 있습니다.')
+                      e.target.value = ''
+                    }
+                  }
+                }}
+              />
 
               {filePreview && (
                 <div className="space-y-2 mt-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-medium text-gray-600">컬럼 타입 자동 추론</p>
-                    <button
+                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400">컬럼 타입 자동 추론</p>
+                    <Btn
                       type="button"
+                      size="sm"
+                      variant={checks.preview ? 'secondary' : 'primary'}
                       onClick={() => updateCheck('preview', true)}
-                      className={`text-xs px-2 py-1 rounded border ${checks.preview ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                      className={checks.preview ? '!bg-green-50 !text-green-700 !border-green-200' : ''}
                     >
-                      {checks.preview ? '확인 완료' : '미리보기 확인'}
-                    </button>
+                      {checks.preview ? <><CheckCircle2 className="w-3.5 h-3.5" /> 확인 완료</> : '미리보기 확인'}
+                    </Btn>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {filePreview.schema.map(s => (
@@ -375,33 +405,33 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                           s.type === 'NUMBER' ? 'bg-blue-100 text-blue-700'
                           : s.type === 'DATE' ? 'bg-green-100 text-green-700'
                           : s.type === 'BOOLEAN' ? 'bg-purple-100 text-purple-700'
-                          : 'bg-gray-100 text-gray-600'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                         }`}
                       >
                         {s.name} <span className="opacity-60">{s.type}</span>
                       </span>
                     ))}
                   </div>
-                  <div className="overflow-x-auto rounded border text-xs">
-                    <table className="w-full">
-                      <thead className="bg-gray-50 border-b">
+                  <div className="overflow-x-auto rounded-xl border text-xs">
+                    <table className="w-full min-w-[640px]">
+                      <thead className="bg-gray-50 dark:bg-gray-950 border-b">
                         <tr>
                           {filePreview.headers.map(h => (
-                            <th key={h} className="px-3 py-1.5 text-left text-gray-600 font-medium">{h}</th>
+                            <th key={h} className="px-3 py-1.5 text-left text-gray-600 dark:text-gray-400 font-medium">{h}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
                         {filePreview.rows.map((row, i) => (
-                          <tr key={i} className="hover:bg-gray-50">
+                          <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-950">
                             {row.map((cell, j) => (
-                              <td key={j} className="px-3 py-1 text-gray-700">{cell || '—'}</td>
+                              <td key={j} className="px-3 py-1 text-gray-700 dark:text-gray-300">{cell || '—'}</td>
                             ))}
                           </tr>
                         ))}
                       </tbody>
                     </table>
-                    <div className="px-3 py-1 bg-gray-50 border-t text-gray-400">
+                    <div className="px-3 py-1 bg-gray-50 dark:bg-gray-950 border-t text-gray-400 dark:text-gray-300">
                       전체 {filePreview.rowCount.toLocaleString()}행 · 미리보기 {Math.min(5, filePreview.rowCount)}행
                     </div>
                   </div>
@@ -412,11 +442,11 @@ export default function SubmissionClient({ role, tenantId }: Props) {
             {/* 업로드 진행률 */}
             {uploading && (
               <div className="space-y-1">
-                <div className="flex justify-between text-xs text-gray-600">
+                <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                   <span className="flex items-center gap-1"><Loader2 className="w-3.5 h-3.5 animate-spin" /> 업로드 중...</span>
                   <span>{uploadProgress}%</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-blue-600 transition-all duration-200"
                     style={{ width: `${uploadProgress}%` }}
@@ -426,8 +456,8 @@ export default function SubmissionClient({ role, tenantId }: Props) {
             )}
 
             {/* 심사 요청 체크리스트 */}
-            <div className={`rounded-lg border p-4 space-y-2 ${formTouched && !allChecked ? 'bg-red-50 border-red-200' : 'bg-gray-50'}`}>
-              <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+            <div className={`rounded-xl border p-4 space-y-2 ${formTouched && !allChecked ? 'bg-red-50 border-red-200' : 'bg-gray-50 dark:bg-gray-950'}`}>
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" /> 심사 요청 전 체크리스트
               </h4>
               <div className="space-y-1.5">
@@ -442,7 +472,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                         className="mt-0.5"
                         readOnly
                       />
-                      <span className={ok ? 'text-gray-700' : 'text-gray-500'}>{c.label}</span>
+                      <span className={ok ? 'text-gray-700 dark:text-gray-300' : 'text-gray-500 dark:text-gray-400'}>{c.label}</span>
                       {formTouched && !ok && <AlertCircle className="w-3.5 h-3.5 text-red-500 ml-auto shrink-0" />}
                     </label>
                   )
@@ -450,35 +480,94 @@ export default function SubmissionClient({ role, tenantId }: Props) {
               </div>
             </div>
 
-            <button type="submit" disabled={uploading}
-              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50">
-              {uploading ? '등록 중...' : '심사 요청'}
-            </button>
+            <div className="flex items-center gap-2">
+              <Btn type="submit" loading={uploading} disabled={!canSubmit}>
+                {uploading ? '등록 중...' : '심사 요청'}
+              </Btn>
+              <Btn type="button" variant="ghost" onClick={() => { setShowForm(false); setFormTouched(false) }} disabled={uploading}>
+                취소
+              </Btn>
+            </div>
           </form>
-        </div>
+        </Card>
+      )}
+
+      {/* 검색·필터·정렬 */}
+      {!showForm && items.length > 0 && (
+        <Card padding="sm" className="flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="데이터셋 제목 검색"
+                className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <select
+                value={sort}
+                onChange={e => setSort(e.target.value as Sort)}
+                className="px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-900"
+              >
+                {SORT_OPTIONS.map(o => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {STATUS_OPTIONS.map(opt => {
+              const active = statusFilter === opt.value
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => setStatusFilter(opt.value)}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${
+                    active
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              )
+            })}
+          </div>
+        </Card>
       )}
 
       {loading ? (
-        <div className="space-y-4 animate-pulse">
-          <div className="flex justify-between items-center">
-            <div className="h-6 bg-gray-200 rounded w-36" />
-            <div className="h-9 bg-gray-200 rounded w-28" />
-          </div>
+        <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg border p-4">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2 flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-1/2" />
-                  <div className="h-3 bg-gray-100 rounded w-1/3" />
-                </div>
-                <div className="h-6 bg-gray-100 rounded-full w-14" />
+            <Card key={i} padding="sm" className="flex items-start justify-between">
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-1/3" />
               </div>
-            </div>
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </Card>
           ))}
         </div>
+      ) : error ? (
+        <EmptyState
+          icon={<AlertCircle className="w-8 h-8 text-red-500" />}
+          title="목록을 불러오지 못했습니다"
+          description={error}
+          action={{ label: '다시 시도', onClick: loadList }}
+        />
       ) : items.length === 0 ? (
         <EmptyState
-          icon="📤"
+          icon={<Upload className="w-8 h-8 text-gray-400 dark:text-gray-300" />}
           title={role === 'center' ? '아직 접수된 데이터셋 신청이 없습니다' : '등록된 데이터셋이 없습니다'}
           description={role === 'center'
             ? '기관이 데이터를 등록하면 여기에 표시됩니다.'
@@ -486,65 +575,69 @@ export default function SubmissionClient({ role, tenantId }: Props) {
           action={role !== 'center' ? { label: '첫 데이터셋 등록하기', onClick: () => setShowForm(true) } : undefined}
         />
       ) : filteredItems.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 text-sm">
-          검색·필터 조건에 맞는 데이터셋이 없습니다.
-        </div>
+        <Card>
+          <div className="text-center py-16 text-gray-400 dark:text-gray-300 text-sm">
+            검색·필터 조건에 맞는 데이터셋이 없습니다.
+          </div>
+        </Card>
       ) : (
-        <div className="bg-white rounded-lg border overflow-hidden shadow-sm">
+        <Card className="overflow-hidden p-0">
           {role === 'center' && (
-            <div className="px-4 py-2 bg-blue-50 border-b text-xs text-blue-600">
+            <div className="px-4 py-2.5 bg-blue-50 border-b text-xs text-blue-600 flex items-center gap-1.5">
+              <AlertCircle className="w-3.5 h-3.5" />
               행을 클릭하면 상세 내용 확인 및 심사가 가능합니다.
             </div>
           )}
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">제목</th>
-                {role === 'center' && <th className="px-4 py-2 text-left text-gray-600 font-medium">기관</th>}
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">상태</th>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">품질</th>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">등록일</th>
-                {role === 'center' && <th className="px-4 py-2 text-left text-gray-600 font-medium">코멘트</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredItems.map(item => (
-                <tr
-                  key={item.submission_id}
-                  onClick={role === 'center' ? () => setSelectedId(item.submission_id) : undefined}
-                  className={`hover:bg-gray-50 ${role === 'center' ? 'cursor-pointer' : ''}`}
-                >
-                  <td className="px-4 py-2 text-gray-800">
-                    {item.title}
-                    {role === 'center' && <span className="ml-1 text-xs text-blue-400">→</span>}
-                  </td>
-                  {role === 'center' && (
-                    <td className="px-4 py-2 text-gray-500 text-xs font-mono">{item.tenant_id}</td>
-                  )}
-                  <td className="px-4 py-2">
-                    <Badge variant={
-                      item.status === 'approved' ? 'green' :
-                      item.status === 'rejected' ? 'red' :
-                      item.status === 'review' ? 'blue' :
-                      item.status === 'submitted' ? 'amber' : 'gray'
-                    }>
-                      {STATUS_LABEL[item.status] ?? item.status}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-2 text-xs text-gray-500">{item.quality_summary ?? '—'}</td>
-                  <td className="px-4 py-2 text-xs text-gray-400">
-                    {new Date(item.submitted_at).toLocaleDateString('ko-KR')}
-                  </td>
-                  {role === 'center' && (
-                    <td className="px-4 py-2 text-xs text-gray-400">
-                      {item.consultant_comments?.[0]?.count ?? 0}건
-                    </td>
-                  )}
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-sm">
+              <thead className="bg-gray-50 dark:bg-gray-950">
+                <tr>
+                  <th className="px-4 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">제목</th>
+                  {role === 'center' && <th className="px-4 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">기관</th>}
+                  <th className="px-4 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">상태</th>
+                  <th className="px-4 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">품질</th>
+                  <th className="px-4 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">등록일</th>
+                  {role === 'center' && <th className="px-4 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">코멘트</th>}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredItems.map(item => (
+                  <tr
+                    key={item.submission_id}
+                    onClick={role === 'center' ? () => setSelectedId(item.submission_id) : undefined}
+                    className={`transition-colors ${role === 'center' ? 'cursor-pointer hover:bg-blue-50/60' : 'hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                  >
+                    <td className="px-4 py-3 text-gray-800 dark:text-gray-200">
+                      <span className="font-medium">{item.title}</span>
+                      {role === 'center' && <span className="ml-1 text-xs text-blue-400">→</span>}
+                    </td>
+                    {role === 'center' && (
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs font-mono">{item.tenant_id}</td>
+                    )}
+                    <td className="px-4 py-3">
+                      <Badge variant={STATUS_VARIANT[item.status] ?? 'gray'}>
+                        {STATUS_LABEL[item.status] ?? item.status}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">{item.quality_summary ?? '—'}</td>
+                    <td className="px-4 py-3 text-xs text-gray-400 dark:text-gray-300">
+                      {new Date(item.submitted_at).toLocaleDateString('ko-KR')}
+                    </td>
+                    {role === 'center' && (
+                      <td className="px-4 py-3 text-xs text-gray-400 dark:text-gray-300">
+                        {item.consultant_comments?.[0]?.count ?? 0}건
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-950 border-t text-xs text-gray-400 dark:text-gray-300 flex items-center justify-between">
+            <span>총 {filteredItems.length}건</span>
+            <span className="flex items-center gap-1"><ArrowUpDown className="w-3.5 h-3.5" /> {SORT_OPTIONS.find(o => o.value === sort)?.label}</span>
+          </div>
+        </Card>
       )}
     </div>
   )

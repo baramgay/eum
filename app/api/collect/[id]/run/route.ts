@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { runCollection } from '@/lib/collector'
+import { createNotification } from '@/lib/notifications'
 import type { CollectionJob } from '@/lib/collector'
 
 type Params = { params: Promise<{ id: string }> }
@@ -47,10 +48,24 @@ export async function POST(req: Request, { params }: Params) {
       .eq('log_id', logId)
       .maybeSingle()
 
+    const status = log?.status ?? 'success'
+    const rowsFetched = log?.rows_fetched ?? 0
+
+    void (async () => {
+      const ok = status === 'success' || status === 'done'
+      await createNotification({
+        tenant_id: job.tenant_id,
+        type: ok ? 'collection_complete' : 'collection_fail',
+        title: ok ? `수집 완료 — ${job.source_id}` : `수집 실패 — ${job.source_id}`,
+        message: ok ? `${rowsFetched.toLocaleString()}행 수집 완료` : undefined,
+        link: `/collect`,
+      })
+    })()
+
     return NextResponse.json({
       log_id:      logId,
-      status:      log?.status ?? 'success',
-      rows_fetched: log?.rows_fetched ?? 0,
+      status,
+      rows_fetched: rowsFetched,
     })
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)

@@ -1,12 +1,18 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Rule } from '@/lib/processor'
 import RuleEditor from './RuleEditor'
 import toast from 'react-hot-toast'
-import { Settings2, BarChart2, Search, Play, History } from 'lucide-react'
-import { StatCard, Badge, EmptyState } from '@/components/ui'
+import { useRealtime } from '@/components/realtime/RealtimeProvider'
+import { subscribeTable } from '@/lib/supabase/realtime'
+import {
+  Settings2, BarChart2, Search, Play, History, ArrowUpDown,
+  Filter, Trash2, Edit3, AlertCircle, CheckCircle2, XCircle,
+  Loader2, Clock, Network,
+} from 'lucide-react'
+import { StatCard, Badge, EmptyState, Card, Btn, PageHeader, Skeleton } from '@/components/ui'
 
 interface Pipeline {
   id: string
@@ -29,6 +35,8 @@ interface RunRecord {
   started_at: string
   finished_at: string | null
   result_dataset_id: string | null
+  result_table?: string | null
+  error_log?: unknown[]
 }
 
 interface RunResult {
@@ -38,6 +46,16 @@ interface RunResult {
   output_rows: number
   error_rows: number
   dataset_id: string
+  result_table?: string | null
+}
+
+interface LineageNode {
+  id: string
+  run_type: string
+  run_id: string
+  source_ids: string[] | null
+  target_table: string
+  created_at: string
 }
 
 interface Props { role: string; tenantId: string }
@@ -47,6 +65,8 @@ const SOURCE_KIND_LABEL: Record<string, string> = {
   catalog: '카탈로그',
   gold:    'Gold 테이블',
 }
+
+type SortKey = 'created_desc' | 'created_asc' | 'name_asc' | 'name_desc'
 
 export default function ProcessClient({ role, tenantId }: Props) {
   const router = useRouter()
@@ -59,45 +79,154 @@ export default function ProcessClient({ role, tenantId }: Props) {
   const [runResult, setRunResult]     = useState<{ id: string; result: RunResult } | null>(null)
   const [runsMap, setRunsMap]         = useState<Record<string, RunRecord[]>>({})
   const [search, setSearch]           = useState('')
+  const [sourceFilter, setSourceFilter] = useState<string>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'not_run' | 'running' | 'done' | 'failed'>('all')
+  const [sortBy, setSortBy]           = useState<SortKey>('created_desc')
+  const [error, setError]             = useState<string | null>(null)
+  const [historyLoadingId, setHistoryLoadingId] = useState<string | null>(null)
+  const [deleteLoadingId, setDeleteLoadingId]   = useState<string | null>(null)
+  const [lineageMap, setLineageMap]     = useState<Record<string, LineageNode[]>>({})
+  const [lineageLoadingId, setLineageLoadingId] = useState<string | null>(null)
+
+  const isReadOnly = role === 'viewer'
 
   // collect_source 파라미터로 pre-fill
   const collectSource = searchParams?.get('collect_source') ?? ''
-  const [form, setForm]               = useState({
+  const [form, setForm] = useState({
     name: '', description: '', source_kind: collectSource ? 'catalog' : 'upload',
     source_dataset_id: collectSource,
   })
 
+  const handleFetchError = useCallback(async (res: Response, fallback: string) => {
+    let msg = fallback
+    try {
+      const data = await res.json()
+      if (data.error) msg = data.error
+      if (data.details && Array.isArray(data.details)) {
+        msg += ': ' + data.details.map((d: { message?: string }) => d.message).join(', ')
+      }
+    } catch {
+      msg = `${fallback} (HTTP ${res.status})`
+    }
+    toast.error(msg)
+  }, [])
+
+  const loadRuns = useCallback(async (pipelineId: string) => {
+    try {
+      const res = await fetch(`/api/process/${pipelineId}`)
+      if (!res.ok) return
+      const data = await res.json()
+      if (data.runs) {
+        setRunsMap(prev => ({ ...prev, [pipelineId]: data.runs }))
+      }
+    } catch {
+      // 이력 로드 실패는 침묵 처리
+    }
+  }, [])
+
+  const refreshHistory = useCallback(async (pipelineId: string) => {
+    setHistoryLoadingId(pipelineId)
+    try { await loadRuns(pipelineId) } finally { setHistoryLoadingId(null) }
+  }, [loadRuns])
+
+  const loadLineage = useCallback(async (runId: string, targetTable: string) => {
+    setLineageLoadingId(runId)
+    try {
+      const res = await fetch(`/api/lineage?target_table=${encodeURIComponent(targetTable)}`)
+      if (!res.ok) return
+      const data = await res.json()
+      if (Array.isArray(data.lineage)) {
+        setLineageMap(prev => ({ ...prev, [runId]: data.lineage }))
+      }
+    } catch {
+      // 계보 로드 실패는 침묵 처리
+    } finally {
+      setLineageLoadingId(null)
+    }
+  }, [])
+
   const load = useCallback(async () => {
     setLoading(true)
-    const qs = role !== 'center' ? `?tenant_id=${tenantId}` : ''
-    const res = await fetch(`/api/process${qs}`)
-    const data = await res.json()
-    setPipelines(Array.isArray(data) ? data : [])
-    setLoading(false)
-  }, [role, tenantId])
+    setError(null)
+    try {
+      const qs = role !== 'center' ? `?tenant_id=${tenantId}` : ''
+      const res = await fetch(`/api/process${qs}`)
+      if (!res.ok) {
+        const msg = '파이프라인 목록을 불러오지 못했습니다'
+        await handleFetchError(res, msg)
+        setError(`${msg} (HTTP ${res.status})`)
+        setPipelines([])
+        return
+      }
+      const data = await res.json()
+      const list = Array.isArray(data) ? data : []
+      setPipelines(list)
+      // 각 파이프라인의 최근 이력을 백그라운드로 로드
+      list.forEach((p: Pipeline) => loadRuns(p.id))
+    } catch {
+      const msg = '파이프라인 목록을 불러오지 못했습니다'
+      toast.error(msg)
+      setError(msg)
+      setPipelines([])
+    } finally {
+      setLoading(false)
+    }
+  }, [role, tenantId, handleFetchError, loadRuns])
 
   useEffect(() => { load() }, [load])
   useEffect(() => { if (collectSource) setShowForm(true) }, [collectSource])
 
-  const filteredPipelines = pipelines.filter(p =>
-    (p.name + ' ' + (p.description ?? '') + ' ' + p.source_dataset_id).toLowerCase().includes(search.toLowerCase())
-  )
+  // 실시간 가공 실행 구독
+  const realtime = useRealtime()
+  useEffect(() => {
+    const sub = subscribeTable(realtime, 'processing_runs', () => load(), { event: 'INSERT' })
+    return () => { sub.unsubscribe() }
+  }, [realtime, load])
 
-  const totalRules = pipelines.reduce((sum, p) => sum + (p.rules?.length ?? 0), 0)
-  const recentRuns = Object.values(runsMap).flat()
-  const doneRuns   = recentRuns.filter(r => r.status === 'done').length
-  const failedRuns = recentRuns.filter(r => r.status === 'failed').length
+  // 실행 중인 run이 있으면 주기적으로 새로고침
+  useEffect(() => {
+    const runningPipelines = Object.entries(runsMap)
+      .filter(([, runs]) => runs.some(r => r.status === 'running'))
+      .map(([id]) => id)
+    if (runningPipelines.length === 0) return
+    const interval = setInterval(() => {
+      runningPipelines.forEach(id => loadRuns(id))
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [runsMap, loadRuns])
 
-  async function loadRuns(pipelineId: string) {
-    const res = await fetch(`/api/process/${pipelineId}`)
-    const data = await res.json()
-    if (data.runs) {
-      setRunsMap(prev => ({ ...prev, [pipelineId]: data.runs }))
-    }
-  }
+  const filteredPipelines = useMemo(() => {
+    let list = pipelines.filter(p => {
+      const text = (p.name + ' ' + (p.description ?? '') + ' ' + p.source_dataset_id).toLowerCase()
+      const matchesSearch = text.includes(search.toLowerCase())
+      const matchesSource = sourceFilter === 'all' || p.source_kind === sourceFilter
+      const run = runsMap[p.id]?.[0]
+      const matchesStatus = statusFilter === 'all' ||
+        (statusFilter === 'not_run' ? !run : run?.status === statusFilter)
+      return matchesSearch && matchesSource && matchesStatus
+    })
+    list = [...list].sort((a, b) => {
+      switch (sortBy) {
+        case 'name_asc':  return a.name.localeCompare(b.name)
+        case 'name_desc': return b.name.localeCompare(a.name)
+        case 'created_asc': return a.created_at.localeCompare(b.created_at)
+        case 'created_desc': return b.created_at.localeCompare(a.created_at)
+      }
+    })
+    return list
+  }, [pipelines, search, sourceFilter, statusFilter, sortBy, runsMap])
+
+  const totalRules = useMemo(() =>
+    pipelines.reduce((sum, p) => sum + (p.rules?.length ?? 0), 0),
+  [pipelines])
+
+  const recentRuns = useMemo(() => Object.values(runsMap).flat(), [runsMap])
+  const doneRuns   = useMemo(() => recentRuns.filter(r => r.status === 'done').length, [recentRuns])
+  const failedRuns = useMemo(() => recentRuns.filter(r => r.status === 'failed').length, [recentRuns])
 
   async function createPipeline(e: React.FormEvent) {
     e.preventDefault()
+    if (isReadOnly) return
     const body = {
       tenant_id:         tenantId,
       name:              form.name,
@@ -106,68 +235,158 @@ export default function ProcessClient({ role, tenantId }: Props) {
       source_dataset_id: form.source_dataset_id,
       rules:             [],
     }
-    await fetch('/api/process', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    setShowForm(false)
-    setForm({ name: '', description: '', source_kind: 'upload', source_dataset_id: '' })
-    toast.success('파이프라인이 생성되었습니다.')
-    load()
+    try {
+      const res = await fetch('/api/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) {
+        await handleFetchError(res, '파이프라인 생성 실패')
+        return
+      }
+      setShowForm(false)
+      setForm({ name: '', description: '', source_kind: 'upload', source_dataset_id: '' })
+      toast.success('파이프라인이 생성되었습니다.')
+      load()
+    } catch {
+      toast.error('파이프라인 생성 중 오류가 발생했습니다')
+    }
   }
 
   async function deletePipeline(id: string) {
+    if (isReadOnly) return
     if (!confirm('파이프라인을 삭제하시겠습니까?')) return
-    await fetch(`/api/process/${id}`, { method: 'DELETE' })
-    toast('파이프라인이 삭제되었습니다.')
-    load()
+    setDeleteLoadingId(id)
+    try {
+      const res = await fetch(`/api/process/${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        await handleFetchError(res, '파이프라인 삭제 실패')
+        return
+      }
+      toast.success('파이프라인이 삭제되었습니다.')
+      load()
+    } catch {
+      toast.error('파이프라인 삭제 중 오류가 발생했습니다')
+    } finally {
+      setDeleteLoadingId(null)
+    }
   }
 
   async function saveRules(pipeline: Pipeline, rules: Rule[]) {
-    await fetch(`/api/process/${pipeline.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rules }),
-    })
-    setEditTarget(null)
-    toast.success('규칙이 저장되었습니다.')
-    load()
+    if (isReadOnly) return
+    try {
+      const res = await fetch(`/api/process/${pipeline.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rules }),
+      })
+      if (!res.ok) {
+        await handleFetchError(res, '규칙 저장 실패')
+        return
+      }
+      setEditTarget(null)
+      toast.success('규칙이 저장되었습니다.')
+      load()
+    } catch {
+      toast.error('규칙 저장 중 오류가 발생했습니다')
+    }
   }
 
   async function runPipeline(id: string) {
+    if (isReadOnly) return
     setRunningId(id)
     setRunResult(null)
     try {
       const res = await fetch(`/api/process/${id}/run`, { method: 'POST' })
-      const data: RunResult = await res.json()
-      setRunResult({ id, result: data })
-      toast.success(`파이프라인 실행 완료 — ${data.output_rows ?? 0}행 출력`)
+      const data = await res.json()
+      if (!res.ok) {
+        await handleFetchError(res, data.error ?? '파이프라인 실행 실패')
+        return
+      }
+      const result = data as RunResult
+      setRunResult({ id, result })
+      toast.success(`파이프라인 실행 완료 — ${result.output_rows ?? 0}행 출력`)
       loadRuns(id)
+    } catch {
+      toast.error('파이프라인 실행 중 오류가 발생했습니다')
     } finally {
       setRunningId(null)
     }
   }
 
-  if (loading) return (
-    <div className="space-y-4 animate-pulse">
-      <div className="flex justify-between items-center">
-        <div className="h-6 bg-gray-200 rounded w-44" />
-        <div className="h-9 bg-gray-200 rounded w-32" />
+  function lastRunStatus(id: string): RunRecord | undefined {
+    return runsMap[id]?.[0]
+  }
+
+  function LineagePanel({ node, sourceDatasetId, pipelineName }: {
+    node: LineageNode
+    sourceDatasetId: string
+    pipelineName: string
+  }) {
+    const sources = Array.isArray(node.source_ids) ? node.source_ids : [sourceDatasetId]
+    return (
+      <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded text-xs text-blue-800">
+        <div className="flex items-center gap-2 mb-2 font-medium">
+          <Network className="w-3.5 h-3.5" /> 데이터 계보
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {sources.map((s, i) => (
+            <span key={i} className="px-2 py-1 bg-white border border-blue-200 rounded truncate max-w-[140px]" title={s}>
+              {s}
+            </span>
+          ))}
+          <span className="text-blue-400">→</span>
+          <span className="px-2 py-1 bg-white border border-blue-200 rounded truncate max-w-[140px]" title={pipelineName}>
+            {pipelineName}
+          </span>
+          <span className="text-blue-400">→</span>
+          <span className="px-2 py-1 bg-white border border-blue-200 rounded truncate max-w-[140px]" title={node.target_table}>
+            {node.target_table}
+          </span>
+        </div>
       </div>
-      {Array.from({ length: 2 }).map((_, i) => (
-        <div key={i} className="bg-white rounded-lg border p-4">
-          <div className="flex justify-between items-center">
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-36" />
-              <div className="h-3 bg-gray-100 rounded w-48" />
+    )
+  }
+
+  function statusBadge(run?: RunRecord) {
+    if (!run) return <Badge variant="gray">미실행</Badge>
+    if (run.status === 'done')   return <Badge variant="green"><CheckCircle2 className="w-3 h-3 inline mr-1" />성공</Badge>
+    if (run.status === 'failed') return <Badge variant="red"><XCircle className="w-3 h-3 inline mr-1" />실패</Badge>
+    if (run.status === 'running') return <Badge variant="blue"><Loader2 className="w-3 h-3 inline mr-1 animate-spin" />실행 중</Badge>
+    return <Badge variant="gray">{run.status}</Badge>
+  }
+
+  if (loading) return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <Skeleton className="h-8 w-56" />
+        <Skeleton className="h-9 w-32" />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-28" />
+        ))}
+      </div>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Card key={i} padding="md">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-56" />
+              <div className="flex gap-2 pt-1">
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-5 w-20" />
+              </div>
             </div>
-            <div className="flex gap-2">
-              <div className="h-8 bg-gray-100 rounded w-20" />
-              <div className="h-8 bg-gray-100 rounded w-24" />
+            <div className="flex gap-1.5 shrink-0">
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-16" />
             </div>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   )
@@ -175,18 +394,33 @@ export default function ProcessClient({ role, tenantId }: Props) {
   return (
     <div className="space-y-6">
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800">데이터 가공 파이프라인</h2>
-          <p className="text-sm text-gray-500 mt-0.5">규칙 기반 ETL 변환 및 실행</p>
+      <PageHeader
+        title="데이터 가공 파이프라인"
+        subtitle="규칙 기반 ETL 변환 및 실행"
+        action={
+          !isReadOnly ? (
+            <Btn onClick={() => setShowForm(!showForm)}>+ 파이프라인 추가</Btn>
+          ) : undefined
+        }
+      />
+
+      {isReadOnly && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" />
+          viewer 권한으로는 조회만 가능합니다.
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-        >
-          + 파이프라인 추가
-        </button>
-      </div>
+      )}
+
+      {/* 오류 알림 및 재시도 */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <Btn size="sm" variant="secondary" onClick={load}>다시 시도</Btn>
+        </div>
+      )}
 
       {/* 통계 카드 */}
       {!loading && pipelines.length > 0 && (
@@ -198,90 +432,137 @@ export default function ProcessClient({ role, tenantId }: Props) {
         </div>
       )}
 
-      {/* 검색 */}
-      {!showForm && pipelines.length > 0 && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="파이프라인명, 설명, 소스 식별자 검색"
-            className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+      {/* 생성 폼 */}
+      {showForm && !isReadOnly && (
+        <Card>
+          <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-4">새 파이프라인</h3>
+          <form onSubmit={createPipeline} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="proc-pipeline-name" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">파이프라인명 *</label>
+                <input
+                  id="proc-pipeline-name"
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  required
+                  placeholder="예: 청년인구 정제"
+                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                />
+              </div>
+              <div>
+                <label htmlFor="proc-source-kind" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">소스 종류 *</label>
+                <select
+                  id="proc-source-kind"
+                  value={form.source_kind}
+                  onChange={e => setForm(f => ({ ...f, source_kind: e.target.value }))}
+                  className="w-full border rounded px-3 py-2 text-sm"
+                >
+                  <option value="upload">업로드 (table_name)</option>
+                  <option value="catalog">카탈로그 (dataset_id)</option>
+                  <option value="gold">Gold 테이블</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="proc-source-id" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  소스 식별자 *{' '}
+                  <span className="text-gray-400 dark:text-gray-300">
+                    (upload: table_name / catalog: dataset_id)
+                  </span>
+                </label>
+                <input
+                  id="proc-source-id"
+                  value={form.source_dataset_id}
+                  onChange={e => setForm(f => ({ ...f, source_dataset_id: e.target.value }))}
+                  required
+                  placeholder="예: sub_gyeongnam_a1b2c3d4"
+                  className="w-full border rounded px-3 py-2 text-sm"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="proc-description" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">설명</label>
+                <input
+                  id="proc-description"
+                  value={form.description}
+                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  placeholder="선택 입력"
+                  className="w-full border rounded px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Btn type="submit" size="sm">등록</Btn>
+              <Btn type="button" variant="secondary" size="sm" onClick={() => setShowForm(false)}>취소</Btn>
+            </div>
+          </form>
+        </Card>
       )}
 
-      {/* 생성 폼 */}
-      {showForm && (
-        <form
-          onSubmit={createPipeline}
-          className="bg-white rounded-lg border shadow-sm p-5 space-y-4"
-        >
-          <h3 className="font-medium text-gray-700">새 파이프라인</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">파이프라인명 *</label>
+      {/* 검색 및 필터 */}
+      {!showForm && pipelines.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
-                value={form.name}
-                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                required
-                placeholder="예: 청년인구 정제"
-                className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="파이프라인명, 설명, 소스 식별자 검색"
+                className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div>
-              <label className="block text-xs text-gray-500 mb-1">소스 종류 *</label>
-              <select
-                value={form.source_kind}
-                onChange={e => setForm(f => ({ ...f, source_kind: e.target.value }))}
-                className="w-full border rounded px-3 py-2 text-sm"
+            <div className="flex gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-2 border rounded-md bg-white dark:bg-gray-900 text-sm text-gray-600 dark:text-gray-400">
+                <Filter className="w-4 h-4" />
+                <select
+                  value={sourceFilter}
+                  onChange={e => setSourceFilter(e.target.value)}
+                  className="bg-transparent outline-none text-sm"
+                >
+                  <option value="all">전체 소스</option>
+                  <option value="upload">업로드</option>
+                  <option value="catalog">카탈로그</option>
+                  <option value="gold">Gold</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-2 border rounded-md bg-white dark:bg-gray-900 text-sm text-gray-600 dark:text-gray-400">
+                <ArrowUpDown className="w-4 h-4" />
+                <select
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value as SortKey)}
+                  className="bg-transparent outline-none text-sm"
+                >
+                  <option value="created_desc">최신순</option>
+                  <option value="created_asc">오래된순</option>
+                  <option value="name_asc">이름 오름차순</option>
+                  <option value="name_desc">이름 내림차순</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* 상태 빠른 필터 */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: 'all', label: '전체' },
+              { key: 'not_run', label: '미실행' },
+              { key: 'running', label: '실행 중' },
+              { key: 'done', label: '성공' },
+              { key: 'failed', label: '실패' },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setStatusFilter(key as typeof statusFilter)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                  statusFilter === key
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-950'
+                }`}
               >
-                <option value="upload">업로드 (table_name)</option>
-                <option value="catalog">카탈로그 (dataset_id)</option>
-                <option value="gold">Gold 테이블</option>
-              </select>
-            </div>
-            <div className="col-span-2">
-              <label className="block text-xs text-gray-500 mb-1">
-                소스 식별자 *{' '}
-                <span className="text-gray-400">
-                  (upload: table_name / catalog: dataset_id)
-                </span>
-              </label>
-              <input
-                value={form.source_dataset_id}
-                onChange={e => setForm(f => ({ ...f, source_dataset_id: e.target.value }))}
-                required
-                placeholder="예: sub_gyeongnam_a1b2c3d4"
-                className="w-full border rounded px-3 py-2 text-sm"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-xs text-gray-500 mb-1">설명</label>
-              <input
-                value={form.description}
-                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                placeholder="선택 입력"
-                className="w-full border rounded px-3 py-2 text-sm"
-              />
-            </div>
+                {label}
+              </button>
+            ))}
           </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-            >
-              등록
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200"
-            >
-              취소
-            </button>
-          </div>
-        </form>
+        </div>
       )}
 
       {/* 실행 결과 알림 */}
@@ -296,13 +577,9 @@ export default function ProcessClient({ role, tenantId }: Props) {
               )}
             </span>
             {runResult.result.dataset_id && (
-              <button
-                onClick={() => router.push(`/analytics?dataset_id=${runResult.result.dataset_id}`)}
-                className="flex items-center gap-1 px-3 py-1 bg-violet-600 text-white text-xs rounded hover:bg-violet-700"
-              >
-                <BarChart2 className="w-3 h-3" />
-                분석으로
-              </button>
+              <Btn size="sm" onClick={() => router.push(`/analytics?dataset_id=${runResult.result.dataset_id}`)}>
+                <BarChart2 className="w-3 h-3" /> 분석으로
+              </Btn>
             )}
           </div>
           <button
@@ -315,101 +592,191 @@ export default function ProcessClient({ role, tenantId }: Props) {
       )}
 
       {/* 파이프라인 목록 */}
-      {pipelines.length === 0 ? (
+      {!error && pipelines.length === 0 ? (
         <EmptyState
           icon="🔧"
           title="등록된 파이프라인이 없습니다"
           description="규칙 기반 ETL 파이프라인으로 데이터를 자동으로 변환·정제합니다"
-          action={{ label: '첫 파이프라인 만들기', onClick: () => setShowForm(true) }}
+          action={isReadOnly ? undefined : { label: '첫 파이프라인 만들기', onClick: () => setShowForm(true) }}
         />
       ) : filteredPipelines.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 text-sm">
-          검색 조건에 맞는 파이프라인이 없습니다.
-        </div>
+        <EmptyState
+          icon={<Search className="w-6 h-6 text-gray-400 dark:text-gray-300" />}
+          title="검색 조건에 맞는 파이프라인이 없습니다"
+          description="다른 검색어나 필터를 선택해 보세요"
+          action={{
+            label: '필터 초기화',
+            onClick: () => {
+              setSearch('')
+              setSourceFilter('all')
+              setStatusFilter('all')
+              setSortBy('created_desc')
+            },
+          }}
+        />
       ) : (
         <div className="grid gap-4">
-          {filteredPipelines.map(p => (
-            <div key={p.id} className="bg-white rounded-lg border shadow-sm">
-              {/* 카드 헤더 */}
-              <div className="p-4 flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <div className="font-medium text-gray-800 truncate">{p.name}</div>
-                  {p.description && (
-                    <div className="text-xs text-gray-500 mt-0.5 truncate">{p.description}</div>
-                  )}
-                  <div className="flex flex-wrap gap-2 mt-1.5 text-xs text-gray-400">
-                    <Badge variant="gray">{SOURCE_KIND_LABEL[p.source_kind] ?? p.source_kind}</Badge>
-                    <span className="font-mono truncate max-w-[180px]">{p.source_dataset_id}</span>
-                    <Badge variant="purple">규칙 {p.rules.length}개</Badge>
+          {filteredPipelines.map(p => {
+            const lastRun = lastRunStatus(p.id)
+            return (
+              <Card key={p.id} padding="md" hover>
+                {/* 카드 헤더 */}
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="font-medium text-gray-800 dark:text-gray-200 truncate">{p.name}</div>
+                      {statusBadge(lastRun)}
+                    </div>
+                    {p.description && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{p.description}</div>
+                    )}
+                    <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400 items-center">
+                      <Badge variant="gray">{SOURCE_KIND_LABEL[p.source_kind] ?? p.source_kind}</Badge>
+                      <span className="font-mono truncate max-w-[180px] text-gray-400 dark:text-gray-300">{p.source_dataset_id}</span>
+                      <Badge variant="purple">규칙 {p.rules.length}개</Badge>
+                      {lastRun?.finished_at && (
+                        <span className="flex items-center gap-1 text-gray-400 dark:text-gray-300">
+                          <Clock className="w-3 h-3" />
+                          {new Date(lastRun.finished_at).toLocaleString('ko-KR')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5 shrink-0">
+                    {!isReadOnly && (
+                      <>
+                        <Btn variant="secondary" size="sm" onClick={() => setEditTarget(p)}>
+                          <Edit3 className="w-3 h-3" /> 규칙
+                        </Btn>
+                        <Btn
+                          size="sm"
+                          onClick={() => runPipeline(p.id)}
+                          loading={runningId === p.id}
+                          disabled={runningId !== null}
+                        >
+                          <Play className="w-3 h-3" /> {runningId === p.id ? '실행 중' : '실행'}
+                        </Btn>
+                      </>
+                    )}
+                    <Btn
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => refreshHistory(p.id)}
+                      loading={historyLoadingId === p.id}
+                      disabled={historyLoadingId === p.id}
+                      title="실행 이력 보기"
+                    >
+                      <History className="w-3 h-3" /> 이력
+                    </Btn>
+                    {!isReadOnly && (
+                      <Btn
+                        variant="danger"
+                        size="sm"
+                        onClick={() => deletePipeline(p.id)}
+                        loading={deleteLoadingId === p.id}
+                        disabled={deleteLoadingId === p.id || runningId !== null}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Btn>
+                    )}
                   </div>
                 </div>
-                <div className="flex gap-1.5 shrink-0">
-                  <button
-                    onClick={() => setEditTarget(p)}
-                    className="px-3 py-1.5 text-xs text-gray-600 border rounded hover:bg-gray-50"
-                  >
-                    규칙 편집
-                  </button>
-                  <button
-                    onClick={() => runPipeline(p.id)}
-                    disabled={runningId === p.id}
-                    className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {runningId === p.id ? '실행 중...' : '전체 실행'}
-                  </button>
-                  <button
-                    onClick={() => loadRuns(p.id)}
-                    className="px-3 py-1.5 text-xs text-gray-500 border rounded hover:bg-gray-50"
-                    title="실행 이력 보기"
-                  >
-                    이력
-                  </button>
-                  <button
-                    onClick={() => deletePipeline(p.id)}
-                    className="px-3 py-1.5 text-xs text-red-500 border border-red-200 rounded hover:bg-red-50"
-                  >
-                    삭제
-                  </button>
-                </div>
-              </div>
 
-              {/* 실행 이력 */}
-              {runsMap[p.id] && runsMap[p.id].length > 0 && (
-                <div className="border-t px-4 py-3 bg-gray-50">
-                  <p className="text-xs font-medium text-gray-500 mb-2">최근 실행 이력</p>
-                  <div className="space-y-1">
-                    {runsMap[p.id].map(run => (
-                      <div key={run.id} className="flex items-center gap-3 text-xs text-gray-600">
-                        <span className={`inline-block w-14 text-center rounded px-1 py-0.5 font-medium ${
-                          run.status === 'done'    ? 'bg-green-100 text-green-700' :
-                          run.status === 'failed'  ? 'bg-red-100 text-red-600' :
-                          run.status === 'running' ? 'bg-blue-100 text-blue-600' :
-                                                     'bg-gray-100 text-gray-500'
-                        }`}>
-                          {run.status}
-                        </span>
-                        <span>
-                          입력 {(run.input_rows ?? 0).toLocaleString()}행
-                          → 출력 {(run.output_rows ?? 0).toLocaleString()}행
-                        </span>
-                        {run.error_rows > 0 && (
-                          <span className="text-red-500">오류 {run.error_rows}건</span>
-                        )}
-                        <span className="text-gray-400 ml-auto">
-                          {run.started_at ? new Date(run.started_at).toLocaleString('ko-KR') : '—'}
-                        </span>
-                      </div>
-                    ))}
+                {/* 실행 이력 */}
+                {runsMap[p.id] && runsMap[p.id].length > 0 && (
+                  <div className="border-t mt-4 pt-3 bg-gray-50 dark:bg-gray-950 -mx-5 -mb-5 px-5 pb-4 rounded-b-2xl">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">최근 실행 이력</p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs text-left min-w-[520px]">
+                        <thead>
+                          <tr className="text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                            <th className="pb-2 font-medium">상태</th>
+                            <th className="pb-2 font-medium">입/출력</th>
+                            <th className="pb-2 font-medium text-right">오류</th>
+                            <th className="pb-2 font-medium">결과</th>
+                            <th className="pb-2 font-medium text-right">시작일시</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {runsMap[p.id].map(run => {
+                            const lineage = lineageMap[run.id]
+                            const showLineage = lineage !== undefined
+                            return (
+                              <Fragment key={run.id}>
+                                <tr className="text-gray-600 dark:text-gray-400">
+                                  <td className="py-2">{statusBadge(run)}</td>
+                                  <td className="py-2 whitespace-nowrap">
+                                    입력 {(run.input_rows ?? 0).toLocaleString()}행
+                                    <span className="text-gray-400 dark:text-gray-300 mx-1">→</span>
+                                    출력 {(run.output_rows ?? 0).toLocaleString()}행
+                                  </td>
+                                  <td className="py-2 text-right">
+                                    {run.error_rows > 0 ? (
+                                      <Badge variant="red">{run.error_rows}건</Badge>
+                                    ) : (
+                                      <span className="text-gray-400 dark:text-gray-300">—</span>
+                                    )}
+                                  </td>
+                                  <td className="py-2">
+                                    <div className="flex gap-1">
+                                      {run.result_dataset_id && (
+                                        <Btn
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => router.push(`/analytics?dataset_id=${run.result_dataset_id}`)}
+                                        >
+                                          <BarChart2 className="w-3 h-3" /> 분석
+                                        </Btn>
+                                      )}
+                                      {run.result_table && (
+                                        <Btn
+                                          variant="ghost"
+                                          size="sm"
+                                          loading={lineageLoadingId === run.id}
+                                          onClick={() => {
+                                            if (showLineage) {
+                                              setLineageMap(prev => { const n = { ...prev }; delete n[run.id]; return n })
+                                            } else {
+                                              loadLineage(run.id, run.result_table!)
+                                            }
+                                          }}
+                                        >
+                                          <Network className="w-3 h-3" /> 계보
+                                        </Btn>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="py-2 text-right whitespace-nowrap text-gray-400 dark:text-gray-300">
+                                    {run.started_at ? new Date(run.started_at).toLocaleString('ko-KR') : '—'}
+                                  </td>
+                                </tr>
+                                {showLineage && lineage[0] && (
+                                  <tr>
+                                    <td colSpan={5} className="py-0">
+                                      <LineagePanel
+                                        node={lineage[0]}
+                                        sourceDatasetId={p.source_dataset_id}
+                                        pipelineName={p.name}
+                                      />
+                                    </td>
+                                  </tr>
+                                )}
+                              </Fragment>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </Card>
+            )
+          })}
         </div>
       )}
 
       {/* 규칙 편집 모달 */}
-      {editTarget && (
+      {editTarget && !isReadOnly && (
         <RuleEditor
           pipelineId={editTarget.id}
           initialRules={editTarget.rules}

@@ -1341,7 +1341,7 @@ export async function GET() {
 ```ts
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { buildOntology, getGraph, listActions } from '@/lib/ontology'
+import { buildOntology, getGraph, listActions } from '@/lib/ontology/core'
 
 export async function POST() {
   const supabase = await createClient()
@@ -1363,7 +1363,7 @@ export async function GET(req: Request) {
 ```ts
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { scoreAction, listActions } from '@/lib/ontology'
+import { scoreAction, listActions } from '@/lib/ontology/core'
 
 export async function GET(req: Request, { params }: { params: Promise<{ key: string }> }) {
   const { key } = await params
@@ -1488,7 +1488,7 @@ import { getSubmission } from '@/lib/submission'
 import { runQualityGeneric } from '@/lib/quality'
 import { generateQualityRecommendations } from '@/lib/quality'
 import { computeSubmissionContribution, computeAiReadyChecklist } from '@/lib/evaluation'
-import { recommendOntologyCandidates } from '@/lib/ontology'
+import { recommendOntologyCandidates } from '@/lib/ontology/core'
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -1905,7 +1905,7 @@ test('computeSubmissionContribution — approved+comment → open+share 기여',
 - [ ] `__tests__/lib/ontology.test.ts`
 
 ```ts
-import { recommendOntologyCandidates, listActions } from '@/lib/ontology'
+import { recommendOntologyCandidates, listActions } from '@/lib/ontology/core'
 
 test('빈 메타는 빈 배열', () => {
   expect(recommendOntologyCandidates({})).toEqual([])

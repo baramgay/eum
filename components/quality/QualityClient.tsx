@@ -1,9 +1,29 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { CheckCircle2, XCircle, MinusCircle, AlertCircle } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  CheckCircle2, XCircle, AlertCircle, RefreshCw,
+  ChevronDown, ChevronUp, History, BarChart3, ListChecks,
+  AlertTriangle, TrendingDown, TrendingUp, Activity, Filter, Download, Search,
+} from 'lucide-react'
+import {
+  ResponsiveContainer, BarChart, Bar, LineChart, Line,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, PieChart, Pie,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+} from 'recharts'
+import PageHeader from '@/components/ui/PageHeader'
+import Card from '@/components/ui/Card'
+import SortableTable from '@/components/common/SortableTable'
+import StatCard from '@/components/ui/StatCard'
+import Badge from '@/components/ui/Badge'
+import Btn from '@/components/ui/Btn'
+import EmptyState from '@/components/ui/EmptyState'
+import Skeleton from '@/components/ui/Skeleton'
+import { buildAreaSignals, buildQualityIssues, buildAreaComparison, type Severity } from '@/lib/quality'
 
-interface RuleDetail { rule: string; violations: number }
+type QualityArea = 'completeness' | 'accuracy' | 'consistency' | 'recency' | 'metadata'
+
+interface RuleDetail { rule: string; violations: number; area?: QualityArea }
 
 interface QualityResult {
   dataset_id: string
@@ -18,257 +38,913 @@ interface QualityResult {
   ran_at: string
 }
 
-// 5영역 품질 신호등
-interface DimSignal { name: string; label: string; status: 'pass' | 'fail' | 'none'; violations: number; total: number }
-
-function buildDimSignals(results: QualityResult[]): DimSignal[] {
-  const dims: Record<string, { violations: number; total: number }> = {
-    completeness: { violations: 0, total: 0 },
-    accuracy:     { violations: 0, total: 0 },
-    consistency:  { violations: 0, total: 0 },
-    recency:      { violations: 0, total: 0 },
-    metadata:     { violations: 0, total: 0 },
-  }
-  for (const r of results) {
-    for (const d of r.detail) {
-      const n = d.rule
-      let dim = 'accuracy'
-      if (n.includes('NULL') || n.includes('결측')) dim = 'completeness'
-      else if (n.includes('연도'))                  dim = 'recency'
-      else if (n.includes('정합성'))                dim = 'consistency'
-      dims[dim].violations += d.violations
-      dims[dim].total += r.checked / r.rule_count
-    }
-  }
-  const label: Record<string, string> = {
-    completeness: '완전성',
-    accuracy:     '정확성',
-    consistency:  '일관성',
-    recency:      '최신성',
-    metadata:     '메타데이터',
-  }
-  return Object.entries(dims).map(([name, { violations, total }]) => ({
-    name, label: label[name],
-    status: total === 0 ? 'none' : violations === 0 ? 'pass' : 'fail',
-    violations, total: Math.round(total),
-  }))
+interface QualityIssue {
+  area: QualityArea
+  areaLabel: string
+  datasetId: string
+  table: string
+  rule: string
+  violations: number
+  severity: Severity
+  recommendation: string
 }
 
-// 평가편람 품질 영역 지표 매핑
-interface EvalBadge { code: string; label: string; pass: boolean }
-
-function evalBadges(r: QualityResult): EvalBadge[] {
-  return [
-    {
-      code:  '①-2',
-      label: '품질진단 도구',
-      // 결과 행 자체가 있으면 도구 적용 완료
-      pass:  true,
-    },
-    {
-      code:  '②',
-      label: '데이터 값 관리',
-      // 오류율이 기준(threshold) 이하이면 충족
-      pass:  r.error_rate <= r.threshold,
-    },
-    {
-      code:  '③',
-      label: '진단결과 조치',
-      // 통과(passed)이면 오류 보완 완료로 간주
-      pass:  r.passed,
-    },
-  ]
+interface QualityHistoryRow {
+  id: string
+  dataset_id: string
+  table_name: string
+  rule_count: number
+  checked: number
+  errors: number
+  error_rate: number
+  passed: boolean
+  detail: RuleDetail[]
+  ran_at: string
 }
+
+interface CompareResult {
+  current: QualityHistoryRow | null
+  previous: QualityHistoryRow | null
+  deltaErrors: number
+  deltaRate: number
+  improved: boolean
+}
+
+interface AreaSignal {
+  name: QualityArea
+  label: string
+  status: 'pass' | 'fail' | 'none'
+  violations: number
+  checked: number
+  rules: number
+}
+
+const AREA_META: Record<QualityArea, { label: string; color: string; desc: string }> = {
+  completeness: { label: '완전성', color: '#3B82F6', desc: '필수 값 누락/결측' },
+  accuracy:     { label: '정확성', color: '#10B981', desc: '범위·부호·값 오류' },
+  consistency:  { label: '일관성', color: '#8B5CF6', desc: '컬럼 간 정합성' },
+  recency:      { label: '최신성', color: '#F59E0B', desc: '연도·기간 적절성' },
+  metadata:     { label: '메타데이터', color: '#06B6D4', desc: '코드·용어 표준' },
+}
+
+const AREA_ORDER: QualityArea[] = ['completeness', 'accuracy', 'consistency', 'recency', 'metadata']
+
+const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#EC4899', '#6366F1']
+
+function inferArea(rule: string): QualityArea {
+  const n = rule
+  if (n.includes('NULL') || n.includes('결측') || n.includes('누락')) return 'completeness'
+  if (n.includes('연도') || n.includes('최신') || n.includes('기간')) return 'recency'
+  if (n.includes('정합성') || n.includes('중복') || n.includes('일관')) return 'consistency'
+  if (n.includes('메타') || n.includes('코드') || n.includes('유효성')) return 'metadata'
+  return 'accuracy'
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleString('ko-KR')
+}
+
+function truncateId(id: string) {
+  return id.length > 16 ? id.slice(0, 16) + '…' : id
+}
+
+function QualitySkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i}>
+            <Skeleton className="h-3 w-2/3 mb-3" />
+            <Skeleton className="h-8 w-1/2" />
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <Skeleton className="h-4 w-1/4 mb-4" />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="bg-gray-50 dark:bg-gray-950 rounded-xl border p-4">
+              <Skeleton className="w-8 h-8 rounded-full mx-auto mb-2" />
+              <Skeleton className="h-3 w-3/4 mx-auto" />
+            </div>
+          ))}
+        </div>
+      </Card>
+      <Card>
+        <Skeleton className="h-4 w-1/3 mb-4" />
+        <Skeleton className="h-64 w-full" />
+      </Card>
+    </div>
+  )
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <Card>
+      <EmptyState
+        icon={<AlertCircle className="w-6 h-6 text-red-500" />}
+        title="데이터를 불러오지 못했습니다"
+        description={message}
+        action={{ label: '다시 시도', onClick: onRetry }}
+      />
+    </Card>
+  )
+}
+
+function SeverityBadge({ severity }: { severity: Severity }) {
+  const config = {
+    critical: { label: '심각', className: 'bg-red-100 text-red-700 ring-red-200' },
+    high:     { label: '높음', className: 'bg-orange-100 text-orange-700 ring-orange-200' },
+    medium:   { label: '보통', className: 'bg-amber-100 text-amber-700 ring-amber-200' },
+    low:      { label: '낮음', className: 'bg-blue-100 text-blue-700 ring-blue-200' },
+  }[severity]
+  return (
+    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ring-1 ${config.className}`}>
+      {config.label}
+    </span>
+  )
+}
+
+function downloadHistoryCSV(history: QualityHistoryRow[], tableName: string) {
+  const headers = ['검사일', '오류율(%)', '오류건수', '검사건수', '규칙수', '결과']
+  const rows = history.map(h => [
+    formatDate(h.ran_at),
+    h.error_rate.toFixed(4),
+    h.errors.toLocaleString(),
+    h.checked.toLocaleString(),
+    h.rule_count.toLocaleString(),
+    h.passed ? '통과' : '실패',
+  ])
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${tableName}_quality_history.csv`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
+type TabKey = 'results' | 'issues' | 'history'
 
 export default function QualityClient() {
   const [results, setResults]   = useState<QualityResult[]>([])
+  const [history, setHistory]   = useState<QualityHistoryRow[]>([])
   const [loading, setLoading]   = useState(true)
+  const [error, setError]       = useState<string | null>(null)
   const [running, setRunning]   = useState(false)
+  const [activeTab, setActiveTab] = useState<TabKey>('results')
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const [selectedDataset, setSelectedDataset] = useState<string>('')
+  const [resultDatasetFilter, setResultDatasetFilter] = useState<string>('all')
+  const [compare, setCompare]   = useState<CompareResult | null>(null)
+  const [areaFilter, setAreaFilter] = useState<QualityArea | 'all'>('all')
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
-    const r = await fetch('/api/quality')
-    const d = await r.json()
-    setResults(Array.isArray(d) ? d : [])
-    setLoading(false)
-  }
+    setError(null)
+    try {
+      const r = await fetch('/api/quality')
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      const d = await r.json()
+      const arr = Array.isArray(d) ? d : d.results ?? []
+      setResults(arr)
+      if (arr.length > 0) setSelectedDataset(prev => prev || arr[0].dataset_id)
+    } catch (e) {
+      console.error(e)
+      setResults([])
+      setError('품질 검사 결과를 불러오지 못했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const loadHistory = useCallback(async () => {
+    try {
+      const qs = selectedDataset ? `?dataset_id=${encodeURIComponent(selectedDataset)}` : ''
+      const r = await fetch(`/api/quality?view=history${qs}`)
+      const d = await r.json()
+      setHistory(Array.isArray(d) ? d : [])
+    } catch (e) {
+      console.error(e)
+      setHistory([])
+    }
+  }, [selectedDataset])
+
+  const loadCompare = useCallback(async () => {
+    if (!selectedDataset) return
+    try {
+      const r = await fetch(`/api/quality?view=compare&dataset_id=${encodeURIComponent(selectedDataset)}`)
+      const d = await r.json()
+      setCompare(d as CompareResult)
+    } catch (e) {
+      console.error(e)
+      setCompare(null)
+    }
+  }, [selectedDataset])
 
   async function runAll() {
     setRunning(true)
-    await fetch('/api/quality', { method: 'POST' })
-    await load()
-    setRunning(false)
+    try {
+      await fetch('/api/quality', { method: 'POST' })
+      await load()
+      if (activeTab === 'history') await loadHistory()
+      if (activeTab === 'history' || activeTab === 'issues') await loadCompare()
+    } finally {
+      setRunning(false)
+    }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    if (activeTab === 'history') loadHistory()
+    if (activeTab === 'history' || activeTab === 'issues') loadCompare()
+  }, [activeTab, selectedDataset, loadHistory, loadCompare])
+
+  const signals = useMemo(() => buildAreaSignals(results), [results])
+  const issues  = useMemo(() => buildQualityIssues(results), [results])
+  const filteredIssues = useMemo(() =>
+    areaFilter === 'all' ? issues : issues.filter(i => i.area === areaFilter),
+  [issues, areaFilter])
+
+  const filteredResults = useMemo(() =>
+    resultDatasetFilter === 'all'
+      ? results
+      : results.filter(r => r.dataset_id === resultDatasetFilter),
+  [results, resultDatasetFilter])
+
+  useEffect(() => {
+    if (resultDatasetFilter !== 'all' && !results.find(r => r.dataset_id === resultDatasetFilter)) {
+      setResultDatasetFilter('all')
+    }
+  }, [results, resultDatasetFilter])
 
   const passedCount   = results.filter(r => r.passed).length
   const totalDatasets = results.length
   const totalErrors   = results.reduce((s, r) => s + r.errors, 0)
+  const avgErrorRate  = totalDatasets ? results.reduce((s, r) => s + r.error_rate, 0) / totalDatasets : 0
 
-  // 평가편람 요약: 전체 기준 영역 달성 현황
   const allHaveResults  = totalDatasets > 0
   const valueManagePass = allHaveResults && results.every(r => r.error_rate <= r.threshold)
   const actionPass      = allHaveResults && results.every(r => r.passed)
 
+  const issueCountsByArea = useMemo(() => {
+    const counts: Record<QualityArea | 'all', number> = {
+      all: issues.length,
+      completeness: 0, accuracy: 0, consistency: 0, recency: 0, metadata: 0,
+    }
+    for (const i of issues) counts[i.area] += 1
+    return counts
+  }, [issues])
+
+  // 차트 데이터
+  const areaChartData = useMemo(() => signals.map(s => ({
+    name: s.label,
+    위반: s.violations,
+    규칙: s.rules,
+    color: AREA_META[s.name].color,
+  })), [signals])
+
+  const areaScoreData = useMemo(() => signals.map(s => {
+    const checked = Math.max(1, s.checked)
+    const score = s.rules === 0 ? 100 : Math.max(0, (1 - s.violations / checked) * 100)
+    return {
+      area: s.label,
+      score: Number(score.toFixed(1)),
+      fullMark: 100,
+      color: AREA_META[s.name].color,
+    }
+  }), [signals])
+
+  const datasetRadarData = useMemo(() => {
+    const target = resultDatasetFilter === 'all' ? null : filteredResults[0]
+    if (!target) return []
+    const perRule = target.rule_count > 0 ? target.checked / target.rule_count : 0
+    const dims: Record<QualityArea, { violations: number; checked: number }> = {
+      completeness: { violations: 0, checked: 0 },
+      accuracy:     { violations: 0, checked: 0 },
+      consistency:  { violations: 0, checked: 0 },
+      recency:      { violations: 0, checked: 0 },
+      metadata:     { violations: 0, checked: 0 },
+    }
+    for (const d of target.detail) {
+      const area = d.area ?? inferArea(d.rule)
+      dims[area].violations += d.violations
+      dims[area].checked += Math.max(1, Math.round(perRule))
+    }
+    return AREA_ORDER.map(area => {
+      const v = dims[area]
+      const checked = Math.max(1, v.checked)
+      const score = Math.max(0, (1 - v.violations / checked) * 100)
+      return { area: AREA_META[area].label, score: Number(score.toFixed(1)), fullMark: 100 }
+    })
+  }, [filteredResults, resultDatasetFilter])
+
+  const areaCompareData = useMemo(() => {
+    if (!compare?.current) return []
+    return buildAreaComparison(compare.current, compare.previous)
+  }, [compare])
+
+  const historyChartData = useMemo(() => {
+    return [...history].reverse().map(h => ({
+      label: new Date(h.ran_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      오류율: h.error_rate,
+      오류건수: h.errors,
+      passed: h.passed,
+    }))
+  }, [history])
+
+  const datasetStatusData = useMemo(() => filteredResults.map(r => ({
+    name: r.table,
+    오류율: r.error_rate,
+    passed: r.passed,
+  })), [filteredResults])
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800">품질 진단</h2>
-          {totalDatasets > 0 && (
-            <p className="text-sm text-gray-500 mt-0.5">
-              데이터셋 {passedCount}/{totalDatasets} 통과 · 총 오류 {totalErrors.toLocaleString()}건
-            </p>
-          )}
-        </div>
-        <button
-          onClick={runAll} disabled={running}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
-        >
-          {running ? '실행 중...' : '전체 재검사'}
-        </button>
+    <div className="space-y-5">
+      <PageHeader
+        title="품질 진단"
+        subtitle="데이터셋별 규칙 기반 품질진단 및 이력 비교"
+        action={
+          <Btn onClick={runAll} loading={running} disabled={running}>
+            <RefreshCw className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
+            전체 재검사
+          </Btn>
+        }
+      />
+
+      {/* 요약 카드 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard label="검사 데이터셋" value={`${passedCount}/${totalDatasets}`} color="blue" icon={<Activity className="w-5 h-5" />} />
+        <StatCard label="총 오류" value={totalErrors.toLocaleString()} color={totalErrors > 0 ? 'red' : 'green'} icon={<AlertTriangle className="w-5 h-5" />} />
+        <StatCard label="평균 오류율" value={`${avgErrorRate.toFixed(4)}%`} color={avgErrorRate > 0.001 ? 'amber' : 'green'} icon={<BarChart3 className="w-5 h-5" />} />
+        <StatCard label="통과율" value={`${totalDatasets ? Math.round(passedCount / totalDatasets * 100) : 0}%`} color="purple" icon={<CheckCircle2 className="w-5 h-5" />} />
       </div>
 
       {/* 5영역 품질 신호등 */}
       {totalDatasets > 0 && (
-        <div className="bg-white rounded-xl border p-4 shadow-sm">
-          <p className="text-xs font-semibold text-gray-500 mb-3">품질 5영역 신호등</p>
-          <div className="grid grid-cols-5 gap-3">
-            {buildDimSignals(results).map(sig => (
-              <div key={sig.name} className="flex flex-col items-center gap-1.5">
-                {sig.status === 'pass' ? (
-                  <CheckCircle2 className="w-7 h-7 text-green-500" />
-                ) : sig.status === 'fail' ? (
-                  <XCircle className="w-7 h-7 text-red-500" />
-                ) : (
-                  <AlertCircle className="w-7 h-7 text-gray-300" />
-                )}
-                <span className="text-xs font-medium text-gray-700">{sig.label}</span>
-                <span className={`text-xs ${
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">품질 5영역 신호등</h3>
+            <span className="text-xs text-gray-400 dark:text-gray-300">영역별 위반 현황</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {signals.map(sig => (
+              <Card
+                key={sig.name}
+                padding="sm"
+                className={`text-center ${
+                  sig.status === 'pass' ? 'bg-green-50/50 border-green-200' :
+                  sig.status === 'fail' ? 'bg-red-50/50 border-red-200' :
+                  'bg-gray-50 dark:bg-gray-950 border-gray-200 dark:border-gray-700'
+                }`}
+              >
+                <div className="flex justify-center mb-2">
+                  {sig.status === 'pass' ? (
+                    <CheckCircle2 className="w-8 h-8 text-green-500" />
+                  ) : sig.status === 'fail' ? (
+                    <XCircle className="w-8 h-8 text-red-500" />
+                  ) : (
+                    <AlertCircle className="w-8 h-8 text-gray-300 dark:text-gray-200" />
+                  )}
+                </div>
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{sig.label}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{AREA_META[sig.name].desc}</p>
+                <p className={`text-xs font-medium mt-2 ${
                   sig.status === 'pass' ? 'text-green-600' :
-                  sig.status === 'fail' ? 'text-red-600' : 'text-gray-400'
+                  sig.status === 'fail' ? 'text-red-600' : 'text-gray-400 dark:text-gray-300'
                 }`}>
-                  {sig.status === 'none' ? '미측정' : sig.violations === 0 ? '이상 없음' : `${sig.violations}건`}
-                </span>
-              </div>
+                  {sig.status === 'none' ? '미측정' : sig.violations === 0 ? '이상 없음' : `${sig.violations.toLocaleString()}건 위반`}
+                </p>
+                {sig.rules > 0 && (
+                  <p className="text-[10px] text-gray-400 dark:text-gray-300 mt-1">규칙 {sig.rules}종 · 검사 {sig.checked.toLocaleString()}건</p>
+                )}
+              </Card>
             ))}
           </div>
+        </Card>
+      )}
 
-          {/* 갭 리포트 */}
-          {buildDimSignals(results).some(s => s.status === 'none') && (
-            <div className="mt-3 p-2.5 bg-amber-50 rounded-lg border border-amber-200 flex items-start gap-2">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-700">
-                <strong>갭:</strong> {buildDimSignals(results).filter(s => s.status === 'none').map(s => s.label).join(', ')} 영역은 측정 규칙이 없습니다.
-                추후 해당 영역 규칙 추가를 권장합니다.
-              </p>
-            </div>
-          )}
-        </div>
+      {/* 5영역 품질 레이더 차트 */}
+      {totalDatasets > 0 && (
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">품질 5영역 레이더</h3>
+            <span className="text-xs text-gray-400 dark:text-gray-300">100점에 가까울수록 양호</span>
+          </div>
+          <div className="h-72 flex items-center justify-center">
+            <figure
+              className="w-full h-full"
+              role="img"
+              aria-label={`품질 5영역 레이더 차트, 데이터셋 ${totalDatasets}개`}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart data={areaScoreData} margin={{ top: 8, right: 32, bottom: 8, left: 32 }}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="area" tick={{ fontSize: 12 }} />
+                  <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} tickCount={6} />
+                  <Tooltip formatter={(v: unknown) => [`${v}점`, '품질 점수']} />
+                  <Radar
+                    name="품질 점수"
+                    dataKey="score"
+                    stroke="#3B82F6"
+                    fill="#3B82F6"
+                    fillOpacity={0.25}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
+            </figure>
+          </div>
+        </Card>
       )}
 
       {/* 평가편람 영역 요약 배지 */}
       {totalDatasets > 0 && (
-        <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-xl border">
-          <span className="text-xs text-gray-500 self-center mr-1">평가편람 품질 영역:</span>
+        <div className="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-gray-950 rounded-xl border">
+          <span className="text-xs text-gray-500 dark:text-gray-400 self-center mr-1">평가편람 품질 영역:</span>
           {[
             { code: '①-2', label: '품질진단 도구 적용', pass: allHaveResults },
             { code: '②',   label: '데이터 값 관리',     pass: valueManagePass },
             { code: '③',   label: '진단결과 조치',      pass: actionPass },
           ].map(b => (
-            <span
+            <Badge
               key={b.code}
-              className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium border ${
-                b.pass
-                  ? 'bg-green-50 text-green-700 border-green-200'
-                  : 'bg-red-50 text-red-700 border-red-200'
-              }`}
+              variant={b.pass ? 'green' : 'red'}
             >
-              {b.pass
-                ? <CheckCircle2 className="w-3 h-3" />
-                : <XCircle className="w-3 h-3" />
-              }
-              {b.code} {b.label}
-            </span>
+              <span className="inline-flex items-center gap-1">
+                {b.pass ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                {b.code} {b.label}
+              </span>
+            </Badge>
           ))}
         </div>
       )}
 
-      {loading ? (
-        <div className="text-center py-8 text-gray-400">로딩 중...</div>
-      ) : results.length === 0 ? (
-        <div className="text-center py-8 text-gray-400">
-          품질 검사 결과가 없습니다. <strong>전체 재검사</strong>를 실행하세요.
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {results.map(r => {
-            const badges = evalBadges(r)
-            return (
-              <div key={r.dataset_id} className="bg-white rounded-lg border shadow-sm overflow-hidden">
-                <div className={`px-4 py-3 flex items-center justify-between ${r.passed ? 'bg-green-50' : 'bg-red-50'}`}>
-                  <div className="flex items-center gap-3">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      r.passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>{r.passed ? '통과' : '실패'}</span>
-                    <span className="font-medium text-gray-800 text-sm font-mono">{r.table}</span>
-                    <span className="text-xs text-gray-500">규칙 {r.rule_count}종 · 검사 {r.checked.toLocaleString()}건</span>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    오류율 {r.error_rate.toFixed(4)}% (기준 {r.threshold}%)
-                  </span>
-                </div>
+      {/* 탭 */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <nav className="flex gap-6" aria-label="품질진단 탭">
+          {[
+            { key: 'results', label: '진단 결과', icon: ListChecks },
+            { key: 'issues',  label: '이슈 상세', icon: AlertTriangle },
+            { key: 'history', label: '이력 비교', icon: History },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key as TabKey)}
+              className={`flex items-center gap-1.5 pb-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab.key
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
 
-                {/* 평가편람 지표 연결 배지 */}
-                <div className="px-4 py-2 flex items-center gap-1.5 border-b bg-gray-50/50">
-                  <span className="text-xs text-gray-400 mr-1">관련 지표:</span>
-                  {badges.map(b => (
-                    <span
-                      key={b.code}
-                      title={b.label}
-                      className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
-                        b.pass
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-700'
+      {loading ? (
+        <QualitySkeleton />
+      ) : error ? (
+        <ErrorState message={error} onRetry={load} />
+      ) : results.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={<AlertCircle className="w-6 h-6 text-gray-400 dark:text-gray-300" />}
+            title="품질 검사 결과가 없습니다"
+            description="전체 재검사를 실행하여 데이터셋 품질을 진단해 보세요."
+            action={{ label: '전체 재검사', onClick: runAll }}
+          />
+        </Card>
+      ) : (
+        <>
+          {/* 진단 결과 탭 */}
+          {activeTab === 'results' && (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-gray-900 rounded-xl border px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+                  <label htmlFor="dataset-filter" className="text-sm text-gray-600 dark:text-gray-400">데이터셋</label>
+                  <select
+                    id="dataset-filter"
+                    value={resultDatasetFilter}
+                    onChange={e => setResultDatasetFilter(e.target.value)}
+                    className="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-2 pr-8 bg-gray-50 dark:bg-gray-950"
+                  >
+                    <option value="all">전체 데이터셋</option>
+                    {results.map(r => (
+                      <option key={r.dataset_id} value={r.dataset_id}>{r.table}</option>
+                    ))}
+                  </select>
+                </div>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{filteredResults.length}개 데이터셋 표시 중</span>
+              </div>
+
+              {filteredResults.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon={<Search className="w-6 h-6 text-gray-400 dark:text-gray-300" />}
+                    title="선택한 데이터셋에 대한 결과가 없습니다"
+                    description="다른 데이터셋을 선택하거나 전체 데이터셋을 조회해 보세요."
+                  />
+                </Card>
+              ) : filteredResults.map(r => {
+                const isOpen = expanded[r.dataset_id]
+                const byArea = AREA_ORDER.map(area => ({
+                  area,
+                  label: AREA_META[area].label,
+                  items: r.detail.filter(d => (d.area ?? inferArea(d.rule)) === area),
+                })).filter(g => g.items.length > 0)
+
+                return (
+                  <Card key={r.dataset_id} padding="sm" hover className="overflow-hidden">
+                    <button
+                      type="button"
+                      className={`w-full px-4 py-3 flex items-center justify-between text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${r.passed ? 'bg-green-50' : 'bg-red-50'}`}
+                      onClick={() => setExpanded(p => ({ ...p, [r.dataset_id]: !p[r.dataset_id] }))}
+                      aria-expanded={isOpen}
+                      aria-label={`${r.table} 품질 결과 상세 ${isOpen ? '닫기' : '펼치기'}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Badge variant={r.passed ? 'green' : 'red'}>{r.passed ? '통과' : '실패'}</Badge>
+                        <span className="font-medium text-gray-800 dark:text-gray-200 text-sm font-mono">{r.table}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">규칙 {r.rule_count}종 · 검사 {r.checked.toLocaleString()}건</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">오류율 {r.error_rate.toFixed(4)}%</span>
+                        {isOpen ? <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" /> : <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />}
+                      </div>
+                    </button>
+
+                    {isOpen && (
+                      <div className="p-4 space-y-4">
+                        {byArea.map(g => (
+                          <div key={g.area}>
+                            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: AREA_META[g.area].color }} />
+                              {g.label}
+                            </h4>
+                            <SortableTable
+                              caption={`${g.label} 규칙별 위반 현황`}
+                              data={g.items}
+                              keyExtractor={(_, i) => String(i)}
+                              minWidth={500}
+                              tableClassName="text-xs border rounded-lg overflow-hidden"
+                              columns={[
+                                {
+                                  key: 'rule',
+                                  label: '규칙',
+                                  render: d => d.rule,
+                                },
+                                {
+                                  key: 'violations',
+                                  label: '위반',
+                                  align: 'right',
+                                  sortable: true,
+                                  sortValue: d => d.violations,
+                                  className: 'w-32',
+                                  render: d => (
+                                    <Badge variant={d.violations === 0 ? 'green' : 'red'}>
+                                      {d.violations === 0 ? '이상 없음' : `${d.violations.toLocaleString()}건 위반`}
+                                    </Badge>
+                                  ),
+                                },
+                              ]}
+                            />
+                          </div>
+                        ))}
+                        <div className="text-right text-xs text-gray-400 dark:text-gray-300 pt-2">
+                          검사일: {formatDate(r.ran_at)}
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                )
+              })}
+
+              {/* 데이터셋별 오류율 차트 */}
+              <Card>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">데이터셋별 오류율</h3>
+                <div className="h-64">
+                  <figure
+                    className="w-full h-full"
+                    role="img"
+                    aria-label={`데이터셋별 오류율 막대 차트, ${datasetStatusData.length}개 데이터셋`}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={datasetStatusData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
+                        <Tooltip formatter={(v: unknown) => [`${Number(v).toFixed(4)}%`, '오류율']} />
+                        <Bar dataKey="오류율" radius={[4, 4, 0, 0]}>
+                          {datasetStatusData.map((entry, i) => (
+                            <Cell key={i} fill={entry.passed ? '#10B981' : '#EF4444'} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </figure>
+                </div>
+              </Card>
+
+              {/* 선택 데이터셋 레이더 차트 */}
+              {datasetRadarData.length > 0 && (
+                <Card>
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">선택 데이터셋 품질 5영역</h3>
+                  <div className="h-72 flex items-center justify-center">
+                    <figure
+                      className="w-full h-full"
+                      role="img"
+                      aria-label={`선택 데이터셋 품질 5영역 레이더 차트`}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart data={datasetRadarData} margin={{ top: 8, right: 32, bottom: 8, left: 32 }}>
+                          <PolarGrid />
+                          <PolarAngleAxis dataKey="area" tick={{ fontSize: 12 }} />
+                          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} tickCount={6} />
+                          <Tooltip formatter={(v: unknown) => [`${v}점`, '품질 점수']} />
+                          <Radar name="품질 점수" dataKey="score" stroke="#10B981" fill="#10B981" fillOpacity={0.25} />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </figure>
+                  </div>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {/* 이슈 상세 탭 */}
+          {activeTab === 'issues' && (
+            <div className="space-y-4">
+              <Card className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">영역 필터:</span>
+                {(['all', ...AREA_ORDER] as const).map(key => {
+                  const active = areaFilter === key
+                  const label = key === 'all' ? '전체' : AREA_META[key].label
+                  const count = issueCountsByArea[key]
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setAreaFilter(key)}
+                      className={`inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
+                        active
+                          ? 'bg-blue-50 border-blue-200 text-blue-700'
+                          : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
                       }`}
                     >
-                      {b.pass
-                        ? <CheckCircle2 className="w-2.5 h-2.5" />
-                        : <MinusCircle className="w-2.5 h-2.5" />
-                      }
-                      {b.code}
-                    </span>
-                  ))}
-                  <span className="text-xs text-gray-300 ml-1">품질 영역</span>
-                </div>
+                      {label}
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'}`}>
+                        {count}
+                      </span>
+                    </button>
+                  )
+                })}
+              </Card>
 
-                {r.detail.length > 0 && (
-                  <table className="w-full text-xs">
-                    <tbody className="divide-y divide-gray-100">
-                      {r.detail.map((d, i) => (
-                        <tr key={i} className="hover:bg-gray-50">
-                          <td className="px-4 py-1.5 text-gray-400 w-8 text-center">{i + 1}</td>
-                          <td className="px-4 py-1.5 text-gray-700">{d.rule}</td>
-                          <td className="px-4 py-1.5 text-right pr-4">
-                            <span className={`px-2 py-0.5 rounded font-medium ${
-                              d.violations === 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                            }`}>
-                              {d.violations === 0 ? '이상 없음' : `${d.violations.toLocaleString()}건 위반`}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-                <div className="px-4 py-1.5 bg-gray-50 border-t text-right text-xs text-gray-400">
-                  검사일: {new Date(r.ran_at).toLocaleString('ko-KR')}
+              {filteredIssues.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon={<CheckCircle2 className="w-6 h-6 text-green-500" />}
+                    title="해당 영역에 품질 이슈가 없습니다"
+                    description="모든 품질 규칙이 정상입니다."
+                  />
+                </Card>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredIssues.slice(0, 20).map((issue, idx) => (
+                      <Card key={idx} padding="sm" hover className="border-l-4" style={{ borderLeftColor: AREA_META[issue.area].color }}>
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <Badge variant={issue.area === 'completeness' ? 'blue' : issue.area === 'accuracy' ? 'green' : issue.area === 'consistency' ? 'purple' : issue.area === 'recency' ? 'amber' : 'gray'}>
+                                {issue.areaLabel}
+                              </Badge>
+                              <SeverityBadge severity={issue.severity} />
+                            </div>
+                            <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1.5">{issue.rule}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-mono">{issue.table} · {truncateId(issue.datasetId)}</p>
+                          </div>
+                          <span className="text-lg font-bold text-red-600">{issue.violations.toLocaleString()}</span>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-3 bg-gray-50 dark:bg-gray-950 p-2 rounded-lg">{issue.recommendation}</p>
+                      </Card>
+                    ))}
+                  </div>
+
+                  {filteredIssues.length > 20 && (
+                    <p className="text-center text-xs text-gray-400 dark:text-gray-300">외 {filteredIssues.length - 20}건의 이슈가 더 있습니다.</p>
+                  )}
+                </>
+              )}
+
+              {/* 영역별 이슈 분포 차트 */}
+              <Card>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">영역별 이슈 분포</h3>
+                <div className="h-64 flex items-center justify-center">
+                  <figure
+                    className="w-full h-full"
+                    role="img"
+                    aria-label={`영역별 이슈 분포 원형 차트, 총 ${issues.length}건 이슈`}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={areaChartData.filter(d => d.위반 > 0)}
+                          dataKey="위반"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          label={({ name, value }) => `${name}: ${value}`}
+                        >
+                          {areaChartData.filter(d => d.위반 > 0).map((entry, i) => (
+                            <Cell key={i} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </figure>
                 </div>
-              </div>
-            )
-          })}
-        </div>
+              </Card>
+            </div>
+          )}
+
+          {/* 이력 비교 탭 */}
+          {activeTab === 'history' && (
+            <div className="space-y-4">
+              <Card className="flex flex-wrap items-center gap-3">
+                <label htmlFor="quality-dataset" className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택:</label>
+                <select
+                  id="quality-dataset"
+                  value={selectedDataset}
+                  onChange={e => setSelectedDataset(e.target.value)}
+                  className="px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {results.map(r => (
+                    <option key={r.dataset_id} value={r.dataset_id}>{r.table} ({truncateId(r.dataset_id)})</option>
+                  ))}
+                </select>
+              </Card>
+
+              {compare && compare.current && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="text-center">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">현재 오류율</p>
+                      <p className={`text-2xl font-bold mt-1 ${compare.current.passed ? 'text-green-600' : 'text-red-600'}`}>
+                        {compare.current.error_rate.toFixed(4)}%
+                      </p>
+                      <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">{formatDate(compare.current.ran_at)}</p>
+                    </Card>
+                    <Card className="text-center">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">이전 대비 오류율</p>
+                      <p className={`text-2xl font-bold mt-1 flex items-center justify-center gap-1 ${compare.improved ? 'text-green-600' : 'text-red-600'}`}>
+                        {compare.improved ? <TrendingDown className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />}
+                        {compare.deltaRate > 0 ? '+' : ''}{compare.deltaRate.toFixed(4)}%
+                      </p>
+                      <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">{compare.previous ? formatDate(compare.previous.ran_at) : '이전 이력 없음'}</p>
+                    </Card>
+                    <Card className="text-center">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">오류 건수 변화</p>
+                      <p className={`text-2xl font-bold mt-1 ${compare.deltaErrors <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {compare.deltaErrors > 0 ? '+' : ''}{compare.deltaErrors.toLocaleString()}건
+                      </p>
+                      <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">현재 {compare.current.errors.toLocaleString()}건</p>
+                    </Card>
+                  </div>
+
+                  {/* 영역별 이력 비교 차트 */}
+                  {areaCompareData.length > 0 && (
+                    <Card>
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">영역별 위반 변화 (현재 − 이전)</h3>
+                      <div className="h-64">
+                        <figure
+                          className="w-full h-full"
+                          role="img"
+                          aria-label="영역별 위반 변화 비교 막대 차트"
+                        >
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={areaCompareData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                              <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                              <YAxis tick={{ fontSize: 11 }} />
+                              <Tooltip formatter={(v: any, n: any) => [`${Number(v).toLocaleString()}건`, n === 'current' ? '현재' : '이전']} />
+                              <Legend />
+                              <Bar dataKey="current" name="현재" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                              <Bar dataKey="previous" name="이전" fill="#94A3B8" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </figure>
+                      </div>
+                    </Card>
+                  )}
+                </>
+              )}
+
+              {history.length === 0 ? (
+                <Card>
+                  <EmptyState
+                    icon={<History className="w-6 h-6 text-gray-300 dark:text-gray-200" />}
+                    title="선택한 데이터셋의 진단 이력이 없습니다"
+                    description="전체 재검사를 실행하면 이력이 쌓입니다."
+                  />
+                </Card>
+              ) : (
+                <Card>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">오류율 추이</h3>
+                  </div>
+                  <div className="h-72">
+                    <figure
+                      className="w-full h-full"
+                      role="img"
+                      aria-label={`오류율 추이 선 차트, 이력 ${historyChartData.length}건`}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={historyChartData} margin={{ top: 8, right: 16, left: 8, bottom: 24 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="label" tick={{ fontSize: 10 }} angle={-30} textAnchor="end" height={50} />
+                          <YAxis tick={{ fontSize: 11 }} />
+                          <Tooltip formatter={(v: unknown) => [`${Number(v).toFixed(4)}%`, '오류율']} />
+                          <Legend />
+                          <Line type="monotone" dataKey="오류율" stroke="#EF4444" strokeWidth={2} dot={{ r: 4 }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </figure>
+                  </div>
+                </Card>
+              )}
+
+              {history.length > 0 && (
+                <Card>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">이력 목록</h3>
+                    <Btn
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => downloadHistoryCSV(history, results.find(r => r.dataset_id === selectedDataset)?.table ?? 'dataset')}
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      CSV 다운로드
+                    </Btn>
+                  </div>
+                  <SortableTable
+                    caption="품질 진단 이력 목록"
+                    data={history}
+                    keyExtractor={h => h.id}
+                    minWidth={600}
+                    columns={[
+                      {
+                        key: 'ran_at',
+                        label: '검사일',
+                        sortable: true,
+                        sortValue: h => new Date(h.ran_at),
+                        render: h => formatDate(h.ran_at),
+                      },
+                      {
+                        key: 'error_rate',
+                        label: '오류율',
+                        align: 'right',
+                        sortable: true,
+                        sortValue: h => h.error_rate,
+                        render: h => <span className="tabular-nums">{h.error_rate.toFixed(4)}%</span>,
+                      },
+                      {
+                        key: 'errors',
+                        label: '오류건수',
+                        align: 'right',
+                        sortable: true,
+                        sortValue: h => h.errors,
+                        render: h => <span className="tabular-nums">{h.errors.toLocaleString()}</span>,
+                      },
+                      {
+                        key: 'checked',
+                        label: '검사건수',
+                        align: 'right',
+                        sortable: true,
+                        sortValue: h => h.checked,
+                        render: h => <span className="tabular-nums">{h.checked.toLocaleString()}</span>,
+                      },
+                      {
+                        key: 'passed',
+                        label: '결과',
+                        align: 'center',
+                        render: h => <Badge variant={h.passed ? 'green' : 'red'}>{h.passed ? '통과' : '실패'}</Badge>,
+                      },
+                    ]}
+                  />
+                </Card>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

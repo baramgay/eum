@@ -1,9 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import DatasetModal from './DatasetModal'
-import { Download, Calendar, Eye, Database, X, Building2 } from 'lucide-react'
+import {
+  Download,
+  Calendar,
+  Database,
+  X,
+  Building2,
+  Search,
+  FilterX,
+  AlertCircle,
+  Sparkles,
+  Clock,
+  TrendingUp,
+} from 'lucide-react'
+import { Card, Badge, Btn, EmptyState, Skeleton, StatCard, PageHeader } from '@/components/ui'
 
 interface CatalogItem {
   dataset_id: string
@@ -42,17 +56,37 @@ const SORT_OPTIONS = [
   { value: 'high_value', label: '활용도순' },
 ]
 
-function SkeletonCard() {
+function DatasetCardSkeleton() {
   return (
-    <div className="bg-white rounded-lg border shadow-sm p-5 animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-3/4 mb-3" />
-      <div className="h-3 bg-gray-100 rounded w-full mb-2" />
-      <div className="h-3 bg-gray-100 rounded w-2/3 mb-4" />
-      <div className="flex gap-2">
-        <div className="h-5 bg-gray-100 rounded-full w-16" />
-        <div className="h-5 bg-gray-100 rounded-full w-12" />
+    <Card padding="sm" className="space-y-3">
+      <div className="flex items-start justify-between">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-12" />
       </div>
-    </div>
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-3 w-full" />
+      <Skeleton className="h-3 w-2/3" />
+      <div className="flex items-center justify-between pt-2">
+        <Skeleton className="h-3 w-16" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+    </Card>
+  )
+}
+
+function ActiveFilterChip({ label, icon, onRemove }: { label: string; icon?: ReactNode; onRemove: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 pl-2 pr-1 py-1 rounded-full">
+      {icon}
+      {label}
+      <button
+        onClick={onRemove}
+        className="hover:text-gray-900 dark:hover:text-gray-100 p-0.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+        aria-label="필터 제거"
+      >
+        <X className="w-3 h-3" />
+      </button>
+    </span>
   )
 }
 
@@ -73,6 +107,8 @@ export default function PortalClient() {
   const [activeTheme, setActiveTheme]   = useState('')
   const [onlyAiReady, setOnlyAiReady]   = useState(false)
   const [loading, setLoading]           = useState(true)
+  const [error, setError]               = useState(false)
+  const [retryCount, setRetryCount]     = useState(0)
   const [selectedDataset, setSelectedDataset] = useState<CatalogItem | null>(null)
   const [usage, setUsage]               = useState<UsageSummary | null>(null)
   const [tenantName, setTenantName]     = useState('')
@@ -86,7 +122,7 @@ export default function PortalClient() {
     return () => clearTimeout(timer)
   }, [searchInput])
 
-  // 테마 변경 시 페이지 초기화
+  // 테마/정렬 변경 시 페이지 초기화
   useEffect(() => {
     setPage(1)
   }, [activeTheme, sort])
@@ -120,6 +156,7 @@ export default function PortalClient() {
   // 데이터 패치
   useEffect(() => {
     setLoading(true)
+    setError(false)
     const params = new URLSearchParams({ sort, page: String(page) })
     if (query.trim())  params.set('q', query.trim())
     if (activeTheme)   params.set('theme', activeTheme)
@@ -161,10 +198,27 @@ export default function PortalClient() {
         if (fetchedThemes && fetchedThemes.length > 0) setThemes(fetchedThemes)
         setLoading(false)
       })
-      .catch(() => setLoading(false))
-  }, [query, sort, activeTheme, page, onlyAiReady, usage, tenantId])
+      .catch(() => {
+        setLoading(false)
+        setError(true)
+      })
+  }, [query, sort, activeTheme, page, onlyAiReady, usage, tenantId, retryCount])
 
   const totalPages = Math.ceil(total / pageSize)
+
+  const clearFilters = () => {
+    setSearchInput('')
+    setQuery('')
+    setActiveTheme('')
+    setOnlyAiReady(false)
+    if (tenantId) router.push('/portal')
+  }
+
+  const hasFilters = Boolean(query || activeTheme || onlyAiReady || tenantId)
+
+  const aiReadyCount = items.filter(i => i.ai_ready).length
+  const topDownloadCount = usage?.topDownloads?.[0]?.count ?? 0
+  const recentUpdateCount = usage?.recentDatasets?.length ?? 0
 
   return (
     <div className="space-y-4">
@@ -172,76 +226,120 @@ export default function PortalClient() {
         <DatasetModal item={selectedDataset} onClose={() => setSelectedDataset(null)} />
       )}
 
-      {/* 헤더 */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold text-gray-800">데이터 포털</h2>
-          {tenantId && (
-            <span className="inline-flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200">
-              <Building2 className="w-3 h-3" />
-              {tenantName || tenantId}
-              <button
-                onClick={() => router.push('/portal')}
-                className="hover:text-blue-900"
-                title="기관 필터 해제"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          )}
-        </div>
-        <span className="text-sm text-gray-400">
-          {loading ? '로딩 중...' : `전체 ${total.toLocaleString()}개 데이터셋`}
-        </span>
+      <PageHeader
+        title="데이터 포털"
+        action={
+          <Badge variant="gray">
+            {loading ? '로딩 중...' : `전체 ${total.toLocaleString()}개 데이터셋`}
+          </Badge>
+        }
+      />
+
+      {/* 요약 KPI */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="전체 데이터셋"
+          value={loading ? '—' : total.toLocaleString()}
+          icon={<Database className="w-5 h-5 text-blue-500" />}
+          color="blue"
+        />
+        <StatCard
+          label="AI-Ready"
+          value={loading ? '—' : aiReadyCount.toLocaleString()}
+          icon={<Sparkles className="w-5 h-5 text-purple-500" />}
+          color="purple"
+        />
+        <StatCard
+          label="이번 달 신규·업데이트"
+          value={loading ? '—' : recentUpdateCount.toLocaleString()}
+          icon={<Clock className="w-5 h-5 text-green-500" />}
+          color="green"
+        />
+        <StatCard
+          label="최다 다운로드"
+          value={loading ? '—' : topDownloadCount.toLocaleString()}
+          icon={<TrendingUp className="w-5 h-5 text-amber-500" />}
+          color="amber"
+        />
       </div>
 
-      {/* 검색 + 정렬 */}
-      <div className="flex gap-2">
-        <input
-          value={searchInput}
-          onChange={e => setSearchInput(e.target.value)}
-          placeholder="데이터셋 검색..."
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      {/* 검색 + 정렬 + 필터 초기화 */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
+          <input
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            placeholder="데이터셋 검색..."
+            className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
         <select
           value={sort}
           onChange={e => setSort(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
         >
           {SORT_OPTIONS.map(o => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
+        {hasFilters && (
+          <Btn variant="ghost" size="sm" onClick={clearFilters}>
+            <FilterX className="w-3.5 h-3.5" />
+            초기화
+          </Btn>
+        )}
       </div>
+
+      {/* 적용 중인 필터 */}
+      {hasFilters && (
+        <div className="flex flex-wrap items-center gap-2">
+          {query && (
+            <ActiveFilterChip
+              label={`검색: ${query}`}
+              onRemove={() => { setSearchInput(''); setQuery('') }}
+            />
+          )}
+          {activeTheme && (
+            <ActiveFilterChip label={activeTheme} onRemove={() => setActiveTheme('')} />
+          )}
+          {onlyAiReady && (
+            <ActiveFilterChip label="AI-Ready" onRemove={() => setOnlyAiReady(false)} />
+          )}
+          {tenantId && (
+            <ActiveFilterChip
+              label={tenantName || tenantId}
+              icon={<Building2 className="w-3 h-3" />}
+              onRemove={() => router.push('/portal')}
+            />
+          )}
+        </div>
+      )}
 
       {/* 테마 필터 탭 + AI-Ready 필터 */}
       <div className="flex flex-wrap items-center gap-2">
         {themes.length > 0 && (
           <>
-            <button
+            <Btn
+              variant={activeTheme === '' ? 'primary' : 'secondary'}
+              size="sm"
               onClick={() => setActiveTheme('')}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                activeTheme === ''
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className="rounded-full"
             >
               전체
-            </button>
+            </Btn>
             {themes.map(t => (
-              <button
+              <Btn
                 key={t}
+                variant={activeTheme === t ? 'primary' : 'secondary'}
+                size="sm"
                 onClick={() => setActiveTheme(activeTheme === t ? '' : t)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  activeTheme === t
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                className="rounded-full"
               >
                 {t}
-              </button>
+              </Btn>
             ))}
-            <div className="w-px h-4 bg-gray-200 mx-1" />
+            <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
           </>
         )}
         <button
@@ -249,7 +347,7 @@ export default function PortalClient() {
           className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
             onlyAiReady
               ? 'bg-purple-600 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
           }`}
         >
           ✦ AI-Ready
@@ -257,29 +355,41 @@ export default function PortalClient() {
       </div>
 
       {/* 카드 그리드 */}
-      {loading ? (
+      {error ? (
+        <EmptyState
+          icon={<AlertCircle className="w-8 h-8 text-red-500" />}
+          title="데이터를 불러오지 못했습니다"
+          description="잠시 후 다시 시도해주세요."
+          action={{ label: '다시 시도', onClick: () => setRetryCount(c => c + 1) }}
+        />
+      ) : loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+          {Array.from({ length: 6 }).map((_, i) => <DatasetCardSkeleton key={i} />)}
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-8 text-gray-400">검색 결과가 없습니다.</div>
+        <EmptyState
+          icon={<Search className="w-8 h-8 text-gray-400 dark:text-gray-300" />}
+          title="검색 결과가 없습니다"
+          description="다른 키워드나 필터를 조정해 보세요."
+          action={{ label: '필터 초기화', onClick: clearFilters }}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map(item => (
-            <div
+            <Card
               key={item.dataset_id}
+              padding="sm"
+              hover
               onClick={() => setSelectedDataset(item)}
-              className="bg-white rounded-lg border p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col"
+              className="flex flex-col"
             >
               <div className="flex items-start justify-between mb-2">
-                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-                  {item.theme}
-                </span>
-                <span className="text-xs text-gray-400">{item.format}</span>
+                <Badge variant="blue">{item.theme}</Badge>
+                <Badge variant="gray">{item.format}</Badge>
               </div>
-              <h3 className="font-medium text-gray-800 text-sm mb-1">{item.title}</h3>
+              <h3 className="font-medium text-gray-800 dark:text-gray-200 text-sm mb-1">{item.title}</h3>
               {item.description && (
-                <p className="text-xs text-gray-500 line-clamp-2 mb-2">{item.description}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">{item.description}</p>
               )}
               {item.keywords && (
                 <div className="flex flex-wrap gap-1 mb-2">
@@ -287,7 +397,7 @@ export default function PortalClient() {
                     <button
                       key={k}
                       onClick={e => { e.stopPropagation(); setSearchInput(k); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                      className="text-[10px] bg-gray-100 text-gray-600 hover:bg-gray-200 px-1.5 py-0.5 rounded"
+                      className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-1.5 py-0.5 rounded"
                     >
                       #{k}
                     </button>
@@ -297,7 +407,7 @@ export default function PortalClient() {
 
               {/* 메타 뱃지 행 */}
               <div className="mt-auto space-y-2">
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                   <span className="flex items-center gap-1">
                     <Database className="w-3.5 h-3.5" />
                     {item.rows != null ? `${item.rows.toLocaleString()}행` : '—'}
@@ -307,67 +417,64 @@ export default function PortalClient() {
                     {(item.download_count ?? 0).toLocaleString()}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-xs text-gray-400">
+                <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-300">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5" />
                     {item.updated_at
                       ? new Date(item.updated_at).toLocaleDateString('ko-KR')
                       : '—'}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Eye className="w-3.5 h-3.5" />
-                    상세보기
-                  </span>
                 </div>
-                <div className="flex items-center gap-1 flex-wrap justify-end pt-1">
-                  {item.ai_ready && (
-                    <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
-                      AI-Ready
-                    </span>
-                  )}
-                  {item.api_enabled && (
-                    <span className="text-xs bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">
-                      API
-                    </span>
-                  )}
-                  {item.quality_summary && (
-                    <span
-                      className={`text-xs px-1.5 py-0.5 rounded ${
-                        item.quality_summary.includes('통과')
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}
-                    >
-                      {item.quality_summary.includes('통과') ? '품질 통과' : '품질 확인 필요'}
-                    </span>
-                  )}
+                <div className="flex items-center gap-1 flex-wrap justify-between pt-1">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {item.ai_ready && (
+                      <Badge variant="purple">AI-Ready</Badge>
+                    )}
+                    {item.api_enabled && (
+                      <Badge variant="blue">API</Badge>
+                    )}
+                    {item.quality_summary && (
+                      <Badge variant={item.quality_summary.includes('통과') ? 'green' : 'amber'}>
+                        {item.quality_summary.includes('통과') ? '품질 통과' : '품질 확인 필요'}
+                      </Badge>
+                    )}
+                  </div>
+                  <Btn
+                    variant="secondary"
+                    size="sm"
+                    onClick={e => { e.stopPropagation(); setSelectedDataset(item) }}
+                  >
+                    상세보기
+                  </Btn>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
 
       {/* 페이지네이션 — total > pageSize일 때만 표시 */}
-      {!loading && total > pageSize && (
+      {!loading && !error && total > pageSize && (
         <div className="flex items-center justify-center gap-3 pt-2">
-          <button
+          <Btn
+            variant="secondary"
+            size="sm"
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="px-4 py-1.5 text-sm rounded border border-gray-300 disabled:opacity-40 hover:bg-gray-50 transition-colors"
           >
             이전
-          </button>
-          <span className="text-sm text-gray-600">
+          </Btn>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
             {page} / {totalPages}
           </span>
-          <button
+          <Btn
+            variant="secondary"
+            size="sm"
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="px-4 py-1.5 text-sm rounded border border-gray-300 disabled:opacity-40 hover:bg-gray-50 transition-colors"
           >
             다음
-          </button>
+          </Btn>
         </div>
       )}
     </div>

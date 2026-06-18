@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { buildOntology, getGraph, listActions } from '@/lib/ontology'
+import { buildOntology, getCachedGraph, listActions } from '@/lib/ontology/core'
 
 export async function POST() {
   const supabase = await createClient()
@@ -20,6 +20,5 @@ export async function GET(req: Request) {
   }
 
   const sgg = searchParams.get('sgg') ?? ''
-  const supabase = await createClient()
-  return NextResponse.json(await getGraph(supabase, sgg || undefined))
+  return NextResponse.json(await getCachedGraph(sgg || undefined))
 }

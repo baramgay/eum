@@ -31,6 +31,13 @@ const DATASET_MAP = {
   'air_quality.csv': 'ds-air-quality',
   'public_hospital.csv': 'ds-public-hospital',
   'school_population.csv': 'ds-school-population',
+  'public_facility.csv': 'ds-public-facility',
+  'youth_population.csv': 'ds-youth-population',
+  'business.csv': 'ds-business',
+  'cultural_facility.csv': 'ds-cultural-facility',
+  'sports_facility.csv': 'ds-sports-facility',
+  'welfare_facility.csv': 'ds-welfare-facility',
+  'tourism.csv': 'ds-tourism',
 }
 
 function parseCsvLine(line) {

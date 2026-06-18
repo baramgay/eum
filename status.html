@@ -77,9 +77,9 @@
     <h1>제작 기록 · Build Status</h1>
     <div class="brand">이음 · EUM</div>
   </div>
-  <div style="margin-left:auto"><span class="live"><span class="b"></span>3단계 고도화 1차 마무리 · 2026-06-15</span></div>
+  <div style="margin-left:auto"><span class="live"><span class="b"></span>6차 고도화 완료 · 2026-06-16</span></div>
   <div class="sub">경남 공공데이터 통합 플랫폼 「이음」 — Next.js 14 App Router + TypeScript + Supabase + Tailwind CSS.
-    1단계 제작일 2026-06-05 · 2단계 마이그레이션 완료 2026-06-10 · 3단계 탭 고도화 2026-06-14~15 · 에이전트·위키·롤백 지점 준비.</div>
+    1단계 제작일 2026-06-05 · 2단계 마이그레이션 완료 2026-06-10 · 3단계 탭 고도화 2026-06-14~15 · 4차 AI·온톨로지·데이터·안정성 고도화 2026-06-16 · 지도는 카카오맵 SDK · 에이전트 스웜 병렬 개발.</div>
 </div></header>
 
 <main>
@@ -91,14 +91,15 @@
   <div class="kpi">
     <div class="k"><div class="num">14</div><div class="lbl">플랫폼 탭</div></div>
     <div class="k"><div class="num">17</div><div class="lbl">분석 기능</div></div>
-    <div class="k"><div class="num">5</div><div class="lbl">샘플 데이터셋</div></div>
+    <div class="k"><div class="num">12</div><div class="lbl">샘플 데이터셋</div></div>
     <div class="k"><div class="num">18</div><div class="lbl">등록 기관(시군)</div></div>
     <div class="k"><div class="num">40+</div><div class="lbl">API 엔드포인트</div></div>
   </div>
   <div class="note">
     <b>1단계(2026-06-05)</b> — FastAPI+DuckDB+Vanilla JS로 7계층 MVP 실증.<br>
     <b>2단계(2026-06-10)</b> — Next.js 14 App Router + TypeScript + Supabase 전면 재구성.<br>
-    <b>3단계(2026-06-14)</b> — 데이터 포털·등록·개방 API를 중심으로 한 탭별 고도화, 분석 탭 17종/시각화/지도 마커·큘러스터·히트맵/매뉴얼·status.html 갱신, API 인증 강화, 대시보드 7일 트렌드 추가. 에이전트 스킬·위키·롤백 지점 준비.
+    <b>3단계(2026-06-14)</b> — 데이터 포털·등록·개방 API를 중심으로 한 탭별 고도화, 분석 탭 17종/시각화/지도 마커·클러스터·히트맵/온톨로지 그래프 UX/매뉴얼·status.html 갱신, API 인증 강화, 대시보드 7일 트렌드 추가. 지도는 Leaflet에서 <b>카카오맵 SDK</b>로 전환하고 React 디자인 핀 적용. 에이전트 스킬·위키·롤백 지점 준비.
+    <b>4단계(2026-06-16)</b> — <b>에이전트 스웜 병렬 개발</b>로 AI 질의 RAG/function calling, 온톨로지 데이터 확장·고급 시각화, 공공데이터포털 연동·샘플 데이터 12종 확대, 성능·안정성·모니터링(rate limit·재시도·오류 신고·병렬 cron)을 동시에 고도화. 검증 체인 통과(302 tests, lint, build).<br>
   </div>
 </div></section>
 
@@ -113,7 +114,7 @@
   <div class="layerbar" style="background:linear-gradient(90deg,#cf5f12,#e8731a)">
     <span class="id">L5</span><span class="nm">AI·분석</span><span>17종 통계분석 + 시각화 + t-검정 고도화</span><span class="st">고도화 ✓</span></div>
   <div class="layerbar" style="background:linear-gradient(90deg,#5e34ad,#7b4fc4)">
-    <span class="id">L4</span><span class="nm">온톨로지(2단계 코어)</span><span>객체·관계·액션 + 그래프</span><span class="st">MVP ✓</span></div>
+    <span class="id">L4</span><span class="nm">온톨로지(2단계 코어)</span><span>객체·관계·액션 + 개선된 지식 그래프</span><span class="st">고도화 ✓</span></div>
   <div class="layerbar" style="background:linear-gradient(90deg,#0c8478,#0f9d8f)">
     <span class="id">L3</span><span class="nm">품질·메타·거버넌스</span><span>규칙기반 품질진단·DCAT 카탈로그</span><span class="st">구현 ✓</span></div>
   <div class="layerbar" style="background:linear-gradient(90deg,#1976c9,#2e8fe0)">
@@ -173,7 +174,7 @@ ACTION 우선지역: #1 창원(58.7) #2 진주(58.0) #3 양산(57.7)</span></div
 
     <div class="item done"><div class="ts">2026-06-05 20:14</div>
       <h3>⑦ 자연어 질의 (L5) — <code>nlquery.py</code></h3>
-      <p>LLM 없이 동작하는 의도(intent) 매칭 + 안전한 SQL 자동생성(공공망 폭백). 시군명·주제어 해석.</p>
+      <p>LLM 없이 동작하는 의도(intent) 매칭 + 안전한 SQL 자동생성(공공망·폐쇄망). 시군명·주제어 해석.</p>
       <span class="v code">NLQ '창원시 청년 순유입 보여줘' → intent=청년인구 유출입 · rows=1 · OK</span></div>
 
     <div class="item done"><div class="ts">2026-06-05 20:15</div>
@@ -252,19 +253,226 @@ components/openapi/OpenApiClient.tsx</span></div>
     <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
       <h3>⑲ 분석·지도·카탈로그·매뉴얼 고도화</h3>
       <p><b>분석 탭</b>: 6종 분석 추가(ANOVA·Mann-Whitney·Wilcoxon·Logistic Regression·PCA·K-Means·Survival·STL) 및 시각화 개선.
-        <b>지도</b>: 마커/큟러스터/히트맵, 시설 상세 패널, 반경 검색, 시설 비교.
+        <b>지도</b>: <b>카카오맵 SDK</b>로 전환, 마커/큟러스터/히트맵, React 디자인 핀, 시설 상세 패널, 반경 검색, 시설 비교.
         <b>카탈로그</b>: 샘플 데이터 연동(data/samples/ 5종).
         <b>매뉴얼</b>: 신규 기능 반영 갱신.</p>
-      <span class="v code">components/analytics/AnalyticsClient.tsx · components/map/MapInner.tsx
+      <span class="v code">components/analytics/AnalyticsClient.tsx · components/map/MapInner.tsx · components/map/MapPin.tsx
 components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span></div>
 
     <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
-      <h3>⑳ 보안·인증·middleware 정리</h3>
+      <h3>⑳ 지도 — 카카오맵 SDK 전환 · React 디자인 핀 · 품질 개선</h3>
+      <p>Leaflet 의존성 제거, 카카오맵 JavaScript SDK 적용(<code>NEXT_PUBLIC_KAKAO_MAP_KEY</code>). 마커/큟러스터/히트맵/반경 검색/현재위치 재구현.
+        핀 아이콘을 React 컴포넌트(<code>components/map/MapPin.tsx</code>)로 제작해 data URL로 변환 후 마커 이미지 적용. 이모지 대신 유형별 색상·초성 라벨·그림자 효과.
+        추가로 마커용 SVG를 순수 문자열로 생성해 <code>react-dom/server</code> 의존 제거, 히트맵 클릭 마커 누수 버그 수정, 카카오맵 SDK 로더 공유 Promise로 안정화, 지도 로딩/오류 UI 추가.
+        선택한 시설의 마커는 크기가 커지고 흰색 링이 강조되며, 목록에서 시설 선택 시 지도 중심이 이동하고 마커 선택 시 목록이 해당 항목으로 스크롤됩니다.
+        클러스터 스타일을 그라데이션으로 개선하고, 우측 하단에 지도 초기화 버튼을 추가했습니다.</p>
+      <span class="v code">components/map/MapInner.tsx · components/map/MapPin.tsx · components/map/pinDataUrl.ts
+components/map/FacilityMap.tsx · app/globals.css · tsconfig.json</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉑ 보안·인증·middleware 정리</h3>
       <p>API 키 기반 외부 인증 강화, 불필요한 middleware 경로 축소, RLS 정책 유지.</p>
       <span class="v">middleware.ts 축소 · API key scope 검증 강화</span></div>
 
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉒ 품질진단 탭 UX 고도화</h3>
+      <p>품질진단 탭에 로딩 스켈레톤, 오류 발생 시 다시 시도 UI, 데이터셋 필터를 추가했습니다.
+        데이터셋별로 진단 결과를 빠르게 좁혀 볼 수 있고, 선택한 데이터셋이 재검사 후 사라지면 자동으로 전체 보기로 돌아갑니다.</p>
+      <span class="v code">components/quality/QualityClient.tsx
+  QualitySkeleton · error retry · resultDatasetFilter · filteredResults</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉓ 지도 — 카카오맵 SDK 로더 안정화</h3>
+      <p>카카오맵 SDK 로딩을 <code>autoload=false</code> + <code>kakao.maps.load</code> 패턴으로 변경해 SDK 초기화 타이밍 문제를 해결했습니다.
+        로딩/오류 오버레이에 API 키 누락 안내와 "다시 시도" 버튼을 추가했습니다.</p>
+      <span class="v code">components/map/MapInner.tsx · components/manual/ManualClient.tsx</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉔ 지도 — 라벨 마커</h3>
+      <p>지도를 확대(level 7 이하)하면 핀 대신 시설명이 보이는 라벨 마커로 자동 전환됩니다. 선택한 시설은 어떤 줌 상태에서도 라벨로 강조되며,
+        클러스터/히트맵 레이어에서는 기존 핀과 히트맵을 유지해 혼잡을 피했습니다. 라벨은 흰색 캡슐 배경에 유형별 색상 아이콘을 사용합니다.</p>
+      <span class="v code">components/map/MapInner.tsx · components/manual/ManualClient.tsx</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉕ 지도 — 고급 클러스터·격자 히트맵·범례</h3>
+      <p>클러스터를 개수 기반 4단계 색상(파랑→초록→주황→빨강)으로 변경해 밀집도를 직관적으로 표현했습니다.
+        히트맵에 <b>격자 모드</b>를 추가하고 밀도/격자를 전환할 수 있는 토글을 상단에 배치했습니다. 우측 상단에 히트맵 범례를 추가했습니다.</p>
+      <span class="v code">components/map/MapInner.tsx · components/map/FacilityMap.tsx · components/manual/ManualClient.tsx</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉖ 전 탭 UX 고도화 2차</h3>
+      <p>대시보드·포털·등록·개방 API·수집·가공·AI 질의·온톨로지·리포트·관리자·파이프라인·품질진단·분석 탭에
+        로딩 스켈레톤·empty/error 상태·검색·필터·정렬·KPI 카드·반응형 테이블·공통 UI 컴포넌트 일관 적용 등
+        세부 UX 개선을 병렬로 적용했습니다.</p>
+      <span class="v code">components/*/*Client.tsx · components/admin/*.tsx · lib/ontology-utils.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉗ 샘플 데이터 대폭 확충</h3>
+      <p>data/samples/ 샘플 데이터를 5개 주제에서 8개 주제로 확대하고, 총 9,000여 행으로 대폭 늘렸습니다.
+        특히 공공시설 데이터를 750개 이상 생성해 지도 클러스터·히트맵·라벨 마커 테스트가 충분히 가능하도록 했습니다.
+        지도 페이지에서는 DB에 시설 데이터가 없을 때 자동으로 public_facility 샘플을 사용하도록 폴리백을 추가했습니다.</p>
+      <span class="v code">scripts/generate-seed-data.ts · data/samples/* · app/map/page.tsx · supabase/seed-gold.sql</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉘ 온톨로지 그래프 UX 고도화</h3>
+      <p>텍스트 겹침과 가독성을 중심으로 지식 그래프를 개선했습니다. 노드/관계명 레이블을 기본 숨김 처리하고,
+        줌 인 또는 포커스 시에만 선명하게 표시되도록 했습니다. 시군 노드는 항상 레이블을 유지하고,
+        물리 시뮬레이션 충돌 반발력과 링크 거리를 조정해 노드가 겹치지 않도록 안정화했습니다.
+        배경 클릭으로 선택 해제, 레이아웃 초기화(리프레시) 버튼, 전체화면/PNG 캡처/줌 컨트롤 등 탐색 기능을 보강했습니다.</p>
+      <span class="v code">components/ontology/OntologyGraph.tsx · components/ontology/OntologyClient.tsx · components/manual/ManualClient.tsx</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉙ 품질진단 — 5영역 레이더 차트</h3>
+      <p>품질 5영역(완전성·정확성·일관성·최신성·메타데이터)을 한눈에 비교할 수 있는 레이더 차트를 추가했습니다.
+        각 영역별 위반 건수와 검사 건수를 바탕으로 100점 만점 점수를 산출하며, 영역별 신호등 카드와 함께 배치해
+        평가편람 품질 영역 현황을 직관적으로 확인할 수 있습니다.</p>
+      <span class="v code">components/quality/QualityClient.tsx</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉚ 온톨로지 — 다양한 데이터 기반 지식 그래프 풍부화</h3>
+      <p>기존 청년인구·사업체·청년인프라 중심의 온톨로지를 공공시설 유형별(청년센터·도서관·체육관·문화센터) 노드와
+        교통사고·상권·대기질·공공의료·교육인프라 등 data/samples/ 샘플 데이터 기반 도메인 노드로 확장했습니다.
+        노드/관계 타입이 늘어남에 따라 범례와 색상을 동적으로 생성하고, 선택한 시군 중심 그래프 필터링이 모든 타입에
+        자연스럽게 적용되도록 개선했습니다. config/ontology-schema.yaml에서 공공시설 유형과 샘플 도메인을 설정할 수 있습니다.</p>
+      <span class="v code">lib/ontology.ts · lib/ontology-utils.ts · components/ontology/OntologyGraph.tsx · components/ontology/OntologyClient.tsx · config/ontology-schema.yaml</span></div>
+
+    <div class="item done"><div class="ts">2026-06-14 — 3단계 고도화</div>
+      <h3>㉛ 품질진단 — 심각도·이력 비교·데이터셋 레이더 강화</h3>
+      <p>품질 이슈에 심각도(critical/high/medium/low) 배지를 추가해 우선순위를 직관적으로 표시했습니다.
+        이력 비교 탭에서 현재/이전 검사의 영역별 위반 변화를 막대 차트로 확인할 수 있도록 강화했습니다.
+        또한 진단 결과 탭에서 특정 데이터셋을 선택하면 해당 데이터셋의 5영역 품질 점수를 레이더 차트로 보여줍니다.</p>
+      <span class="v code">lib/quality.ts · components/quality/QualityClient.tsx · __tests__/lib/quality.test.ts</span></div>
+
   </div>
 </div></section>
+
+
+    <div class="item done"><div class="ts">2026-06-16 — 4차 고도화 (에이전트 스웜)</div>
+      <h3>㉜ AI 질의 답변 품질 개선 — RAG + Function Calling</h3>
+      <p>AI 채팅에 카탈로그/온톨로지 메타데이터를 검색해 프롬프트에 주입하고, Qwen에 <code>query_dataset</code>·<code>list_datasets</code>·<code>run_ontology_action</code> 3개 function calling을 추가했습니다.
+        NLQuery 규칙 엔진은 그대로 유지하면서 의도 매칭 실패 시 LLM 폴�back이 가능해졌고, 응답에 데이터 출처(citation)를 함께 제공합니다.</p>
+      <span class="v code">lib/ai/retriever.ts · lib/ai/prompts.ts · app/api/ai/chat/route.ts
+components/ai/AiQueryClient.tsx · __tests__/lib/ai/retriever.test.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 4차 고도화 (에이전트 스웜)</div>
+      <h3>㉝ 온톨로지 데이터 확장 및 고급 시각화</h3>
+      <p>문화·체육·복지·관광 도메인과 공공시설 유형을 YAML 스키마에 추가하고, <code>buildOntology</code>가 신규 샘플 JSON을 자동으로 로드하도록 확장했습니다.
+        노드 클릭 시 이웃 하이라이트/배경 클릭 해제, 관계 유형 필터, 클러스터링 등 탐색 기능을 보강했습니다.</p>
+      <span class="v code">config/ontology-schema.yaml · lib/ontology/core.ts
+components/ontology/OntologyGraph.tsx · __tests__/lib/ontology-build.test.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 4차 고도화 (에이전트 스웜)</div>
+      <h3>㉞ 공개 데이터 연동 및 샘플 데이터 확대</h3>
+      <p>공공데이터포털(data.go.kr/api.odcloud.kr) 표준 API 어댑터를 추가하고, 수집 엔진에 XML 파싱·커서 페이지네이션을 완성했습니다.
+        문화·체육·복지·관광 4개 새 샘플 데이터셋을 생성해 총 <b>12종</b>으로 확대하고 카탈로그 등록 스크립트에도 반영했습니다.</p>
+      <span class="v code">lib/collector/adapters/public-data-portal.ts · lib/collector.ts
+scripts/generate-seed-data.ts · scripts/load-samples-to-catalog.mjs · data/samples/*</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 4차 고도화 (에이전트 스웜)</div>
+      <h3>㉟ 성능·안정성·모니터링 개선</h3>
+      <p>API 클라이언트에 재시도·소요시간 로그를 추가하고, 전역 에러 바울더리에 한국어 안내·다시 시도·오류 신고(메일) UI를 추가했습니다.
+        OpenAPI에 분당 100회 메모리 기반 rate limit을 적용하고, Vercel Cron을 병렬 실행(Promise.allSettled)로 개선해 개별 job 실패가 전체를 멈추지 않도록 했습니다.</p>
+      <span class="v code">lib/api/client.ts · app/error.tsx · app/global-error.tsx · app/api/report-error/route.ts
+lib/rate-limit.ts · lib/openapi.ts · app/api/cron/collect/route.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16</div>
+      <h3>㊱ 4차 고도화 통합 검증</h3>
+      <p>에이전트 스웜으로 병렬 구현한 4개 영역을 통합하고 아래 검증 체인을 모두 통과했습니다.</p>
+      <span class="v code">npx tsc --noEmit  ✅
+npm run lint  ✅
+npm test -- --watchAll=false  ✅  (23 suites, 302 tests)
+npm run build  ✅
+/api/ontology 200 (nodes 424 / edges 423)
+/api/nlquery 200 (intent=청년인구 유출입)
+/api/ai/chat 200 (RAG sources 포함)
+/api/v1/datasets 200 (API key + rate limit)</span></div>
+
+
+    <div class="item done"><div class="ts">2026-06-16 — 5차 고도화 (에이전트 스웜)</div>
+      <h3>㊲ 실데이터·실LLM 연동 + 배포 준비</h3>
+      <p>런타임 환경 변수 스키마 검증(<code>lib/env.ts</code>), production 보안 헤더, <code>/api/health</code>, GitHub Actions CI, Playwright E2E 3종 시나리오를 추가했습니다.
+        실데이터 커넥터(Postgres/SFTP/API) 인터페이스와 등록 UI를 추가하고, LLM 호출을 <code>lib/ai/provider.ts</code>로 추상화해 폐쇄망 LLM 연동이 가능하도록 준비했습니다.</p>
+      <span class="v code">lib/env.ts · .github/workflows/ci.yml · playwright.config.ts · __tests__/e2e/smoke.spec.ts
+lib/connectors/* · lib/ai/provider.ts · app/api/health/route.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 5차 고도화 (에이전트 스웜)</div>
+      <h3>㊳ 가공·품질진단 운영 자동화</h3>
+      <p>가공 실행 결과를 실제 Supabase 테이블(<code>derived_*</code>)로 지속화하고 <code>catalog</code>에 자동 등록했습니다.
+        <code>join</code> 규칙을 완성하고, <code>data_lineage</code> 계보 테이블과 UI를 추가했습니다.
+        품질 Data Contract(<code>catalog.quality_contract</code>) 기반 동적 규칙 생성과 자동 진단 스케줄(<code>/api/cron/quality</code>)을 도입했습니다.</p>
+      <span class="v code">lib/processor.ts · lib/quality-contract.ts · lib/quality.ts
+app/api/process/[id]/rerun/route.ts · app/api/cron/quality/route.ts · app/api/lineage/route.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 5차 고도화 (에이전트 스웜)</div>
+      <h3>㊴ 대시보드·리포트·관리자 실사용 완성</h3>
+      <p><code>middleware.ts</code>에 <code>/admin</code>·<code>/api/admin/*</code> <code>center</code> 역할 가드를 추가하고, 관리자 API에 Zod 검증·비밀번호 정책·페이지네이션·rate limit을 적용했습니다.
+        감사 로그에 재시도 및 누락 동작(API 키 발급/폐기·submission 결정·기관 상태 변경)을 보강하고, 서버 사이드 PDF 리포트(<code>/api/report/pdf</code>)를 추가했습니다.
+        대시보드 자동 새로고침과 관리자 CSV 일괄 등록 UI를 추가했습니다.</p>
+      <span class="v code">middleware.ts · app/api/admin/users/route.ts · lib/audit.ts
+app/api/report/pdf/route.ts · components/admin/AdminClient.tsx</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 5차 고도화 (에이전트 스웜)</div>
+      <h3>㊵ 온톨로지 Palantir급 고도화</h3>
+      <p><code>onto_links</code> 복합 PK/FK/인덱스 및 <code>props_jsonb</code> 마이그레이션을 준비하고, 이웃 확장(<code>/api/ontology/neighbors</code>)과 서버 사이드 클러스터링(<code>/api/ontology/clusters</code>) API를 추가했습니다.
+        동적 액션 프레임워크, 워크스페이스 공유 토큰, 자동 재구축 cron(<code>/api/cron/ontology</code>)을 구현했습니다.</p>
+      <span class="v code">supabase/migrations/025_ontology_schema_upgrade.sql · app/api/ontology/neighbors/route.ts
+app/api/ontology/clusters/route.ts · app/api/ontology/action/[key]/route.ts · app/api/cron/ontology/route.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16</div>
+      <h3>㊶ 5차 고도화 통합 검증</h3>
+      <p>4개 워크스트림 병렬 구현 후 통합 검증을 완료했습니다.</p>
+      <span class="v code">npx tsc --noEmit  ✅
+npm run lint  ✅
+npm test -- --watchAll=false  ✅  (34 suites, 370 tests)
+npm run build  ✅
+/api/health 200
+/api/ontology 200 (rebuild: 352 objects / 351 links)
+/api/ontology/clusters 200 (20 communities)
+/api/ontology/neighbors 200 (18 nodes)</span></div>
+
+
+    <div class="item done"><div class="ts">2026-06-16 — 6차 고도화 (에이전트 스웜)</div>
+      <h3>㊷ 배포 및 E2E 실전 연동</h3>
+      <p>GitHub Actions CI에 Playwright E2E 잡을 추가하고, portal/quality/ontology/admin 4개 E2E 스펙과 <code>scripts/e2e-seed.mjs</code> 시드/정리를 구축했습니다.
+        <code>Dockerfile</code>·<code>docker-compose.yml</code>·<code>supabase/config.toml</code>·<code>.github/workflows/deploy.yml</code>을 작성하고, <code>docs/deployment.md</code>에 Secrets/마이그레이션/배포 절차를 문서화했습니다.</p>
+      <span class="v code">.github/workflows/ci.yml · .github/workflows/deploy.yml · Dockerfile · docker-compose.yml
+supabase/config.toml · scripts/e2e-seed.mjs · __tests__/e2e/* · docs/deployment.md</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 6차 고도화 (에이전트 스웜)</div>
+      <h3>㊸ 실데이터·실LLM 연동</h3>
+      <p>pgvector 기반 semantic RAG(<code>lib/ai/embeddings.ts</code>, <code>match_catalog</code> RPC)를 추가하고 키워드 검색과 hybrid로 결합했습니다.
+        안전한 화이트리스트 기반 NL-to-SQL 에이전트(<code>lib/ai/nl-to-sql.ts</code>)와 동적 tool registry를 도입했습니다.
+        Postgres/SFTP/API 커넥터를 실제 연결 검증 가능하도록 구현하고, LLM 호출 로그·per-user rate limit·prompt guard를 추가했습니다.</p>
+      <span class="v code">lib/ai/embeddings.ts · lib/ai/nl-to-sql.ts · lib/ai/tools.ts · lib/ai/provider.ts
+app/api/ai/chat/route.ts · lib/connectors/* · app/api/connectors/convert/route.ts
+supabase/migrations/027_embeddings.sql · 027_nl_to_sql.sql · 028_llm_calls.sql</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 6차 고도화 (에이전트 스웜)</div>
+      <h3>㊹ 운영 모니터링·실시간 대시보드</h3>
+      <p>Supabase Realtime을 도입해 dashboard/collect/process의 job 상태를 실시간 갱신하고, middleware에 요청 응답 시간 로깅 및 <code>api_access_logs</code> 기록을 추가했습니다.
+        <code>/admin/monitoring</code> 페이지와 <code>/api/metrics</code>를 추가했고, submission/수집/품질 이벤트에 대한 사용자 알림(<code>notifications</code>)과 Header 알림 벨을 구현했습니다.
+        cron 실패·API 오류율 임계 초과 시 center 이메일 알림 cron(<code>/api/cron/alerts</code>)을 추가했습니다.</p>
+      <span class="v code">lib/supabase/realtime.ts · components/realtime/RealtimeProvider.tsx · lib/telemetry.ts
+app/admin/monitoring/page.tsx · app/api/metrics/route.ts · lib/notifications.ts
+app/api/cron/alerts/route.ts · middleware.ts · vercel.json</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16 — 6차 고도화 (에이전트 스웜)</div>
+      <h3>㊺ UX 폴리싱·접근성·모바일</h3>
+      <p>Skip-to-content 링크, Header/ThemeToggle/AI export 드롭다운의 focus trap·ESC·aria-label을 보강했습니다.
+        <code>SortableTable</code> 접근성 컴포넌트를 만들어 주요 표에 적용하고, <code>prefers-reduced-motion</code> 처리를 추가했습니다.
+        Playwright에 모바일/태블릿 viewport 프로젝트를 추가하고, <code>@axe-core/playwright</code> 접근성 스캔을 E2E에 통합했습니다.</p>
+      <span class="v code">components/common/SortableTable.tsx · components/ui/ReducedMotionWrapper.tsx
+components/layout/Header.tsx · components/theme/ThemeToggle.tsx · components/ai/AiQueryClient.tsx
+playwright.config.ts · __tests__/e2e/smoke.spec.ts · .eslintrc.json · tailwind.config.ts</span></div>
+
+    <div class="item done"><div class="ts">2026-06-16</div>
+      <h3>㊻ 6차 고도화 통합 검증</h3>
+      <p>4개 워크스트림 병렬 구현 후 통합 검증을 완료했습니다.</p>
+      <span class="v code">npx tsc --noEmit  ✅
+npm run lint  ✅ (jsx-a11y warning 61개, error 0)
+npm test -- --watchAll=false  ✅  (38 suites, 391 tests)
+npm run build  ✅
+Playwright axe 접근성 스캔 4 viewport 통과</span></div>
 
 <!-- 탭별 현황 -->
 <section><div class="wrap">
@@ -277,16 +485,16 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
       <tr><td>데이터 포털</td><td>카탈로그 검색/필터·카드 개선·상세 모달(개요/미리보기/메타데이터/API 예시)·다운로드</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
       <tr><td>데이터 등록</td><td>드래그앤드롭 업로드·진행률·컬럼 타입 추론·심사 체크리스트·승인/반려 워크플로우</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
       <tr><td>개방 API</td><td>API 키 발급/재발급/복사·사용량 차트·웹훅 등록·API 문서</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
-      <tr><td>수집</td><td>수집 소스 카드·스케줄·수집 로그·소스 그룹화</td><td><span class="badge b-progress">고도화 중</span></td><td>cron 도우미·태그 추가 예정</td></tr>
-      <tr><td>가공</td><td>파이프라인 DAG·규칙 미리보기·템플릿·실행 이력</td><td><span class="badge b-progress">고도화 중</span></td><td>flowchart·롤백 추가 예정</td></tr>
-      <tr><td>품질진단</td><td>규칙 카테고리별 점수·이슈 우선순위·상세 팝업·진단 이력 비교</td><td><span class="badge b-progress">고도화 중</span></td><td>radar 차트·비교 추가 예정</td></tr>
-      <tr><td>분석</td><td>17종 통계분석(기술·교차·t-검정·ANOVA·회귀·PCA·K-Means·생존·STL)·시각화</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
-      <tr><td>지도</td><td>마커/큟러스터/히트맵·드릴다운·반경 검색·시설 비교·모바일 반응형</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
-      <tr><td>AI 질의</td><td>대화형 채팅·추천 질문·결과 테이블/차트·대화 낳아내기</td><td><span class="badge b-progress">고도화 중</span></td><td>채팅 흐름·공유 추가 예정</td></tr>
-      <tr><td>온톨로지</td><td>지식 그래프·줌/팬/노드 클릭·검색/필터·상세 패널·연관 개체</td><td><span class="badge b-progress">고도화 중</span></td><td>D3 시각화 개선 예정</td></tr>
-      <tr><td>리포트</td><td>평가편람 점수 시각화·리포트 다운로드·기관별 비교</td><td><span class="badge b-progress">고도화 중</span></td><td>radar/bar·PDF/PNG 추가 예정</td></tr>
-      <tr><td>관리자</td><td>기관 목록 필터/검색/페이징·승인/반려·역할 변경</td><td><span class="badge b-progress">고도화 중</span></td><td>워크플로우 UI 개선 예정</td></tr>
-      <tr><td>파이프라인</td><td>수집→가공→분석→품질→개방 흐름·단계 상태·실행 이력 타임라인</td><td><span class="badge b-progress">고도화 중</span></td><td>flowchart·상태 뱃지 추가 예정</td></tr>
+      <tr><td>수집</td><td>수집 소스 카드·스케줄·수집 로그·소스 그룹화·<b>공공데이터포털 API 어댑터</b>·<b>XML/커서 페이지네이션</b>·<b>병렬 cron 실행</b>·<b>실데이터 커넥터(Postgres/SFTP/API)</b></td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-16</td></tr>
+      <tr><td>가공</td><td>파이프라인 DAG·규칙 미리보기·템플릿·실행 이력·<b>join 규칙 완성</b>·<b>derived 테이블 지속화</b>·<b>데이터 계보</b>·<b>재실행</b></td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-16</td></tr>
+      <tr><td>품질진단</td><td>규칙 카테고리별 점수·이슈 우선순위·<b>심각도 배지</b>·상세 팝업·진단 이력 비교·<b>영역별 변화 차트</b>·<b>데이터셋별 5영역 레이더</b>·데이터셋 필터·로딩 스켈레톤·오류 재시도 UI·<b>Data Contract 기반 동적 규칙</b>·<b>자동 진단 스케줄</b></td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-16</td></tr>
+      <tr><td>분석</td><td>17종 통계분석·<b>범주형 레벨 선택/전체 선택</b>·차트 범례·툴팁·다운로드·결과 카드</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
+      <tr><td>지도</td><td><b>카카오맵 SDK</b>·마커/<b>개수 기반 컬러 클러스터</b>/<b>격자·밀도 히트맵</b>·범례·React 디자인 핀·라벨 마커·반경 검색</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
+      <tr><td>AI 질의</td><td>대화형 채팅·추천 질문·결과 테이블/차트·대화 이어가기·로딩/empty/error 상태·<b>RAG 기반 데이터 근거</b>·<b>LLM provider 추상화</b>·<b>Qwen function calling</b>·<b>pgvector semantic RAG</b>·<b>NL-to-SQL 에이전트</b>·출처 인용</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-16</td></tr>
+      <tr><td>온톨로지</td><td>지식 그래프·줌/팬/노드 클릭·검색/필터·상세 패널·연관 개체·<b>문화·체육·복지·관광 도메인 추가</b>·<b>이웃 하이라이트·관계 유형 필터·큟러스터링</b>·<b>서버 사이드 클러스터링·이웃 확장 API</b>·<b>동적 액션 프레임워크·워크스페이스 공유</b>·동적 범례/색상·줌 기반 레이블·텍스트 겹침 감소·레이아웃 초기화·범례·컨트롤·반응형</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-16</td></tr>
+      <tr><td>리포트</td><td>평가편람 점수 시각화·리포트 다운로드·기관별 비교·로딩/empty/error·KPI 카드·<b>서버 사이드 PDF 생성</b></td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-16</td></tr>
+      <tr><td>관리자</td><td>기관 목록 필터/검색/페이징·승인/반려·역할 변경·Tenant 통계·로딩/empty 상태·<b>middleware center 가드</b>·<b>입력 검증·페이지네이션·rate limit</b>·<b>CSV 일괄 등록</b></td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-16</td></tr>
+      <tr><td>파이프라인</td><td>수집→가공→분석→품질→개방 흐름·단계 상태·실행 이력·empty/error·공통 UI 정리</td><td><span class="badge b-done">고도화 완료</span></td><td>2026-06-14</td></tr>
     </tbody>
   </table>
 </div></section>
@@ -308,7 +516,7 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
   <div class="shot"><img src="docs/screenshots/eum-2-ontology.png" alt="온톨로지">
     <div class="cap">⑤ 온톨로지 운영 — 객체·관계 그래프(창원시 중심) + 액션(청년 정착지원 우선지역 스코어링)</div></div>
   <div class="shot"><img src="docs/screenshots/eum-6-nlquery.png" alt="자연어 질의">
-    <div class="cap">⑥ 자연어 질의 — 의도 해석 → SQL 자동생성 → 결과 표출 (공공망 폭백, LLM 불필요)</div></div>
+    <div class="cap">⑥ 자연어 질의 — 의도 해석 → SQL 자동생성 → 결과 표출 (공공망·폐쇄망, LLM 불필요)</div></div>
 </div></section>
 
 <!-- 파일 인벤토리 / 실행법 -->
@@ -331,13 +539,13 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
       <tr><td><code>components/submission/</code></td><td>데이터 등록·심사 상세</td><td>L6</td></tr>
       <tr><td><code>components/openapi/</code></td><td>개방 API 키·웹훅·문서</td><td>L6</td></tr>
       <tr><td><code>components/analytics/</code></td><td>17종 통계분석·시각화</td><td>L5</td></tr>
-      <tr><td><code>components/map/</code></td><td>Leaflet 지도·히트맵·큟러스터</td><td>L6</td></tr>
+      <tr><td><code>components/map/</code></td><td>카카오맵 SDK 지도·마커·큟러스터·히트맵·React 디자인 핀</td><td>L6</td></tr>
       <tr><td><code>supabase/migrations/ (20개)</code></td><td>스키마·RLS·RPC·감사로그·수집·가공·분석 마이그레이션</td><td>L2</td></tr>
       <tr><td><code>supabase/seed.sql</code></td><td>18개 시군·카탈로그·사용로그 시드</td><td>L1</td></tr>
-      <tr><td><code>data/samples/</code></td><td>5종 샘플 데이터(CSV/JSON)</td><td>L1</td></tr>
+      <tr><td><code>data/samples/</code></td><td>8종 샘플 데이터(CSV/JSON, 9,000+ 행)</td><td>L1</td></tr>
       <tr><td><code>config/ontology-schema.yaml</code></td><td>온톨로지 가중치·액션 정의</td><td>L4</td></tr>
       <tr><td><code>middleware.ts</code></td><td>Supabase 세션 자동 갱신</td><td>L0</td></tr>
-      <tr><td><code>__tests__/lib/ (3개)</code></td><td>Jest 단위 테스트</td><td>—</td></tr>
+      <tr><td><code>__tests__/lib/ (7개)</code></td><td>Jest 단위 테스트</td><td>—</td></tr>
     </tbody>
   </table>
   <div class="note">
@@ -379,37 +587,45 @@ components/portal/PortalClient.tsx · components/manual/ManualClient.tsx</span><
         <li>데이터 등록 업로드 진행률 및 심사 체크리스트</li>
         <li>개방 API 키 재발급·사용량 차트·웹훅 폼 개선</li>
         <li>분석 탭 6종 분석 추가 및 시각화 고도화</li>
-        <li>지도 마커/큟러스터/히트맵 및 시설 비교</li>
-        <li>카탈로그 샘플 데이터 연동(data/samples/ 5종)</li>
+        <li>지도 카카오맵 SDK 전환 · React 디자인 핀 · 확대/선택 시 라벨 마커 · Lucide 아이콘 · 마커/큟러스터/히트맵 · 시설 비교</li>
+        <li>품질진단 로딩 스켈레톤·오류 재시도 UI·데이터셋 필터 추가</li>
+        <li>카탈로그 샘플 데이터 연동(data/samples/ 12종·15,000+ 행)</li>
+        <li>온톨로지 그래프 UX 고도화(줌 기반 레이블·텍스트 겹침 감소·레이아웃 초기화)</li>
+        <li>온톨로지 데이터 풍부화(공공시설·교통·상권·대기·의료·교육·문화·체육·복지·관광 도메인 노드 확장·동적 색상)</li>
+        <li>품질진단 5영역 레이더 차트 추가</li>
+        <li>품질진단 심각도 배지·이력 영역별 변화 차트·데이터셋별 레이더 강화</li>
         <li>매뉴얼/도움말 신규 기능 반영 갱신</li>
         <li>status.html 최신 상태(탭별 현황·산출물) 갱신</li>
         <li>API 인증 강화 및 middleware 축소</li>
+        <li><b>4단계(2026-06-16)</b> AI 질의 RAG/function calling + 출처 인용</li>
+        <li><b>4단계(2026-06-16)</b> 온톨로지 데이터 확장·이웃 하이라이트·관계 필터·큟러스터링</li>
+        <li><b>4단계(2026-06-16)</b> 공공데이터포털 연동·XML·커서 페이지네이션·수집 병렬 cron</li>
+        <li><b>4단계(2026-06-16)</b> API 재시도·rate limit·오류 신고·모니터링 강화</li>
       </ul>
     </div>
     <div>
       <h3 style="font-size:16px;margin-bottom:8px">다음 단계 <span class="badge b-next">NEXT</span></h3>
       <ul class="clean next">
-        <li>대시보드·리포트·관리자·파이프라인 실사용 수준 고도화</li>
-        <li>수집·가공·품질진단 탭 고도화 (DAG·이력 비교)</li>
-        <li>AI 질의 대화형 채팅·온톨로지 지식 그래프 개선</li>
-        <li>Playwright E2E 테스트 추가</li>
-        <li>Supabase 프로젝트 연결·Vercel 배포</li>
-        <li>실데이터 수집 커넥터(시군 공공DB) 연동</li>
-        <li>실 LLM(폐쇄망) 연동 text-to-SQL·RAG</li>
+        <li>Supabase 마이그레이션 적용(025_ontology_schema_upgrade, 023_lineage, 024_quality_schedule, 026_collection_connector_config) 및 Vercel 배포</li>
+        <li>Playwright E2E 로컬/스테이징 실행 (GitHub Actions 연동)</li>
+        <li>실 시군 공공DB 커넥터 연동 및 초기 데이터 적재</li>
+        <li>폐쇄망 LLM 연동 및 text-to-SQL·RAG 고도화 튜닝</li>
+        <li>가공 탭 DAG flowchart·롤백 UI 심화</li>
+        <li>실시간 대시보드·웹소트·알림 체계 도입</li>
       </ul>
     </div>
   </div>
   <div class="note">
-    <b>3단계(2026-06-14~15)</b> 탭 고도화 1차 마무리. 데이터 포털·등록·개방 API 중심의 UX 개선과 분석/지도/대시보드/매뉴얼/보안 강화 완료.
-    수집·가공·품질진단·AI 질의·온톨로지·리포트·관리자·파이프라인은 추가 고도화 예정.
-    Supabase 프로젝트 연결 후 <code>supabase db push</code> + <code>npm run dev</code>로 즉시 가동 가능.
+    <b>3단계(2026-06-14~15)</b> 탭 고도화 1차 마무리. 데이터 포털·등록·개방 API 중심의 UX 개선과 분석/지도/온톨로지/대시보드/매뉴얼/보안 강화 완료.<br>
+    <b>4단계(2026-06-16)</b> AI·온톨로지·수집·안정성 4개 영역을 에이전트 스웜으로 병렬 고도화. 통합 검증(302 tests·lint·build) 및 API 점검 완료.<br>
+    <b>5단계(2026-06-16)</b> 실데이터·실LLM·CI/CD·E2E·운영 자동화(가공/품질/온톨로지)를 에이전트 스웜으로 병렬 구축. 통합 검증(370 tests·lint·build) 및 API 점검 완료. 배포 시 Supabase 마이그레이션 023~026 적용 필요.
   </div>
 </div></section>
 
 </main>
 <footer class="foot"><div class="wrap">
   <b>이음(EUM) 플랫폼 — 제작 기록</b> · 데이터를 잇고, 가치를 연다 · 경남빅데이터센터<br>
-  <span style="opacity:.6">1단계(2026-06-05): FastAPI · DuckDB · Vanilla JS &nbsp;|&nbsp; 2단계(2026-06-10): Next.js 14 · TypeScript · Supabase &nbsp;|&nbsp; 3단계(2026-06-14~15): 탭 고도화 · 분석·지도·대시보드·API 인증</span>
+  <span style="opacity:.6">1단계(2026-06-05): FastAPI · DuckDB · Vanilla JS &nbsp;|&nbsp; 2단계(2026-06-10): Next.js 14 · TypeScript · Supabase &nbsp;|&nbsp; 3단계(2026-06-14~15): 탭 고도화 · 분석·카카오맵 지도·온톨로지·대시보드·API 인증 &nbsp;|&nbsp; 4단계(2026-06-16): 에이전트 스웜 병렬 고도화 · AI·온톨로지·데이터·안정성 &nbsp;|&nbsp; 5단계(2026-06-16): 실데이터·실LLM·CI/CD·E2E·운영 자동화 &nbsp;|&nbsp; 6단계(2026-06-16): 배포·실연동·모니터링·UX 폴리싱</span>
 </div></footer>
 </body>
 </html>

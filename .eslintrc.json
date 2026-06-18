@@ -1,3 +1,18 @@
 {
-  "extends": ["next/core-web-vitals"]
+  "extends": ["next/core-web-vitals", "plugin:jsx-a11y/recommended"],
+  "rules": {
+    "jsx-a11y/label-has-associated-control": ["warn", {
+      "labelComponents": ["Label"],
+      "labelAttributes": ["htmlFor"],
+      "controlComponents": ["Input", "Textarea", "Select", "Switch", "Checkbox", "RadioGroupItem", "SelectTrigger"],
+      "assert": "either",
+      "depth": 25
+    }],
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-noninteractive-element-interactions": "warn",
+    "jsx-a11y/no-noninteractive-tabindex": "warn",
+    "jsx-a11y/no-autofocus": "warn",
+    "jsx-a11y/no-redundant-roles": "warn"
+  }
 }

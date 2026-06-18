@@ -2,15 +2,27 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { createFocusTrap } from '@/lib/focus-trap'
+import SortableTable from '@/components/common/SortableTable'
 import {
   Search, BarChart2, Table2, HelpCircle, ExternalLink,
   MessageSquare, Plus, Trash2, Download, Share2, Copy, Check,
-  History, Sparkles, Send, MoreVertical, ChevronLeft,
+  History, Sparkles, Send, ChevronLeft, RotateCcw, PieChart as PieChartIcon,
+  TrendingUp, AlertCircle, X,
 } from 'lucide-react'
+import ResultSummary from './ResultSummary'
+import type { ConversationTurn } from '@/lib/nlquery/context'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
-  ResponsiveContainer, CartesianGrid, LabelList
+  ResponsiveContainer, CartesianGrid, LabelList,
+  LineChart, Line, PieChart, Pie, Legend,
 } from 'recharts'
+import Badge from '@/components/ui/Badge'
+import { EmptyState } from '@/components/ui/EmptyState'
+import Btn from '@/components/ui/Btn'
+import Card from '@/components/ui/Card'
+import Skeleton from '@/components/ui/Skeleton'
+import StatCard from '@/components/ui/StatCard'
 
 interface QueryResult {
   intent: string | null
@@ -20,6 +32,17 @@ interface QueryResult {
   hint?: string
   source?: string
   source_url?: string
+  follow_up?: string[]
+  summary?: string
+  topN?: number
+  filterDescription?: string
+}
+
+interface SourceItem {
+  source: 'catalog' | 'ontology'
+  title: string
+  snippet: string
+  url?: string
 }
 
 interface ChatMessage {
@@ -28,6 +51,8 @@ interface ChatMessage {
   query?: string
   result?: QueryResult
   text?: string
+  content?: string
+  sources?: SourceItem[]
   createdAt: number
 }
 
@@ -38,23 +63,46 @@ interface Conversation {
   updatedAt: number
 }
 
+interface ExampleItem {
+  category: string
+  label: string
+  q: string
+}
+
 const STORAGE_KEY = 'eum-ai-conversations'
 
-const EXAMPLES = [
-  { label: '정착잠재 순위',   q: '청년 정착잠재 순위 보여줘' },
-  { label: '창원시 사업체',   q: '창원시 사업체 현황' },
-  { label: '거창 청년인구',   q: '거창군 청년 인구 유입 현황' },
-  { label: '소득 높은 시군',  q: '소득 높은 시군 순위' },
-  { label: '거제 청년센터',   q: '거제시 청년센터' },
-  { label: '경남 제조업',     q: '경남 제조업 사업체 현황' },
-  { label: '인구 유입 순위',  q: '청년 인구 유입이 많은 시군' },
+type ChartType = 'bar' | 'line' | 'pie'
+
+const DEFAULT_EXAMPLES: ExampleItem[] = [
+  { category: '정착', label: '정착잠재 순위',   q: '청년 정착잠재 순위 보여줘' },
+  { category: '사업체', label: '창원시 사업체',   q: '창원시 사업체 현황' },
+  { category: '인구', label: '거창 청년인구',   q: '거창군 청년 인구 유입 현황' },
+  { category: '소득', label: '소득 높은 시군',  q: '소득 높은 시군 순위' },
+  { category: '시설', label: '거제 청년센터',   q: '거제시 청년센터' },
+  { category: '제조업', label: '경남 제조업',     q: '경남 제조업 사업체 현황' },
+  { category: '인구', label: '인구 유입 순위',  q: '청년 인구 유입이 많은 시군' },
 ]
+
+const CATEGORY_COLORS: Record<string, string> = {
+  '정착': 'bg-emerald-100 text-emerald-700',
+  '사업체': 'bg-blue-100 text-blue-700',
+  '인구': 'bg-amber-100 text-amber-700',
+  '소득': 'bg-purple-100 text-purple-700',
+  '시설': 'bg-cyan-100 text-cyan-700',
+  '제조업': 'bg-indigo-100 text-indigo-700',
+}
 
 const BAR_COLORS = [
   '#4F46E5','#0891B2','#059669','#D97706','#DC2626',
   '#7C3AED','#BE185D','#0D9488','#B45309','#1D4ED8',
   '#6D28D9','#047857','#9D174D','#1E40AF','#065F46',
   '#7E22CE','#991B1B','#1E3A8A',
+]
+
+const PIE_COLORS = [
+  '#4F46E5','#0891B2','#059669','#D97706','#DC2626',
+  '#7C3AED','#BE185D','#0D9488','#B45309','#1D4ED8',
+  '#6D28D9','#047857',
 ]
 
 function genId() {
@@ -95,6 +143,14 @@ function formatValue(v: unknown): string {
 function buildTitle(query: string): string {
   const trimmed = query.trim()
   return trimmed.length > 22 ? trimmed.slice(0, 22) + '…' : trimmed
+}
+
+function timeAgo(ts: number): string {
+  const diff = Math.floor((Date.now() - ts) / 1000)
+  if (diff < 60) return '방금'
+  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`
+  return `${Math.floor(diff / 86400)}일 전`
 }
 
 function exportMarkdown(conv: Conversation): string {
@@ -139,10 +195,94 @@ function download(filename: string, content: string, type: string) {
   URL.revokeObjectURL(url)
 }
 
-function ResultCard({ message, isLatest }: { message: ChatMessage; isLatest?: boolean }) {
+function detectPreferredChart(columns: string[], rows: Record<string, unknown>[]): ChartType {
+  const numericCols = columns.filter(c => isNumericCol(c, rows))
+  const labelCol = getLabelCol(columns)
+  const labelValues = new Set(rows.map(r => String(r[labelCol])))
+  // 구성/비율 데이터는 파이 차트 우선
+  if (numericCols.length === 1 && labelValues.size >= 3 && labelValues.size <= 12 && rows.length <= 15) {
+    return 'pie'
+  }
+  // 시계열 성향은 라인 차트
+  const timeLike = /년|year|월|month|분기|quarter/.test(labelCol)
+  if (numericCols.length >= 1 && timeLike && rows.length >= 3) return 'line'
+  return 'bar'
+}
+
+function SourceBadge({ source, sourceUrl }: { source?: string; sourceUrl?: string }) {
+  if (!source) return null
+  const content = (
+    <span className="inline-flex items-center gap-1.5">
+      <Badge variant="blue" size="sm">출처</Badge>
+      <span className="text-xs text-gray-600 dark:text-gray-400">{source}</span>
+      {sourceUrl && <ExternalLink className="w-3 h-3 text-gray-400 dark:text-gray-300" />}
+    </span>
+  )
+  if (sourceUrl) {
+    return (
+      <a
+        href={sourceUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition-colors"
+        title="출처 페이지 새 창 열기"
+      >
+        {content}
+      </a>
+    )
+  }
+  return <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gray-50 dark:bg-gray-950">{content}</div>
+}
+
+function Sources({ sources }: { sources?: SourceItem[] }) {
+  if (!sources || sources.length === 0) return null
+  return (
+    <div className="w-full">
+      <p className="text-[11px] text-gray-400 dark:text-gray-300 mb-1.5">참고 자료</p>
+      <ul className="space-y-1">
+        {sources.map((s, i) => (
+          <li key={i} className="text-xs text-gray-600 dark:text-gray-400">
+            {s.url ? (
+              <a
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 hover:text-blue-600"
+              >
+                <Badge variant="gray" size="sm">{s.source}</Badge>
+                <span className="font-medium">{s.title}</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            ) : (
+              <span className="inline-flex items-center gap-1">
+                <Badge variant="gray" size="sm">{s.source}</Badge>
+                <span className="font-medium">{s.title}</span>
+              </span>
+            )}
+            <span className="block text-[11px] text-gray-400 dark:text-gray-300 truncate">{s.snippet}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function ResultCard({
+  message,
+  isLatest,
+  onFollowUp,
+  onRetry,
+}: {
+  message: ChatMessage
+  isLatest?: boolean
+  onFollowUp?: (q: string) => void
+  onRetry?: () => void
+}) {
   const result = message.result
   const [viewMode, setViewMode] = useState<'table'|'chart'>('table')
+  const [chartType, setChartType] = useState<ChartType>('bar')
   const [chartCol, setChartCol] = useState('')
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (!result) return
@@ -150,6 +290,7 @@ function ResultCard({ message, isLatest }: { message: ChatMessage; isLatest?: bo
     if (numCols.length > 0) {
       setChartCol(numCols[0])
       setViewMode('chart')
+      setChartType(detectPreferredChart(result.columns, result.rows))
     } else {
       setViewMode('table')
     }
@@ -157,67 +298,113 @@ function ResultCard({ message, isLatest }: { message: ChatMessage; isLatest?: bo
 
   if (!result) {
     return (
-      <div className="bg-white rounded-lg border shadow-sm px-4 py-3 text-sm text-gray-600">
-        {message.text ?? '응답을 받지 못했습니다.'}
-      </div>
+      <Card className={`!p-0 overflow-hidden ${isLatest ? 'ring-1 ring-red-100' : ''}`}>
+        <div className="px-4 py-3 flex items-start gap-3">
+          <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+          <div className="flex-1 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+            {message.content ?? message.text ?? '응답을 받지 못했습니다.'}
+          </div>
+        </div>
+        {message.sources && message.sources.length > 0 && (
+          <div className="px-4 py-2 bg-gray-50 dark:bg-gray-950 border-t">
+            <Sources sources={message.sources} />
+          </div>
+        )}
+        {onRetry && (
+          <div className="px-4 py-2 bg-gray-50 dark:bg-gray-950 border-t flex items-center gap-2">
+            <Btn onClick={onRetry} variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+              <RotateCcw className="w-3.5 h-3.5" /> 다시 시도
+            </Btn>
+          </div>
+        )}
+      </Card>
     )
   }
 
   const numericCols = result.columns.filter(c => isNumericCol(c, result.rows))
   const labelCol = getLabelCol(result.columns)
   const chartData = result.rows.slice(0, 18).map(r => ({
-    name: String(r[labelCol] ?? '').slice(0, 4),
+    name: String(r[labelCol] ?? '').slice(0, 5),
     v: toNumber(r[chartCol]),
     full: r[labelCol],
   }))
+  const pieData = result.rows.slice(0, 12).map(r => ({
+    name: String(r[labelCol] ?? '기타'),
+    value: toNumber(r[chartCol]),
+  })).filter(d => d.value > 0)
+
+  async function copyResult() {
+    if (!result) return
+    const text = [
+      result.intent ? `의도: ${result.intent}` : '',
+      `결과 ${result.rows.length}행`,
+      result.columns.join('\t'),
+      ...result.rows.map(r => result.columns.map(c => String(r[c] ?? '')).join('\t')),
+    ].filter(Boolean).join('\n')
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // ignore
+    }
+  }
 
   return (
-    <div className={`bg-white rounded-lg border shadow-sm overflow-hidden ${isLatest ? 'ring-1 ring-blue-100' : ''}`}>
-      <div className="px-4 py-3 bg-gray-50 border-b flex items-center justify-between flex-wrap gap-2">
+    <Card className={`!p-0 overflow-hidden ${isLatest ? 'ring-1 ring-blue-100' : ''}`}>
+      <div className="px-4 py-3 bg-gray-50 dark:bg-gray-950 border-b flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2 flex-wrap">
           {result.intent && (
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-              {result.intent}
-            </span>
+            <Badge variant="purple" size="sm">{result.intent}</Badge>
           )}
           {result.sigun && (
-            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-              {result.sigun}
-            </span>
+            <Badge variant="gray" size="sm">{result.sigun}</Badge>
           )}
-          <span className="text-xs text-gray-400">{result.rows.length}개 결과</span>
+          <span className="text-xs text-gray-400 dark:text-gray-300">{result.rows.length}개 결과</span>
         </div>
-        {numericCols.length > 0 && (
-          <div className="flex items-center gap-2">
-            {numericCols.length > 1 && (
-              <select
-                value={chartCol}
-                onChange={e => setChartCol(e.target.value)}
-                className="text-xs border rounded px-2 py-1 text-gray-600 bg-white"
-              >
-                {numericCols.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            )}
-            <div className="flex rounded border overflow-hidden">
-              <button
-                onClick={() => setViewMode('table')}
-                className={`flex items-center gap-1 px-2.5 py-1 text-xs ${
-                  viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <Table2 className="w-3.5 h-3.5" /> 표
-              </button>
-              <button
-                onClick={() => setViewMode('chart')}
-                className={`flex items-center gap-1 px-2.5 py-1 text-xs ${
-                  viewMode === 'chart' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <BarChart2 className="w-3.5 h-3.5" /> 차트
-              </button>
+        <div className="flex items-center gap-2">
+          {numericCols.length > 0 && (
+            <div className="flex items-center gap-2">
+              {numericCols.length > 1 && (
+                <select
+                  value={chartCol}
+                  onChange={e => setChartCol(e.target.value)}
+                  className="text-xs border rounded px-2 py-1 text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900"
+                >
+                  {numericCols.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              )}
+              <div className="flex rounded border overflow-hidden">
+                <button
+                  onClick={() => setViewMode('table')}
+                  className={`flex items-center gap-1 px-2.5 py-1 text-xs ${
+                    viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  }`}
+                >
+                  <Table2 className="w-3.5 h-3.5" /> 표
+                </button>
+                <button
+                  onClick={() => setViewMode('chart')}
+                  className={`flex items-center gap-1 px-2.5 py-1 text-xs ${
+                    viewMode === 'chart' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  }`}
+                >
+                  <BarChart2 className="w-3.5 h-3.5" /> 차트
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+          <Btn
+            onClick={copyResult}
+            variant="secondary"
+            size="sm"
+            className="text-xs"
+            title="결과 복사"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? '복사됨' : '복사'}
+          </Btn>
+        </div>
       </div>
 
       {result.hint && (
@@ -226,86 +413,151 @@ function ResultCard({ message, isLatest }: { message: ChatMessage; isLatest?: bo
         </div>
       )}
 
-      {result.rows.length === 0 ? (
-        <div className="px-4 py-10 text-center text-gray-400 text-sm">결과 없음</div>
-      ) : viewMode === 'chart' && chartCol ? (
-        <div className="p-4">
-          <p className="text-xs text-gray-400 mb-3">{chartCol}</p>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={chartData} margin={{ top: 16, right: 20, left: 10, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-              <YAxis
-                tick={{ fontSize: 11 }}
-                tickFormatter={v => typeof v === 'number' && v >= 10000 ? `${(v / 10000).toFixed(0)}만` : String(v)}
-              />
-              <Tooltip
-                formatter={(v: unknown) => [Number(v).toLocaleString(), chartCol]}
-                labelFormatter={(_, payload) => String((payload?.[0]?.payload as { full?: unknown })?.full ?? '')}
-              />
-              <Bar dataKey="v" radius={[4, 4, 0, 0]}>
-                <LabelList
-                  dataKey="v"
-                  position="top"
-                  style={{ fontSize: 10, fill: '#6b7280' }}
-                  formatter={(v: unknown) => {
-                    const n = Number(v)
-                    return n >= 10000 ? `${(n / 10000).toFixed(1)}만` : n.toLocaleString()
-                  }}
-                />
-                {chartData.map((_, i) => (
-                  <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
-        <div className="overflow-x-auto max-h-96">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 sticky top-0">
-              <tr>
-                {result.columns.map(c => (
-                  <th key={c} className="px-4 py-2 text-left text-gray-600 font-medium text-xs whitespace-nowrap">
-                    {c}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {result.rows.map((row, i) => (
-                <tr key={i} className="hover:bg-gray-50">
-                  {result.columns.map(c => (
-                    <td key={c} className="px-4 py-2 text-gray-700 text-sm whitespace-nowrap">
-                      {formatValue(row[c])}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {message.content && (
+        <div className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap border-b">
+          {message.content}
         </div>
       )}
 
-      {result.source && (
-        <div className="px-4 py-2 bg-gray-50 border-t flex items-center gap-2">
-          <span className="text-xs text-gray-400">출처:</span>
-          {result.source_url ? (
-            <a
-              href={result.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
-            >
-              {result.source}
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          ) : (
-            <span className="text-xs text-gray-500">{result.source}</span>
+      <ResultSummary
+        summary={result.summary}
+        topN={result.topN}
+        filterDescription={result.filterDescription}
+      />
+
+      {result.rows.length === 0 ? (
+        <div className="px-4 py-10 text-center text-gray-400 dark:text-gray-300 text-sm">결과 없음</div>
+      ) : viewMode === 'chart' && chartCol ? (
+        <figure
+          className="p-4"
+          role="img"
+          aria-label={`${chartCol} 기준 ${chartType === 'pie' ? '구성 비율' : chartType === 'line' ? '추이' : '비교'} 차트, ${chartData.length}개 항목`}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{chartCol}</p>
+            <div className="flex rounded border overflow-hidden">
+              <button
+                onClick={() => setChartType('bar')}
+                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'bar' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                title="막대 차트"
+                aria-label="막대 차트"
+              >
+                <BarChart2 className="w-3 h-3" />
+              </button>
+              <button
+                onClick={() => setChartType('line')}
+                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'line' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                title="선 차트"
+                aria-label="선 차트"
+              >
+                <TrendingUp className="w-3 h-3" />
+              </button>
+              <button
+                onClick={() => setChartType('pie')}
+                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'pie' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                title="원형 차트"
+                aria-label="원형 차트"
+              >
+                <PieChartIcon className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={320}>
+            {chartType === 'line' ? (
+              <LineChart data={chartData} margin={{ top: 16, right: 20, left: 10, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip
+                  formatter={(v: unknown) => [Number(v).toLocaleString(), chartCol]}
+                  labelFormatter={(_, payload) => String((payload?.[0]?.payload as { full?: unknown })?.full ?? '')}
+                />
+                <Line type="monotone" dataKey="v" stroke="#4F46E5" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            ) : chartType === 'pie' ? (
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={entry => `${entry.name}: ${Number(entry.value).toLocaleString()}`}
+                >
+                  {pieData.map((_, i) => (
+                    <Cell key={`cell-${i}`} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v: unknown) => Number(v).toLocaleString()} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+              </PieChart>
+            ) : (
+              <BarChart data={chartData} margin={{ top: 16, right: 20, left: 10, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                <YAxis
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={v => typeof v === 'number' && v >= 10000 ? `${(v / 10000).toFixed(0)}만` : String(v)}
+                />
+                <Tooltip
+                  formatter={(v: unknown) => [Number(v).toLocaleString(), chartCol]}
+                  labelFormatter={(_, payload) => String((payload?.[0]?.payload as { full?: unknown })?.full ?? '')}
+                />
+                <Bar dataKey="v" radius={[4, 4, 0, 0]}>
+                  <LabelList
+                    dataKey="v"
+                    position="top"
+                    style={{ fontSize: 10, fill: '#6b7280' }}
+                    formatter={(v: unknown) => {
+                      const n = Number(v)
+                      return n >= 10000 ? `${(n / 10000).toFixed(1)}만` : n.toLocaleString()
+                    }}
+                  />
+                  {chartData.map((_, i) => (
+                    <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            )}
+          </ResponsiveContainer>
+        </figure>
+      ) : (
+        <SortableTable
+          caption="질의 결과"
+          ariaLabel="질의 결과 표"
+          maxHeight={384}
+          data={result.rows}
+          keyExtractor={(_, i) => String(i)}
+          columns={result.columns.map(c => ({
+            key: c,
+            label: c,
+            render: row => formatValue((row as Record<string, unknown>)[c]),
+          }))}
+        />
+      )}
+
+      <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-950 border-t space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SourceBadge source={result.source} sourceUrl={result.source_url} />
+          {result.follow_up && result.follow_up.length > 0 && onFollowUp && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] text-gray-400 dark:text-gray-300">추천:</span>
+              {result.follow_up.map(q => (
+                <button
+                  key={q}
+                  onClick={() => onFollowUp(q)}
+                  className="text-[11px] px-2 py-1 rounded-full bg-white dark:bg-gray-900 border text-gray-600 dark:text-gray-400 hover:border-blue-400 hover:text-blue-700 transition-colors"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
           )}
         </div>
-      )}
-    </div>
+        {message.sources && message.sources.length > 0 && <Sources sources={message.sources} />}
+      </div>
+    </Card>
   )
 }
 
@@ -321,11 +573,45 @@ export default function AiQueryClient() {
   const [showExamples, setShowExamples] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [copiedShare, setCopiedShare] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false)
+  const exportMenuRef = useRef<HTMLDivElement>(null)
+  const exportBtnRef = useRef<HTMLDivElement>(null)
+  const [sidebarSearch, setSidebarSearch] = useState('')
+  const [exampleCategory, setExampleCategory] = useState('전체')
+  const [examples, setExamples] = useState<ExampleItem[]>(DEFAULT_EXAMPLES)
 
   const currentConv = useMemo(
     () => conversations.find(c => c.id === currentId) ?? null,
     [conversations, currentId]
   )
+
+  const exampleCategories = useMemo(
+    () => ['전체', ...Array.from(new Set(examples.map(e => e.category)))],
+    [examples]
+  )
+
+  const filteredExamples = useMemo(
+    () => exampleCategory === '전체' ? examples : examples.filter(e => e.category === exampleCategory),
+    [exampleCategory, examples]
+  )
+
+  const filteredConversations = useMemo(
+    () => sidebarSearch.trim()
+      ? conversations.filter(c => c.title.toLowerCase().includes(sidebarSearch.toLowerCase()))
+      : conversations,
+    [conversations, sidebarSearch]
+  )
+
+  const stats = useMemo(() => {
+    const userMsgs = currentConv?.messages.filter(m => m.role === 'user').length ?? 0
+    const resultMsgs = currentConv?.messages.filter(m => m.role === 'assistant' && m.result).length ?? 0
+    return {
+      totalConversations: conversations.length,
+      questions: userMsgs,
+      results: resultMsgs,
+      lastActivity: currentConv ? timeAgo(currentConv.updatedAt) : '-',
+    }
+  }, [conversations.length, currentConv])
 
   // load from localStorage
   useEffect(() => {
@@ -374,6 +660,42 @@ export default function AiQueryClient() {
     }
   }, [currentConv?.messages, loading])
 
+  useEffect(() => {
+    if (!exportOpen || !exportMenuRef.current) return
+    const trap = createFocusTrap(exportMenuRef.current, {
+      onClose: () => setExportOpen(false),
+      escapeCloses: true,
+      returnFocus: true,
+    })
+    return () => trap.destroy()
+  }, [exportOpen])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      const target = e.target as Node
+      if (exportOpen && !exportBtnRef.current?.contains(target) && !exportMenuRef.current?.contains(target)) {
+        setExportOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [exportOpen])
+
+  // 동적 추천 질문 로드
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/ai/examples')
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { examples?: ExampleItem[] } | null) => {
+        if (cancelled || !data?.examples?.length) return
+        setExamples(data.examples)
+      })
+      .catch(() => {
+        // 네트워크 오류 시 기본 예시 유지
+      })
+    return () => { cancelled = true }
+  }, [])
+
   function createNewConversation(title = '새 대화') {
     const id = genId()
     const conv: Conversation = { id, title, messages: [], updatedAt: Date.now() }
@@ -416,31 +738,99 @@ export default function AiQueryClient() {
     }))
   }
 
-  async function ask(q: string) {
+  function getContextPayload(): ConversationTurn[] {
+    const msgs = currentConv?.messages ?? []
+    return msgs
+      .map((m): ConversationTurn | null => {
+        // 오류 메시지 턴은 문맥 추론에 혼란을 주지 않도록 제외
+        if (m.role === 'assistant' && !m.result) return null
+        return {
+          role: m.role,
+          text: m.query ?? m.text,
+          intent: m.result?.intent,
+          sigun: m.result?.sigun,
+          topN: m.result?.topN,
+          filterDescription: m.result?.filterDescription,
+        }
+      })
+      .filter((t): t is ConversationTurn => t !== null)
+  }
+
+  function messageContent(m: ChatMessage): string {
+    if (m.role === 'user') return m.query ?? ''
+    if (m.content) return m.content
+    if (m.text) return m.text
+    if (m.result) return m.result.summary ?? `의도: ${m.result.intent ?? '-'}, ${m.result.rows.length}개 결과`
+    return ''
+  }
+
+  function buildChatMessages(q: string, retry: boolean): { role: 'user' | 'assistant'; content: string }[] {
+    const prior = (currentConv?.messages ?? [])
+      .filter((m): m is ChatMessage => m.role === 'user' || m.role === 'assistant')
+      .map((m) => ({ role: m.role, content: messageContent(m) }))
+      .filter((m) => m.content.trim())
+
+    const msgs = [...prior]
+    const last = msgs[msgs.length - 1]
+    if (!retry || last?.role !== 'user') {
+      msgs.push({ role: 'user', content: q })
+    }
+    return msgs
+  }
+
+  async function ask(q: string, retry = false) {
     if (!q.trim()) return
     if (!currentId) createNewConversation(buildTitle(q))
     setLoading(true); setError(''); setShowExamples(false)
 
-    const userMsg: ChatMessage = { id: genId(), role: 'user', query: q, createdAt: Date.now() }
-    addMessage(userMsg)
+    if (!retry) {
+      const userMsg: ChatMessage = { id: genId(), role: 'user', query: q, createdAt: Date.now() }
+      addMessage(userMsg)
+    }
 
     try {
-      const r = await fetch(`/api/nlquery?q=${encodeURIComponent(q)}`)
-      if (!r.ok) throw new Error(`HTTP ${r.status}`)
-      const d: QueryResult = await r.json()
-      const assistantMsg: ChatMessage = { id: genId(), role: 'assistant', result: d, createdAt: Date.now() }
+      const r = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: buildChatMessages(q, retry) }),
+      })
+      const d: {
+        content?: string
+        result?: QueryResult
+        sources?: SourceItem[]
+        error?: string
+      } = await r.json()
+      if (!r.ok) {
+        throw new Error(d.error || `HTTP ${r.status}`)
+      }
+      const assistantMsg: ChatMessage = {
+        id: genId(),
+        role: 'assistant',
+        content: d.content,
+        result: d.result,
+        sources: d.sources,
+        createdAt: Date.now(),
+      }
       addMessage(assistantMsg)
     } catch (e) {
-      setError(e instanceof Error ? e.message : '질의 처리 중 오류가 발생했습니다.')
+      const msg = e instanceof Error ? e.message : '질의 처리 중 오류가 발생했습니다.'
+      setError(msg)
       const failMsg: ChatMessage = {
         id: genId(), role: 'assistant',
-        text: e instanceof Error ? e.message : '질의 처리 중 오류가 발생했습니다.',
+        text: msg,
         createdAt: Date.now()
       }
       addMessage(failMsg)
     } finally {
       setLoading(false)
       setQuery('')
+    }
+  }
+
+  function retryLast() {
+    const lastUser = currentConv?.messages.slice().reverse().find(m => m.role === 'user' && m.query)
+    if (lastUser?.query) {
+      ask(lastUser.query, true)
     }
   }
 
@@ -471,109 +861,172 @@ export default function AiQueryClient() {
   const messages = currentConv?.messages ?? []
 
   return (
-    <div className="flex h-[calc(100vh-140px)] min-h-[560px] gap-4">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-140px)] min-h-[560px] gap-4">
       {/* 사이드바 */}
       <aside
-        className={`${sidebarOpen ? 'w-64' : 'w-0 opacity-0'} transition-all duration-300 flex flex-col bg-white border rounded-lg shadow-sm overflow-hidden`}
+        className={`transition-all duration-300 flex flex-col bg-white dark:bg-gray-900 border rounded-lg shadow-sm overflow-hidden ${
+          sidebarOpen ? 'w-full md:w-64 h-48 md:h-auto opacity-100' : 'w-0 h-0 md:h-auto opacity-0 overflow-hidden'
+        }`}
+        aria-label="대화 목록"
       >
-        <div className="p-3 border-b">
-          <button
-            onClick={() => createNewConversation()}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
-          >
+        <div className="p-3 border-b space-y-2">
+          <Btn onClick={() => createNewConversation()} variant="primary" size="md" className="w-full justify-center">
             <Plus className="w-4 h-4" /> 새 대화
-          </button>
+          </Btn>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
+            <input
+              type="text"
+              value={sidebarSearch}
+              onChange={e => setSidebarSearch(e.target.value)}
+              placeholder="대화 검색..."
+              className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {sidebarSearch && (
+              <button
+                onClick={() => setSidebarSearch('')}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+                title="검색어 지우기"
+                aria-label="검색어 지우기"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {conversations.map(conv => (
-            <div
-              key={conv.id}
-              onClick={() => switchConversation(conv.id)}
-              className={`group flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer text-sm ${
-                conv.id === currentId ? 'bg-blue-50 text-blue-800' : 'text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <MessageSquare className="w-4 h-4 shrink-0 opacity-60" />
-              <span className="truncate flex-1">{conv.title}</span>
-              <button
-                onClick={e => { e.stopPropagation(); deleteConversation(conv.id) }}
-                className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-600 transition-opacity"
-                title="삭제"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
+          {filteredConversations.length === 0 ? (
+            <div className="px-3 py-6 text-center text-xs text-gray-400 dark:text-gray-300">
+              {sidebarSearch ? '검색 결과가 없습니다' : '저장된 대화가 없습니다'}
             </div>
-          ))}
+          ) : (
+            filteredConversations.map(conv => (
+              <div
+                key={conv.id}
+                className={`group flex items-center gap-2 rounded-md text-sm ${
+                  conv.id === currentId ? 'text-blue-800' : 'text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => switchConversation(conv.id)}
+                  className={`flex items-center gap-2 flex-1 min-w-0 px-3 py-2 rounded-md text-left ${
+                    conv.id === currentId
+                      ? 'bg-blue-50 text-blue-800'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  }`}
+                >
+                  <MessageSquare className="w-4 h-4 shrink-0 opacity-60" />
+                  <span className="truncate flex-1">{conv.title}</span>
+                </button>
+                <button
+                  onClick={() => deleteConversation(conv.id)}
+                  className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 dark:text-gray-300 hover:text-red-600 transition-opacity"
+                  title="삭제"
+                  aria-label="대화 삭제"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))
+          )}
         </div>
-        <div className="p-3 border-t text-xs text-gray-400 flex items-center gap-1.5">
+        <div className="p-3 border-t text-xs text-gray-400 dark:text-gray-300 flex items-center gap-1.5">
           <History className="w-3.5 h-3.5" />
-          {conversations.length}개 대화 저장됨
+          {sidebarSearch
+            ? `${filteredConversations.length}/${conversations.length}개 대화`
+            : `${conversations.length}개 대화 저장됨`}
         </div>
       </aside>
 
       {/* 메인 채팅 영역 */}
-      <div className="flex-1 flex flex-col bg-white border rounded-lg shadow-sm overflow-hidden">
+      <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 border rounded-lg shadow-sm overflow-hidden">
         {/* 헤더 */}
         <div className="px-4 py-3 border-b flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(o => !o)}
-            className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-md"
+            className="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
             title="대화 목록"
+            aria-label="대화 목록"
+            aria-expanded={sidebarOpen}
           >
             {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <History className="w-4 h-4" />}
           </button>
           <div className="flex-1">
-            <h2 className="text-lg font-semibold text-gray-800">AI 자연어 질의</h2>
-            <p className="text-xs text-gray-500">
-              경남 청년·사업체·인프라 데이터를 자연어로 질의 · 룰 기반 의도 매칭
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">AI 자연어 질의</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              경남 청년·사업체·인프라 데이터를 자연어로 질의 · RAG + 도구 호출 기반
             </p>
           </div>
           <div className="flex items-center gap-1.5">
-            <button
+            <Btn
               onClick={handleShare}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 border rounded-md hover:bg-gray-50"
+              variant="secondary"
+              size="sm"
               title="대화 링크 복사"
             >
               {copiedShare ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Share2 className="w-3.5 h-3.5" />}
               {copiedShare ? '복사됨' : '공유'}
-            </button>
-            <div className="relative group">
-              <button
-                className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 border rounded-md hover:bg-gray-50"
+            </Btn>
+            <div className="relative" ref={exportBtnRef}>
+              <Btn
+                variant="secondary"
+                size="sm"
                 title="대화 내용 저장"
+                aria-expanded={exportOpen}
+                aria-haspopup="menu"
+                aria-controls="ai-export-menu"
+                onClick={() => setExportOpen(v => !v)}
               >
                 <Download className="w-3.5 h-3.5" /> 내보내기
-              </button>
-              <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-white border rounded-md shadow-lg py-1 z-20 min-w-[120px]">
-                <button
-                  onClick={() => handleExport('markdown')}
-                  className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
+              </Btn>
+              {exportOpen && (
+                <div
+                  id="ai-export-menu"
+                  ref={exportMenuRef}
+                  role="menu"
+                  aria-label="대화 낳기 옵션"
+                  className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-900 border rounded-md shadow-lg py-1 z-20 min-w-[120px]"
                 >
-                  Markdown (.md)
-                </button>
-                <button
-                  onClick={() => handleExport('json')}
-                  className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
-                >
-                  JSON (.json)
-                </button>
-              </div>
+                    <button
+                      role="menuitem"
+                      onClick={() => { setExportOpen(false); handleExport('markdown') }}
+                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950"
+                    >
+                      Markdown (.md)
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => { setExportOpen(false); handleExport('json') }}
+                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950"
+                    >
+                      JSON (.json)
+                    </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
+        {/* 상단 요약 KPI */}
+        {conversations.length > 0 && (
+          <div className="px-4 py-3 border-b bg-gray-50/50 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard label="총 대화" value={stats.totalConversations} color="blue" icon={<MessageSquare className="w-5 h-5" />} />
+            <StatCard label="현재 질문" value={stats.questions} color="purple" icon={<HelpCircle className="w-5 h-5" />} />
+            <StatCard label="결과 수" value={stats.results} color="green" icon={<BarChart2 className="w-5 h-5" />} />
+            <StatCard label="마지막 활동" value={stats.lastActivity} color="amber" icon={<History className="w-5 h-5" />} />
+          </div>
+        )}
+
         {/* 채팅 메시지 */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-5">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 gap-4">
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                <Sparkles className="w-8 h-8 text-blue-500" />
-              </div>
-              <div>
-                <p className="text-gray-600 font-medium">경남 공공데이터에 대해 자연어로 질의필 수 있습니다.</p>
-                <p className="text-sm mt-1">아래 추천 질문을 선택하거나 직접 입력필세요.</p>
-              </div>
-            </div>
+            <EmptyState
+              icon={<Sparkles className="w-8 h-8 text-blue-500" />}
+              title="경남 공공데이터에 대해 자연어로 질의할 수 있습니다"
+              description="아래 추천 질문을 선택하거나 직접 입력하세요."
+              action={{ label: '새 대화 시작', onClick: () => createNewConversation() }}
+            />
           ) : (
             messages.map((m, idx) => (
               <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -583,9 +1036,14 @@ export default function AiQueryClient() {
                       {m.query}
                     </div>
                   ) : (
-                    <ResultCard message={m} isLatest={idx === messages.length - 1} />
+                    <ResultCard
+                      message={m}
+                      isLatest={idx === messages.length - 1}
+                      onFollowUp={q => ask(q)}
+                      onRetry={retryLast}
+                    />
                   )}
-                  <div className={`text-[10px] text-gray-400 mt-1 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
+                  <div className={`text-[10px] text-gray-400 dark:text-gray-300 mt-1 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
                     {new Date(m.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -595,72 +1053,125 @@ export default function AiQueryClient() {
 
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-white border rounded-lg px-4 py-3 shadow-sm flex items-center gap-3 text-sm text-gray-600">
-                <span className="w-4 h-4 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-                데이터를 조회하고 있습니다…
-              </div>
+              <Card className="!p-4 w-full max-w-xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-4 h-4 rounded-full" />
+                  <Skeleton className="w-32 h-4" />
+                </div>
+                <Skeleton className="w-full h-24" />
+                <div className="flex gap-2">
+                  <Skeleton className="w-20 h-8" />
+                  <Skeleton className="w-20 h-8" />
+                </div>
+              </Card>
             </div>
           )}
 
           {error && messages.length === 0 && (
-            <div className="bg-red-50 text-red-700 text-sm px-4 py-2.5 rounded-md border border-red-200">
-              {error}
-            </div>
+            <Card className="!p-4 bg-red-50 border-red-200 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-red-800">질의 처리 중 오류가 발생했습니다</p>
+                <p className="text-sm text-red-700 mt-0.5">{error}</p>
+              </div>
+              <Btn
+                onClick={retryLast}
+                variant="secondary"
+                size="sm"
+                loading={loading}
+                className="border-red-200 text-red-700 hover:bg-red-100"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> 다시 시도
+              </Btn>
+            </Card>
           )}
         </div>
 
         {/* 입력 영역 */}
-        <div className="p-4 border-t bg-gray-50">
+        <div className="p-4 border-t bg-gray-50 dark:bg-gray-950">
           {showExamples && messages.length === 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
-              {EXAMPLES.map(ex => (
-                <button
-                  key={ex.q}
-                  onClick={() => { setQuery(ex.q); ask(ex.q) }}
-                  className="px-3 py-1.5 bg-white border text-gray-600 text-xs rounded-full hover:border-blue-400 hover:text-blue-700 transition-colors"
-                >
-                  <Sparkles className="w-3 h-3 inline-block mr-1 text-amber-500" />
-                  {ex.label}
-                </button>
-              ))}
+            <div className="mb-3 space-y-2">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-xs text-gray-400 dark:text-gray-300 mr-1">추천:</span>
+                {exampleCategories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setExampleCategory(cat)}
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                      exampleCategory === cat
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-blue-400 hover:text-blue-700'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {filteredExamples.map(ex => (
+                  <button
+                    key={ex.q}
+                    onClick={() => { setQuery(ex.q); ask(ex.q) }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 border text-gray-600 dark:text-gray-400 text-xs rounded-full hover:border-blue-400 hover:text-blue-700 transition-colors"
+                  >
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${CATEGORY_COLORS[ex.category] || 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
+                      {ex.category}
+                    </span>
+                    <Sparkles className="w-3 h-3 text-amber-500" />
+                    {ex.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && ask(query)}
                 placeholder="예: 청년 정착잠재 순위 보여줘"
-                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
               />
             </div>
-            <button
+            <Btn
               onClick={() => ask(query)}
-              disabled={loading || !query.trim()}
-              className="px-5 py-2.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 font-medium flex items-center gap-1.5"
+              variant="primary"
+              size="md"
+              loading={loading}
+              disabled={!query.trim()}
+              className="px-5"
             >
-              {loading ? (
-                <>
-                  <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  처리 중
-                </>
-              ) : (
-                <><Send className="w-4 h-4" /> 질문</>
-              )}
-            </button>
-            <button
+              <Send className="w-4 h-4" /> 질문
+            </Btn>
+            <Btn
               onClick={() => setShowExamples(p => !p)}
-              className={`px-3 py-2.5 border rounded-md text-gray-500 hover:bg-gray-50 ${showExamples ? 'bg-blue-50 border-blue-200 text-blue-600' : ''}`}
+              variant="secondary"
+              size="md"
+              className={`px-3 ${showExamples ? 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100' : ''}`}
               title="추천 질문"
+              aria-label="추천 질문"
             >
               <HelpCircle className="w-4 h-4" />
-            </button>
+            </Btn>
+            {messages.length > 0 && (
+              <Btn
+                onClick={retryLast}
+                variant="secondary"
+                size="md"
+                loading={loading}
+                className="px-3"
+                title="마지막 질문 재시도"
+                aria-label="마지막 질문 재시도"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </Btn>
+            )}
           </div>
-          <p className="text-[11px] text-gray-400 mt-2">
-            이 응답은 룰 기반 평가로 생성되며, 실제 정책 판단 시 담당 부서 데이터를 확인필세요.
+          <p className="text-[11px] text-gray-400 dark:text-gray-300 mt-2">
+            이 응답은 검색된 컨텍스트와 도구 호출 결과를 바탕으로 생성되며, 실제 정책 판단 시 담당 부서 데이터를 확인하세요.
           </p>
         </div>
       </div>

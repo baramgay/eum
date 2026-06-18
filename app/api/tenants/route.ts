@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { logAction } from '@/lib/audit'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const supabase = await createClient()
   const { data } = await supabase.from('tenants').select('*')

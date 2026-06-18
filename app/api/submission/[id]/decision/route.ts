@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { recordDecision } from '@/lib/submission'
-import { logAction } from '@/lib/audit'
+import { logSubmissionDecided } from '@/lib/audit'
 import { sendEmail, emailDecisionNotify, getTenantContactEmail, CENTER_EMAIL } from '@/lib/email'
+import { createNotification } from '@/lib/notifications'
 
 const VALID_STATUSES = new Set(['approved', 'rejected', 'review'])
 
@@ -52,10 +53,12 @@ export async function POST(
     }, { onConflict: 'dataset_id' })
   }
 
-  // 감사 로그 (fire-and-forget)
-  const action = body.status === 'approved' ? 'approved' : body.status === 'rejected' ? 'rejected' : 'review'
-  void logAction(
-    supabase, user, action, 'submission', id,
+  // 감사 로그 (재시도 + 동기 경고)
+  void logSubmissionDecided(
+    supabase,
+    user,
+    id,
+    body.status as 'approved' | 'rejected' | 'review',
     { status: 'submitted' },
     { status: body.status, decision_note: body.decision_note },
     req,
@@ -72,6 +75,16 @@ export async function POST(
         body.decision_note ?? '',
       )
       await sendEmail(to, subject, html)
+
+      // 인앱 알림
+      const statusLabel = body.status === 'approved' ? '승인' : '반려'
+      await createNotification({
+        tenant_id: sub.tenant_id,
+        type: 'submission_decision',
+        title: `데이터 제출 ${statusLabel} — ${sub.title}`,
+        message: body.decision_note ?? undefined,
+        link: `/submission/${id}`,
+      })
     })()
   }
 

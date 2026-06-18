@@ -3,6 +3,18 @@
     {
       "path": "/api/cron/collect",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/quality",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/ontology",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/alerts",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

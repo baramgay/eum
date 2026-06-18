@@ -142,6 +142,16 @@ def action_update_types(config: dict) -> dict:
     return {"ok": True}
 
 
+def _apply_level_filters(df, variables: dict):
+    """level_values에 따라 범주형 변수의 선택된 레벨만 남긴 DataFrame 반환."""
+    level_values = variables.get("level_values") or {}
+    for col, levels in level_values.items():
+        if col not in df.columns or not levels:
+            continue
+        df = df[df[col].astype(str).isin([str(v) for v in levels])]
+    return df.copy()
+
+
 # ────────────────────────────────────────────
 # 분석 함수들
 # ────────────────────────────────────────────
@@ -288,6 +298,8 @@ def run_crosstab(df, variables: dict, options: dict) -> dict:
     import pandas as pd
     import numpy as np
     from scipy import stats
+
+    df = _apply_level_filters(df, variables)
 
     row_var = (variables.get("row") or [None])[0]
     col_var = (variables.get("column") or [None])[0]
@@ -568,6 +580,8 @@ def run_one_way_anova(df, variables: dict, options: dict) -> dict:
     import pandas as pd
     import numpy as np
     from scipy import stats
+
+    df = _apply_level_filters(df, variables)
 
     dep_var    = (variables.get("dependent") or [None])[0]
     factor_var = (variables.get("factor")    or [None])[0]
@@ -1002,6 +1016,8 @@ def run_chi_square_test(df, variables: dict, options: dict) -> dict:
     import pandas as pd
     import numpy as np
     from scipy import stats
+
+    df = _apply_level_filters(df, variables)
 
     var1 = (variables.get("variable1") or [None])[0]
     var2 = (variables.get("variable2") or [None])[0]

@@ -4,6 +4,14 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Input from '@/components/ui/Input'
+import Label from '@/components/ui/Label'
+import FormError from '@/components/ui/FormError'
+
+interface FormErrors {
+  email?: string
+  password?: string
+}
 
 export default function LoginPage() {
   const supabase = createClient()
@@ -11,9 +19,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [showPw,   setShowPw]   = useState(false)
   const [loading,  setLoading]  = useState(false)
+  const [errors,   setErrors]   = useState<FormErrors>({})
+
+  function validate(): boolean {
+    const next: FormErrors = {}
+    if (!email.trim()) {
+      next.email = '이메일을 입력해주세요.'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      next.email = '올바른 이메일 형식이 아닙니다.'
+    }
+    if (!password) {
+      next.password = '비밀번호를 입력해주세요.'
+    } else if (password.length < 6) {
+      next.password = '비밀번호는 6자 이상이어야 합니다.'
+    }
+    setErrors(next)
+    return Object.keys(next).length === 0
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!validate()) return
+
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
@@ -35,46 +62,58 @@ export default function LoginPage() {
                 stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">이음(EUM)</h1>
-          <p className="text-sm text-gray-500 mt-1">경남 공공데이터 개방 플랫폼</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">이음(EUM)</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">경남 공공데이터 개방 플랫폼</p>
         </div>
 
         {/* 카드 */}
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 p-8">
-          <h2 className="text-base font-semibold text-gray-900 mb-6">로그인</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm ring-1 ring-gray-200/80 p-8">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-6">로그인</h2>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">이메일</label>
-              <input
-                type="email" required value={email}
-                onChange={e => setEmail(e.target.value)}
+              <Label htmlFor="email" required>이메일</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={e => {
+                  setEmail(e.target.value)
+                  if (errors.email) setErrors(prev => ({ ...prev, email: undefined }))
+                }}
                 autoComplete="email"
                 placeholder="user@example.com"
-                className="w-full px-3.5 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl
-                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                           placeholder:text-gray-400 transition-all"
+                error={errors.email}
+                aria-describedby={errors.email ? 'email-error' : undefined}
               />
+              <FormError id="email-error" message={errors.email} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">비밀번호</label>
+              <Label htmlFor="password" required>비밀번호</Label>
               <div className="relative">
-                <input
-                  type={showPw ? 'text' : 'password'} required value={password}
-                  onChange={e => setPassword(e.target.value)}
+                <Input
+                  id="password"
+                  type={showPw ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => {
+                    setPassword(e.target.value)
+                    if (errors.password) setErrors(prev => ({ ...prev, password: undefined }))
+                  }}
                   autoComplete="current-password"
-                  className="w-full px-3.5 py-2.5 pr-10 text-sm bg-gray-50 border border-gray-200 rounded-xl
-                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                             transition-all"
+                  error={errors.password}
+                  aria-describedby={errors.password ? 'password-error' : undefined}
+                  className="pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 보기'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400"
                   tabIndex={-1}
                 >
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              <FormError id="password-error" message={errors.password} />
             </div>
 
             <button
@@ -94,7 +133,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs text-gray-600 dark:text-gray-300 mt-6">
           경남빅데이터센터 GNI · 데이터 허브 플랫폼
         </p>
       </div>

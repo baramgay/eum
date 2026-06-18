@@ -1,12 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   BarChart2, FlaskConical, Target, Plus, Trash2, Save,
   CheckCircle, AlertTriangle, Clock, ExternalLink, FileText,
-  Layers,
+  Layers, Search, X,
 } from 'lucide-react'
 import PipelineFlow from './PipelineFlow'
+import PageHeader from '@/components/ui/PageHeader'
+import Card from '@/components/ui/Card'
+import StatCard from '@/components/ui/StatCard'
+import Badge from '@/components/ui/Badge'
+import Btn from '@/components/ui/Btn'
+import EmptyState from '@/components/ui/EmptyState'
+import Skeleton from '@/components/ui/Skeleton'
 
 // ────── 타입 ──────
 interface AnalysisRecord {
@@ -36,24 +43,76 @@ interface QualInput {
   updated_at: string | null
 }
 
+// ────── 공통 스켈레톤 ──────
+function ListSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: count }).map((_, i) => (
+        <Card key={i} padding="sm" className="flex items-start gap-3">
+          <Skeleton className="w-8 h-8 rounded-lg flex-shrink-0" />
+          <div className="flex-1 space-y-2 py-0.5">
+            <Skeleton className="h-4 w-1/3" />
+            <Skeleton className="h-3 w-1/4" />
+          </div>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <Card>
+      <EmptyState
+        icon={<AlertTriangle className="w-6 h-6 text-red-500" />}
+        title="데이터를 불러오지 못했습니다"
+        description={message}
+        action={{ label: '다시 시도', onClick: onRetry }}
+      />
+    </Card>
+  )
+}
+
 // ────── 서브컴포넌트: 분석 실적 ──────
 function AnalysisTab() {
   const [records, setRecords] = useState<AnalysisRecord[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
   const [form, setForm] = useState({
     title: '', purpose: '', datasets_used: '', result_summary: '',
     policy_applied: false, performed_at: '',
   })
 
-  const load = () =>
+  const load = () => {
+    setLoading(true)
+    setError(null)
     fetch('/api/pipeline/analysis')
-      .then(r => r.json())
+      .then(async r => {
+        if (!r.ok) throw new Error('데이터를 불러오지 못했습니다.')
+        return r.json()
+      })
       .then(d => { setRecords(Array.isArray(d) ? d : []); setLoading(false) })
-      .catch(() => setLoading(false))
+      .catch((e) => { setError((e as Error).message); setLoading(false) })
+  }
 
   useEffect(() => { load() }, [])
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return records
+    return records.filter(r =>
+      r.title.toLowerCase().includes(q) ||
+      (r.purpose && r.purpose.toLowerCase().includes(q)) ||
+      (r.result_summary && r.result_summary.toLowerCase().includes(q))
+    )
+  }, [records, query])
+
+  const total = records.length
+  const policyCount = records.filter(r => r.policy_applied).length
 
   const save = async () => {
     if (!form.title.trim() || !form.performed_at) return
@@ -82,35 +141,48 @@ function AnalysisTab() {
 
   const del = async (id: string) => {
     if (!confirm('삭제하시겠습니까?')) return
+    setDeleting(id)
     await fetch(`/api/pipeline/analysis/${id}`, { method: 'DELETE' })
+    setDeleting(null)
     load()
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-gray-800">데이터 분석·활용 실적</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">데이터 분석·활용 실적</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             평가편람 분석·활용 ①-1 지표 — 데이터 분석·정책활용 실적 (10점)
           </p>
         </div>
-        <button
+        <Btn
+          size="sm"
+          className="bg-purple-600 hover:bg-purple-700 border-purple-600"
           onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
           실적 등록
-        </button>
+        </Btn>
       </div>
+
+      {!loading && !error && total > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard label="총 실적" value={total} color="purple" icon={<BarChart2 className="w-5 h-5" />} />
+          <StatCard label="정책 반영" value={policyCount} color="green" icon={<CheckCircle className="w-5 h-5" />} />
+          <StatCard label="미반영" value={total - policyCount} color="gray" icon={<Clock className="w-5 h-5" />} />
+          <StatCard label="반영률" value={`${total ? Math.round(policyCount / total * 100) : 0}%`} color="purple" icon={<Target className="w-5 h-5" />} />
+        </div>
+      )}
 
       {showForm && (
         <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 space-y-3">
           <h4 className="text-sm font-semibold text-purple-800">분석 실적 신규 등록</h4>
           <div className="grid md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">분석명 *</label>
+              <label htmlFor="pl-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석명 *</label>
               <input
+                id="pl-title"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
                 placeholder="예: 경남 청년인구 이동패턴 분석"
                 value={form.title}
@@ -118,8 +190,9 @@ function AnalysisTab() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">수행일 *</label>
+              <label htmlFor="pl-performed-at" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">수행일 *</label>
               <input
+                id="pl-performed-at"
                 type="date"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
                 value={form.performed_at}
@@ -127,8 +200,9 @@ function AnalysisTab() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">분석 목적</label>
+              <label htmlFor="pl-purpose" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석 목적</label>
               <input
+                id="pl-purpose"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
                 placeholder="정책활용 / 서비스개선 / 사회문제해결"
                 value={form.purpose}
@@ -136,8 +210,9 @@ function AnalysisTab() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">활용 데이터셋 (쉼표 구분)</label>
+              <label htmlFor="pl-datasets" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">활용 데이터셋 (쉼표 구분)</label>
               <input
+                id="pl-datasets"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
                 placeholder="주민등록인구통계, 청년지원사업현황"
                 value={form.datasets_used}
@@ -145,8 +220,9 @@ function AnalysisTab() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-medium text-gray-600 mb-1">결과 요약</label>
+              <label htmlFor="pl-result-summary" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">결과 요약</label>
               <textarea
+                id="pl-result-summary"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none"
                 rows={2}
                 placeholder="분석 결과 및 정책 제언 요약"
@@ -162,75 +238,109 @@ function AnalysisTab() {
               checked={form.policy_applied}
               onChange={e => setForm(p => ({ ...p, policy_applied: e.target.checked }))}
             />
-            <span className="text-gray-700">정책에 실제 반영됨</span>
+            <span className="text-gray-700 dark:text-gray-300">정책에 실제 반영됨</span>
           </label>
           <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => setShowForm(false)}
-              className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
-            >
-              취소
-            </button>
-            <button
+            <Btn size="sm" variant="ghost" onClick={() => setShowForm(false)}>취소</Btn>
+            <Btn
+              size="sm"
+              className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+              loading={saving}
+              disabled={!form.title.trim() || !form.performed_at}
               onClick={save}
-              disabled={saving || !form.title.trim() || !form.performed_at}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
             >
               <Save className="w-3.5 h-3.5" />
-              {saving ? '저장 중...' : '저장'}
-            </button>
+              저장
+            </Btn>
           </div>
         </div>
       )}
 
-      {loading ? (
-        <div className="text-center py-8 text-gray-400 text-sm">로딩 중...</div>
-      ) : records.length === 0 ? (
-        <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl">
-          <BarChart2 className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm text-gray-400">등록된 분석 실적이 없습니다.</p>
-          <p className="text-xs text-gray-300 mt-1">
-            분석·활용 지표 기여를 위해 실적을 등록하세요.
-          </p>
+      {!loading && !error && total > 0 && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
+          <input
+            type="text"
+            placeholder="분석명, 목적, 결과 요약 검색..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="w-full pl-9 pr-9 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+              aria-label="검색어 초기화"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
+      )}
+
+      {loading ? (
+        <ListSkeleton />
+      ) : error ? (
+        <ErrorState message={error} onRetry={load} />
+      ) : records.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={<BarChart2 className="w-6 h-6 text-purple-500" />}
+            title="등록된 분석 실적이 없습니다"
+            description="분석·활용 지표 기여를 위해 실적을 등록하세요."
+            action={{ label: '실적 등록', onClick: () => setShowForm(true) }}
+          />
+        </Card>
+      ) : filtered.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={<Search className="w-6 h-6 text-gray-400 dark:text-gray-300" />}
+            title="검색 결과가 없습니다"
+            description="다른 키워드나 필터를 변경해 보세요."
+          />
+        </Card>
       ) : (
         <div className="space-y-2">
-          {records.map(r => (
-            <div key={r.record_id} className="bg-white border rounded-xl p-4 flex items-start gap-3 hover:border-purple-200 transition-colors">
-              <div className={`mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${r.policy_applied ? 'bg-green-100' : 'bg-gray-100'}`}>
+          {filtered.map(r => (
+            <Card key={r.record_id} padding="sm" hover className="flex items-start gap-3">
+              <div className={`mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${r.policy_applied ? 'bg-green-100' : 'bg-gray-100 dark:bg-gray-800'}`}>
                 {r.policy_applied
                   ? <CheckCircle className="w-4 h-4 text-green-600" />
-                  : <Clock className="w-4 h-4 text-gray-400" />}
+                  : <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium text-gray-800">{r.title}</p>
-                  <button
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{r.title}</p>
+                  <Btn
+                    size="sm"
+                    variant="ghost"
+                    className="text-gray-300 dark:text-gray-200 hover:text-red-600 hover:bg-red-50"
+                    loading={deleting === r.record_id}
                     onClick={() => del(r.record_id)}
-                    className="flex-shrink-0 text-gray-300 hover:text-red-500 transition-colors"
+                    aria-label="삭제"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  </Btn>
                 </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
-                  <span className="text-xs text-gray-400">{r.performed_at.slice(0, 10)}</span>
-                  {r.purpose && <span className="text-xs text-purple-600">{r.purpose}</span>}
-                  {r.policy_applied && (
-                    <span className="text-xs text-green-600 font-medium">정책 반영</span>
-                  )}
+                <div className="flex flex-wrap items-center gap-2 mt-1">
+                  <span className="text-xs text-gray-400 dark:text-gray-300">{r.performed_at.slice(0, 10)}</span>
+                  {r.purpose && <Badge variant="purple">{r.purpose}</Badge>}
+                  <Badge variant={r.policy_applied ? 'green' : 'gray'}>
+                    {r.policy_applied ? '정책 반영' : '미반영'}
+                  </Badge>
                 </div>
                 {r.datasets_used && r.datasets_used.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1.5">
                     {r.datasets_used.map(ds => (
-                      <span key={ds} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{ds}</span>
+                      <Badge key={ds} variant="gray" size="sm">{ds}</Badge>
                     ))}
                   </div>
                 )}
                 {r.result_summary && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{r.result_summary}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{r.result_summary}</p>
                 )}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
@@ -240,27 +350,50 @@ function AnalysisTab() {
 
 // ────── 서브컴포넌트: 가명·합성 실적 ──────
 const CASE_TYPE_LABEL = { synthetic: '합성데이터', anonymized: '가명정보 제공' }
-const CASE_TYPE_COLOR = { synthetic: 'bg-blue-100 text-blue-700', anonymized: 'bg-amber-100 text-amber-700' }
+const CASE_TYPE_BADGE: Record<string, 'blue' | 'amber'> = { synthetic: 'blue', anonymized: 'amber' }
 
 function SyntheticTab() {
   const [cases, setCases] = useState<SyntheticCase[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState<'all' | 'synthetic' | 'anonymized'>('all')
   const [form, setForm] = useState({
     case_type: 'synthetic' as 'synthetic' | 'anonymized',
     title: '', dataset_id: '', portal_url: '', opened_at: '',
   })
 
-  const load = () =>
+  const load = () => {
+    setLoading(true)
+    setError(null)
     fetch('/api/pipeline/synthetic')
-      .then(r => r.json())
+      .then(async r => {
+        if (!r.ok) throw new Error('데이터를 불러오지 못했습니다.')
+        return r.json()
+      })
       .then(d => { setCases(Array.isArray(d) ? d : []); setLoading(false) })
-      .catch(() => setLoading(false))
+      .catch((e) => { setError((e as Error).message); setLoading(false) })
+  }
 
   useEffect(() => { load() }, [])
 
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return cases.filter(c => {
+      const matchesType = typeFilter === 'all' || c.case_type === typeFilter
+      const matchesQuery = !q ||
+        c.title.toLowerCase().includes(q) ||
+        (c.dataset_id && c.dataset_id.toLowerCase().includes(q))
+      return matchesType && matchesQuery
+    })
+  }, [cases, query, typeFilter])
+
   const bonusScore = Math.min(cases.length, 5)
+  const syntheticCount = cases.filter(c => c.case_type === 'synthetic').length
+  const anonymizedCount = cases.filter(c => c.case_type === 'anonymized').length
 
   const save = async () => {
     if (!form.title.trim() || !form.opened_at) return
@@ -286,59 +419,74 @@ function SyntheticTab() {
 
   const del = async (id: string) => {
     if (!confirm('삭제하시겠습니까?')) return
+    setDeleting(id)
     await fetch(`/api/pipeline/synthetic/${id}`, { method: 'DELETE' })
+    setDeleting(null)
     load()
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-gray-800">가명정보·합성데이터 개방 실적</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">가명정보·합성데이터 개방 실적</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             평가편람 ⑤ 가점 — 1건당 1점, 최대 5점 가점
           </p>
         </div>
-        <button
+        <Btn
+          size="sm"
+          className="bg-blue-600 hover:bg-blue-700 border-blue-600"
           onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
           실적 등록
-        </button>
+        </Btn>
       </div>
 
+      {!loading && !error && cases.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard label="총 실적" value={cases.length} color="blue" icon={<FlaskConical className="w-5 h-5" />} />
+          <StatCard label="획득 가점" value={`+${bonusScore}`} color="green" icon={<CheckCircle className="w-5 h-5" />} />
+          <StatCard label="합성데이터" value={syntheticCount} color="blue" icon={<BarChart2 className="w-5 h-5" />} />
+          <StatCard label="가명정보 제공" value={anonymizedCount} color="amber" icon={<FileText className="w-5 h-5" />} />
+        </div>
+      )}
+
       {/* 가점 현황 배지 */}
-      <div className={`rounded-xl p-4 flex items-center gap-4 ${bonusScore >= 5 ? 'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200'}`}>
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold ${bonusScore >= 5 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-          +{bonusScore}
-        </div>
-        <div>
-          <p className={`text-sm font-semibold ${bonusScore >= 5 ? 'text-green-700' : 'text-blue-700'}`}>
-            현재 가점 {bonusScore}점 / 최대 5점
-          </p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {cases.length}건 등록 — {bonusScore >= 5 ? '최대 가점 달성!' : `${5 - bonusScore}건 추가 시 만점`}
-          </p>
-        </div>
-        <div className="flex-1">
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all ${bonusScore >= 5 ? 'bg-green-500' : 'bg-blue-500'}`}
-              style={{ width: `${(bonusScore / 5) * 100}%` }}
-            />
+      {!loading && !error && (
+        <div className={`rounded-xl p-4 flex items-center gap-4 ${bonusScore >= 5 ? 'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200'}`}>
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold ${bonusScore >= 5 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+            +{bonusScore}
+          </div>
+          <div>
+            <p className={`text-sm font-semibold ${bonusScore >= 5 ? 'text-green-700' : 'text-blue-700'}`}>
+              현재 가점 {bonusScore}점 / 최대 5점
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {cases.length}건 등록 — {bonusScore >= 5 ? '최대 가점 달성!' : `${5 - bonusScore}건 추가 시 만점`}
+            </p>
+          </div>
+          <div className="flex-1">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div
+                className={`h-2 rounded-full transition-all ${bonusScore >= 5 ? 'bg-green-500' : 'bg-blue-500'}`}
+                style={{ width: `${(bonusScore / 5) * 100}%` }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {showForm && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
           <h4 className="text-sm font-semibold text-blue-800">가명정보·합성데이터 실적 등록</h4>
           <div className="grid md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">유형 *</label>
+              <label htmlFor="pl-case-type" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">유형 *</label>
               <select
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white"
+                id="pl-case-type"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900"
                 value={form.case_type}
                 onChange={e => setForm(p => ({ ...p, case_type: e.target.value as 'synthetic' | 'anonymized' }))}
               >
@@ -347,8 +495,9 @@ function SyntheticTab() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">개방·제공일 *</label>
+              <label htmlFor="pl-opened-at" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">개방·제공일 *</label>
               <input
+                id="pl-opened-at"
                 type="date"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
                 value={form.opened_at}
@@ -356,8 +505,9 @@ function SyntheticTab() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-medium text-gray-600 mb-1">데이터명 *</label>
+              <label htmlFor="pl-syn-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">데이터명 *</label>
               <input
+                id="pl-syn-title"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
                 placeholder="예: 경남 복지서비스 이용 합성데이터"
                 value={form.title}
@@ -365,8 +515,9 @@ function SyntheticTab() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">연관 데이터셋 ID</label>
+              <label htmlFor="pl-dataset-id" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">연관 데이터셋 ID</label>
               <input
+                id="pl-dataset-id"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
                 placeholder="catalog 데이터셋 ID"
                 value={form.dataset_id}
@@ -374,8 +525,9 @@ function SyntheticTab() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">공공데이터포털 URL</label>
+              <label htmlFor="pl-portal-url" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">공공데이터포털 URL</label>
               <input
+                id="pl-portal-url"
                 type="url"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
                 placeholder="https://data.go.kr/..."
@@ -385,48 +537,95 @@ function SyntheticTab() {
             </div>
           </div>
           <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => setShowForm(false)}
-              className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
-            >
-              취소
-            </button>
-            <button
+            <Btn size="sm" variant="ghost" onClick={() => setShowForm(false)}>취소</Btn>
+            <Btn
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 border-blue-600"
+              loading={saving}
+              disabled={!form.title.trim() || !form.opened_at}
               onClick={save}
-              disabled={saving || !form.title.trim() || !form.opened_at}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               <Save className="w-3.5 h-3.5" />
-              {saving ? '저장 중...' : '저장'}
-            </button>
+              저장
+            </Btn>
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && cases.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
+            <input
+              type="text"
+              placeholder="데이터명, 데이터셋 ID 검색..."
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              className="w-full pl-9 pr-9 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+                aria-label="검색어 초기화"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <div className="flex gap-1.5">
+            {(['all', 'synthetic', 'anonymized'] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setTypeFilter(t)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                  typeFilter === t
+                    ? 'bg-blue-50 border-blue-200 text-blue-700'
+                    : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                }`}
+              >
+                {t === 'all' ? '전체' : CASE_TYPE_LABEL[t]}
+              </button>
+            ))}
           </div>
         </div>
       )}
 
       {loading ? (
-        <div className="text-center py-8 text-gray-400 text-sm">로딩 중...</div>
+        <ListSkeleton />
+      ) : error ? (
+        <ErrorState message={error} onRetry={load} />
       ) : cases.length === 0 ? (
-        <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl">
-          <FlaskConical className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm text-gray-400">등록된 실적이 없습니다.</p>
-          <p className="text-xs text-gray-300 mt-1">1건 등록 시 1점 가점 부여됩니다.</p>
-        </div>
+        <Card>
+          <EmptyState
+            icon={<FlaskConical className="w-6 h-6 text-blue-500" />}
+            title="등록된 실적이 없습니다"
+            description="1건 등록 시 1점 가점 부여됩니다."
+            action={{ label: '실적 등록', onClick: () => setShowForm(true) }}
+          />
+        </Card>
+      ) : filtered.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={<Search className="w-6 h-6 text-gray-400 dark:text-gray-300" />}
+            title="검색 결과가 없습니다"
+            description="다른 키워드나 필터를 변경해 보세요."
+          />
+        </Card>
       ) : (
         <div className="space-y-2">
-          {cases.map(c => (
-            <div key={c.case_id} className="bg-white border rounded-xl p-4 flex items-start gap-3 hover:border-blue-200 transition-colors">
+          {filtered.map(c => (
+            <Card key={c.case_id} padding="sm" hover className="flex items-start gap-3">
               <div className="mt-0.5 w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <FlaskConical className="w-4 h-4 text-blue-600" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-medium text-gray-800">{c.title}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${CASE_TYPE_COLOR[c.case_type]}`}>
-                        {CASE_TYPE_LABEL[c.case_type]}
-                      </span>
-                      <span className="text-xs text-gray-400">{c.opened_at.slice(0, 10)}</span>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{c.title}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <Badge variant={CASE_TYPE_BADGE[c.case_type]}>{CASE_TYPE_LABEL[c.case_type]}</Badge>
+                      <span className="text-xs text-gray-400 dark:text-gray-300">{c.opened_at.slice(0, 10)}</span>
                       {c.portal_url && (
                         <a
                           href={c.portal_url}
@@ -439,15 +638,19 @@ function SyntheticTab() {
                       )}
                     </div>
                   </div>
-                  <button
+                  <Btn
+                    size="sm"
+                    variant="ghost"
+                    className="text-gray-300 dark:text-gray-200 hover:text-red-600 hover:bg-red-50"
+                    loading={deleting === c.case_id}
                     onClick={() => del(c.case_id)}
-                    className="flex-shrink-0 text-gray-300 hover:text-red-500 transition-colors"
+                    aria-label="삭제"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  </Btn>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
@@ -462,15 +665,23 @@ function TargetsTab() {
     quality_pass_goal: 100, synthetic_goal: 2, analysis_goal: 5,
   })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true)
+    setError(null)
     fetch('/api/pipeline/targets')
-      .then(r => r.json())
+      .then(async r => {
+        if (!r.ok) throw new Error('목표 데이터를 불러오지 못했습니다.')
+        return r.json()
+      })
       .then(d => { setTargets(d); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [])
+      .catch((e) => { setError((e as Error).message); setLoading(false) })
+  }
+
+  useEffect(() => { load() }, [])
 
   const save = async () => {
     setSaving(true)
@@ -493,25 +704,44 @@ function TargetsTab() {
     { key: 'analysis_goal',       label: '분석 실적 목표건수', unit: '건', desc: '분석·활용 ①-1 지표 목표' },
   ]
 
-  if (loading) return <div className="text-center py-8 text-gray-400 text-sm">로딩 중...</div>
+  if (loading) {
+    return (
+      <Card padding="sm">
+        <Skeleton className="h-4 w-1/3 mb-4" />
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4">
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-3 w-1/4" />
+                <Skeleton className="h-3 w-2/3" />
+              </div>
+              <Skeleton className="h-8 w-20" />
+            </div>
+          ))}
+        </div>
+      </Card>
+    )
+  }
+
+  if (error) return <ErrorState message={error} onRetry={load} />
 
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-base font-semibold text-gray-800">평가 목표 설정</h3>
-        <p className="text-xs text-gray-500 mt-0.5">목표 대비 현황을 리포트에서 비교합니다.</p>
+        <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">평가 목표 설정</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">목표 대비 현황을 리포트에서 비교합니다.</p>
       </div>
-      <div className="bg-white border rounded-xl overflow-hidden">
-        <div className="px-4 py-3 bg-gray-50 border-b flex items-center gap-2">
+      <div className="bg-white dark:bg-gray-900 border rounded-xl overflow-hidden">
+        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-950 border-b flex items-center gap-2">
           <Target className="w-4 h-4 text-amber-500" />
-          <span className="text-sm font-semibold text-gray-700">{targets.target_year}년 평가 목표</span>
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{targets.target_year}년 평가 목표</span>
         </div>
         <div className="p-4 space-y-4">
           {fields.map(f => (
             <div key={f.key} className="flex items-center gap-4">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-700">{f.label}</p>
-                <p className="text-xs text-gray-400">{f.desc}</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{f.label}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-300">{f.desc}</p>
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 <input
@@ -523,27 +753,26 @@ function TargetsTab() {
                   value={targets[f.key]}
                   onChange={e => setTargets(p => ({ ...p, [f.key]: Number(e.target.value) }))}
                 />
-                <span className="text-xs text-gray-500 w-4">{f.unit}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 w-4">{f.unit}</span>
               </div>
             </div>
           ))}
         </div>
-        <div className="px-4 py-3 border-t bg-gray-50 flex justify-end">
-          <button
+        <div className="px-4 py-3 border-t bg-gray-50 dark:bg-gray-950 flex justify-end">
+          <Btn
+            size="sm"
+            className={saved
+              ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-100'
+              : 'bg-amber-500 hover:bg-amber-600 border-amber-500'}
+            loading={saving}
             onClick={save}
-            disabled={saving}
-            className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium ${
-              saved
-                ? 'bg-green-100 text-green-700'
-                : 'bg-amber-500 text-white hover:bg-amber-600'
-            } disabled:opacity-50`}
           >
             {saved ? (
               <><CheckCircle className="w-3.5 h-3.5" /> 저장됨</>
             ) : (
-              <><Save className="w-3.5 h-3.5" /> {saving ? '저장 중...' : '목표 저장'}</>
+              <><Save className="w-3.5 h-3.5" /> 목표 저장</>
             )}
-          </button>
+          </Btn>
         </div>
       </div>
 
@@ -562,11 +791,7 @@ function TargetsTab() {
 
 // ────── 서브컴포넌트: 정성지표 입력 ──────
 const STATUS_LABEL: Record<string, string> = { ok: '우수', warn: '보통', na: '미입력' }
-const STATUS_COLOR: Record<string, string> = {
-  ok:   'bg-green-100 text-green-700',
-  warn: 'bg-yellow-100 text-yellow-700',
-  na:   'bg-gray-100 text-gray-500',
-}
+const STATUS_BADGE: Record<string, 'green' | 'amber' | 'gray'> = { ok: 'green', warn: 'amber', na: 'gray' }
 
 function QualitativeTab() {
   const [inputs, setInputs] = useState<QualInput[] | null>(null)
@@ -608,18 +833,35 @@ function QualitativeTab() {
     }
   }
 
-  if (loading) return <div className="text-center py-8 text-gray-400 text-sm">로딩 중...</div>
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} padding="sm">
+            <Skeleton className="h-4 w-1/3 mb-3" />
+            <Skeleton className="h-3 w-2/3" />
+          </Card>
+        ))}
+      </div>
+    )
+  }
   if (errMsg === 'no_tenant') return (
-    <div className="text-center py-12 text-gray-400 text-sm">
-      <p className="font-medium text-gray-500">기관 담당자 전용 기능입니다.</p>
-      <p className="mt-1">개별 기관 계정으로 로그인하면 정성지표 실적을 입력할 수 있습니다.</p>
-    </div>
+    <Card>
+      <EmptyState
+        icon={<AlertTriangle className="w-6 h-6 text-amber-500" />}
+        title="기관 담당자 전용 기능입니다"
+        description="개별 기관 계정으로 로그인하면 정성지표 실적을 입력할 수 있습니다."
+      />
+    </Card>
   )
   if (errMsg === 'server_error') return (
-    <div className="text-center py-12 text-amber-600 text-sm">
-      <p className="font-medium">데이터베이스 준비 중입니다.</p>
-      <p className="mt-1 text-gray-500">Supabase SQL Editor에서 017_qualitative_inputs.sql 마이그레이션을 적용해주세요.</p>
-    </div>
+    <Card>
+      <EmptyState
+        icon={<AlertTriangle className="w-6 h-6 text-amber-500" />}
+        title="데이터베이스 준비 중입니다"
+        description="Supabase SQL Editor에서 017_qualitative_inputs.sql 마이그레이션을 적용해주세요."
+      />
+    </Card>
   )
 
   const safeInputs = inputs ?? []
@@ -628,8 +870,8 @@ function QualitativeTab() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-base font-semibold text-gray-800">정성지표 실적 입력</h3>
-        <p className="text-xs text-gray-500 mt-0.5">
+        <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">정성지표 실적 입력</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
           자동 집계가 불가한 정성 지표는 담당자가 직접 실적을 입력합니다.
         </p>
       </div>
@@ -643,17 +885,21 @@ function QualitativeTab() {
 
       <div className="space-y-2">
         {safeInputs.map(inp => (
-          <div key={inp.key} className="bg-white border rounded-xl p-4">
+          <Card key={inp.key} padding="sm" hover>
             {editing === inp.key ? (
               <div className="space-y-3">
-                <p className="text-sm font-medium text-gray-800">{inp.name}</p>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{inp.name}</p>
                 <div className="flex gap-2">
                   {(['ok', 'warn', 'na'] as const).map(s => (
                     <button
                       key={s}
                       onClick={() => setDraft(p => ({ ...p, status: s }))}
                       className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                        draft.status === s ? STATUS_COLOR[s] + ' border-current' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                        draft.status === s
+                          ? STATUS_BADGE[s] === 'green' ? 'bg-green-100 text-green-700 border-green-200' :
+                            STATUS_BADGE[s] === 'amber' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                            'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
                       }`}
                     >
                       {STATUS_LABEL[s]}
@@ -668,44 +914,45 @@ function QualitativeTab() {
                   onChange={e => setDraft(p => ({ ...p, note: e.target.value }))}
                 />
                 <div className="flex gap-2 justify-end">
-                  <button onClick={() => setEditing(null)} className="px-3 py-1.5 text-xs text-gray-500 hover:bg-gray-100 rounded-lg">취소</button>
-                  <button
+                  <Btn size="sm" variant="ghost" onClick={() => setEditing(null)}>취소</Btn>
+                  <Btn
+                    size="sm"
+                    className="bg-indigo-600 hover:bg-indigo-700 border-indigo-600"
+                    loading={saving === inp.key}
                     onClick={() => saveEdit(inp.key)}
-                    disabled={saving === inp.key}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
                   >
                     <Save className="w-3 h-3" />
-                    {saving === inp.key ? '저장 중...' : '저장'}
-                  </button>
+                    저장
+                  </Btn>
                 </div>
               </div>
             ) : (
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLOR[inp.status]}`}>
-                      {STATUS_LABEL[inp.status]}
-                    </span>
-                    <p className="text-sm font-medium text-gray-800">{inp.name}</p>
+                    <Badge variant={STATUS_BADGE[inp.status]}>{STATUS_LABEL[inp.status]}</Badge>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{inp.name}</p>
                   </div>
                   {inp.note && (
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{inp.note}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{inp.note}</p>
                   )}
                   {inp.updated_at && (
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
                       최종 수정: {new Date(inp.updated_at).toLocaleDateString('ko-KR')}
                     </p>
                   )}
                 </div>
-                <button
+                <Btn
+                  size="sm"
+                  variant="secondary"
+                  className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
                   onClick={() => startEdit(inp)}
-                  className="flex-shrink-0 px-2.5 py-1 text-xs text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
                 >
                   입력
-                </button>
+                </Btn>
               </div>
             )}
-          </div>
+          </Card>
         ))}
       </div>
     </div>
@@ -733,14 +980,12 @@ export default function PipelineClient() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold text-gray-800">데이터 파이프라인</h2>
-        <p className="text-sm text-gray-500 mt-0.5">
-          데이터가 수집·가공·분석·품질진단을 거쳐 개방되는 전체 흐름을 관리합니다.
-        </p>
-      </div>
+      <PageHeader
+        title="데이터 파이프라인"
+        subtitle="데이터가 수집·가공·분석·품질진단을 거쳐 개방되는 전체 흐름을 관리합니다."
+      />
 
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
         {[
           { key: 'flow', label: '데이터 처리 흐름', Icon: Layers },
           { key: 'performance', label: '실적 관리', Icon: BarChart2 },
@@ -750,10 +995,10 @@ export default function PipelineClient() {
             <button
               key={key}
               onClick={() => setMainTab(key as MainTab)}
-              className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px ${
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px whitespace-nowrap ${
                 active
                   ? 'border-blue-600 text-blue-700 bg-blue-50'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -768,21 +1013,21 @@ export default function PipelineClient() {
       {mainTab === 'performance' && (
         <div className="space-y-6">
           <div>
-            <h3 className="text-base font-semibold text-gray-800">평가편람 실적 관리</h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">평가편람 실적 관리</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               평가편람 정량 지표에 직접 기여하는 실적을 등록하고 관리합니다.
             </p>
           </div>
 
-          <div className="flex gap-1 border-b border-gray-200">
+          <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
             {PERFORMANCE_TABS.map(({ key, label, Icon, color }) => {
               const active = perfTab === key
               return (
                 <button
                   key={key}
                   onClick={() => setPerfTab(key)}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px ${
-                    active ? ACTIVE_STYLE[color] : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px whitespace-nowrap ${
+                    active ? ACTIVE_STYLE[color] : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
                   }`}
                 >
                   <Icon className="w-4 h-4" />

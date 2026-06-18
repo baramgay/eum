@@ -10,6 +10,14 @@ export type Row = Record<string, unknown>
 
 export type AggFunc = 'sum' | 'count' | 'mean' | 'max' | 'min'
 
+export const RULE_TYPES = [
+  'select', 'rename', 'cast', 'nullfill', 'nulldrop', 'filter',
+  'normalize', 'derive', 'dedup', 'codemap', 'concat', 'split',
+  'aggregate', 'join', 'pivot',
+] as const
+
+export type RuleType = (typeof RULE_TYPES)[number]
+
 export type Rule =
   | { type: 'select';    mode: 'include' | 'exclude'; columns: string[] }
   | { type: 'rename';    from: string; to: string }
@@ -40,6 +48,173 @@ export interface ProcessResult {
   inputRows: number
   outputRows: number
   errorRows: number
+}
+
+export interface RuleValidationError {
+  index: number
+  type: string
+  message: string
+}
+
+const VALID_CAST_TARGETS = ['number', 'string', 'date'] as const
+const VALID_FILTER_OPS = ['>', '<', '>=', '<=', '==', '!=', 'contains', 'startsWith', 'endsWith'] as const
+const VALID_NORMALIZE_FNS = ['trim', 'upper', 'lower'] as const
+const VALID_DERIVE_EXPRS = ['year', 'month', 'day', 'quarter', 'weekday', 'hour', 'dateformat'] as const
+const VALID_AGG_FUNCS = ['sum', 'count', 'mean', 'max', 'min'] as const
+const VALID_JOIN_HOWS = ['left', 'inner', 'right'] as const
+
+function isNonEmptyString(v: unknown): v is string {
+  return typeof v === 'string' && v.trim().length > 0
+}
+
+function isStringArray(v: unknown): v is string[] {
+  return Array.isArray(v) && v.every(i => typeof i === 'string')
+}
+
+const SAFE_TABLE_NAME_RE = /^[a-zA-Z_][a-zA-Z0-9_]*$/
+
+export function isSafeTableName(name: string): boolean {
+  return SAFE_TABLE_NAME_RE.test(name)
+}
+
+/**
+ * 단일 규칙의 필수 필드와 타입을 검증한다.
+ * 오류가 있으면 설명 문자열을, 없으면 null을 반환한다.
+ */
+export function validateRule(rule: unknown, index: number): RuleValidationError | null {
+  if (!rule || typeof rule !== 'object') {
+    return { index, type: 'unknown', message: '규칙이 객체가 아닙니다' }
+  }
+  const r = rule as Record<string, unknown>
+  const type = r.type
+  if (!isNonEmptyString(type) || !RULE_TYPES.includes(type as RuleType)) {
+    return { index, type: String(type), message: `지원하지 않는 규칙 타입입니다: ${type}` }
+  }
+
+  switch (type) {
+    case 'select': {
+      if (!isStringArray(r.columns) || r.columns.length === 0) {
+        return { index, type, message: '선택할 컬럼을 1개 이상 지정해야 합니다' }
+      }
+      if (r.mode !== 'include' && r.mode !== 'exclude') {
+        return { index, type, message: 'mode는 include 또는 exclude여야 합니다' }
+      }
+      break
+    }
+    case 'rename': {
+      if (!isNonEmptyString(r.from)) return { index, type, message: 'from 컬럼명을 입력해야 합니다' }
+      if (!isNonEmptyString(r.to)) return { index, type, message: 'to 컬럼명을 입력해야 합니다' }
+      break
+    }
+    case 'cast': {
+      if (!isNonEmptyString(r.column)) return { index, type, message: '컬럼명을 입력해야 합니다' }
+      if (!VALID_CAST_TARGETS.includes(r.to as typeof VALID_CAST_TARGETS[number])) {
+        return { index, type, message: 'to는 number/string/date 중 하나여야 합니다' }
+      }
+      break
+    }
+    case 'nullfill': {
+      if (!isNonEmptyString(r.column)) return { index, type, message: '컬럼명을 입력해야 합니다' }
+      break
+    }
+    case 'nulldrop': {
+      if (!isStringArray(r.columns) || r.columns.length === 0) {
+        return { index, type, message: '제거 기준 컬럼을 1개 이상 지정해야 합니다' }
+      }
+      break
+    }
+    case 'filter': {
+      if (!isNonEmptyString(r.column)) return { index, type, message: '컬럼명을 입력해야 합니다' }
+      if (!VALID_FILTER_OPS.includes(r.op as typeof VALID_FILTER_OPS[number])) {
+        return { index, type, message: '지원하지 않는 비교 연산자입니다' }
+      }
+      break
+    }
+    case 'normalize': {
+      if (!isNonEmptyString(r.column)) return { index, type, message: '컬럼명을 입력해야 합니다' }
+      if (!VALID_NORMALIZE_FNS.includes(r.fn as typeof VALID_NORMALIZE_FNS[number])) {
+        return { index, type, message: 'fn은 trim/upper/lower 중 하나여야 합니다' }
+      }
+      break
+    }
+    case 'derive': {
+      if (!isNonEmptyString(r.source)) return { index, type, message: '소스 컬럼명을 입력해야 합니다' }
+      if (!isNonEmptyString(r.target)) return { index, type, message: '대상 컬럼명을 입력해야 합니다' }
+      if (!VALID_DERIVE_EXPRS.includes(r.expr as typeof VALID_DERIVE_EXPRS[number])) {
+        return { index, type, message: '지원하지 않는 파생 표현식입니다' }
+      }
+      break
+    }
+    case 'dedup': {
+      if (!isStringArray(r.keys)) {
+        return { index, type, message: 'keys는 문자열 배열이어야 합니다' }
+      }
+      break
+    }
+    case 'codemap': {
+      if (!isNonEmptyString(r.column)) return { index, type, message: '컬럼명을 입력해야 합니다' }
+      if (!r.map || typeof r.map !== 'object' || Array.isArray(r.map)) {
+        return { index, type, message: 'map은 객체여야 합니다' }
+      }
+      break
+    }
+    case 'concat': {
+      if (!isNonEmptyString(r.target)) return { index, type, message: '결과 컬럼명을 입력해야 합니다' }
+      if (!isStringArray(r.sources) || r.sources.length === 0) {
+        return { index, type, message: '합칠 컬럼을 1개 이상 지정해야 합니다' }
+      }
+      break
+    }
+    case 'split': {
+      if (!isNonEmptyString(r.column)) return { index, type, message: '분리할 컬럼명을 입력해야 합니다' }
+      if (!isStringArray(r.targets) || r.targets.length === 0) {
+        return { index, type, message: '결과 컬럼을 1개 이상 지정해야 합니다' }
+      }
+      break
+    }
+    case 'aggregate': {
+      if (!isStringArray(r.groupBy)) {
+        return { index, type, message: 'groupBy는 문자열 배열이어야 합니다' }
+      }
+      if (!isNonEmptyString(r.column)) return { index, type, message: '집계할 컬럼명을 입력해야 합니다' }
+      if (!VALID_AGG_FUNCS.includes(r.agg as typeof VALID_AGG_FUNCS[number])) {
+        return { index, type, message: '지원하지 않는 집계 함수입니다' }
+      }
+      break
+    }
+    case 'join': {
+      if (!isNonEmptyString(r.datasetId)) return { index, type, message: '조인할 데이터셋 ID를 입력해야 합니다' }
+      if (!isNonEmptyString(r.on)) return { index, type, message: '조인 키 컬럼을 입력해야 합니다' }
+      if (!VALID_JOIN_HOWS.includes(r.how as typeof VALID_JOIN_HOWS[number])) {
+        return { index, type, message: 'how는 left/inner/right 중 하나여야 합니다' }
+      }
+      break
+    }
+    case 'pivot': {
+      if (!isNonEmptyString(r.index)) return { index, type, message: '인덱스 컬럼명을 입력해야 합니다' }
+      if (!isNonEmptyString(r.columns)) return { index, type, message: '피벗 컬럼명을 입력해야 합니다' }
+      if (!isNonEmptyString(r.values)) return { index, type, message: '값 컬럼명을 입력해야 합니다' }
+      if (!VALID_AGG_FUNCS.includes(r.agg as typeof VALID_AGG_FUNCS[number])) {
+        return { index, type, message: '지원하지 않는 집계 함수입니다' }
+      }
+      break
+    }
+  }
+  return null
+}
+
+/**
+ * 규칙 배열 전체를 검증한다.
+ * 오류가 있으면 오류 배열을, 없으면 빈 배열을 반환한다.
+ */
+export function validateRules(rules: unknown[]): RuleValidationError[] {
+  if (!Array.isArray(rules)) return [{ index: 0, type: 'unknown', message: 'rules는 배열이어야 합니다' }]
+  const errors: RuleValidationError[] = []
+  rules.forEach((rule, index) => {
+    const err = validateRule(rule, index)
+    if (err) errors.push(err)
+  })
+  return errors
 }
 
 // ─── 규칙별 처리 함수 ──────────────────────────────────────────────────────────
@@ -333,9 +508,75 @@ function applyPivot(rows: Row[], rule: Extract<Rule, { type: 'pivot' }>): Row[] 
   return Array.from(groups.values())
 }
 
+function applyJoin(
+  rows: Row[],
+  rule: Extract<Rule, { type: 'join' }>,
+  targetRows: Row[],
+): Row[] {
+  if (!targetRows.length) return rows
+
+  const joinKey = rule.on
+  const prefix = 'right_'
+
+  // 타겟 컬럼명 충돌 방지를 위해 접두어를 붙인다
+  const prefixedTarget = (row: Row): Row => {
+    const out: Row = {}
+    for (const [k, v] of Object.entries(row)) {
+      out[k === joinKey ? k : `${prefix}${k}`] = v
+    }
+    return out
+  }
+
+  const index = new Map<unknown, Row[]>()
+  for (const t of targetRows) {
+    const key = t[joinKey]
+    if (!index.has(key)) index.set(key, [])
+    index.get(key)!.push(prefixedTarget(t))
+  }
+
+  const result: Row[] = []
+
+  if (rule.how === 'right') {
+    // right join: 타겟의 모든 행을 출력, 매칭되는 왼쪽 행이 없으면 NULL
+    const leftIndex = new Map<unknown, Row[]>()
+    for (const r of rows) {
+      const key = r[joinKey]
+      if (!leftIndex.has(key)) leftIndex.set(key, [])
+      leftIndex.get(key)!.push(r)
+    }
+    for (const t of targetRows) {
+      const key = t[joinKey]
+      const leftMatches = leftIndex.get(key) ?? [null]
+      for (const l of leftMatches) {
+        result.push({ ...(l ?? {}), ...prefixedTarget(t) })
+      }
+    }
+    return result
+  }
+
+  for (const r of rows) {
+    const key = r[joinKey]
+    const matches = index.get(key)
+    if (matches && matches.length > 0) {
+      for (const m of matches) {
+        result.push({ ...r, ...m })
+      }
+    } else if (rule.how === 'left') {
+      // left join: 매칭 없어도 왼쪽 행은 출력, 타겟 컬럼은 NULL
+      const nullRow: Row = {}
+      for (const k of Object.keys(targetRows[0])) {
+        if (k !== joinKey) nullRow[`${prefix}${k}`] = null
+      }
+      result.push({ ...r, ...nullRow })
+    }
+    // inner: 매칭 없으면 제외
+  }
+  return result
+}
+
 // ─── 메인 함수 ─────────────────────────────────────────────────────────────────
 
-export function applyRules(data: Row[], rules: Rule[]): ProcessResult {
+export function applyRules(data: Row[], rules: Rule[], joinData: Record<string, Row[]> = {}): ProcessResult {
   const errors: ProcessError[] = []
   let rows: Row[] = [...data]
 
@@ -355,7 +596,7 @@ export function applyRules(data: Row[], rules: Rule[]): ProcessResult {
       case 'concat':    rows = applyConcat(rows, rule); break
       case 'split':     rows = applySplit(rows, rule, i, errors); break
       case 'aggregate': rows = applyAggregate(rows, rule); break
-      case 'join':      /* server-side only: 서버 실행 시 처리, 미리보기에서는 skip */ break
+      case 'join':      rows = applyJoin(rows, rule, joinData[rule.datasetId] ?? []); break
       case 'pivot':     rows = applyPivot(rows, rule); break
     }
   }
@@ -371,21 +612,180 @@ export function applyRules(data: Row[], rules: Rule[]): ProcessResult {
   }
 }
 
-// ─── Supabase 저장 연동 ────────────────────────────────────────────────────────
+// ─── 데이터셋 로드 ─────────────────────────────────────────────────────────────
+
+const DATASET_PAGE_SIZE = 1000
+
+export async function loadDatasetRows(
+  supabase: SupabaseClient,
+  datasetId: string,
+  options?: { limit?: number },
+): Promise<Row[]> {
+  const limit = options?.limit ?? Infinity
+
+  // 1) catalog 에 등록된 테이블인지 확인
+  const { data: cat } = await supabase
+    .from('catalog')
+    .select('table_name')
+    .eq('dataset_id', datasetId)
+    .maybeSingle()
+
+  const tableName = cat?.table_name
+
+  if (tableName && tableName.startsWith('gold_')) {
+    // Gold 테이블은 직접 쿼리
+    let rows: Row[] = []
+    let from = 0
+    while (true) {
+      const pageLimit = Math.min(DATASET_PAGE_SIZE, limit - rows.length)
+      if (pageLimit <= 0) break
+      const { data: page } = await supabase
+        .from(tableName)
+        .select('*')
+        .range(from, from + pageLimit - 1)
+      if (!page || page.length === 0) break
+      rows = rows.concat(page as Row[])
+      if (page.length < pageLimit) break
+      from += pageLimit
+      if (rows.length >= limit) break
+    }
+    return rows.slice(0, limit === Infinity ? undefined : limit)
+  }
+
+  // 2) submission_uploads.preview (JSONB) 로드
+  if (tableName) {
+    const { data: upload } = await supabase
+      .from('submission_uploads')
+      .select('preview')
+      .eq('table_name', tableName)
+      .maybeSingle()
+    if (upload?.preview) return (upload.preview as Row[]).slice(0, limit === Infinity ? undefined : limit)
+  }
+
+  // 3) datasetId 자체가 table_name 인 경우
+  const { data: upload } = await supabase
+    .from('submission_uploads')
+    .select('preview')
+    .eq('table_name', datasetId)
+    .maybeSingle()
+  if (upload?.preview) return (upload.preview as Row[]).slice(0, limit === Infinity ? undefined : limit)
+
+  return []
+}
+
+export async function collectJoinTargets(
+  supabase: SupabaseClient,
+  rules: Rule[],
+  options?: { limit?: number },
+): Promise<Record<string, Row[]>> {
+  const joinRules = rules.filter((r): r is Extract<Rule, { type: 'join' }> => r.type === 'join')
+  const targets: Record<string, Row[]> = {}
+  await Promise.all(
+    joinRules.map(async rule => {
+      targets[rule.datasetId] = await loadDatasetRows(supabase, rule.datasetId, options)
+    })
+  )
+  return targets
+}
+
+// ─── 결과 영속화 / 계보 기록 ───────────────────────────────────────────────────
 
 export interface PipelineRunResult {
-  run_id:      string
-  status:      'done' | 'failed'
-  input_rows:  number
-  output_rows: number
-  error_rows:  number
-  dataset_id:  string
-  error_msg?:  string
+  run_id:       string
+  status:       'done' | 'failed'
+  input_rows:   number
+  output_rows:  number
+  error_rows:   number
+  dataset_id:   string
+  result_table?: string
+  error_msg?:   string
 }
+
+export async function createDerivedTable(
+  supabase: SupabaseClient,
+  tableName: string,
+  rows: Row[],
+  schema?: Array<{ name: string; type: string }>,
+): Promise<void> {
+  if (!isSafeTableName(tableName)) {
+    throw new Error(`유효하지 않은 파생 테이블명입니다: ${tableName}`)
+  }
+  if (!rows.length) {
+    // RPC 는 비어 있는 행 배열에도 테이블을 생성해야 하므로 빈 스키마를 허용하지 않는다.
+    // 0행 결과는 카탈로그/업로드 미리보기만 남기고 파생 테이블은 생성하지 않는다.
+    return
+  }
+
+  const { error } = await supabase.rpc('create_derived_table', {
+    p_table_name: tableName,
+    p_columns:    schema ?? inferSchema(rows),
+    p_rows:       rows,
+  })
+
+  if (error) throw new Error(`파생 테이블 생성 실패: ${error.message}`)
+}
+
+export async function registerCatalogEntry(
+  supabase: SupabaseClient,
+  params: {
+    datasetId: string
+    tenantId: string
+    title: string
+    description?: string
+    tableName: string
+    rowCount: number
+    derivedFrom: Record<string, unknown>
+    lineageIds: string[]
+  },
+): Promise<void> {
+  const { error } = await supabase.from('catalog').upsert({
+    dataset_id:    params.datasetId,
+    tenant_id:     params.tenantId,
+    title:         params.title,
+    description:   params.description ?? null,
+    table_name:    params.tableName,
+    rows:          params.rowCount,
+    is_open:       false,
+    ai_ready:      false,
+    high_value:    false,
+    updated_at:    new Date().toISOString(),
+    derived_from:  params.derivedFrom,
+    lineage_ids:   params.lineageIds,
+  }, { onConflict: 'dataset_id' })
+
+  if (error) throw new Error(`카탈로그 등록 실패: ${error.message}`)
+}
+
+export async function recordLineage(
+  supabase: SupabaseClient,
+  params: {
+    runType: string
+    runId: string
+    sourceIds: string[]
+    targetTable: string
+  },
+): Promise<string> {
+  const { data, error } = await supabase
+    .from('data_lineage')
+    .insert({
+      run_type:     params.runType,
+      run_id:       params.runId,
+      source_ids:   params.sourceIds,
+      target_table: params.targetTable,
+    })
+    .select('id')
+    .single()
+
+  if (error) throw new Error(`계보 기록 실패: ${error.message}`)
+  return data.id as string
+}
+
+// ─── Supabase 저장 연동 ────────────────────────────────────────────────────────
 
 export async function runPipelineAndSave(
   supabase: SupabaseClient,
   pipelineId: string,
+  options?: { createDerivedTable?: boolean },
 ): Promise<PipelineRunResult> {
   const { data: pipeline, error: pErr } = await supabase
     .from('processing_pipelines')
@@ -406,20 +806,17 @@ export async function runPipelineAndSave(
 
   try {
     // 소스 데이터 로드
-    let sourceRows: Row[] = []
-    if (pipeline.source_kind === 'upload' || pipeline.source_kind === 'catalog') {
-      const { data: upload } = await supabase
-        .from('submission_uploads')
-        .select('preview')
-        .eq('table_name', pipeline.source_dataset_id)
-        .maybeSingle()
-      if (upload?.preview) sourceRows = upload.preview as Row[]
-    }
+    const sourceRows = await loadDatasetRows(supabase, pipeline.source_dataset_id)
 
-    const result = applyRules(sourceRows, pipeline.rules as Rule[])
+    // 조인 대상 데이터셋 로드
+    const joinTargets = await collectJoinTargets(supabase, pipeline.rules as Rule[])
+
+    const result = applyRules(sourceRows, pipeline.rules as Rule[], joinTargets)
     const schema = inferSchema(result.rows)
     const datasetId = 'proc_' + randomHex(4)
+    const resultTable = `derived_${runId}`
 
+    // 미리보기/행 수는 기존 submission_uploads 에도 유지해 하위호환성 보장
     await supabase.from('submission_uploads').insert({
       upload_id:   datasetId,
       table_name:  datasetId,
@@ -429,6 +826,34 @@ export async function runPipelineAndSave(
       created_at:  new Date().toISOString(),
     })
 
+    // 전체 결과를 실제 테이블로 영속화 (0행일 때는 테이블 생성 생략)
+    const persistDerived = options?.createDerivedTable !== false && result.rows.length > 0
+    if (persistDerived) {
+      await createDerivedTable(supabase, resultTable, result.rows, schema)
+
+      const lineageId = await recordLineage(supabase, {
+        runType:     'process',
+        runId,
+        sourceIds:   [pipeline.source_dataset_id],
+        targetTable: resultTable,
+      })
+
+      await registerCatalogEntry(supabase, {
+        datasetId,
+        tenantId:    pipeline.tenant_id,
+        title:       `파생 데이터: ${pipeline.name}`,
+        description: `파이프라인 ${pipeline.id} 실행 결과`,
+        tableName:   resultTable,
+        rowCount:    result.rows.length,
+        derivedFrom: {
+          pipeline_id:       pipeline.id,
+          run_id:            runId,
+          source_dataset_id: pipeline.source_dataset_id,
+        },
+        lineageIds: [lineageId],
+      })
+    }
+
     await supabase.from('processing_runs').update({
       status:            'done',
       finished_at:       new Date().toISOString(),
@@ -436,15 +861,17 @@ export async function runPipelineAndSave(
       output_rows:       result.outputRows,
       error_rows:        result.errorRows,
       result_dataset_id: datasetId,
+      result_table:      persistDerived ? resultTable : null,
     }).eq('id', runId)
 
     return {
-      run_id:      runId,
-      status:      'done',
-      input_rows:  result.inputRows,
-      output_rows: result.outputRows,
-      error_rows:  result.errorRows,
-      dataset_id:  datasetId,
+      run_id:       runId,
+      status:       'done',
+      input_rows:   result.inputRows,
+      output_rows:  result.outputRows,
+      error_rows:   result.errorRows,
+      dataset_id:   datasetId,
+      result_table: persistDerived ? resultTable : undefined,
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)

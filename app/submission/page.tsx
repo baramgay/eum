@@ -10,7 +10,7 @@ export default async function SubmissionPage() {
   const role     = user.user_metadata?.role as string
   const tenantId = user.user_metadata?.tenant_id as string
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <Header userEmail={user.email} role={role} />
       <main className="max-w-7xl mx-auto px-4 py-6">
         <SubmissionClient role={role} tenantId={tenantId} />

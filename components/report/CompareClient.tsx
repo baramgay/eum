@@ -1,6 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+} from 'recharts'
 
 interface CompareRow {
   tenant_id: string; name: string
@@ -20,7 +23,7 @@ function HeatCell({ value, goal, unit = '%' }: { value: number; goal: number; un
   return (
     <td className="px-3 py-2 text-center">
       <span className="text-sm font-bold" style={{ color }}>{value}{unit}</span>
-      <div className="w-12 mx-auto bg-gray-100 rounded-full h-1 mt-0.5">
+      <div className="w-12 mx-auto bg-gray-100 dark:bg-gray-800 rounded-full h-1 mt-0.5">
         <div className="h-1 rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
     </td>
@@ -55,7 +58,7 @@ export default function CompareClient() {
   }, [])
 
   if (loading) return (
-    <div className="flex items-center justify-center py-16 gap-3 text-gray-400">
+    <div className="flex items-center justify-center py-16 gap-3 text-gray-400 dark:text-gray-300">
       <div className="w-4 h-4 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" />
       기관별 집계 중...
     </div>
@@ -68,7 +71,7 @@ export default function CompareClient() {
   )
 
   if (!rows.length) return (
-    <div className="text-center py-16 text-gray-400 text-sm">등록된 기관이 없습니다.</div>
+    <div className="text-center py-16 text-gray-400 dark:text-gray-300 text-sm">등록된 기관이 없습니다.</div>
   )
 
   const GOALS = goals
@@ -84,28 +87,35 @@ export default function CompareClient() {
     return score(b) - score(a)
   })
 
+  const chartData = sorted.map(r => ({
+    name: r.name,
+    open: r.open_pct,
+    aiReady: r.ai_ready_pct,
+    quality: r.quality_pct,
+  }))
+
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold text-gray-800">기관별 평가 현황 비교</h3>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">기관별 평가 현황 비교</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
           전체 {rows.length}개 기관 · 목표 달성 기준: 개방 {GOALS.open}%·AI-Ready {GOALS.aiReady}%·품질 {GOALS.quality}%·분석 {GOALS.analysis}건·가명합성 {GOALS.synthetic}건
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border shadow-sm overflow-x-auto">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border shadow-sm overflow-x-auto">
         <table className="w-full text-sm min-w-[680px]">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-gray-50 dark:bg-gray-950 border-b">
             <tr>
-              <th className="px-3 py-2.5 text-left text-xs text-gray-500 font-medium w-8">#</th>
-              <th className="px-3 py-2.5 text-left text-xs text-gray-700 font-semibold min-w-[120px]">기관명</th>
-              <th className="px-3 py-2.5 text-center text-xs text-gray-500 font-medium">등록<br/>건수</th>
+              <th className="px-3 py-2.5 text-left text-xs text-gray-500 dark:text-gray-400 font-medium w-8">#</th>
+              <th className="px-3 py-2.5 text-left text-xs text-gray-700 dark:text-gray-300 font-semibold min-w-[120px]">기관명</th>
+              <th className="px-3 py-2.5 text-center text-xs text-gray-500 dark:text-gray-400 font-medium">등록<br/>건수</th>
               <th className="px-3 py-2.5 text-center text-xs text-blue-600 font-semibold">개방률</th>
               <th className="px-3 py-2.5 text-center text-xs text-purple-600 font-semibold">AI-Ready</th>
               <th className="px-3 py-2.5 text-center text-xs text-teal-600 font-semibold">품질통과율</th>
               <th className="px-3 py-2.5 text-center text-xs text-indigo-600 font-semibold">분석<br/>실적</th>
               <th className="px-3 py-2.5 text-center text-xs text-green-600 font-semibold">가명·합성<br/>실적</th>
-              <th className="px-3 py-2.5 text-center text-xs text-gray-500 font-medium">목표<br/>달성</th>
+              <th className="px-3 py-2.5 text-center text-xs text-gray-500 dark:text-gray-400 font-medium">목표<br/>달성</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -117,10 +127,10 @@ export default function CompareClient() {
                 (r.analysis >= GOALS.analysis ? 1 : 0) +
                 (r.synthetic >= GOALS.synthetic ? 1 : 0)
               return (
-                <tr key={r.tenant_id} className="hover:bg-gray-50">
-                  <td className="px-3 py-2.5 text-center text-xs text-gray-400">{i + 1}</td>
-                  <td className="px-3 py-2.5 font-medium text-gray-800">{r.name}</td>
-                  <td className="px-3 py-2.5 text-center text-gray-600 text-sm">{r.total}</td>
+                <tr key={r.tenant_id} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                  <td className="px-3 py-2.5 text-center text-xs text-gray-400 dark:text-gray-300">{i + 1}</td>
+                  <td className="px-3 py-2.5 font-medium text-gray-800 dark:text-gray-200">{r.name}</td>
+                  <td className="px-3 py-2.5 text-center text-gray-600 dark:text-gray-400 text-sm">{r.total}</td>
                   <HeatCell value={r.open_pct} goal={GOALS.open} />
                   <HeatCell value={r.ai_ready_pct} goal={GOALS.aiReady} />
                   <HeatCell value={r.quality_pct} goal={GOALS.quality} />
@@ -138,8 +148,26 @@ export default function CompareClient() {
         </table>
       </div>
 
+      {/* 기관별 핵심 지표 차트 */}
+      <div className="bg-white dark:bg-gray-900 rounded-xl border shadow-sm p-5">
+        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">기관별 핵심 지표 비교</p>
+        <p className="text-xs text-gray-400 dark:text-gray-300 mb-4">개방률·AI-Ready·품질 통과율 (%)</p>
+        <ResponsiveContainer width="100%" height={Math.max(240, sorted.length * 36)}>
+          <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 20, left: 100, bottom: 4 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} />
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
+            <Tooltip formatter={(v, n) => [`${v}%`, n as string]} />
+            <Legend />
+            <Bar dataKey="open" name="개방률" fill="#2563eb" radius={[0, 4, 4, 0]} />
+            <Bar dataKey="aiReady" name="AI-Ready" fill="#9333ea" radius={[0, 4, 4, 0]} />
+            <Bar dataKey="quality" name="품질통과율" fill="#059669" radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
       {/* 범례 */}
-      <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+      <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
         {[
           { color: '#16a34a', label: '목표 달성 (100%+)' },
           { color: '#d97706', label: '근접 (70-99%)' },

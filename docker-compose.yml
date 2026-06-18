@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+
+  analyzer:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             python scripts/analyze.py"

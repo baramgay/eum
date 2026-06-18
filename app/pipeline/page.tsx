@@ -9,7 +9,7 @@ export default async function PipelinePage() {
   if (!user) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <Header userEmail={user.email} role={user.user_metadata?.role} />
       <main className="max-w-4xl mx-auto px-4 py-6">
         <PipelineClient />

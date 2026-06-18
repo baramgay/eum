@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { encryptAuthValue, calcNextRunAt, type ScheduleType } from '@/lib/collector'
 
 type Params = { params: Promise<{ id: string }> }
+
+const SOURCE_SELECT = 'source_id,tenant_id,title,description,url,method,auth_type,auth_key,query_params,request_body,resp_format,json_path,theme,keywords,license,pagination_type,pagination_page_param,pagination_size_param,pagination_size,pagination_total_path,connector_config,created_at,updated_at'
 
 export async function GET(_req: Request, { params }: Params) {
   const { id } = await params
@@ -14,7 +17,7 @@ export async function GET(_req: Request, { params }: Params) {
 
   const { data: src, error } = await supabase
     .from('collection_sources')
-    .select('source_id,tenant_id,title,description,url,method,auth_type,auth_key,query_params,resp_format,json_path,theme,keywords,license,created_at,updated_at')
+    .select(SOURCE_SELECT)
     .eq('source_id', id)
     .maybeSingle()
 
@@ -54,12 +57,29 @@ export async function PATCH(req: Request, { params }: Params) {
 
   const body = await req.json() as Record<string, unknown>
 
-  // auth_value 직접 전달 허용 (PATCH는 명시적 수정 의도)
-  const allowed = ['title','description','url','method','auth_type','auth_key','auth_value',
-    'query_params','resp_format','json_path','theme','keywords','license']
+  const allowed = [
+    'title','description','url','method','auth_type','auth_key','auth_value',
+    'query_params','request_body','resp_format','json_path','theme','keywords','license',
+    'pagination_type','pagination_page_param','pagination_size_param','pagination_size','pagination_total_path',
+    'connector_config',
+  ]
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
   for (const key of allowed) {
-    if (key in body) updates[key] = body[key]
+    if (!(key in body)) continue
+    let value = body[key]
+    if (key === 'auth_value') {
+      value = typeof value === 'string' && value.length > 0 ? encryptAuthValue(value) : null
+    }
+    if (key === 'auth_key') {
+      value = typeof value === 'string' && value.length > 0 ? value : null
+    }
+    if (key === 'pagination_size') {
+      value = value ? Number(value) : 1000
+    }
+    if (key === 'request_body') {
+      value = value && typeof value === 'object' ? value : null
+    }
+    updates[key] = value
   }
 
   const { error } = await supabase
@@ -68,8 +88,12 @@ export async function PATCH(req: Request, { params }: Params) {
 
   // 스케줄 변경 시 job도 업데이트
   if (body.schedule_type) {
+    const scheduleType = body.schedule_type as ScheduleType
     await supabase.from('collection_jobs')
-      .update({ schedule_type: body.schedule_type })
+      .update({
+        schedule_type: scheduleType,
+        next_run_at:   calcNextRunAt(scheduleType),
+      })
       .eq('source_id', id)
   }
 

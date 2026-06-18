@@ -2,8 +2,12 @@ export const runtime = 'nodejs'
 
 import { createHash, randomUUID } from 'crypto'
 import { createClient as createRaw, type SupabaseClient } from '@supabase/supabase-js'
+import { SlidingWindowRateLimiter } from './rate-limit'
 
 export type ApiKeyScope = { type: 'all' } | { type: 'datasets'; ids: string[] }
+
+/** OpenAPI 요청 제한: 키별 1분에 최대 100회 */
+const rateLimiter = new SlidingWindowRateLimiter(60_000, 100)
 
 export interface ValidateResult {
   valid: boolean
@@ -170,13 +174,14 @@ export async function sendWebhook(
   }
 }
 
-/** 공개 API용 래퍼: X-API-Key 헤더 검증 + 비동기 로깅 */
+/** 공개 API용 래퍼: X-API-Key 헤더 검증 + 비동기 로깅 + 속도 제한 */
 export async function withApiKey(
   req: Request,
   handler: (ctx: { sb: SupabaseClient; auth: ValidateResult }) => Promise<Response>
 ): Promise<Response> {
   const sb = createPublicClient()
   const key = req.headers.get('x-api-key')
+  const startMs = Date.now()
   const auth = await validateApiKey(sb, key)
   if (!auth.valid) {
     const code =
@@ -186,9 +191,28 @@ export async function withApiKey(
       { status: code }
     )
   }
-  const startMs = Date.now()
-  const res = await handler({ sb, auth })
+
   const { pathname } = new URL(req.url)
+
+  // 속도 제한: 키별 1분에 100회
+  const limit = rateLimiter.isAllowed(auth.keyId!)
+  if (!limit.allowed) {
+    const res = Response.json(
+      { error: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.', reason: 'rate_limited' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': '100',
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': String(Math.ceil(limit.resetAt / 1000)),
+        },
+      }
+    )
+    void logApiAccess(sb, auth.keyId!, pathname, req.method, 429, startMs)
+    return res
+  }
+
+  const res = await handler({ sb, auth })
   void logApiAccess(sb, auth.keyId!, pathname, req.method, res.status, startMs)
   return res
 }

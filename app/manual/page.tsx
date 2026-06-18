@@ -9,7 +9,7 @@ export default async function ManualPage() {
   if (!user) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <Header userEmail={user.email} role={user.user_metadata?.role} />
       <ManualClient role={user.user_metadata?.role ?? 'viewer'} />
     </div>

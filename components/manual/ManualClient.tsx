@@ -131,10 +131,33 @@ const SECTIONS: Section[] = [
       { type: 'p', text: '경남 18개 시군의 청년 인프라(청년센터·도서관·체육관·문화센터) 위치를 카카오맵에서 확인합니다. 마커·클러스터·히트맵 3가지 레이어로 밀도와 개별 시설을 모두 살펼 수 있습니다.' },
       { type: 'sub', text: '레이어 전환' },
       { type: 'ul', items: [
-        '마커: 개별 시설을 유형별 핀으로 표시, 클릭 시 팝업 상세 확인',
-        '클러스터: 줌 아웃 시 근접 마커를 묶어 개수 표시, 밀집도를 한눈에 파악',
-        '히트맵: 시설 분포의 밀도를 색상 그라데이션으로 시각화',
+        '마커: 개별 시설을 유형별 React 디자인 핀으로 표시, 클릭 시 팝업 상세 확인',
+        '클러스터: 줌 아웃 시 근접 마커를 묶어 개수 표시, 개수에 따라 색상이 단계적으로 변화합니다',
+        '히트맵: 시설 분포의 밀도를 색상으로 시각화, 밀도/격자 모드 전환 및 범례 제공',
         '상단 레이어 토글 버튼으로 즉시 전환, URL에도 상태가 반영됩니다',
+      ]},
+      { type: 'sub', text: '라벨 마커' },
+      { type: 'ul', items: [
+        '지도를 확대(level 7 이하)하면 핀 대신 시설명이 보이는 라벨 마커로 자동 전환됩니다',
+        '선택한 시설은 어떤 줌 상태에서도 라벨로 강조되어 이름을 바로 확인할 수 있습니다',
+        '라벨은 흰색 캡슐 배경에 유형별 색상 아이콘을 사용해 깔끔하게 표시됩니다',
+      ]},
+      { type: 'sub', text: '클러스터' },
+      { type: 'ul', items: [
+        '클러스터 원의 색상이 마커 개수에 따라 파랑→초록→주황→빨강으로 변합니다',
+        '클릭하면 해당 그룹이 확대되어 개별 마커를 확인할 수 있습니다',
+      ]},
+      { type: 'sub', text: '히트맵' },
+      { type: 'ul', items: [
+        '밀도 모드: 부드러운 원형 그라데이션으로 분포를 표현합니다',
+        '격자 모드: 지도 화면을 사각형 격자로 나누어 셀별 개수를 표시합니다',
+        '우측 상단 범례로 밀도 수준을 한눈에 확인할 수 있습니다',
+        '셀을 클릭하면 해당 영역에 포함된 시설 목록을 볼 수 있습니다',
+      ]},
+      { type: 'sub', text: '현재 위치' },
+      { type: 'ul', items: [
+        '우측 하단 "내 위치" 버튼을 누르면 브라우저 위치 권한을 요청하고, 현재 위치로 지도 중심을 이동합니다',
+        '현재 위치는 파란색 맥박 아이콘으로 표시됩니다',
       ]},
       { type: 'sub', text: '검색 및 카테고리 필터' },
       { type: 'ul', items: [
@@ -144,6 +167,12 @@ const SECTIONS: Section[] = [
       ]},
       { type: 'sub', text: '목록 보기' },
       { type: 'p', text: '하단 "목록 보기" 버튼을 클릭하면 지도 위에서 필터링된 시설 목록을 슬라이드업 패널로 확인할 수 있습니다. 항목을 선택하면 해당 시설의 상세 정보를 확인할 수 있습니다.' },
+      { type: 'sub', text: '로딩 및 오류 처리' },
+      { type: 'ul', items: [
+        '카카오맵 SDK는 동적으로 로드되며, 로딩 중에는 스피너가 표시됩니다',
+        'API 키가 없거나 SDK 로딩에 실패하면 안내 메시지와 "다시 시도" 버튼이 표시됩니다',
+        '문제가 지속되면 .env.local의 NEXT_PUBLIC_KAKAO_MAP_KEY 값과 카카오 개발자 사이트의 도메인 설정을 확인하세요',
+      ]},
       { type: 'sub', text: 'URL 파라미터' },
       { type: 'code', text: '/map?layer=cluster   # 클러스터 모드로 열기\n/map?layer=heatmap  # 히트맵 모드로 열기\n/map?layer=marker   # 기본 마커 모드로 열기 (기본값)' },
       { type: 'tip', text: '레이어 상태는 브라우저 URL에 자동 저장되어 공유 링크로 전달할 수 있습니다.' },
@@ -168,6 +197,20 @@ const SECTIONS: Section[] = [
         '연도·좌표 범위 검사',
         '참조 무결성 (예: 종사자 수 ≥ 사업체 수)',
       ]},
+      { type: 'sub', text: '탭 구성' },
+      { type: 'ul', items: [
+        '진단 결과: 데이터셋별 통과/실패, 규칙별 위반 건수, 데이터셋별 오류율 차트, 5영역 레이더 차트, 선택 데이터셋 레이더',
+        '이슈 상세: 위반 항목을 영역 필터와 심각도(critical/high/medium/low) 배지로 빠르게 확인',
+        '이력 비교: 선택한 데이터셋의 최근/직전 검사 결과 비교, 오류율 추이, 영역별 위반 변화 차트',
+      ]},
+      { type: 'sub', text: '이슈 심각도' },
+      { type: 'p', text: '각 위반 항목은 위반 비율(또는 위반 건수)에 따라 심각·높음·보통·낮음으로 분류됩니다. 치명적(critical) 이슈를 먼저 조치하면 데이터 품질 개선 효과가 큽니다.' },
+      { type: 'sub', text: '5영역 레이더 차트' },
+      { type: 'p', text: '완전성·정확성·일관성·최신성·메타데이터 5개 품질 영역을 100점 만점 방사형 차트로 시각화합니다. 전체 집계뿐 아니라 데이터셋 필터에서 특정 데이터셋을 선택하면 해당 데이터셋의 5영역 점수도 레이더로 확인할 수 있습니다.' },
+      { type: 'sub', text: '데이터셋 필터' },
+      { type: 'p', text: '진단 결과 탭 상단에서 데이터셋을 선택하면 해당 데이터셋만 펼쳐서 볼 수 있습니다. 재검사 후 선택한 데이터셋이 사라지면 자동으로 전체 보기로 돌아갑니다.' },
+      { type: 'sub', text: '로딩·오류 상태' },
+      { type: 'p', text: '검사 결과를 불러오는 동안 스켈레톤 UI를 표시하고, API 오류 발생 시 다시 시도 버튼을 제공합니다.' },
       { type: 'sub', text: '재검사' },
       { type: 'p', text: '우측 상단 "전체 재검사" 버튼을 클릭하면 전체 데이터셋을 즉시 재검사합니다.' },
       { type: 'tip', text: '데이터 수집·가공 파이프라인 완료 후 자동으로 품질 검사가 트리거됩니다.' },
@@ -178,12 +221,34 @@ const SECTIONS: Section[] = [
     id: 'ontology', title: '온톨로지',
     blocks: [
       { type: 'h', text: '지식 그래프 탐색' },
-      { type: 'p', text: '경남 청년 데이터를 노드(시군, 데이터셋, 지표)와 엣지(관계)로 구성한 지식 그래프입니다. 온톨로지 방식의 통합 데이터 플랫폼 구조로 엔티티 간 관계를 표현합니다.' },
+      { type: 'p', text: '경남 청년 데이터를 노드(시군, 데이터셋, 지표)와 엣지(관계)로 구성한 지식 그래프입니다. 온톨로지 방식의 통합 데이터 플랫폼 구조로 엔티티 간 관계를 표현하며, 텍스트 겹침을 최소화한 가독성 중심의 그래프 뷰를 제공합니다.' },
       { type: 'sub', text: '탭 구성' },
       { type: 'ul', items: [
         '개요: 그래프 통계(노드·엣지 수), 정책 액션 추천',
         '그래프: 시각적 노드-엣지 탐색 (시군 코드로 필터 가능)',
         '노드 목록: 모든 노드를 테이블로 확인',
+      ]},
+      { type: 'sub', text: '노드 및 데이터 구성' },
+      { type: 'p', text: '온톨로지는 시군을 중심으로 다양한 도메인 데이터를 연결한 지식 그래프입니다. 노드 타입과 데이터 출처는 다음과 같습니다.' },
+      { type: 'ul', items: [
+        '시군: 경남 18개 시군 행정구역',
+        '청년인구 / 사업체: Gold 테이블(agg_youth_pop, agg_business) 기반',
+        '공공시설 유형: gold_public_facility를 우선 사용하고, DB가 비어 있으면 data/samples/public_facility.json 샘플을 폴리백. 청년센터·도서관·체육관·문화센터를 개별 노드로 표현',
+        '교통안전: data/samples/traffic_accidents.json 기반 시군별 사고·사망·부상 집계',
+        '상권: data/samples/commercial_area.json 기반 시군별 점포·매출·종사자 집계',
+        '대기환경: data/samples/air_quality.json 기반 시군별 PM10·PM2.5·오염물질 평균',
+        '공공의료: data/samples/public_hospital.json 기반 시군별 병상·의사·간호사 집계',
+        '교육인프라: data/samples/school_population.json 기반 시군별 학교·학생·교원 집계',
+      ]},
+      { type: 'sub', text: '그래프 컨트롤 및 가독성' },
+      { type: 'ul', items: [
+        '줌/팬: 마우스 휠 또는 우측 하단 +/- 버튼으로 확대/축소, 드래그로 이동',
+        '레이블 제어: 노드명/관계명을 개별로 켜고 끌 수 있으며, 기본적으로 축소 상태에서 레이블을 숨겨 깔끔하게 표시합니다',
+        '줌 기반 레이블: 충분히 확대하면 모든 노드 레이블이 자동으로 표시되고, 선택/호버된 노드와 연결된 노드/관계는 항상 강조됩니다',
+        '선택 해제: 그래프 배경을 클릭하면 선택이 해제되고 전체 뷰가 밝아집니다',
+        '레이아웃 초기화: 상단 리프레시 버튼으로 force simulation을 다시 시작하고 줌을 초기 상태로 되돌립니다',
+        '전체화면/캡처: 전체화면 버튼 또는 PNG 캡처 버튼으로 그래프를 저장할 수 있습니다',
+        '동적 범례: 실제 그래프에 포함된 노드/관계 타입에 맞춰 범례와 색상이 자동으로 구성됩니다',
       ]},
       { type: 'sub', text: '정책 액션' },
       { type: 'ul', items: [
@@ -405,21 +470,25 @@ const SECTIONS: Section[] = [
     id: 'samples', title: '샘플 데이터',
     blocks: [
       { type: 'h', text: 'data/samples/ 샘플 데이터 안내' },
-      { type: 'p', text: '로컬 개발과 분석 기능 테스트를 위해 5개 주제의 샘플 CSV/JSON이 준비되어 있습니다. 카탈로그의 dataset_id(예: ds-traffic-accident)와 연결되어 있어 별도 업로드 없이 바로 분석해 볼 수 있습니다.' },
+      { type: 'p', text: '로컬 개발과 분석·지도 기능 테스트를 위해 8개 주제, 총 9,000여 행의 샘플 CSV/JSON이 준비되어 있습니다. DB가 비어 있을 때는 지도 탭이 public_facility 샘플을 자동으로 사용합니다.' },
       { type: 'grid', items: [
-        { icon: 'samples', name: '교통사고', desc: 'ds-traffic-accident · 사고 유형·상해·재산피해' },
-        { icon: 'samples', name: '상권', desc: 'ds-commercial-area · 업종별 점포·매출·종사자' },
-        { icon: 'samples', name: '대기질', desc: 'ds-air-quality · 측정소별 PM10·PM2.5·오염물질' },
-        { icon: 'samples', name: '공공의료', desc: 'ds-public-hospital · 보건소·의료원 의료인력·병상' },
-        { icon: 'samples', name: '학교/교육', desc: 'ds-school-population · 학교급별 학교 수·학생·교원' },
+        { icon: 'samples', name: '교통사고', desc: 'ds-traffic-accident · 3,300+ 행 · 사고 유형·상해·재산피해' },
+        { icon: 'samples', name: '상권', desc: 'ds-commercial-area · 860+ 행 · 업종별 점포·매출·종사자' },
+        { icon: 'samples', name: '대기질', desc: 'ds-air-quality · 2,600+ 행 · 측정소별 PM10·PM2.5·오염물질' },
+        { icon: 'samples', name: '공공의료', desc: 'ds-public-hospital · 180+ 행 · 보건소·의료원 의료인력·병상' },
+        { icon: 'samples', name: '학교/교육', desc: 'ds-school-population · 360+ 행 · 학교급별 학교 수·학생·교원' },
+        { icon: 'samples', name: '공공시설', desc: 'ds-public-facility · 750+ 행 · 지도·클로스터·히트맵 테스트용' },
+        { icon: 'samples', name: '청년 인구', desc: 'ds-youth-population · 570+ 행 · 연령·성별 유입·유출' },
+        { icon: 'samples', name: '사업체', desc: 'ds-business · 500+ 행 · 업종별 사업체·종사자' },
       ]},
       { type: 'sub', text: '활용 방법' },
       { type: 'ul', items: [
         '분석 탭 → "카탈로그 로드" → 샘플 데이터셋 선택 → 변수 타입 확인 → 분석 실행',
         'CSV 파일을 직접 업로드하여 동일한 분석을 테스트할 수도 있습니다',
         '상권·대기질 데이터는 시군별 비교(ANOVA, t-검정), 교통사고는 교차표, 공공의료는 기술통계에 적합합니다',
+        '지도 탭은 DB에 시설이 없어도 public_facility 샘플 750여 개로 클러스터·히트맵·라벨 마커를 테스트할 수 있습니다',
       ]},
-      { type: 'tip', text: '샘플 데이터는 개발 환경에서 catalog/submission_uploads 미리보기로 제공되며, 운영 환경에서는 scripts/load-samples-to-catalog.mjs를 통해 DB에 적재할 수 있습니다.' },
+      { type: 'tip', text: '샘플 데이터는 scripts/generate-seed-data.ts로 재생성할 수 있으며, 운영 환경에서는 supabase/seed-gold.sql 또는 scripts/load-samples-to-catalog.mjs를 통해 DB에 적재할 수 있습니다.' },
     ],
   },
   {
@@ -450,8 +519,15 @@ const UPDATE_LOG = [
     '분석 가이드: 17종 분석·파일/카탈로그 로드·변수 매핑·CSV 내보내기',
     '가공 가이드: 15가지 변환 규칙(aggregate·join·pivot 등) 반영',
     '지도 가이드: 마커/큘러스터/히트맵, 검색·필터·목록 보기, URL layer 파라미터',
+    '지도 안정화: 카카오맵 SDK autoload=false + kakao.maps.load, 로딩/재시도/키 누락 안내',
+    '지도 라벨 마커: 확대 시 시설명 라벨, 선택 시 항상 라벨 표시',
+    '지도 클러스터/히트맵: 개수 기반 클러스터 색상, 밀도·격자 히트맵 모드, 범례',
+    '샘플 데이터 대폭 확충: 8개 주제 9,000+ 행, 공공시설 750+ (지도 테스트용), DB 비어 있을 때 샘플 폴리백',
     'AI 질의 가이드: 대화 이력·차트/표 전환·마크다운 내보내기 추가',
     '기관명 "경남빅데이터센터"로 통일',
+    '온톨로지 가이드: 줌 기반 레이블·텍스트 겹침 감소·레이아웃 초기화·PNG 캡처·전체화면 추가',
+    '온톨로지 데이터 풍부화: 공공시설(청년센터·도서관·체육관·문화센터)·교통안전·상권·대기환경·공공의료·교육인프라 노드 추가',
+    '품질진단 가이드: 5영역 레이더 차트·이력 비교·오류율 추이·이슈 심각도·영역별 변화 차트·데이터셋별 레이더 반영',
     'status.html 최신 상태(3단계 완료·탭별 현황·산출물) 갱신',
   ]},
   { date: '2026-06-12', items: [
@@ -476,25 +552,25 @@ function renderBlock(block: Block, idx: number) {
   switch (block.type) {
     case 'h':
       return (
-        <h3 key={idx} className="text-base font-semibold text-gray-900 mt-8 mb-3 flex items-center gap-2">
+        <h3 key={idx} className="text-base font-semibold text-gray-900 dark:text-gray-100 mt-8 mb-3 flex items-center gap-2">
           <span className="w-1 h-4 rounded-full bg-blue-500 flex-shrink-0" />
           {block.text}
         </h3>
       )
     case 'sub':
       return (
-        <h4 key={idx} className="text-sm font-semibold text-gray-700 mt-5 mb-2 uppercase tracking-wide">
+        <h4 key={idx} className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-5 mb-2 uppercase tracking-wide">
           {block.text}
         </h4>
       )
     case 'p':
-      return <p key={idx} className="text-sm text-gray-600 leading-7 mb-3">{block.text}</p>
+      return <p key={idx} className="text-sm text-gray-600 dark:text-gray-400 leading-7 mb-3">{block.text}</p>
     case 'ul':
       return (
         <ul key={idx} className="space-y-2 mb-4">
           {block.items.map((item, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 flex-shrink-0" />
+            <li key={i} className="flex items-start gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 mt-2 flex-shrink-0" />
               <span className="leading-7">{item}</span>
             </li>
           ))}
@@ -532,11 +608,11 @@ function renderBlock(block: Block, idx: number) {
         <div key={idx} className="flex items-center gap-2 my-4 flex-wrap">
           {block.items.map((item, i) => (
             <span key={i} className="flex items-center gap-2">
-              <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-xs font-medium ring-1 ring-gray-200">
+              <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-full text-xs font-medium ring-1 ring-gray-200">
                 {item}
               </span>
               {i < block.items.length - 1 && (
-                <ChevronRight className="w-4 h-4 text-gray-300" />
+                <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-200" />
               )}
             </span>
           ))}
@@ -548,13 +624,13 @@ function renderBlock(block: Block, idx: number) {
           {block.items.map((f, i) => {
             const Icon = ICON_MAP[f.icon] ?? BookOpen
             return (
-              <div key={i} className="flex items-start gap-3 bg-gray-50 rounded-xl p-3.5 ring-1 ring-gray-200/70">
-                <div className="w-8 h-8 rounded-lg bg-white ring-1 ring-gray-200 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-4 h-4 text-gray-600" />
+              <div key={i} className="flex items-start gap-3 bg-gray-50 dark:bg-gray-950 rounded-xl p-3.5 ring-1 ring-gray-200/70">
+                <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 ring-1 ring-gray-200 flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-800 leading-5">{f.name}</p>
-                  <p className="text-xs text-gray-500 leading-5">{f.desc}</p>
+                  <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 leading-5">{f.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-5">{f.desc}</p>
                 </div>
               </div>
             )
@@ -566,11 +642,11 @@ function renderBlock(block: Block, idx: number) {
       return (
         <div key={idx} className="space-y-2.5 my-4">
           {block.items.map((r, i) => (
-            <div key={i} className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-xl ring-1 ring-gray-200/70">
+            <div key={i} className="flex items-center gap-3 p-3.5 bg-gray-50 dark:bg-gray-950 rounded-xl ring-1 ring-gray-200/70">
               <span className={`text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 ring-1 ${r.color}`}>
                 {r.badge}
               </span>
-              <span className="text-sm text-gray-600 leading-6">{r.desc}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400 leading-6">{r.desc}</span>
             </div>
           ))}
         </div>
@@ -596,12 +672,12 @@ export default function ManualClient({ role }: { role: string }) {
       {/* 페이지 헤더 */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">사용 안내</h1>
-          <p className="text-sm text-gray-500 mt-1.5">이음(EUM) 플랫폼 기능 및 사용법 가이드</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">사용 안내</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">이음(EUM) 플랫폼 기능 및 사용법 가이드</p>
         </div>
         <button
           onClick={() => setShowLog(v => !v)}
-          className="flex items-center gap-2 text-sm text-gray-500 border border-gray-200 rounded-xl px-4 py-2 hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors"
         >
           <Clock className="w-4 h-4" />
           {showLog ? '가이드 보기' : '업데이트 이력'}
@@ -610,8 +686,8 @@ export default function ManualClient({ role }: { role: string }) {
 
       {showLog ? (
         /* ─── 업데이트 이력 ─── */
-        <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-6">업데이트 이력</h2>
+        <div className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm p-8">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6">업데이트 이력</h2>
           <div className="space-y-8">
             {UPDATE_LOG.map(log => (
               <div key={log.date} className="flex gap-6">
@@ -620,8 +696,8 @@ export default function ManualClient({ role }: { role: string }) {
                 </div>
                 <ul className="flex-1 space-y-2 border-l border-gray-100 pl-6">
                   {log.items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                      <span className="w-1 h-1 rounded-full bg-gray-400 mt-2.5 flex-shrink-0" />
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <span className="w-1 h-1 rounded-full bg-gray-400 dark:bg-gray-500 mt-2.5 flex-shrink-0" />
                       <span className="leading-6">{item}</span>
                     </li>
                   ))}
@@ -635,9 +711,9 @@ export default function ManualClient({ role }: { role: string }) {
         <div className="flex gap-6 items-start">
           {/* 사이드바 */}
           <aside className="w-56 flex-shrink-0 sticky top-6">
-            <nav className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
+            <nav className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-100">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">메뉴</p>
+                <p className="text-xs font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider">메뉴</p>
               </div>
               {visibleSections.map(s => {
                 const SIcon = ICON_MAP[s.id] ?? BookOpen
@@ -651,10 +727,10 @@ export default function ManualClient({ role }: { role: string }) {
                       border-b border-gray-50 last:border-b-0
                       ${isActive
                         ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950 hover:text-gray-900 dark:hover:text-gray-100'}
                     `}
                   >
-                    <SIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+                    <SIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400 dark:text-gray-300'}`} />
                     <span className="font-medium leading-5 flex-1">{s.title}</span>
                     {s.role === 'center' && (
                       <span className={`text-xs px-1.5 py-0.5 rounded-md font-medium ${
@@ -669,8 +745,8 @@ export default function ManualClient({ role }: { role: string }) {
             </nav>
 
             {/* 바로가기 */}
-            <div className="mt-4 bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-4">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">바로가기</p>
+            <div className="mt-4 bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm p-4">
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-3">바로가기</p>
               <div className="space-y-1">
                 {[
                   { href: '/',       label: '대시보드',    icon: LayoutDashboard },
@@ -679,11 +755,11 @@ export default function ManualClient({ role }: { role: string }) {
                 ].map(({ href, label, icon: LIcon }) => (
                   <Link
                     key={href} href={href}
-                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors group"
+                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950 hover:text-gray-900 dark:hover:text-gray-100 transition-colors group"
                   >
-                    <LIcon className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+                    <LIcon className="w-4 h-4 text-gray-400 dark:text-gray-300 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
                     <span className="flex-1">{label}</span>
-                    <ArrowUpRight className="w-3 h-3 text-gray-300 group-hover:text-gray-500" />
+                    <ArrowUpRight className="w-3 h-3 text-gray-300 dark:text-gray-200 group-hover:text-gray-500 dark:group-hover:text-gray-400" />
                   </Link>
                 ))}
               </div>
@@ -692,14 +768,14 @@ export default function ManualClient({ role }: { role: string }) {
 
           {/* 본문 */}
           <main className="flex-1 min-w-0">
-            <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm">
               {/* 섹션 헤더 */}
               <div className="flex items-center gap-4 px-8 py-6 border-b border-gray-100">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 ring-1 ring-blue-100 flex items-center justify-center flex-shrink-0">
                   <ActiveIcon className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">{active.title}</h2>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{active.title}</h2>
                   {active.role === 'center' && (
                     <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium ring-1 ring-blue-200">
                       센터 전용 기능
@@ -715,15 +791,15 @@ export default function ManualClient({ role }: { role: string }) {
             </div>
 
             {/* 하단 네비게이션 */}
-            <div className="mt-4 flex items-center justify-between bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm px-6 py-3.5">
-              <p className="text-xs text-gray-400">
+            <div className="mt-4 flex items-center justify-between bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm px-6 py-3.5">
+              <p className="text-xs text-gray-400 dark:text-gray-300">
                 마지막 업데이트: 2026-06-14 · 기능 추가 시 자동 갱신
               </p>
               <div className="flex gap-2">
                 {activeIdx > 0 && (
                   <button
                     onClick={() => setActiveId(visibleSections[activeIdx - 1].id)}
-                    className="flex items-center gap-1.5 text-xs text-gray-500 border border-gray-200 rounded-xl px-3.5 py-2 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                     이전

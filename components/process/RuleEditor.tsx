@@ -1,8 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { AggFunc, Rule, Row, ProcessError } from '@/lib/processor'
+import { validateRules } from '@/lib/processor'
+import Modal from '@/components/ui/Modal'
 import PreviewPanel from './PreviewPanel'
+import { Btn, Badge } from '@/components/ui'
+import {
+  Settings2, Type, Calendar, Filter, Eraser, Trash2,
+  ArrowUp, ArrowDown, Plus, Eye, Save, X, AlertCircle,
+} from 'lucide-react'
 
 interface RuleEditorProps {
   pipelineId: string
@@ -13,22 +20,28 @@ interface RuleEditorProps {
 
 type RuleType = Rule['type']
 
-const RULE_TYPES: { value: RuleType; label: string }[] = [
-  { value: 'select',    label: '컬럼 선택' },
-  { value: 'rename',    label: '컬럼 이름 변경' },
-  { value: 'cast',      label: '타입 변환' },
-  { value: 'nullfill',  label: 'NULL 채우기' },
-  { value: 'nulldrop',  label: 'NULL 행 제거' },
-  { value: 'filter',    label: '행 필터' },
-  { value: 'normalize', label: '문자 정규화' },
-  { value: 'derive',    label: '파생 컬럼' },
-  { value: 'dedup',     label: '중복 제거' },
-  { value: 'codemap',   label: '코드 치환' },
-  { value: 'concat',    label: '컬럼 합치기' },
-  { value: 'split',     label: '컬럼 분리' },
-  { value: 'aggregate', label: '그룹 집계' },
-  { value: 'join',      label: '테이블 조인' },
-  { value: 'pivot',     label: '피벗' },
+interface RuleTypeMeta {
+  value: RuleType
+  label: string
+  icon: React.ReactNode
+}
+
+const RULE_TYPES: RuleTypeMeta[] = [
+  { value: 'select',    label: '컬럼 선택',    icon: <Settings2 className="w-3 h-3" /> },
+  { value: 'rename',    label: '이름 변경',    icon: <Type className="w-3 h-3" /> },
+  { value: 'cast',      label: '타입 변환',    icon: <Type className="w-3 h-3" /> },
+  { value: 'nullfill',  label: 'NULL 채우기',  icon: <Eraser className="w-3 h-3" /> },
+  { value: 'nulldrop',  label: 'NULL 행 제거', icon: <Trash2 className="w-3 h-3" /> },
+  { value: 'filter',    label: '행 필터',      icon: <Filter className="w-3 h-3" /> },
+  { value: 'normalize', label: '문자 정규화',  icon: <Type className="w-3 h-3" /> },
+  { value: 'derive',    label: '파생 컬럼',    icon: <Calendar className="w-3 h-3" /> },
+  { value: 'dedup',     label: '중복 제거',    icon: <Trash2 className="w-3 h-3" /> },
+  { value: 'codemap',   label: '코드 치환',    icon: <Settings2 className="w-3 h-3" /> },
+  { value: 'concat',    label: '컬럼 합치기',  icon: <Plus className="w-3 h-3" /> },
+  { value: 'split',     label: '컬럼 분리',    icon: <Settings2 className="w-3 h-3" /> },
+  { value: 'aggregate', label: '그룹 집계',    icon: <Settings2 className="w-3 h-3" /> },
+  { value: 'join',      label: '테이블 조인',  icon: <Plus className="w-3 h-3" /> },
+  { value: 'pivot',     label: '피벗',         icon: <Settings2 className="w-3 h-3" /> },
 ]
 
 const AGG_OPTIONS: { value: AggFunc; label: string }[] = [
@@ -184,7 +197,7 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
             placeholder="기준 키 컬럼 (쉼표 구분, 비우면 전체 행 기준)"
             value={rule.keys.join(',')}
             onChange={e => onChange({ ...rule, keys: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
-          <p className="text-gray-400">빈 칸이면 모든 컬럼 기준으로 완전 중복 제거</p>
+          <p className="text-gray-400 dark:text-gray-300">빈 칸이면 모든 컬럼 기준으로 완전 중복 제거</p>
         </div>
       )
     case 'codemap': {
@@ -276,7 +289,7 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
       return (
         <div className="flex flex-col gap-1 text-xs">
           <div className="bg-amber-50 border border-amber-200 rounded px-2 py-1 text-amber-700 text-[10px]">
-            서버 실행 시 처리됩니다 (미리보기에서는 건너뜁니다)
+            서버 실행 시 처리됩니다 (미리보기에서는 걸러집니다)
           </div>
           <div className="flex gap-1">
             <input className="border rounded px-2 py-1 flex-1" placeholder="조인할 데이터셋 ID"
@@ -330,6 +343,9 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
     before: Row[]; after: Row[]; errors: ProcessError[]
   } | null>(null)
 
+  const validationErrors = useMemo(() => validateRules(rules as unknown[]), [rules])
+  const hasErrors = validationErrors.length > 0
+
   function updateRule(i: number, r: Rule) {
     setRules(prev => prev.map((x, idx) => idx === i ? r : x))
   }
@@ -351,6 +367,7 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
   }
 
   async function runPreview() {
+    if (hasErrors) return
     setPreviewing(true)
     try {
       const res = await fetch(`/api/process/${pipelineId}/preview`, {
@@ -359,6 +376,10 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
         body: JSON.stringify({ rules }),
       })
       const data = await res.json()
+      if (!res.ok) {
+        setPreviewData({ before: [], after: [], errors: [{ rowIndex: 0, ruleIndex: 0, message: data.error ?? '미리보기 실패' }] })
+        return
+      }
       setPreviewData(data)
     } finally {
       setPreviewing(false)
@@ -366,42 +387,77 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
   }
 
   async function handleSave() {
+    if (hasErrors) return
     setSaving(true)
     try { await onSave(rules) } finally { setSaving(false) }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="font-semibold text-gray-800">규칙 편집</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+    <Modal
+      open
+      onClose={onClose}
+      title="규칙 편집"
+      description="데이터 처리 규칙을 추가·수정·삭제합니다"
+      size="lg"
+      className="max-w-3xl"
+      showCloseButton={false}
+    >
+      <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <Settings2 className="w-5 h-5 text-blue-600" />
+          <h2 className="font-semibold text-gray-800 dark:text-gray-200">규칙 편집</h2>
+          <Badge variant="blue">{rules.length}개</Badge>
         </div>
+        <button onClick={onClose} className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 p-1"><X className="w-5 h-5" /></button>
+      </div>
 
-        <div className="p-4 space-y-3">
-          {rules.length === 0 && (
-            <p className="text-sm text-gray-400 italic text-center py-4">규칙이 없습니다. 아래에서 추가하세요.</p>
-          )}
-          {rules.map((rule, i) => (
-            <div key={i} className="border rounded p-3 bg-gray-50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
-                  {i + 1}. {RULE_TYPES.find(t => t.value === rule.type)?.label ?? rule.type}
-                </span>
-                <div className="flex gap-1">
-                  <button onClick={() => moveUp(i)}
-                    className="text-xs px-1.5 py-0.5 border rounded text-gray-500 hover:bg-gray-100"
-                    disabled={i === 0}>▲</button>
-                  <button onClick={() => moveDown(i)}
-                    className="text-xs px-1.5 py-0.5 border rounded text-gray-500 hover:bg-gray-100"
-                    disabled={i === rules.length - 1}>▼</button>
-                  <button onClick={() => deleteRule(i)}
-                    className="text-xs px-1.5 py-0.5 border rounded text-red-500 hover:bg-red-50">삭제</button>
-                </div>
+      <div className="p-4 space-y-3 overflow-y-auto flex-1">
+          {hasErrors && (
+            <div className="bg-red-50 border border-red-200 rounded p-3 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <div className="text-xs text-red-700">
+                <p className="font-semibold mb-1">저장 전 아래 오류를 해결하세요</p>
+                <ul className="space-y-0.5">
+                  {validationErrors.map(e => (
+                    <li key={e.index}>규칙 {e.index + 1} ({RULE_TYPES.find(t => t.value === e.type)?.label ?? e.type}): {e.message}</li>
+                  ))}
+                </ul>
               </div>
-              <RuleForm rule={rule} onChange={r => updateRule(i, r)} />
             </div>
-          ))}
+          )}
+
+          {rules.length === 0 && (
+            <p className="text-sm text-gray-400 dark:text-gray-300 italic text-center py-4">규칙이 없습니다. 아래에서 추가하세요.</p>
+          )}
+          {rules.map((rule, i) => {
+            const meta = RULE_TYPES.find(t => t.value === rule.type)
+            const isInvalid = validationErrors.some(e => e.index === i)
+            return (
+              <div key={i} className={`border rounded p-3 ${isInvalid ? 'bg-red-50 border-red-200' : 'bg-gray-50 dark:bg-gray-950'}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded flex items-center gap-1 ${
+                    isInvalid ? 'bg-red-100 text-red-700' : 'bg-blue-50 text-blue-700'
+                  }`}>
+                    {meta?.icon}
+                    {i + 1}. {meta?.label ?? rule.type}
+                  </span>
+                  <div className="flex gap-1">
+                    <button onClick={() => moveUp(i)}
+                      className="text-xs px-1.5 py-0.5 border rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40"
+                      disabled={i === 0}><ArrowUp className="w-3 h-3" /></button>
+                    <button onClick={() => moveDown(i)}
+                      className="text-xs px-1.5 py-0.5 border rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40"
+                      disabled={i === rules.length - 1}><ArrowDown className="w-3 h-3" /></button>
+                    <button onClick={() => deleteRule(i)}
+                      className="text-xs px-1.5 py-0.5 border rounded text-red-500 hover:bg-red-50 flex items-center gap-0.5">
+                      <Trash2 className="w-3 h-3" /> 삭제
+                    </button>
+                  </div>
+                </div>
+                <RuleForm rule={rule} onChange={r => updateRule(i, r)} />
+              </div>
+            )
+          })}
 
           <div className="flex gap-2 items-center pt-2 border-t">
             <select
@@ -413,12 +469,7 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
                 <option key={t.value} value={t.value}>{t.label}</option>
               ))}
             </select>
-            <button
-              onClick={addRule}
-              className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-            >
-              + 규칙 추가
-            </button>
+            <Btn onClick={addRule} size="sm"><Plus className="w-3.5 h-3.5" /> 규칙 추가</Btn>
           </div>
         </div>
 
@@ -432,26 +483,26 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
           </div>
         )}
 
-        <div className="flex justify-end gap-2 p-4 border-t bg-gray-50">
-          <button
-            onClick={runPreview}
-            disabled={previewing}
-            className="px-4 py-1.5 border rounded text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
-          >
-            {previewing ? '미리보기 중...' : '미리보기'}
-          </button>
-          <button onClick={onClose} className="px-4 py-1.5 border rounded text-sm text-gray-600 hover:bg-gray-100">
-            취소
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {saving ? '저장 중...' : '저장'}
-          </button>
-        </div>
+      <div className="flex justify-end gap-2 p-4 border-t bg-gray-50 dark:bg-gray-950 flex-shrink-0">
+        <Btn
+          variant="secondary"
+          size="sm"
+          onClick={runPreview}
+          loading={previewing}
+          disabled={hasErrors}
+        >
+          <Eye className="w-3.5 h-3.5" /> 미리보기
+        </Btn>
+        <Btn variant="secondary" size="sm" onClick={onClose}>취소</Btn>
+        <Btn
+          size="sm"
+          onClick={handleSave}
+          loading={saving}
+          disabled={hasErrors}
+        >
+          <Save className="w-3.5 h-3.5" /> 저장
+        </Btn>
       </div>
-    </div>
+    </Modal>
   )
 }

@@ -1,146 +1,132 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import toast from 'react-hot-toast'
-import { RefreshCw, FlaskConical, ArrowRight, Search, Database, Calendar, CheckCircle, AlertCircle } from 'lucide-react'
-import { StatCard, Badge, EmptyState } from '@/components/ui'
+import { Database, Calendar, ScrollText, Activity, Plus } from 'lucide-react'
+import { PageHeader, Btn } from '@/components/ui'
+import Modal from '@/components/ui/Modal'
+import { useRealtime } from '@/components/realtime/RealtimeProvider'
+import { subscribeTable } from '@/lib/supabase/realtime'
+import CollectSourceForm from './CollectSourceForm'
+import CollectSourcesPanel from './CollectSourcesPanel'
+import CollectSchedulesPanel from './CollectSchedulesPanel'
+import CollectLogsPanel from './CollectLogsPanel'
+import CollectRunsPanel from './CollectRunsPanel'
+import type { SourceWithJob, CollectLog, TestResult } from './types'
 
-interface CollectSource {
-  source_id:     string
-  tenant_id:     string
-  title:         string
-  url:           string
-  method:        string
-  auth_type:     string
-  resp_format:   string
-  theme:         string | null
-  keywords:      string | null
-  license:       string | null
-  created_at:    string
-  updated_at:    string
-}
-
-interface CollectJob {
-  job_id:        string
-  source_id:     string
-  schedule_type: string
-  status:        string
-  last_run_at:   string | null
-}
-
-interface CollectLog {
-  log_id:       string
-  started_at:   string
-  status:       string
-  rows_fetched: number
-  rows_new:     number
-  rows_deleted: number
-  error_msg:    string | null
-}
-
-interface TestResult {
-  ok:           boolean
-  rows_fetched?: number
-  pages_fetched?: number
-  preview?:     Record<string, unknown>[]
-  columns?:     string[]
-  error?:       string
-}
-
-interface SourceWithJob extends CollectSource {
-  job?: CollectJob
-}
-
-interface LastRunResult {
-  sourceId:    string
-  rowsFetched: number
-}
+type TabKey = 'sources' | 'schedules' | 'logs' | 'runs'
 
 interface Props { role: string; tenantId: string }
 
-const JOB_STATUS_COLOR: Record<string, string> = {
-  idle:    'bg-gray-100 text-gray-600',
-  running: 'bg-blue-100 text-blue-700',
-  success: 'bg-green-100 text-green-700',
-  failed:  'bg-red-100 text-red-700',
-}
+const TAB_CONFIG: { key: TabKey; label: string; icon: React.ReactNode }[] = [
+  { key: 'sources',   label: '소스 관리',   icon: <Database className="w-4 h-4" /> },
+  { key: 'schedules', label: '스케줄 관리', icon: <Calendar className="w-4 h-4" /> },
+  { key: 'logs',      label: '수집 로그',   icon: <ScrollText className="w-4 h-4" /> },
+  { key: 'runs',      label: '실행 현황',   icon: <Activity className="w-4 h-4" /> },
+]
 
-const LOG_STATUS_COLOR: Record<string, string> = {
-  running: 'bg-blue-100 text-blue-700',
-  success: 'bg-green-100 text-green-700',
-  failed:  'bg-red-100 text-red-700',
-}
-
-const SCHEDULE_LABEL: Record<string, string> = {
-  manual:  '수동',
-  daily:   '매일',
-  weekly:  '매주',
-  monthly: '매월',
-}
-
-function truncateUrl(url: string, maxLen = 40): string {
-  if (url.length <= maxLen) return url
-  return url.slice(0, maxLen) + '…'
-}
+const LOG_LIMIT = 20
 
 export default function CollectClient({ role, tenantId }: Props) {
-  const router = useRouter()
-  const [sources,       setSources]       = useState<SourceWithJob[]>([])
-  const [loading,       setLoading]       = useState(true)
-  const [showForm,      setShowForm]      = useState(false)
-  const [submitting,    setSubmitting]    = useState(false)
-  const [runningId,     setRunningId]     = useState<string | null>(null)
-  const [lastRunResult, setLastRunResult] = useState<LastRunResult | null>(null)
-  const [logModal,      setLogModal]      = useState<{ sourceId: string; title: string } | null>(null)
-  const [logs,          setLogs]          = useState<CollectLog[]>([])
-  const [logsLoading,   setLogsLoading]   = useState(false)
-  const [testing,       setTesting]       = useState(false)
-  const [testResult,    setTestResult]    = useState<TestResult | null>(null)
-  const [search,        setSearch]        = useState('')
-  const [statusFilter,  setStatusFilter]  = useState<string>('all')
+  const [activeTab, setActiveTab] = useState<TabKey>('sources')
 
-  // 폼 상태
-  const [authType,       setAuthType]       = useState('none')
-  const [respFormat,     setRespFormat]     = useState('json')
-  const [method,         setMethod]         = useState('GET')
-  const [paginationType, setPaginationType] = useState('none')
+  const [sources, setSources] = useState<SourceWithJob[]>([])
+  const [loading, setLoading]   = useState(true)
 
-  // 현재 폼 데이터 수집 (테스트용)
-  function collectFormData(form: HTMLFormElement): Record<string, unknown> {
-    const fd = new FormData(form)
-    return {
-      url:           fd.get('url'),
-      method:        fd.get('method'),
-      auth_type:     fd.get('auth_type'),
-      auth_key:      fd.get('auth_key') || null,
-      auth_value:    fd.get('auth_value') || null,
-      resp_format:   fd.get('resp_format'),
-      json_path:     fd.get('json_path') || null,
-      pagination_type:       fd.get('pagination_type') || 'none',
-      pagination_page_param: fd.get('pagination_page_param') || 'pageNo',
-      pagination_size_param: fd.get('pagination_size_param') || 'numOfRows',
-      pagination_size:       fd.get('pagination_size') || 10,
-      pagination_total_path: fd.get('pagination_total_path') || '$.totalCount',
-      request_body:  (() => {
-        const v = (fd.get('request_body') as string)?.trim()
-        if (!v) return null
-        try { return JSON.parse(v) } catch { return null }
-      })(),
-    }
-  }
+  const [showForm, setShowForm] = useState(false)
+  const [editingSource, setEditingSource] = useState<SourceWithJob | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
-  async function loadSources() {
+  const [testing, setTesting] = useState(false)
+  const [testResult, setTestResult] = useState<TestResult | null>(null)
+
+  const [runningId, setRunningId] = useState<string | null>(null)
+  const [lastRunResult, setLastRunResult] = useState<{ sourceId: string; rowsFetched: number } | null>(null)
+
+  const [search, setSearch] = useState('')
+  const [sourceStatusFilter, setSourceStatusFilter] = useState('all')
+
+  const [logs, setLogs] = useState<CollectLog[]>([])
+  const [logsLoading, setLogsLoading] = useState(false)
+  const logsOffsetRef = useRef(0)
+  const [logsHasMore, setLogsHasMore] = useState(false)
+  const [logStatusFilter, setLogStatusFilter] = useState('all')
+  const [logSourceFilter, setLogSourceFilter] = useState('all')
+
+  const [sourcesError, setSourcesError] = useState<string | null>(null)
+  const [logsError, setLogsError] = useState<string | null>(null)
+
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [updatingJobId, setUpdatingJobId] = useState<string | null>(null)
+
+  const loadSources = useCallback(async () => {
     setLoading(true)
-    const res = await fetch('/api/collect')
-    const list: SourceWithJob[] = await res.json()
-    setSources(Array.isArray(list) ? list : [])
-    setLoading(false)
-  }
+    setSourcesError(null)
+    try {
+      const res = await fetch('/api/collect')
+      if (!res.ok) throw new Error('수집 소스를 불러오지 못했습니다.')
+      const list: SourceWithJob[] = await res.json()
+      setSources(Array.isArray(list) ? list : [])
+    } catch (e) {
+      setSourcesError(e instanceof Error ? e.message : '수집 소스를 불러오지 못했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  async function handleTest(e: React.MouseEvent<HTMLButtonElement>) {
-    const form = (e.currentTarget.closest('form') as HTMLFormElement)
-    const data = collectFormData(form)
+  const loadLogs = useCallback(async (reset = false) => {
+    if (reset) logsOffsetRef.current = 0
+    const offset = logsOffsetRef.current
+    const params = new URLSearchParams({ limit: String(LOG_LIMIT), offset: String(offset) })
+    if (logStatusFilter !== 'all') params.set('status', logStatusFilter)
+    if (logSourceFilter !== 'all') params.set('source_id', logSourceFilter)
+
+    setLogsLoading(true)
+    setLogsError(null)
+    try {
+      const res = await fetch(`/api/collect/logs?${params.toString()}`)
+      if (!res.ok) throw new Error('수집 로그를 불러오지 못했습니다.')
+      const data = await res.json() as { rows: CollectLog[]; count: number }
+      const rows = data.rows ?? []
+      setLogs(prev => reset ? rows : [...prev, ...rows])
+      setLogsHasMore((offset + rows.length) < data.count)
+      logsOffsetRef.current = offset + rows.length
+    } catch (e) {
+      setLogsError(e instanceof Error ? e.message : '수집 로그를 불러오지 못했습니다.')
+    } finally {
+      setLogsLoading(false)
+    }
+  }, [logStatusFilter, logSourceFilter])
+
+  useEffect(() => { loadSources() }, [loadSources])
+
+  useEffect(() => {
+    if (activeTab === 'logs' || activeTab === 'runs') {
+      loadLogs(true)
+    }
+  }, [activeTab, logStatusFilter, logSourceFilter, loadLogs])
+
+  // 실시간 수집 로그 구독
+  const realtime = useRealtime()
+  useEffect(() => {
+    const sub = subscribeTable(realtime, 'collection_logs', () => {
+      loadLogs(true)
+      loadSources()
+    }, { event: 'INSERT' })
+    return () => { sub.unsubscribe() }
+  }, [realtime, loadLogs, loadSources])
+
+  // 실행 중일 때는 로그/실행 탭을 주기적으로 갱신
+  useEffect(() => {
+    if (!runningId && activeTab !== 'logs' && activeTab !== 'runs') return
+    const timer = setInterval(() => {
+      loadLogs(true)
+      loadSources()
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [runningId, activeTab, loadLogs, loadSources])
+
+  async function handleTest(data: Record<string, unknown>) {
     if (!data.url) { toast.error('URL을 먼저 입력하세요.'); return }
     setTesting(true)
     setTestResult(null)
@@ -162,45 +148,42 @@ export default function CollectClient({ role, tenantId }: Props) {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const fd = new FormData(e.currentTarget)
-    const rawBody = (fd.get('request_body') as string)?.trim()
-    let parsedBody: Record<string, unknown> | null = null
-    if (rawBody) {
-      try { parsedBody = JSON.parse(rawBody) } catch { toast.error('request_body JSON 파싱 오류'); return }
-    }
-
-    const body: Record<string, unknown> = {
-      tenant_id:    tenantId,
-      title:        fd.get('title'),
-      url:          fd.get('url'),
-      method:       fd.get('method'),
-      auth_type:    fd.get('auth_type'),
-      auth_key:     fd.get('auth_key') || null,
-      auth_value:   fd.get('auth_value') || null,
-      resp_format:  fd.get('resp_format'),
-      json_path:    fd.get('json_path') || null,
-      schedule_type: fd.get('schedule_type'),
-      theme:        fd.get('theme') || null,
-      keywords:     fd.get('keywords') || null,
-      request_body: parsedBody,
-      pagination_type:       fd.get('pagination_type') || 'none',
-      pagination_page_param: fd.get('pagination_page_param') || 'pageNo',
-      pagination_size_param: fd.get('pagination_size_param') || 'numOfRows',
-      pagination_size:       fd.get('pagination_size') ? Number(fd.get('pagination_size')) : 1000,
-      pagination_total_path: fd.get('pagination_total_path') || '$.totalCount',
-    }
+  async function handleCreate(body: Record<string, unknown>) {
     setSubmitting(true)
-    await fetch('/api/collect', {
+    const res = await fetch('/api/collect', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...body, tenant_id: tenantId }),
+    })
+    setSubmitting(false)
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: '오류' }))
+      toast.error(`등록 실패: ${err.error}`)
+      return
+    }
+    setShowForm(false)
+    setTestResult(null)
+    toast.success('수집 소스가 등록되었습니다.')
+    await loadSources()
+  }
+
+  async function handleUpdate(body: Record<string, unknown>) {
+    if (!editingSource) return
+    setSubmitting(true)
+    const res = await fetch(`/api/collect/${editingSource.source_id}`, {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
     setSubmitting(false)
-    setShowForm(false)
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: '오류' }))
+      toast.error(`수정 실패: ${err.error}`)
+      return
+    }
+    setEditingSource(null)
     setTestResult(null)
-    toast.success('수집 소스가 등록되었습니다.')
+    toast.success('수집 소스가 수정되었습니다.')
     await loadSources()
   }
 
@@ -219,499 +202,184 @@ export default function CollectClient({ role, tenantId }: Props) {
       toast.error(`수집 실패: ${err.error ?? '오류'}`)
     }
     await loadSources()
+    await loadLogs(true)
   }
 
   async function handleDelete(sourceId: string) {
     if (!confirm('소스를 삭제하면 수집 이력도 모두 삭제됩니다. 계속하시겠습니까?')) return
-    await fetch(`/api/collect/${sourceId}`, { method: 'DELETE' })
-    toast('소스가 삭제되었습니다.')
-    await loadSources()
+    setDeletingId(sourceId)
+    try {
+      const res = await fetch(`/api/collect/${sourceId}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: '오류' }))
+        toast.error(`삭제 실패: ${err.error}`)
+        return
+      }
+      toast('소스가 삭제되었습니다.')
+      await loadSources()
+    } finally {
+      setDeletingId(null)
+    }
   }
 
-  async function openLogs(sourceId: string, title: string) {
-    setLogModal({ sourceId, title })
-    setLogsLoading(true)
-    const res = await fetch(`/api/collect/${sourceId}/logs`)
-    setLogs(await res.json())
-    setLogsLoading(false)
+  async function handleUpdateJob(sourceId: string, patch: Record<string, unknown>) {
+    setUpdatingJobId(sourceId)
+    try {
+      const res = await fetch(`/api/collect/${sourceId}/job`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: '오류' }))
+        toast.error(`스케줄 변경 실패: ${err.error}`)
+        return
+      }
+      toast.success('스케줄 설정이 변경되었습니다.')
+      await loadSources()
+    } finally {
+      setUpdatingJobId(null)
+    }
   }
 
-  useEffect(() => { loadSources() }, [])
+  function openCreate() {
+    setEditingSource(null)
+    setTestResult(null)
+    setShowForm(true)
+  }
 
-  const filteredSources = sources.filter(src => {
-    const haystack = (src.title + ' ' + src.url + ' ' + (src.theme ?? '') + ' ' + (src.keywords ?? '')).toLowerCase()
-    const matchesSearch = haystack.includes(search.toLowerCase())
-    const matchesStatus = statusFilter === 'all'
-      ? true
-      : statusFilter === 'idle'
-        ? !src.job?.status || src.job.status === 'idle'
-        : src.job?.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  function openEdit(src: SourceWithJob) {
+    setShowForm(false)
+    setEditingSource(src)
+    setTestResult(null)
+  }
 
-  const scheduledCount = sources.filter(s => s.job && s.job.schedule_type !== 'manual').length
-  const successCount   = sources.filter(s => s.job?.status === 'success').length
-  const failedCount    = sources.filter(s => s.job?.status === 'failed').length
+  function closeModal() {
+    setShowForm(false)
+    setEditingSource(null)
+    setTestResult(null)
+  }
+
+  const formSource = showForm ? null : editingSource
+  const isFormOpen = showForm || !!editingSource
 
   return (
     <div className="space-y-4">
-      {/* 로그 모달 */}
-      {logModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4 flex flex-col max-h-[80vh]">
-            <div className="flex items-center justify-between px-5 py-3 border-b">
-              <h3 className="font-semibold text-gray-800">수집 이력 — {logModal.title}</h3>
-              <button onClick={() => setLogModal(null)} className="text-gray-400 hover:text-gray-700 text-lg">✕</button>
-            </div>
-            <div className="overflow-auto flex-1">
-              {logsLoading ? (
-                <div className="py-8 text-center text-gray-400">로딩 중...</div>
-              ) : logs.length === 0 ? (
-                <div className="py-8 text-center text-gray-400">수집 이력이 없습니다.</div>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 sticky top-0">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-gray-600 font-medium">로그 ID</th>
-                      <th className="px-3 py-2 text-left text-gray-600 font-medium">시작</th>
-                      <th className="px-3 py-2 text-left text-gray-600 font-medium">상태</th>
-                      <th className="px-3 py-2 text-right text-gray-600 font-medium">수집</th>
-                      <th className="px-3 py-2 text-right text-gray-600 font-medium">신규</th>
-                      <th className="px-3 py-2 text-right text-gray-600 font-medium">삭제</th>
-                      <th className="px-3 py-2 text-left text-gray-600 font-medium">오류</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {logs.map(log => (
-                      <tr key={log.log_id} className="hover:bg-gray-50">
-                        <td className="px-3 py-2 font-mono text-xs text-gray-500">{log.log_id}</td>
-                        <td className="px-3 py-2 text-xs text-gray-500">
-                          {new Date(log.started_at).toLocaleString('ko-KR')}
-                        </td>
-                        <td className="px-3 py-2">
-                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${LOG_STATUS_COLOR[log.status] ?? 'bg-gray-100 text-gray-600'}`}>
-                            {log.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2 text-right text-xs">{log.rows_fetched.toLocaleString()}</td>
-                        <td className="px-3 py-2 text-right text-xs text-green-600">+{log.rows_new}</td>
-                        <td className="px-3 py-2 text-right text-xs text-red-500">-{log.rows_deleted}</td>
-                        <td className="px-3 py-2 text-xs max-w-xs">
-                          {log.error_msg ? (
-                            <details className="cursor-pointer">
-                              <summary className="text-red-500 truncate max-w-[200px]">{log.error_msg}</summary>
-                              <pre className="mt-1 whitespace-pre-wrap text-red-600 bg-red-50 p-1 rounded text-[10px] max-h-32 overflow-auto">{log.error_msg}</pre>
-                            </details>
-                          ) : <span className="text-gray-300">—</span>}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
+      {/* 폼 모달 */}
+      <Modal
+        open={isFormOpen}
+        onClose={closeModal}
+        title={editingSource ? '수집 소스 수정' : '수집 소스 등록'}
+        description="외부 데이터 수집 소스를 등록하거나 수정합니다"
+        size="xl"
+        className="max-w-4xl"
+        showCloseButton={false}
+      >
+        <div className="flex items-center justify-between px-5 py-3 border-b flex-shrink-0">
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+            {editingSource ? '수집 소스 수정' : '수집 소스 등록'}
+          </h3>
+          <button onClick={closeModal} className="text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 text-lg">✕</button>
         </div>
-      )}
+        <div className="overflow-auto p-5 flex-1">
+          <CollectSourceForm
+            key={editingSource?.source_id ?? 'new'}
+            initialData={formSource}
+            onSubmit={editingSource ? handleUpdate : handleCreate}
+            onTest={handleTest}
+            onCancel={closeModal}
+            submitting={submitting}
+            testing={testing}
+            testResult={testResult}
+          />
+        </div>
+      </Modal>
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800">데이터 수집 관리</h2>
-        <button
-          onClick={() => { setShowForm(!showForm); setTestResult(null) }}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-        >
-          {showForm ? '취소' : '수집 소스 등록'}
-        </button>
+      <PageHeader
+        title="데이터 수집 관리"
+        subtitle="외부 API·파일을 등록하고 스케줄·실행·이력을 관리합니다"
+        action={
+          <Btn onClick={openCreate}>
+            <Plus className="w-4 h-4" />
+            수집 소스 등록
+          </Btn>
+        }
+      />
+
+      {/* 탭 */}
+      <div className="border-b">
+        <nav className="flex gap-1">
+          {TAB_CONFIG.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab.key
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* 통계 카드 */}
-      {!loading && sources.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <StatCard label="총 소스" value={sources.length} color="blue" icon="🌐" />
-          <StatCard label="스케줄 등록" value={scheduledCount} color="purple" icon={<Calendar className="w-4 h-4" />} />
-          <StatCard label="최근 성공" value={successCount} color="green" icon={<CheckCircle className="w-4 h-4" />} />
-          <StatCard label="최근 실패" value={failedCount} color="red" icon={<AlertCircle className="w-4 h-4" />} />
-        </div>
-      )}
-
-      {/* 검색·필터 */}
-      {!showForm && sources.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="제목, URL, 주제, 키워드 검색"
-              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm"
-          >
-            <option value="all">전체 상태</option>
-            <option value="idle">대기</option>
-            <option value="running">실행 중</option>
-            <option value="success">성공</option>
-            <option value="failed">실패</option>
-          </select>
-        </div>
-      )}
-
-      {/* 소스 등록 폼 */}
-      {showForm && (
-        <div className="bg-white rounded-lg border p-5 shadow-sm">
-          <h3 className="font-medium text-gray-800 mb-4">수집 소스 등록</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* 기본 정보 */}
-            <div className="grid md:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">제목 *</label>
-                <input name="title" required placeholder="소스 제목"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">URL *</label>
-                <input name="url" required placeholder="https://api.data.go.kr/..."
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">HTTP 메서드</label>
-                <select name="method" value={method} onChange={e => setMethod(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md text-sm">
-                  <option value="GET">GET</option>
-                  <option value="POST">POST</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">응답 형식</label>
-                <select name="resp_format" value={respFormat} onChange={e => setRespFormat(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md text-sm">
-                  <option value="json">JSON</option>
-                  <option value="csv">CSV</option>
-                  <option value="xml">XML</option>
-                </select>
-              </div>
-
-              {/* 인증 */}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">인증 방식</label>
-                <select name="auth_type" value={authType} onChange={e => setAuthType(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md text-sm">
-                  <option value="none">인증 없음</option>
-                  <option value="api_key">API 키 (헤더)</option>
-                  <option value="bearer">Bearer 토큰</option>
-                </select>
-              </div>
-
-              {authType === 'api_key' && (
-                <>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">헤더 키</label>
-                    <input name="auth_key" placeholder="X-API-Key"
-                      className="w-full px-3 py-2 border rounded-md text-sm" />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">API 키 값</label>
-                    <input name="auth_value" type="password" placeholder="••••••••"
-                      className="w-full px-3 py-2 border rounded-md text-sm" />
-                  </div>
-                </>
-              )}
-              {authType === 'bearer' && (
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Bearer 토큰</label>
-                  <input name="auth_value" type="password" placeholder="••••••••"
-                    className="w-full px-3 py-2 border rounded-md text-sm" />
-                </div>
-              )}
-              {authType === 'none' && (
-                <>
-                  <input type="hidden" name="auth_key" value="" />
-                  <input type="hidden" name="auth_value" value="" />
-                </>
-              )}
-
-              {respFormat === 'json' && (
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    JSON 경로
-                    <span className="ml-1 text-gray-400 font-normal">예: $.response.body.items.item</span>
-                  </label>
-                  <input name="json_path" placeholder="$.items"
-                    className="w-full px-3 py-2 border rounded-md text-sm" />
-                </div>
-              )}
-
-              {method === 'POST' && (
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Request Body (JSON)
-                  </label>
-                  <textarea name="request_body" rows={3} placeholder={'{"key": "value"}'}
-                    className="w-full px-3 py-2 border rounded-md text-sm font-mono" />
-                </div>
-              )}
-            </div>
-
-            {/* 페이지네이션 설정 */}
-            <div className="border rounded-md p-3 bg-gray-50">
-              <div className="flex items-center gap-2 mb-3">
-                <label className="text-xs font-semibold text-gray-700">페이지네이션</label>
-                <select name="pagination_type" value={paginationType} onChange={e => setPaginationType(e.target.value)}
-                  className="px-2 py-1 border rounded text-xs">
-                  <option value="none">없음 (단일 요청)</option>
-                  <option value="page">페이지 번호 (공공데이터포털 기본)</option>
-                  <option value="offset">오프셋 (offset + limit)</option>
-                </select>
-              </div>
-
-              {(paginationType === 'page' || paginationType === 'offset') && (
-                <div className="grid md:grid-cols-4 gap-2">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">
-                      {paginationType === 'page' ? '페이지 파라미터' : '오프셋 파라미터'}
-                    </label>
-                    <input name="pagination_page_param"
-                      defaultValue={paginationType === 'page' ? 'pageNo' : 'offset'}
-                      className="w-full px-2 py-1 border rounded text-xs" />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">크기 파라미터</label>
-                    <input name="pagination_size_param"
-                      defaultValue={paginationType === 'page' ? 'numOfRows' : 'limit'}
-                      className="w-full px-2 py-1 border rounded text-xs" />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">페이지당 행 수</label>
-                    <input name="pagination_size" type="number" defaultValue="1000" min="1" max="5000"
-                      className="w-full px-2 py-1 border rounded text-xs" />
-                  </div>
-                  {paginationType === 'page' && (
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">전체 건수 경로</label>
-                      <input name="pagination_total_path" defaultValue="$.totalCount"
-                        placeholder="$.totalCount"
-                        className="w-full px-2 py-1 border rounded text-xs" />
-                    </div>
-                  )}
-                </div>
-              )}
-              {(paginationType === 'none' || paginationType === '') && (
-                <>
-                  <input type="hidden" name="pagination_page_param" value="pageNo" />
-                  <input type="hidden" name="pagination_size_param" value="numOfRows" />
-                  <input type="hidden" name="pagination_size" value="1000" />
-                  <input type="hidden" name="pagination_total_path" value="$.totalCount" />
-                </>
-              )}
-            </div>
-
-            {/* 스케줄 + 메타 */}
-            <div className="grid md:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">수집 스케줄</label>
-                <select name="schedule_type"
-                  className="w-full px-3 py-2 border rounded-md text-sm">
-                  <option value="manual">수동</option>
-                  <option value="daily">매일 자정</option>
-                  <option value="weekly">매주 월요일</option>
-                  <option value="monthly">매월 1일</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">주제</label>
-                <input name="theme" placeholder="예: 인구통계"
-                  className="w-full px-3 py-2 border rounded-md text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">키워드</label>
-                <input name="keywords" placeholder="쉼표로 구분"
-                  className="w-full px-3 py-2 border rounded-md text-sm" />
-              </div>
-            </div>
-
-            {/* 테스트 결과 */}
-            {testResult && (
-              <div className={`rounded-md p-3 text-sm ${testResult.ok ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                {testResult.ok ? (
-                  <div>
-                    <p className="font-medium text-green-700 mb-1">
-                      테스트 성공 — 총 {testResult.rows_fetched?.toLocaleString()}행
-                      {testResult.pages_fetched && testResult.pages_fetched > 1 && ` (${testResult.pages_fetched}페이지)`}
-                    </p>
-                    {testResult.columns && testResult.columns.length > 0 && (
-                      <p className="text-xs text-green-600 mb-2">
-                        컬럼: {testResult.columns.join(', ')}
-                      </p>
-                    )}
-                    {testResult.preview && testResult.preview.length > 0 && (
-                      <div className="overflow-x-auto">
-                        <table className="text-xs border-collapse w-full">
-                          <thead>
-                            <tr className="bg-green-100">
-                              {testResult.columns?.map(c => (
-                                <th key={c} className="border border-green-200 px-2 py-1 text-left font-medium text-green-800">{c}</th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {testResult.preview.slice(0, 5).map((row, i) => (
-                              <tr key={i} className="hover:bg-green-50">
-                                {testResult.columns?.map(c => (
-                                  <td key={c} className="border border-green-100 px-2 py-0.5 text-gray-700 max-w-[120px] truncate">
-                                    {row[c] != null ? String(row[c]) : <span className="text-gray-300">—</span>}
-                                  </td>
-                                ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-red-600 font-medium">오류: {testResult.error}</p>
-                )}
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <button type="button" onClick={handleTest} disabled={testing}
-                className="px-4 py-2 border border-blue-400 text-blue-600 text-sm rounded-md hover:bg-blue-50 disabled:opacity-50 flex items-center gap-1.5">
-                <FlaskConical className="w-3.5 h-3.5" />
-                {testing ? '테스트 중...' : '테스트'}
-              </button>
-              <button type="submit" disabled={submitting}
-                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50">
-                {submitting ? '등록 중...' : '등록'}
-              </button>
-              <button type="button" onClick={() => { setShowForm(false); setTestResult(null) }}
-                className="px-4 py-2 border text-gray-600 text-sm rounded-md hover:bg-gray-50">
-                취소
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* 소스 목록 */}
-      {loading ? (
-        <div className="space-y-4 animate-pulse">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg border p-4">
-              <div className="flex justify-between">
-                <div className="space-y-2 flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-1/3" />
-                  <div className="h-3 bg-gray-100 rounded w-2/3" />
-                </div>
-                <div className="flex gap-2">
-                  <div className="h-8 bg-gray-100 rounded w-14" />
-                  <div className="h-8 bg-gray-100 rounded w-20" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : sources.length === 0 ? (
-        <EmptyState
-          icon="🌐"
-          title="등록된 수집 소스가 없습니다"
-          description="외부 API나 파일 URL을 등록하면 데이터를 주기적으로 자동 수집합니다"
-          action={{ label: '첫 수집 소스 등록하기', onClick: () => setShowForm(true) }}
+      {activeTab === 'sources' && (
+        <CollectSourcesPanel
+          role={role}
+          sources={sources}
+          loading={loading}
+          search={search}
+          setSearch={setSearch}
+          statusFilter={sourceStatusFilter}
+          setStatusFilter={setSourceStatusFilter}
+          runningId={runningId}
+          lastRunResult={lastRunResult}
+          deletingId={deletingId}
+          error={sourcesError}
+          onRetry={loadSources}
+          onRun={handleRun}
+          onEdit={openEdit}
+          onDelete={handleDelete}
+          onOpenForm={openCreate}
         />
-      ) : filteredSources.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 text-sm">
-          검색·필터 조건에 맞는 수집 소스가 없습니다.
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg border overflow-hidden shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">제목</th>
-                {role === 'center' && <th className="px-4 py-2 text-left text-gray-600 font-medium">기관</th>}
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">URL</th>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">형식</th>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">스케줄</th>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">상태</th>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">마지막 실행</th>
-                <th className="px-4 py-2 text-left text-gray-600 font-medium">액션</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredSources.map(src => (
-                <tr key={src.source_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-gray-800 font-medium">{src.title}</td>
-                  {role === 'center' && (
-                    <td className="px-4 py-2 text-gray-500 text-xs font-mono">{src.tenant_id}</td>
-                  )}
-                  <td className="px-4 py-2 text-xs text-blue-600 font-mono" title={src.url}>
-                    {truncateUrl(src.url)}
-                  </td>
-                  <td className="px-4 py-2">
-                    <Badge variant="purple">{src.resp_format.toUpperCase()}</Badge>
-                  </td>
-                  <td className="px-4 py-2 text-xs text-gray-500">
-                    {src.job ? SCHEDULE_LABEL[src.job.schedule_type] ?? src.job.schedule_type : '수동'}
-                  </td>
-                  <td className="px-4 py-2">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      runningId === src.source_id
-                        ? 'bg-blue-100 text-blue-700'
-                        : JOB_STATUS_COLOR[src.job?.status ?? 'idle'] ?? JOB_STATUS_COLOR['idle']
-                    }`}>
-                      {runningId === src.source_id ? 'running' : (src.job?.status ?? 'idle')}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 text-xs text-gray-400">
-                    {src.job?.last_run_at
-                      ? new Date(src.job.last_run_at).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
-                      : '—'}
-                  </td>
-                  <td className="px-4 py-2">
-                    <div className="flex flex-wrap gap-1.5">
-                      <button
-                        onClick={() => handleRun(src.source_id)}
-                        disabled={runningId === src.source_id}
-                        className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                      >
-                        {runningId === src.source_id ? '실행 중' : '지금 실행'}
-                      </button>
-                      {lastRunResult?.sourceId === src.source_id && (
-                        <button
-                          onClick={() => router.push(`/process?collect_source=${src.source_id}`)}
-                          className="px-2 py-1 text-xs bg-emerald-600 text-white rounded hover:bg-emerald-700 flex items-center gap-0.5"
-                          title={`${lastRunResult.rowsFetched.toLocaleString()}행 수집 완료 — 가공 파이프라인으로 보내기`}
-                        >
-                          <ArrowRight className="w-3 h-3" />
-                          가공으로
-                        </button>
-                      )}
-                      <button
-                        onClick={() => openLogs(src.source_id, src.title)}
-                        className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                      >
-                        이력
-                      </button>
-                      {role === 'center' && (
-                        <button
-                          onClick={() => handleDelete(src.source_id)}
-                          className="px-2 py-1 text-xs bg-red-50 text-red-600 rounded hover:bg-red-100"
-                        >
-                          삭제
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      )}
+
+      {activeTab === 'schedules' && (
+        <CollectSchedulesPanel
+          sources={sources}
+          loading={loading}
+          updatingSourceId={updatingJobId}
+          onUpdateJob={handleUpdateJob}
+        />
+      )}
+
+      {activeTab === 'logs' && (
+        <CollectLogsPanel
+          logs={logs}
+          loading={logsLoading}
+          sources={sources}
+          statusFilter={logStatusFilter}
+          setStatusFilter={setLogStatusFilter}
+          sourceFilter={logSourceFilter}
+          setSourceFilter={setLogSourceFilter}
+          hasMore={logsHasMore}
+          error={logsError}
+          onRetry={() => loadLogs(true)}
+          onLoadMore={() => loadLogs(false)}
+          onRefresh={() => loadLogs(true)}
+        />
+      )}
+
+      {activeTab === 'runs' && (
+        <CollectRunsPanel
+          sources={sources}
+          logs={logs}
+          runningId={runningId}
+          onRun={handleRun}
+        />
       )}
     </div>
   )

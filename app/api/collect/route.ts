@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { newCollectId, newJobId, encryptAuthValue } from '@/lib/collector'
 
+const SOURCE_SELECT = 'source_id,tenant_id,title,description,url,method,auth_type,auth_key,query_params,request_body,resp_format,json_path,theme,keywords,license,pagination_type,pagination_page_param,pagination_size_param,pagination_size,pagination_total_path,connector_config,created_at,updated_at'
+
 export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,7 +14,7 @@ export async function GET() {
 
   let query = supabase
     .from('collection_sources')
-    .select('source_id,tenant_id,title,description,url,method,auth_type,auth_key,query_params,resp_format,json_path,theme,keywords,license,created_at,updated_at')
+    .select(SOURCE_SELECT)
     .order('created_at', { ascending: false })
 
   if (role !== 'center') {
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
   const sourceId = newCollectId()
   const jobId    = newJobId()
 
-  const rawAuthValue = (body.auth_value as string) ?? null
+  const rawAuthValue = (body.auth_value as string) || null
   const storedAuthValue = rawAuthValue ? encryptAuthValue(rawAuthValue) : null
 
   const { error: srcErr } = await supabase.from('collection_sources').insert({
@@ -70,7 +72,7 @@ export async function POST(req: Request) {
     url:          body.url,
     method:       (body.method as string) ?? 'GET',
     auth_type:    (body.auth_type as string) ?? 'none',
-    auth_key:     (body.auth_key as string) ?? null,
+    auth_key:     (body.auth_key as string) || null,
     auth_value:   storedAuthValue,
     query_params: (body.query_params as object) ?? {},
     request_body: (body.request_body as object) ?? null,
@@ -78,12 +80,13 @@ export async function POST(req: Request) {
     json_path:    (body.json_path as string) ?? null,
     theme:        (body.theme as string) ?? null,
     keywords:     (body.keywords as string) ?? null,
-    license:      (body.license as string) ?? '공공누리 1유형',
+    license:      (body.license as string) || '공공누리 1유형',
     pagination_type:       (body.pagination_type as string) ?? 'none',
     pagination_page_param: (body.pagination_page_param as string) ?? 'pageNo',
     pagination_size_param: (body.pagination_size_param as string) ?? 'numOfRows',
     pagination_size:       body.pagination_size ? Number(body.pagination_size) : 1000,
     pagination_total_path: (body.pagination_total_path as string) ?? '$.totalCount',
+    connector_config:      body.connector_config ?? null,
   })
   if (srcErr) return NextResponse.json({ error: srcErr.message }, { status: 500 })
 

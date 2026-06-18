@@ -1,10 +1,8 @@
+@import 'pretendard/dist/web/static/pretendard.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import 'leaflet/dist/leaflet.css';
-@import 'leaflet.markercluster/dist/MarkerCluster.css';
-@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 @layer base {
   :root {
@@ -22,7 +20,26 @@
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
   }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 8%;
+    --card-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --border: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+
   * { border-color: hsl(var(--border)); }
+  html {
+    font-family: 'Pretendard', ui-sans-serif, system-ui, sans-serif;
+  }
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
@@ -38,5 +55,19 @@
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

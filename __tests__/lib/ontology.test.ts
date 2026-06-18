@@ -1,4 +1,4 @@
-import { recommendOntologyCandidates, listActions } from '@/lib/ontology'
+import { recommendOntologyCandidates, listActions } from '@/lib/ontology/core'
 
 describe('recommendOntologyCandidates', () => {
   it('빈 메타 → 빈 배열', () => {

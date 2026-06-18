@@ -1,17 +1,28 @@
 'use client'
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { FileText, AlertTriangle, CheckCircle, MinusCircle, Building2, Target, Download, ListTodo, Image as ImageIcon } from 'lucide-react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
+import {
+  FileText, AlertTriangle, CheckCircle, MinusCircle, Building2, Target, Download, ListTodo, Image as ImageIcon,
+  Search, Filter, Loader2,
+} from 'lucide-react'
 import html2canvas from 'html2canvas'
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis,
+  PieChart, Pie,
   ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell,
 } from 'recharts'
+import PageHeader from '@/components/ui/PageHeader'
+import Card from '@/components/ui/Card'
+import StatCard from '@/components/ui/StatCard'
+import Badge from '@/components/ui/Badge'
+import Btn from '@/components/ui/Btn'
+import EmptyState from '@/components/ui/EmptyState'
+import Skeleton from '@/components/ui/Skeleton'
 import CompareClient from './CompareClient'
 
 interface Indicator { name: string; value: string; status: 'ok'|'warn'|'na'; desc: string }
 interface Area {
   name: string; weight: number; color: string
-  ok: number; total: number; score: number
+  ok: number; total: number; na?: number; score: number
   indicators: Indicator[]
 }
 interface EvalData {
@@ -34,17 +45,20 @@ interface EvalTargets {
   synthetic_goal: number; analysis_goal: number
 }
 
-const STATUS_BADGE: Record<string, string> = {
-  ok:   'bg-green-100 text-green-700',
-  warn: 'bg-yellow-100 text-yellow-700',
-  na:   'bg-gray-100 text-gray-500',
+type StatusKey = 'ok' | 'warn' | 'na'
+type StatusFilter = 'all' | StatusKey
+
+const STATUS_BADGE: Record<StatusKey, 'green' | 'amber' | 'gray'> = {
+  ok:   'green',
+  warn: 'amber',
+  na:   'gray',
 }
-const STATUS_ICON: Record<string, React.ReactNode> = {
+const STATUS_ICON: Record<StatusKey, React.ReactNode> = {
   ok:   <CheckCircle className="w-3.5 h-3.5 text-green-600" />,
   warn: <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" />,
-  na:   <MinusCircle className="w-3.5 h-3.5 text-gray-400" />,
+  na:   <MinusCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />,
 }
-const STATUS_LABEL: Record<string, string> = { ok: '충족', warn: '미흡', na: 'N/A' }
+const STATUS_LABEL: Record<StatusKey, string> = { ok: '충족', warn: '미흡', na: 'N/A' }
 
 function indicatorAction(ind: Indicator): { action: string; pts: number; difficulty: '쉬움'|'보통'|'어려움' } {
   const n = ind.name.toLowerCase()
@@ -59,11 +73,11 @@ function indicatorAction(ind: Indicator): { action: string; pts: number; difficu
   if (n.includes('조치') || n.includes('보완율'))
     return { action: '품질 미통과 항목 조치 후 재검사 요청', pts: 10, difficulty: '보통' }
   if ((n.includes('분') && n.includes('실적')) || n.includes('정책활용'))
-    return { action: '실적 관리 → 분析 실적 탭에 등록', pts: 10, difficulty: '쉬움' }
+    return { action: '실적 관리 → 분석 실적 탭에 등록', pts: 10, difficulty: '쉬움' }
   if (n.includes('가명') || n.includes('합성'))
     return { action: '실적 관리 → 가명·합성 탭에 등록 (+1점/건)', pts: 5, difficulty: '보통' }
   if (n.includes('메타') || n.includes('공유 실적') || n.includes('입주'))
-    return { action: '기관 관리 → 미입주 기관 온보딩', pts: 8, difficulty: '쉬움' }
+    return { action: '기관 관리 → 미입주 기관 온볼딩', pts: 8, difficulty: '쉬움' }
   return { action: `${ind.name} 충족 조건 확인 후 데이터 보완`, pts: Math.max(3, Math.round(8)), difficulty: '보통' }
 }
 
@@ -71,6 +85,48 @@ const DIFFICULTY_BADGE: Record<string, string> = {
   '쉬움': 'bg-green-50 text-green-700',
   '보통': 'bg-yellow-50 text-yellow-700',
   '어려움': 'bg-red-50 text-red-700',
+}
+
+function ReportSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card padding="lg" className="flex flex-col items-center justify-center">
+          <Skeleton className="h-4 w-1/2 mb-4" />
+          <Skeleton className="h-20 w-1/3 mb-4" />
+          <Skeleton className="h-2 w-full mb-6" />
+          <div className="grid grid-cols-3 gap-2 w-full">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-12" />
+            ))}
+          </div>
+        </Card>
+        <Card padding="md">
+          <Skeleton className="h-4 w-1/3 mx-auto mb-4" />
+          <Skeleton className="h-52" />
+        </Card>
+      </div>
+      <Card>
+        <Skeleton className="h-4 w-1/4 mb-4" />
+        <Skeleton className="h-60" />
+      </Card>
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card>
+          <Skeleton className="h-4 w-1/3 mb-4" />
+          <Skeleton className="h-52" />
+        </Card>
+        <Card>
+          <Skeleton className="h-4 w-1/3 mb-4" />
+          <Skeleton className="h-52" />
+        </Card>
+      </div>
+      <Card>
+        <Skeleton className="h-4 w-1/4 mb-4" />
+        <Skeleton className="h-8 w-full mb-3" />
+        <Skeleton className="h-40" />
+      </Card>
+    </div>
+  )
 }
 
 interface Props { role?: string }
@@ -85,6 +141,8 @@ export default function ReportClient({ role }: Props) {
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState<string | null>(null)
   const [reportMode, setReportMode] = useState<'report' | 'compare'>('report')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   // center 역할이면 기관 목록 로드
   useEffect(() => {
@@ -151,6 +209,7 @@ export default function ReportClient({ role }: Props) {
 
   const reportRef = useRef<HTMLDivElement>(null)
   const [downloadingPng, setDownloadingPng] = useState(false)
+  const [downloadingPdf, setDownloadingPdf] = useState(false)
 
   async function downloadPNG() {
     if (!reportRef.current || !data) return
@@ -174,21 +233,28 @@ export default function ReportClient({ role }: Props) {
     }
   }
 
-  if (loading && reportMode === 'report') return (
-    <div className="flex items-center justify-center py-20 gap-3 text-gray-400">
-      <div className="w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" />
-      평가 지표 산출 중...
-    </div>
-  )
-
-  if ((error || !data) && reportMode === 'report') return (
-    <div className="flex flex-col items-center justify-center py-20 gap-3">
-      <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
-        <AlertTriangle className="w-6 h-6 text-red-400" />
-      </div>
-      <p className="text-sm text-red-600">{error ?? '데이터를 불러올 수 없습니다.'}</p>
-    </div>
-  )
+  async function downloadPDF() {
+    if (!data) return
+    setDownloadingPdf(true)
+    try {
+      const qs = new URLSearchParams()
+      if (selectedTenant) qs.set('tenant_id', selectedTenant)
+      const res = await fetch(`/api/report/pdf?${qs.toString()}`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `평가리포트_${today}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      console.error('[Report] PDF 다운로드 실패:', e)
+      alert('PDF 저장에 실패했습니다.')
+    } finally {
+      setDownloadingPdf(false)
+    }
+  }
 
   const scoreColor = (s: number) =>
     s >= 80 ? '#16a34a' : s >= 60 ? '#d97706' : '#dc2626'
@@ -206,7 +272,7 @@ export default function ReportClient({ role }: Props) {
     { label: '개방률',     current: openRate,    goal: targets.open_rate_goal,    fmt: (v: number) => `${v.toFixed(0)}%` },
     { label: 'AI-Ready',  current: aiReadyRate,  goal: targets.ai_ready_goal,     fmt: (v: number) => `${v.toFixed(0)}%` },
     { label: '품질 통과율', current: qPassRate,   goal: targets.quality_pass_goal, fmt: (v: number) => `${v.toFixed(0)}%` },
-    { label: '분析 실적',   current: data.summary.analysis_records ?? 0, goal: targets.analysis_goal, fmt: (v: number) => `${Math.round(v)}건` },
+    { label: '분석 실적',   current: data.summary.analysis_records ?? 0, goal: targets.analysis_goal, fmt: (v: number) => `${Math.round(v)}건` },
     { label: '가명·합성',   current: data.summary.synthetic_cases   ?? 0, goal: targets.synthetic_goal, fmt: (v: number) => `${Math.round(v)}건` },
   ] : []
 
@@ -221,59 +287,112 @@ export default function ReportClient({ role }: Props) {
 
   const radarData = data ? data.areas.map(a => ({ subject: a.name, score: a.score, fullMark: 100 })) : []
 
+  const statusDistribution = data ? [
+    { name: '충족', value: data.areas.reduce((s, a) => s + a.ok, 0), color: '#16a34a' },
+    { name: '미흡', value: data.areas.reduce((s, a) => s + (a.total - a.ok - (a.na ?? 0)), 0), color: '#d97706' },
+    { name: 'N/A', value: data.areas.reduce((s, a) => s + (a.na ?? 0), 0), color: '#9ca3af' },
+  ] : []
+
+  const readinessData = data ? [
+    { name: 'AI-Ready', value: data.summary.ai_ready, max: data.summary.datasets, color: '#7c3aed' },
+    { name: '품질 통과', value: data.summary.quality_pass, max: data.summary.quality_total, color: '#059669' },
+  ] : []
+
+  const weightedScoreData = data ? data.areas.map(a => ({
+    name: a.name,
+    score: Math.round(a.score * a.weight / 100),
+    max: a.weight,
+  })) : []
+
+  // 지표 필터링
+  const allIndicators = useMemo(() => {
+    if (!data) return []
+    return data.areas.flatMap(area => area.indicators.map(ind => ({ area: area.name, ind })))
+  }, [data])
+
+  const statusCounts = useMemo(() => ({
+    all: allIndicators.length,
+    ok: allIndicators.filter(({ ind }) => ind.status === 'ok').length,
+    warn: allIndicators.filter(({ ind }) => ind.status === 'warn').length,
+    na: allIndicators.filter(({ ind }) => ind.status === 'na').length,
+  }), [allIndicators])
+
+  const filteredAreas = useMemo(() => {
+    if (!data) return []
+    const q = searchQuery.trim().toLowerCase()
+    return data.areas.map(area => ({
+      ...area,
+      indicators: area.indicators.filter(ind => {
+        const matchesStatus = statusFilter === 'all' || ind.status === statusFilter
+        const matchesSearch = !q ||
+          ind.name.toLowerCase().includes(q) ||
+          ind.desc.toLowerCase().includes(q) ||
+          area.name.toLowerCase().includes(q)
+        return matchesStatus && matchesSearch
+      }),
+    })).filter(area => area.indicators.length > 0)
+  }, [data, statusFilter, searchQuery])
+
+  const hasActiveFilters = statusFilter !== 'all' || searchQuery.trim().length > 0
+
+  if (loading && reportMode === 'report') return <ReportSkeleton />
+
+  if ((error || !data) && reportMode === 'report') return (
+    <EmptyState
+      icon={<AlertTriangle className="w-8 h-8 text-red-500" />}
+      title="리포트를 불러올 수 없습니다"
+      description={error ?? '데이터를 불러올 수 없습니다.'}
+      action={{ label: '다시 시도', onClick: () => loadData(selectedTenant || undefined) }}
+    />
+  )
+
   return (
-    <div className="space-y-8 print:space-y-6">
+    <div className="space-y-6 print:space-y-6">
       {/* 헤더 */}
-      <div className="flex items-start justify-between print:hidden">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">데이터 관리 역량 평가편람 대응 리포트</h2>
-          <p className="text-sm text-gray-500 mt-1">경남빅데이터센터 이음(EUM) 플랫폼 · 산출일: {today}</p>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
-          {/* center 역할 — 기관 선택 드롭다운 */}
-          {isCenter && reportMode === 'report' && (
-            <div className="flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              <select
-                value={selectedTenant}
-                onChange={e => setSelectedTenant(e.target.value)}
-                className="text-sm border border-gray-200 rounded-md px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                <option value="">전체 집계</option>
-                {tenants.map(t => (
-                  <option key={t.tenant_id} value={t.tenant_id}>{t.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
-          {data && reportMode === 'report' && (
-            <>
-              <button
-                onClick={downloadCSV}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200"
-              >
-                <Download className="w-4 h-4" />
-                증빙 CSV
-              </button>
-              <button
-                onClick={downloadPNG}
-                disabled={downloadingPng}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 text-sm rounded-md hover:bg-indigo-100 disabled:opacity-50"
-              >
-                <ImageIcon className="w-4 h-4" />
-                {downloadingPng ? '생성 중...' : 'PNG 저장'}
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-          >
-            <FileText className="w-4 h-4" />
-            PDF 출력
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="데이터 관리 역량 평가편람 대응 리포트"
+        subtitle={`경남빅데이터센터 이음(EUM) 플랫폼 · 산출일: ${today}`}
+        action={
+          <div className="flex items-center gap-2 flex-wrap justify-end print:hidden">
+            {/* center 역할 — 기관 선택 드롭다운 */}
+            {isCenter && reportMode === 'report' && (
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
+                <select
+                  value={selectedTenant}
+                  onChange={e => setSelectedTenant(e.target.value)}
+                  className="text-sm border border-gray-200 dark:border-gray-700 rounded-md px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option value="">전체 집계</option>
+                  {tenants.map(t => (
+                    <option key={t.tenant_id} value={t.tenant_id}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {data && reportMode === 'report' && (
+              <>
+                <Btn variant="secondary" size="sm" onClick={downloadCSV}>
+                  <Download className="w-4 h-4" />
+                  증빙 CSV
+                </Btn>
+                <Btn variant="ghost" size="sm" onClick={downloadPNG} loading={downloadingPng} disabled={downloadingPng}>
+                  <ImageIcon className="w-4 h-4" />
+                  {downloadingPng ? '생성 중...' : 'PNG 저장'}
+                </Btn>
+                <Btn variant="ghost" size="sm" onClick={downloadPDF} loading={downloadingPdf} disabled={downloadingPdf}>
+                  <FileText className="w-4 h-4" />
+                  {downloadingPdf ? '생성 중...' : 'PDF 저장'}
+                </Btn>
+              </>
+            )}
+            <Btn size="sm" onClick={() => window.print()}>
+              <FileText className="w-4 h-4" />
+              PDF 출력
+            </Btn>
+          </div>
+        }
+      />
 
       {/* center 전용 모드 탭 */}
       {isCenter && (
@@ -285,7 +404,7 @@ export default function ReportClient({ role }: Props) {
               className={`px-4 py-2 text-sm font-medium rounded-t-md border-b-2 transition-colors ${
                 reportMode === mode
                   ? 'border-blue-600 text-blue-700 bg-blue-50'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
               }`}
             >
               {mode === 'report' ? '평가 리포트' : '기관 비교'}
@@ -317,19 +436,19 @@ export default function ReportClient({ role }: Props) {
           {/* 인쇄용 제목 (화면에선 숨김) */}
           <div className="hidden print:block">
             <h2 className="text-xl font-bold">데이터 관리 역량 평가편람 대응 리포트</h2>
-            {selectedTenantName && <p className="text-sm text-gray-600">기관: {selectedTenantName}</p>}
-            <p className="text-sm text-gray-500">산출일: {today}</p>
+            {selectedTenantName && <p className="text-sm text-gray-600 dark:text-gray-400">기관: {selectedTenantName}</p>}
+            <p className="text-sm text-gray-500 dark:text-gray-400">산출일: {today}</p>
           </div>
 
           {/* 종합 점수 + 레이더 */}
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl border shadow-sm p-6 flex flex-col items-center justify-center">
-              <p className="text-sm text-gray-500 mb-2">종합 평가 점수 (2026 편람 기준)</p>
+            <Card padding="lg" className="flex flex-col items-center justify-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">종합 평가 점수 (2026 편람 기준)</p>
               <div className="flex items-end gap-2">
                 <div className="text-7xl font-extrabold" style={{ color: scoreColor(data.overall) }}>
                   {actualPoints}
                 </div>
-                <div className="pb-2 text-gray-400 text-base">/ {totalPoints}점</div>
+                <div className="pb-2 text-gray-400 dark:text-gray-300 text-base">/ {totalPoints}점</div>
               </div>
               {bonusScore > 0 && (
                 <div className="mt-1 flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-3 py-1">
@@ -337,37 +456,53 @@ export default function ReportClient({ role }: Props) {
                   <span className="text-green-600 text-xs">→ 합계 {grandTotal}점</span>
                 </div>
               )}
-              <div className="w-full bg-gray-100 rounded-full h-2 mt-3">
+              <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2 mt-3">
                 <div
                   className="h-2 rounded-full transition-all"
                   style={{ width: `${data.overall}%`, backgroundColor: scoreColor(data.overall) }}
                 />
               </div>
-              <div className="mt-4 grid grid-cols-3 gap-2 w-full text-xs text-center">
-                <div className="bg-blue-50 rounded p-2">
-                  <span className="font-medium text-blue-700">{data.summary.datasets}</span><br/>등록 데이터셋
-                </div>
-                <div className="bg-green-50 rounded p-2">
-                  <span className="font-medium text-green-700">{data.summary.open}</span><br/>개방 데이터셋
-                </div>
-                <div className="bg-purple-50 rounded p-2">
-                  <span className="font-medium text-purple-700">
-                    {data.summary.tenants_on}/{data.summary.tenants_total}
-                  </span><br/>입주 기관
-                </div>
-                <div className="bg-amber-50 rounded p-2">
-                  <span className="font-medium text-amber-700">{data.summary.ai_ready}</span><br/>AI-Ready
-                </div>
-                <div className="bg-indigo-50 rounded p-2">
-                  <span className="font-medium text-indigo-700">{data.summary.analysis_records ?? 0}</span><br/>분析 실적
-                </div>
-                <div className="bg-teal-50 rounded p-2">
-                  <span className="font-medium text-teal-700">{data.summary.synthetic_cases ?? 0}</span><br/>가명·합성
-                </div>
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3 w-full">
+                <StatCard
+                  label="등록 데이터셋"
+                  value={data.summary.datasets}
+                  color="blue"
+                  icon={<FileText className="w-5 h-5 text-blue-500" />}
+                />
+                <StatCard
+                  label="개방 데이터셋"
+                  value={data.summary.open}
+                  color="green"
+                  icon={<CheckCircle className="w-5 h-5 text-green-500" />}
+                />
+                <StatCard
+                  label="입주 기관"
+                  value={`${data.summary.tenants_on}/${data.summary.tenants_total}`}
+                  color="purple"
+                  icon={<Building2 className="w-5 h-5 text-purple-500" />}
+                />
+                <StatCard
+                  label="AI-Ready"
+                  value={data.summary.ai_ready}
+                  color="amber"
+                  icon={<Target className="w-5 h-5 text-amber-500" />}
+                />
+                <StatCard
+                  label="분석 실적"
+                  value={data.summary.analysis_records ?? 0}
+                  color="blue"
+                  icon={<ListTodo className="w-5 h-5 text-blue-500" />}
+                />
+                <StatCard
+                  label="가명·합성"
+                  value={data.summary.synthetic_cases ?? 0}
+                  color="green"
+                  icon={<CheckCircle className="w-5 h-5 text-green-500" />}
+                />
               </div>
-            </div>
-            <div className="bg-white rounded-xl border shadow-sm p-4">
-              <p className="text-sm font-medium text-gray-600 mb-2 text-center">5개 영역 레이더</p>
+            </Card>
+            <Card padding="md">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 text-center">5개 영역 레이더</p>
               <ResponsiveContainer width="100%" height={220}>
                 <RadarChart data={radarData}>
                   <PolarGrid />
@@ -379,13 +514,13 @@ export default function ReportClient({ role }: Props) {
                   />
                 </RadarChart>
               </ResponsiveContainer>
-            </div>
+            </Card>
           </div>
 
           {/* 영역별 점수 bar 차트 */}
-          <div className="bg-white rounded-xl border shadow-sm p-5">
-            <p className="text-sm font-semibold text-gray-700 mb-1">영역별 점수 분포</p>
-            <p className="text-xs text-gray-400 mb-4">가중치 적용 전 영역 만점 기준 점수</p>
+          <Card>
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">영역별 점수 분포</p>
+            <p className="text-xs text-gray-400 dark:text-gray-300 mb-4">가중치 적용 전 영역 만점 기준 점수</p>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart
                 data={data.areas.map(a => ({ name: a.name, score: a.score, weight: a.weight, color: a.color }))}
@@ -405,43 +540,96 @@ export default function ReportClient({ role }: Props) {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+          </Card>
+
+          {/* 추가 시각화 차트 */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">평가 지표 상태 분포</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mb-4">5개 영역 지표의 충족·미흡·N/A 비율</p>
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Tooltip formatter={(v, n) => [`${v}건`, n as string]} />
+                  <Legend verticalAlign="bottom" height={24} />
+                  <Pie data={statusDistribution} dataKey="value" nameKey="name" cx="50%" cy="45%" outerRadius={80} label>
+                    {statusDistribution.map((entry, i) => (
+                      <Cell key={`cell-${i}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </Card>
+            <Card>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">AI-Ready 및 품질진단 통과율</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mb-4">전체 데이터셋 대비 AI-Ready·품질 통과 건수</p>
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Tooltip formatter={(v, n, p) => [`${v}건 / ${p?.payload?.max}건`, n as string]} />
+                  <Legend verticalAlign="bottom" height={24} />
+                  <Pie data={readinessData} dataKey="value" nameKey="name" cx="50%" cy="45%" innerRadius={55} outerRadius={80} label>
+                    {readinessData.map((entry, i) => (
+                      <Cell key={`cell-${i}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </Card>
           </div>
+
+          <Card>
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">영역별 가중치 반영 점수</p>
+            <p className="text-xs text-gray-400 dark:text-gray-300 mb-4">영역 가중치를 적용한 실제 기여 점수</p>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={weightedScoreData} layout="vertical" margin={{ top: 4, right: 20, left: 40, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" domain={[0, 'dataMax + 5']} tick={{ fontSize: 11 }} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
+                <Tooltip formatter={(v, n, p) => [`${v}점 / 만점 ${p?.payload?.max}점`, n as string]} />
+                <Legend />
+                <Bar dataKey="score" name="가중치 반영 점수" radius={[0, 4, 4, 0]}>
+                  {weightedScoreData.map((entry, i) => (
+                    <Cell key={`cell-${i}`} fill={data?.areas[i]?.color ?? '#3b82f6'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
 
           {/* 목표 대비 현황 패널 */}
           {goalItems.length > 0 && (
-            <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-              <div className="px-5 py-3 flex items-center gap-2 border-b bg-gray-50">
+            <Card className="p-0 overflow-hidden">
+              <div className="px-5 py-3 flex items-center gap-2 border-b bg-gray-50 dark:bg-gray-950">
                 <Target className="w-4 h-4 text-blue-600" />
-                <span className="font-semibold text-gray-800 text-sm">목표 대비 현황</span>
-                <span className="text-xs text-gray-400 ml-1">실적 관리 페이지에서 목표를 수정할 수 있습니다</span>
+                <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">목표 대비 현황</span>
+                <span className="text-xs text-gray-400 dark:text-gray-300 ml-1">실적 관리 페이지에서 목표를 수정할 수 있습니다</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-y md:divide-y-0 divide-gray-100">
                 {goalItems.map(item => {
                   const pct = item.goal > 0 ? Math.min(item.current / item.goal * 100, 100) : 0
                   const met = item.current >= item.goal
                   return (
-                    <div key={item.label} className="px-4 py-3">
-                      <p className="text-xs text-gray-500 mb-1">{item.label}</p>
+                    <div key={item.label} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{item.label}</p>
                       <div className="flex items-baseline gap-1 mb-1.5">
-                        <span className={`text-base font-bold ${met ? 'text-green-700' : 'text-gray-800'}`}>
+                        <span className={`text-base font-bold ${met ? 'text-green-700' : 'text-gray-800 dark:text-gray-200'}`}>
                           {item.fmt(item.current)}
                         </span>
-                        <span className="text-xs text-gray-400">/ 목표 {item.fmt(item.goal)}</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-300">/ 목표 {item.fmt(item.goal)}</span>
                       </div>
-                      <div className="w-full bg-gray-100 rounded-full h-1.5">
+                      <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5">
                         <div
                           className={`h-1.5 rounded-full transition-all ${met ? 'bg-green-500' : 'bg-blue-500'}`}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <p className={`text-xs mt-1 ${met ? 'text-green-600' : 'text-gray-400'}`}>
+                      <p className={`text-xs mt-1 ${met ? 'text-green-600' : 'text-gray-400 dark:text-gray-300'}`}>
                         {met ? '목표 달성' : `${pct.toFixed(0)}% 달성`}
                       </p>
                     </div>
                   )
                 })}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* 개선 액션 아이템 To-Do */}
@@ -456,17 +644,17 @@ export default function ReportClient({ role }: Props) {
               </div>
               <div className="divide-y divide-amber-100">
                 {actionItems.slice(0, 6).map((item, i) => (
-                  <div key={i} className="px-5 py-3 flex items-start gap-3">
+                  <div key={i} className="px-5 py-3 flex items-start gap-3 hover:bg-amber-100/50 transition-colors">
                     <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center mt-0.5">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs text-amber-600 font-medium">{item.area}</span>
-                        <span className="text-xs text-gray-500">›</span>
-                        <span className="text-sm font-medium text-gray-800">{item.action}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">›</span>
+                        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{item.action}</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-0.5">{item.ind.name} · {item.ind.desc}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.ind.name} · {item.ind.desc}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       <span className="text-xs font-bold text-amber-700">+{item.pts}점 기여</span>
@@ -485,24 +673,77 @@ export default function ReportClient({ role }: Props) {
             </div>
           )}
 
+          {/* 영역별 인디케이터 필터 */}
+          <Card className="print:hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">상태 필터</span>
+                {(['all', 'ok', 'warn', 'na'] as StatusFilter[]).map(key => (
+                  <button
+                    key={key}
+                    onClick={() => setStatusFilter(key)}
+                    className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                      statusFilter === key
+                        ? 'bg-blue-50 border-blue-200 text-blue-700 font-medium'
+                        : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                    }`}
+                  >
+                    {key === 'all' ? '전체' : STATUS_LABEL[key as StatusKey]}
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                      statusFilter === key ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                    }`}>
+                      {statusCounts[key === 'all' ? 'all' : key as StatusKey]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="지표명, 설명, 영역 검색"
+                  className="w-full md:w-64 pl-9 pr-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+            <div className="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span>
+                {filteredAreas.reduce((sum, a) => sum + a.indicators.length, 0)}개 지표 표시 중
+                {hasActiveFilters && ' (필터 적용됨)'}
+              </span>
+              {hasActiveFilters && (
+                <Btn
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { setStatusFilter('all'); setSearchQuery('') }}
+                >
+                  필터 초기화
+                </Btn>
+              )}
+            </div>
+          </Card>
+
           {/* 영역별 인디케이터 */}
-          {data.areas.map(area => (
-            <div key={area.name} className="bg-white rounded-xl border shadow-sm overflow-hidden">
+          {filteredAreas.length > 0 ? filteredAreas.map(area => (
+            <div key={area.name} className="bg-white dark:bg-gray-900 rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div
                 className="px-5 py-3 flex items-center justify-between border-b"
                 style={{ backgroundColor: area.color + '15' }}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: area.color }} />
-                  <span className="font-semibold text-gray-800">{area.name}</span>
-                  <span className="text-xs text-gray-500">가중치 {area.weight}점</span>
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">{area.name}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">가중치 {area.weight}점</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-bold" style={{ color: scoreColor(area.score) }}>
                     {Math.round(area.score * area.weight / 100)}
-                    <span className="text-xs font-normal text-gray-400 ml-0.5">/ {area.weight}점</span>
+                    <span className="text-xs font-normal text-gray-400 dark:text-gray-300 ml-0.5">/ {area.weight}점</span>
                   </span>
-                  <div className="w-24 bg-gray-200 rounded-full h-2">
+                  <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div
                       className="h-2 rounded-full transition-all"
                       style={{ width: `${area.score}%`, backgroundColor: area.color }}
@@ -510,38 +751,47 @@ export default function ReportClient({ role }: Props) {
                   </div>
                 </div>
               </div>
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-gray-500 font-medium text-xs">지표명</th>
-                    <th className="px-4 py-2 text-center text-gray-500 font-medium text-xs w-24">현황</th>
-                    <th className="px-4 py-2 text-center text-gray-500 font-medium text-xs w-20">상태</th>
-                    <th className="px-4 py-2 text-left text-gray-500 font-medium text-xs">설명</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {area.indicators.map(ind => (
-                    <tr key={ind.name} className="hover:bg-gray-50">
-                      <td className="px-4 py-2 text-gray-800">{ind.name}</td>
-                      <td className="px-4 py-2 text-center font-medium text-gray-700">{ind.value}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex items-center justify-center gap-1">
-                          {STATUS_ICON[ind.status]}
-                          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${STATUS_BADGE[ind.status]}`}>
-                            {STATUS_LABEL[ind.status]}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 text-gray-400 text-xs">{ind.desc}</td>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px] text-sm">
+                  <thead className="bg-gray-50 dark:bg-gray-950">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">지표명</th>
+                      <th className="px-4 py-2 text-center text-gray-500 dark:text-gray-400 font-medium text-xs w-24">현황</th>
+                      <th className="px-4 py-2 text-center text-gray-500 dark:text-gray-400 font-medium text-xs w-20">상태</th>
+                      <th className="px-4 py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">설명</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {area.indicators.map(ind => (
+                      <tr key={ind.name} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                        <td className="px-4 py-2 text-gray-800 dark:text-gray-200">{ind.name}</td>
+                        <td className="px-4 py-2 text-center font-medium text-gray-700 dark:text-gray-300">{ind.value}</td>
+                        <td className="px-4 py-2">
+                          <div className="flex items-center justify-center gap-1">
+                            {STATUS_ICON[ind.status]}
+                            <Badge variant={STATUS_BADGE[ind.status]} size="sm">
+                              {STATUS_LABEL[ind.status]}
+                            </Badge>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2 text-gray-400 dark:text-gray-300 text-xs">{ind.desc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          ))}
+          )) : (
+            <EmptyState
+              icon={<Search className="w-8 h-8 text-gray-400 dark:text-gray-300" />}
+              title="표시할 지표가 없습니다"
+              description="필터를 초기화하거나 다른 검색어를 입력해 보세요."
+              action={{ label: '필터 초기화', onClick: () => { setStatusFilter('all'); setSearchQuery('') } }}
+            />
+          )}
 
           {/* 인쇄용 푸터 */}
-          <div className="hidden print:block text-center text-xs text-gray-400 mt-8 border-t pt-4">
+          <div className="hidden print:block text-center text-xs text-gray-400 dark:text-gray-300 mt-8 border-t pt-4">
             경상남도 · 이음(EUM) 공공데이터 개방 플랫폼 · {today} 자동 산출
           </div>
         </div>

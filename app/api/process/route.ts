@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { validateRules } from '@/lib/processor'
+
+const VALID_SOURCE_KINDS = ['upload', 'catalog', 'gold']
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -31,23 +34,37 @@ export async function POST(req: Request) {
   const role       = user.user_metadata?.role as string
   const userTenant = user.user_metadata?.tenant_id as string
 
-  const body: {
+  let body: {
     tenant_id?: string
     name?: string
     description?: string
     source_kind?: string
     source_dataset_id?: string
     rules?: unknown[]
-  } = await req.json()
+  }
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: '요청 본문을 JSON으로 파싱할 수 없습니다' }, { status: 400 })
+  }
 
   const tenantId = body.tenant_id ?? userTenant
   if (!tenantId) return NextResponse.json({ error: 'tenant_id가 필요합니다' }, { status: 400 })
   if (role === 'agency' && userTenant !== tenantId) {
     return NextResponse.json({ error: '자신의 기관 데이터만 등록할 수 있습니다' }, { status: 403 })
   }
-  if (!body.name)              return NextResponse.json({ error: 'name이 필요합니다' }, { status: 400 })
-  if (!body.source_kind)       return NextResponse.json({ error: 'source_kind가 필요합니다' }, { status: 400 })
-  if (!body.source_dataset_id) return NextResponse.json({ error: 'source_dataset_id가 필요합니다' }, { status: 400 })
+  if (!body.name?.trim())              return NextResponse.json({ error: 'name이 필요합니다' }, { status: 400 })
+  if (!body.source_kind?.trim())       return NextResponse.json({ error: 'source_kind가 필요합니다' }, { status: 400 })
+  if (!VALID_SOURCE_KINDS.includes(body.source_kind)) {
+    return NextResponse.json({ error: 'source_kind는 upload/catalog/gold 중 하나여야 합니다' }, { status: 400 })
+  }
+  if (!body.source_dataset_id?.trim()) return NextResponse.json({ error: 'source_dataset_id가 필요합니다' }, { status: 400 })
+
+  const rules = body.rules ?? []
+  const validationErrors = validateRules(rules)
+  if (validationErrors.length > 0) {
+    return NextResponse.json({ error: '규칙 검증 오류', details: validationErrors }, { status: 400 })
+  }
 
   const arr = new Uint8Array(16)
   crypto.getRandomValues(arr)
@@ -57,11 +74,11 @@ export async function POST(req: Request) {
   const { data, error } = await supabase.from('processing_pipelines').insert({
     id,
     tenant_id:         tenantId,
-    name:              body.name,
-    description:       body.description ?? null,
+    name:              body.name.trim(),
+    description:       body.description?.trim() ?? null,
     source_kind:       body.source_kind,
-    source_dataset_id: body.source_dataset_id,
-    rules:             body.rules ?? [],
+    source_dataset_id: body.source_dataset_id.trim(),
+    rules:             rules,
     created_at:        now,
     updated_at:        now,
   }).select().single()

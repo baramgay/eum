@@ -3,6 +3,7 @@
  * 2026 평가편람 5개 영역 지표를 Supabase 데이터에서 자동 산출
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { chatCompletion } from './ai/provider'
 
 // 2026 평가편람 기준 (개방·활용 50, 관리체계 11, 합계 200 + 가점 5)
 export const AREAS = [
@@ -21,8 +22,72 @@ export function isQualityPassed(summary: string | null | undefined): boolean {
   return s.endsWith('통과') && !s.endsWith('미통과')
 }
 
+function parseSuggestions(value: unknown): unknown {
+  if (!value) return null
+  if (typeof value === 'object') return value
+  try {
+    return JSON.parse(String(value))
+  } catch {
+    return null
+  }
+}
+
+async function ensureAiReadySuggestions(
+  row: Record<string, unknown>,
+  supabase?: SupabaseClient,
+): Promise<unknown> {
+  const existing = parseSuggestions(row.suggestions)
+  if (existing) return existing
+  if (!supabase) return null
+  if (!process.env.QWEN_API_KEY) return null
+
+  const datasetId = row.dataset_id as string | undefined
+  if (!datasetId) return null
+
+  try {
+    const prompt = `아래 공공데이터셋의 메타데이터를 개선하기 위한 제안을 JSON 형태로 답변하세요.
+답변 형식: {"description_suggestion": "...", "keywords_suggestion": "...", "reason": "..."}
+
+제목: ${row.title ?? ''}
+주제: ${row.theme ?? ''}
+키워드: ${row.keywords ?? ''}
+설명: ${row.description ?? ''}`
+
+    const { content } = await chatCompletion({
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+    })
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : null
+    if (parsed && typeof parsed === 'object') {
+      await supabase.from('catalog').update({ suggestions: parsed }).eq('dataset_id', datasetId)
+      return parsed
+    }
+  } catch {
+    // LLM 제안 생성 실패 시 체크리스트 결과에 영향을 주지 않는다.
+  }
+  return null
+}
+
+export interface AiReadyChecklistResult {
+  ai_ready: boolean
+  pass_count: number
+  total: number
+  checklist: { name: string; pass: boolean; detail: string }[]
+  suggestions?: unknown
+}
+
 // 2026 평가편람 ② AI친화·고가치 데이터 개방 노력 — AI-Ready 공식 체크리스트
-export function computeAiReadyChecklist(row: Record<string, unknown>) {
+export function computeAiReadyChecklist(row: Record<string, unknown>): AiReadyChecklistResult
+export function computeAiReadyChecklist(
+  row: Record<string, unknown>,
+  supabase: SupabaseClient,
+): Promise<AiReadyChecklistResult>
+export function computeAiReadyChecklist(
+  row: Record<string, unknown>,
+  supabase?: SupabaseClient,
+): AiReadyChecklistResult | Promise<AiReadyChecklistResult> {
   const qPassed    = isQualityPassed(String(row.quality_summary ?? ''))
   const rows       = Number(row.rows ?? 0)
   const desc       = String(row.description ?? '').trim()
@@ -97,12 +162,22 @@ export function computeAiReadyChecklist(row: Record<string, unknown>) {
     },
   ]
   const passedCount = checklist.filter(c => c.pass).length
-  return {
+  const base: AiReadyChecklistResult = {
     ai_ready: passedCount >= 6, // 8개 중 6개 이상 통과 시 AI-Ready
     pass_count: passedCount,
     total: checklist.length,
     checklist,
   }
+
+  if (!supabase) {
+    base.suggestions = parseSuggestions(row.suggestions)
+    return base
+  }
+
+  return (async () => {
+    base.suggestions = await ensureAiReadySuggestions(row, supabase)
+    return base
+  })()
 }
 
 // 2026 평가편람 ⑤ 가명정보·합성데이터 개방 실적 (가점, 1건당 1점, 최대 5점)

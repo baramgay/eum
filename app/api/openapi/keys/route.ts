@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { generateApiKey } from '@/lib/openapi'
+import { logApiKeyCreated } from '@/lib/audit'
 
 export async function GET() {
   const supabase = await createClient()
@@ -63,18 +64,30 @@ export async function POST(req: Request) {
 
   // service-role로 insert (RLS 우회)
   const sb = await createServiceClient()
-  const { error } = await sb.from('api_keys').insert({
-    tenant_id:   targetTenantId,
-    key_hash:    hash,
-    key_prefix:  prefix,
-    name:        body.name.trim(),
-    description: body.description ?? null,
-    scope,
-    expires_at:  body.expires_at ?? null,
-    is_active:   true,
-  })
+  const { data: inserted, error } = await sb
+    .from('api_keys')
+    .insert({
+      tenant_id:   targetTenantId,
+      key_hash:    hash,
+      key_prefix:  prefix,
+      name:        body.name.trim(),
+      description: body.description ?? null,
+      scope,
+      expires_at:  body.expires_at ?? null,
+      is_active:   true,
+    })
+    .select('key_id')
+    .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+
+  void logApiKeyCreated(
+    supabase,
+    user,
+    inserted?.key_id ?? '',
+    { tenant_id: targetTenantId, name: body.name.trim(), prefix },
+    req,
+  )
 
   return NextResponse.json({ ok: true, key: plain, prefix }, { status: 201 })
 }

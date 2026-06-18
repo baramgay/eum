@@ -3,6 +3,7 @@ export const runtime = 'nodejs'
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { logApiKeyRevoked } from '@/lib/audit'
 
 export async function PATCH(
   req: Request,
@@ -19,7 +20,7 @@ export async function PATCH(
   // 권한 확인: 해당 키가 본인 tenant 것인지 확인
   const { data: existing } = await supabase
     .from('api_keys')
-    .select('tenant_id')
+    .select('key_id, tenant_id, name, is_active')
     .eq('key_id', id)
     .maybeSingle()
 
@@ -49,6 +50,16 @@ export async function PATCH(
   const { error } = await sb.from('api_keys').update(updates).eq('key_id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
+  if (body.is_active === false && existing.is_active) {
+    void logApiKeyRevoked(
+      supabase,
+      user,
+      id,
+      { tenant_id: existing.tenant_id, name: existing.name, is_active: existing.is_active },
+      req,
+    )
+  }
+
   return NextResponse.json({ ok: true })
 }
 
@@ -66,7 +77,7 @@ export async function DELETE(
 
   const { data: existing } = await supabase
     .from('api_keys')
-    .select('tenant_id')
+    .select('key_id, tenant_id, name, is_active')
     .eq('key_id', id)
     .maybeSingle()
 
@@ -78,6 +89,14 @@ export async function DELETE(
   const sb = await createServiceClient()
   const { error } = await sb.from('api_keys').delete().eq('key_id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+
+  void logApiKeyRevoked(
+    supabase,
+    user,
+    id,
+    { tenant_id: existing.tenant_id, name: existing.name, is_active: existing.is_active },
+    req,
+  )
 
   return NextResponse.json({ ok: true })
 }
