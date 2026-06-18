@@ -1,15 +1,20 @@
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 
 const SAMPLES_DIR = join(process.cwd(), 'data', 'samples')
+const DATA_AVAILABLE = existsSync(SAMPLES_DIR)
 
-function loadSample(name: string) {
+function loadSample(name: string): unknown[] {
   const p = join(SAMPLES_DIR, `${name}.json`)
-  return JSON.parse(readFileSync(p, 'utf8'))
+  if (!existsSync(p)) return []
+  return JSON.parse(readFileSync(p, 'utf8')) as unknown[]
 }
 
-describe('public_facility 샘플 데이터', () => {
-  const facilities: Array<{
+// data/samples 없는 CI 환경에서는 전체 스킵 (데이터 품질 검증은 로컬 전용)
+const describeOrSkip = DATA_AVAILABLE ? describe : describe.skip
+
+describeOrSkip('public_facility 샘플 데이터', () => {
+  const facilities = loadSample('public_facility') as Array<{
     facility_id: string
     sgg_cd: string
     sigun: string
@@ -17,7 +22,7 @@ describe('public_facility 샘플 데이터', () => {
     lon: number | null
     lat: number | null
     capacity: number
-  }> = loadSample('public_facility')
+  }>
 
   it('최소 700개 이상의 시설이 있다', () => {
     expect(facilities.length).toBeGreaterThanOrEqual(700)
@@ -53,7 +58,7 @@ describe('public_facility 샘플 데이터', () => {
   })
 })
 
-describe('8종 샘플 데이터 파일', () => {
+describeOrSkip('8종 샘플 데이터 파일', () => {
   const names = [
     'traffic_accidents',
     'commercial_area',
