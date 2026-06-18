@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createFocusTrap } from '@/lib/focus-trap'
 import SortableTable from '@/components/common/SortableTable'
@@ -8,7 +8,7 @@ import {
   Search, BarChart2, Table2, HelpCircle, ExternalLink,
   MessageSquare, Plus, Trash2, Download, Share2, Copy, Check,
   History, Sparkles, Send, ChevronLeft, RotateCcw, PieChart as PieChartIcon,
-  TrendingUp, AlertCircle, X,
+  TrendingUp, AlertCircle, X, Database, Play, Code2,
 } from 'lucide-react'
 import ResultSummary from './ResultSummary'
 import type { ConversationTurn } from '@/lib/nlquery/context'
@@ -71,7 +71,249 @@ interface ExampleItem {
 
 const STORAGE_KEY = 'eum-ai-conversations'
 
+type AiMode = 'chat' | 'sql'
+
 type ChartType = 'bar' | 'line' | 'pie'
+
+// ---- SQL 질의 모드 타입 ----
+interface SqlQueryState {
+  question: string
+  generatedSql: string
+  editedSql: string
+  explanation: string
+  columns: string[]
+  result: Record<string, unknown>[]
+  rowCount: number
+  loading: boolean
+  error: string
+  phase: 'idle' | 'generated' | 'executed'
+}
+
+function SqlQueryPanel() {
+  const [state, setState] = useState<SqlQueryState>({
+    question: '',
+    generatedSql: '',
+    editedSql: '',
+    explanation: '',
+    columns: [],
+    result: [],
+    rowCount: 0,
+    loading: false,
+    error: '',
+    phase: 'idle',
+  })
+  const [copied, setCopied] = useState(false)
+
+  function update(patch: Partial<SqlQueryState>) {
+    setState(prev => ({ ...prev, ...patch }))
+  }
+
+  async function generate() {
+    if (!state.question.trim()) return
+    update({ loading: true, error: '', phase: 'idle' })
+    try {
+      const res = await fetch('/api/nl-to-sql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: state.question }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        update({ loading: false, error: data.error ?? `HTTP ${res.status}` })
+        return
+      }
+      update({
+        loading: false,
+        generatedSql: data.sql,
+        editedSql: data.sql,
+        explanation: data.explanation,
+        columns: data.columns,
+        result: data.result,
+        rowCount: data.rowCount,
+        phase: 'executed',
+        error: '',
+      })
+    } catch (e) {
+      update({ loading: false, error: e instanceof Error ? e.message : '요청 실패' })
+    }
+  }
+
+  async function runSql() {
+    if (!state.editedSql.trim()) return
+    update({ loading: true, error: '' })
+    try {
+      const res = await fetch('/api/nl-to-sql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: state.question, sql: state.editedSql }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        update({ loading: false, error: data.error ?? `HTTP ${res.status}` })
+        return
+      }
+      update({
+        loading: false,
+        columns: data.columns,
+        result: data.result,
+        rowCount: data.rowCount,
+        phase: 'executed',
+        error: '',
+      })
+    } catch (e) {
+      update({ loading: false, error: e instanceof Error ? e.message : '실행 실패' })
+    }
+  }
+
+  async function copySql() {
+    try {
+      await navigator.clipboard.writeText(state.editedSql)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch { /* ignore */ }
+  }
+
+  function reset() {
+    setState({
+      question: '',
+      generatedSql: '',
+      editedSql: '',
+      explanation: '',
+      columns: [],
+      result: [],
+      rowCount: 0,
+      loading: false,
+      error: '',
+      phase: 'idle',
+    })
+  }
+
+  return (
+    <div className="flex flex-col gap-4 h-full overflow-y-auto p-4">
+      {/* 질문 입력 */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Database className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
+          <input
+            value={state.question}
+            onChange={e => update({ question: e.target.value })}
+            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && generate()}
+            placeholder="예: datasets 테이블에서 최근 10개 항목 보여줘"
+            className="w-full pl-9 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white dark:bg-gray-900"
+            aria-label="자연어 질문 입력"
+          />
+        </div>
+        <Btn
+          onClick={generate}
+          variant="primary"
+          size="md"
+          loading={state.loading}
+          disabled={!state.question.trim()}
+          className="px-5"
+        >
+          <Sparkles className="w-4 h-4" /> SQL 생성
+        </Btn>
+        {state.phase !== 'idle' && (
+          <Btn onClick={reset} variant="secondary" size="md" className="px-3" title="초기화">
+            <RotateCcw className="w-4 h-4" />
+          </Btn>
+        )}
+      </div>
+
+      {/* 오류 */}
+      {state.error && (
+        <Card className="!p-3 border-red-200 bg-red-50 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-700">{state.error}</p>
+        </Card>
+      )}
+
+      {/* 생성된 SQL */}
+      {state.phase !== 'idle' && (
+        <Card className="!p-0 overflow-hidden">
+          <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-950 border-b flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Code2 className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">생성된 SQL</span>
+              {state.explanation && (
+                <span className="text-xs text-gray-400 dark:text-gray-300 truncate max-w-[280px]">
+                  — {state.explanation}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Btn onClick={copySql} variant="secondary" size="sm" className="text-xs">
+                {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? '복사됨' : '복사'}
+              </Btn>
+              <Btn
+                onClick={runSql}
+                variant="primary"
+                size="sm"
+                loading={state.loading}
+                disabled={!state.editedSql.trim()}
+                className="text-xs"
+              >
+                <Play className="w-3.5 h-3.5" /> 실행
+              </Btn>
+            </div>
+          </div>
+          <textarea
+            value={state.editedSql}
+            onChange={e => update({ editedSql: e.target.value })}
+            rows={Math.max(3, Math.min(state.editedSql.split('\n').length + 1, 10))}
+            spellCheck={false}
+            className="w-full px-4 py-3 font-mono text-xs bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 resize-none focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-400"
+            aria-label="SQL 편집기"
+          />
+        </Card>
+      )}
+
+      {/* 결과 테이블 */}
+      {state.phase === 'executed' && (
+        <Card className="!p-0 overflow-hidden">
+          <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-950 border-b flex items-center gap-2">
+            <Table2 className="w-4 h-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">결과</span>
+            <span className="text-xs text-gray-400 dark:text-gray-300">{state.rowCount}행</span>
+          </div>
+          {state.result.length === 0 ? (
+            <div className="px-4 py-10 text-center text-sm text-gray-400 dark:text-gray-300">
+              결과 없음
+            </div>
+          ) : (
+            <SortableTable
+              caption="SQL 질의 결과"
+              ariaLabel="SQL 질의 결과 표"
+              maxHeight={400}
+              data={state.result}
+              keyExtractor={(_, i) => String(i)}
+              columns={state.columns.map(c => ({
+                key: c,
+                label: c,
+                render: row => {
+                  const v = (row as Record<string, unknown>)[c]
+                  if (v == null) return '—'
+                  return String(v)
+                },
+              }))}
+            />
+          )}
+        </Card>
+      )}
+
+      {state.phase === 'idle' && !state.error && (
+        <div className="flex-1 flex flex-col items-center justify-center text-center py-12 text-gray-400 dark:text-gray-300">
+          <Database className="w-10 h-10 mb-3 opacity-30" />
+          <p className="text-sm">자연어로 질문하면 SQL을 자동으로 생성하고 실행합니다.</p>
+          <p className="text-xs mt-1 text-gray-300 dark:text-gray-500">
+            생성된 SQL은 직접 수정한 뒤 실행할 수 있습니다.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 const DEFAULT_EXAMPLES: ExampleItem[] = [
   { category: '정착', label: '정착잠재 순위',   q: '청년 정착잠재 순위 보여줘' },
@@ -565,6 +807,7 @@ export default function AiQueryClient() {
   const searchParams = useSearchParams()
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  const [aiMode, setAiMode] = useState<AiMode>('chat')
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentId, setCurrentId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
@@ -862,10 +1105,10 @@ export default function AiQueryClient() {
 
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-140px)] min-h-[560px] gap-4">
-      {/* 사이드바 */}
+      {/* 사이드바 — 대화형 AI 모드에서만 표시 */}
       <aside
         className={`transition-all duration-300 flex flex-col bg-white dark:bg-gray-900 border rounded-lg shadow-sm overflow-hidden ${
-          sidebarOpen ? 'w-full md:w-64 h-48 md:h-auto opacity-100' : 'w-0 h-0 md:h-auto opacity-0 overflow-hidden'
+          aiMode === 'chat' && sidebarOpen ? 'w-full md:w-64 h-48 md:h-auto opacity-100' : 'w-0 h-0 md:h-auto opacity-0 overflow-hidden'
         }`}
         aria-label="대화 목록"
       >
@@ -943,19 +1186,51 @@ export default function AiQueryClient() {
       <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 border rounded-lg shadow-sm overflow-hidden">
         {/* 헤더 */}
         <div className="px-4 py-3 border-b flex items-center gap-3">
-          <button
-            onClick={() => setSidebarOpen(o => !o)}
-            className="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
-            title="대화 목록"
-            aria-label="대화 목록"
-            aria-expanded={sidebarOpen}
-          >
-            {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <History className="w-4 h-4" />}
-          </button>
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">AI 자연어 질의</h2>
+          {aiMode === 'chat' && (
+            <button
+              onClick={() => setSidebarOpen(o => !o)}
+              className="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
+              title="대화 목록"
+              aria-label="대화 목록"
+              aria-expanded={sidebarOpen}
+            >
+              {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <History className="w-4 h-4" />}
+            </button>
+          )}
+          <div className="flex-1 min-w-0">
+            {/* 모드 전환 탭 */}
+            <div className="flex items-center gap-1 mb-0.5">
+              <div className="flex rounded-md border overflow-hidden">
+                <button
+                  onClick={() => setAiMode('chat')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
+                    aiMode === 'chat'
+                      ? 'bg-gray-800 text-white'
+                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                  }`}
+                  aria-pressed={aiMode === 'chat'}
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  대화형 AI
+                </button>
+                <button
+                  onClick={() => setAiMode('sql')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
+                    aiMode === 'sql'
+                      ? 'bg-gray-800 text-white'
+                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                  }`}
+                  aria-pressed={aiMode === 'sql'}
+                >
+                  <Database className="w-3.5 h-3.5" />
+                  SQL 질의
+                </button>
+              </div>
+            </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              경남 청년·사업체·인프라 데이터를 자연어로 질의 · RAG + 도구 호출 기반
+              {aiMode === 'chat'
+                ? '경남 청년·사업체·인프라 데이터를 자연어로 질의 · RAG + 도구 호출 기반'
+                : '자연어로 SQL을 자동 생성·편집·실행 · SELECT 전용 안전 실행'}
             </p>
           </div>
           <div className="flex items-center gap-1.5">
@@ -1008,8 +1283,8 @@ export default function AiQueryClient() {
           </div>
         </div>
 
-        {/* 상단 요약 KPI */}
-        {conversations.length > 0 && (
+        {/* 상단 요약 KPI — 대화형 모드에서만 표시 */}
+        {aiMode === 'chat' && conversations.length > 0 && (
           <div className="px-4 py-3 border-b bg-gray-50/50 grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard label="총 대화" value={stats.totalConversations} color="blue" icon={<MessageSquare className="w-5 h-5" />} />
             <StatCard label="현재 질문" value={stats.questions} color="purple" icon={<HelpCircle className="w-5 h-5" />} />
@@ -1018,8 +1293,15 @@ export default function AiQueryClient() {
           </div>
         )}
 
-        {/* 채팅 메시지 */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-5">
+        {/* SQL 질의 모드 패널 */}
+        {aiMode === 'sql' && (
+          <div className="flex-1 overflow-hidden">
+            <SqlQueryPanel />
+          </div>
+        )}
+
+        {/* 채팅 메시지 — 대화형 모드에서만 표시 */}
+        <div ref={scrollRef} className={`flex-1 overflow-y-auto p-4 space-y-5 ${aiMode === 'sql' ? 'hidden' : ''}`}>
           {messages.length === 0 ? (
             <EmptyState
               icon={<Sparkles className="w-8 h-8 text-blue-500" />}
@@ -1087,8 +1369,8 @@ export default function AiQueryClient() {
           )}
         </div>
 
-        {/* 입력 영역 */}
-        <div className="p-4 border-t bg-gray-50 dark:bg-gray-950">
+        {/* 입력 영역 — 대화형 모드에서만 표시 */}
+        <div className={`p-4 border-t bg-gray-50 dark:bg-gray-950 ${aiMode === 'sql' ? 'hidden' : ''}`}>
           {showExamples && messages.length === 0 && (
             <div className="mb-3 space-y-2">
               <div className="flex flex-wrap items-center gap-1.5">

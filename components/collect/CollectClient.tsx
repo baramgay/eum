@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Database, Calendar, ScrollText, Activity, Plus } from 'lucide-react'
+import { Database, Calendar, ScrollText, Activity, Plus, ArrowRight } from 'lucide-react'
 import { PageHeader, Btn } from '@/components/ui'
 import Modal from '@/components/ui/Modal'
 import { useRealtime } from '@/components/realtime/RealtimeProvider'
@@ -28,6 +29,7 @@ const TAB_CONFIG: { key: TabKey; label: string; icon: React.ReactNode }[] = [
 const LOG_LIMIT = 20
 
 export default function CollectClient({ role, tenantId }: Props) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<TabKey>('sources')
 
   const [sources, setSources] = useState<SourceWithJob[]>([])
@@ -41,7 +43,7 @@ export default function CollectClient({ role, tenantId }: Props) {
   const [testResult, setTestResult] = useState<TestResult | null>(null)
 
   const [runningId, setRunningId] = useState<string | null>(null)
-  const [lastRunResult, setLastRunResult] = useState<{ sourceId: string; rowsFetched: number } | null>(null)
+  const [lastRunResult, setLastRunResult] = useState<{ sourceId: string; rowsFetched: number; datasetId?: string } | null>(null)
   const [sseProgress, setSseProgress] = useState<string | null>(null)
 
   const [search, setSearch] = useState('')
@@ -219,7 +221,7 @@ export default function CollectClient({ role, tenantId }: Props) {
               if (event.type === 'done') {
                 const rowsFetched: number = event.rows_fetched ?? 0
                 toast.success(`수집 완료 — ${rowsFetched.toLocaleString()}행`)
-                setLastRunResult({ sourceId, rowsFetched })
+                setLastRunResult({ sourceId, rowsFetched, datasetId: event.dataset_id ?? undefined })
               }
               if (event.type === 'error') throw new Error(event.message)
             } catch (e) {
@@ -237,7 +239,7 @@ export default function CollectClient({ role, tenantId }: Props) {
         const data = await res.json()
         const rowsFetched: number = data.rows_fetched ?? 0
         toast.success(`수집 완료 — ${rowsFetched.toLocaleString()}행`)
-        setLastRunResult({ sourceId, rowsFetched })
+        setLastRunResult({ sourceId, rowsFetched, datasetId: data.dataset_id ?? undefined })
       }
     } catch (e) {
       toast.error(`수집 실패: ${e instanceof Error ? e.message : '오류'}`)
@@ -369,6 +371,26 @@ export default function CollectClient({ role, tenantId }: Props) {
           ))}
         </nav>
       </div>
+
+      {/* 수집 완료 배너 — 가공 탭 연동 */}
+      {lastRunResult && !runningId && (
+        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center justify-between gap-4 text-sm">
+          <span className="text-green-700">
+            수집 완료 — {lastRunResult.rowsFetched.toLocaleString()}행
+          </span>
+          <Btn
+            size="sm"
+            onClick={() => {
+              const params = new URLSearchParams({ source_id: lastRunResult.sourceId })
+              if (lastRunResult.datasetId) params.set('dataset_id', lastRunResult.datasetId)
+              router.push(`/process?${params.toString()}`)
+            }}
+          >
+            <ArrowRight className="w-3.5 h-3.5" />
+            가공으로
+          </Btn>
+        </div>
+      )}
 
       {activeTab === 'sources' && (
         <>

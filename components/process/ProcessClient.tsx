@@ -94,11 +94,12 @@ export default function ProcessClient({ role, tenantId }: Props) {
 
   const isReadOnly = role === 'viewer'
 
-  // collect_source 파라미터로 pre-fill
-  const collectSource = searchParams?.get('collect_source') ?? ''
+  // URL params: collect_source(레거시) 또는 source_id + dataset_id 로 form pre-fill
+  const collectSource = searchParams?.get('collect_source') ?? searchParams?.get('source_id') ?? ''
+  const presetDatasetId = searchParams?.get('dataset_id') ?? ''
   const [form, setForm] = useState({
     name: '', description: '', source_kind: collectSource ? 'catalog' : 'upload',
-    source_dataset_id: collectSource,
+    source_dataset_id: presetDatasetId || collectSource,
   })
 
   const handleFetchError = useCallback(async (res: Response, fallback: string) => {
@@ -470,8 +471,9 @@ export default function ProcessClient({ role, tenantId }: Props) {
               <div className="md:col-span-2">
                 {form.source_kind === 'pipeline' ? (
                   <>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">원본 파이프라인 *</label>
+                    <label htmlFor="source-pipeline-select" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">원본 파이프라인 *</label>
                     <select
+                      id="source-pipeline-select"
                       value={form.source_dataset_id}
                       onChange={e => setForm(f => ({ ...f, source_dataset_id: e.target.value }))}
                       className="w-full border rounded px-3 py-2 text-sm"
