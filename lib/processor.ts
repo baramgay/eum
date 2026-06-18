@@ -699,6 +699,7 @@ export interface PipelineRunResult {
   dataset_id:   string
   result_table?: string
   error_msg?:   string
+  errors?:      ProcessError[]
 }
 
 export async function createDerivedTable(
@@ -872,6 +873,7 @@ export async function runPipelineAndSave(
       error_rows:   result.errorRows,
       dataset_id:   datasetId,
       result_table: persistDerived ? resultTable : undefined,
+      errors:       result.errors.slice(0, 100),
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)

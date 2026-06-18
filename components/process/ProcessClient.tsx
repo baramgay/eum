@@ -2,7 +2,7 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import type { Rule } from '@/lib/processor'
+import type { Rule, ProcessError } from '@/lib/processor'
 import RuleEditor from './RuleEditor'
 import toast from 'react-hot-toast'
 import { useRealtime } from '@/components/realtime/RealtimeProvider'
@@ -13,6 +13,7 @@ import {
   Loader2, Clock, Network, Upload,
 } from 'lucide-react'
 import { StatCard, Badge, EmptyState, Card, Btn, PageHeader, Skeleton } from '@/components/ui'
+import Modal from '@/components/ui/Modal'
 
 interface Pipeline {
   id: string
@@ -47,6 +48,7 @@ interface RunResult {
   error_rows: number
   dataset_id: string
   result_table?: string | null
+  errors?: ProcessError[]
 }
 
 interface LineageNode {
@@ -87,6 +89,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
   const [deleteLoadingId, setDeleteLoadingId]   = useState<string | null>(null)
   const [lineageMap, setLineageMap]     = useState<Record<string, LineageNode[]>>({})
   const [lineageLoadingId, setLineageLoadingId] = useState<string | null>(null)
+  const [showErrorDialog, setShowErrorDialog]   = useState(false)
 
   const isReadOnly = role === 'viewer'
 
@@ -573,7 +576,13 @@ export default function ProcessClient({ role, tenantId }: Props) {
               실행 완료 — 입력 {runResult.result.input_rows.toLocaleString()}행
               → 출력 {runResult.result.output_rows.toLocaleString()}행
               {runResult.result.error_rows > 0 && (
-                <span className="text-red-500 ml-1">오류 {runResult.result.error_rows}건</span>
+                <button
+                  type="button"
+                  className="text-red-500 ml-1 underline underline-offset-2 hover:text-red-700"
+                  onClick={() => setShowErrorDialog(true)}
+                >
+                  오류 {runResult.result.error_rows}건
+                </button>
               )}
             </span>
             {runResult.result.dataset_id && (
@@ -789,6 +798,46 @@ export default function ProcessClient({ role, tenantId }: Props) {
           onClose={() => setEditTarget(null)}
         />
       )}
+
+      {/* 오류 행 뷰어 */}
+      <Modal
+        open={showErrorDialog}
+        onClose={() => setShowErrorDialog(false)}
+        title="오류 행 상세"
+        size="lg"
+      >
+        <div className="p-6 overflow-auto">
+          <h3 className="text-sm font-semibold text-gray-800 mb-3">
+            오류 행 상세 ({runResult?.result.errors?.length ?? 0}건 표시 / 최대 100건)
+          </h3>
+          {!runResult?.result.errors?.length ? (
+            <p className="text-sm text-gray-500">오류 상세 정보가 없습니다.</p>
+          ) : (
+            <div className="overflow-auto max-h-[60vh]">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 text-left">
+                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">행 번호</th>
+                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">규칙 번호</th>
+                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">컬럼</th>
+                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">오류 내용</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {runResult.result.errors.map((err, i) => (
+                    <tr key={i} className="hover:bg-red-50">
+                      <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.rowIndex + 1}</td>
+                      <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.ruleIndex + 1}</td>
+                      <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>
+                      <td className="border border-gray-200 px-3 py-1.5 text-red-600">{err.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -39,6 +39,7 @@ export async function POST(
       error_rows:   result.error_rows,
       dataset_id:   result.dataset_id,
       result_table: result.result_table,
+      errors:       result.errors,
     })
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e)
