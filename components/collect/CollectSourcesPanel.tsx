@@ -2,8 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Search, Calendar, CheckCircle, AlertCircle, Database, Play, ArrowRight, Pencil, Trash2, RefreshCw, X } from 'lucide-react'
+import { Search, Calendar, CheckCircle, AlertCircle, Database, Play, ArrowRight, Pencil, Trash2, RefreshCw, X, Eye, Loader2 } from 'lucide-react'
 import { StatCard, Badge, EmptyState, Btn, Skeleton } from '@/components/ui'
+import Modal from '@/components/ui/Modal'
 import SortableTable from '@/components/common/SortableTable'
 import type { SourceWithJob } from './types'
 
@@ -49,6 +50,13 @@ function truncateUrl(url: string, maxLen = 40): string {
   return url.slice(0, maxLen) + '…'
 }
 
+type PreviewData = {
+  preview: Record<string, unknown>[]
+  schema_info: { name: string; type: string }[]
+  rows_fetched: number
+  finished_at: string | null
+}
+
 export default function CollectSourcesPanel({
   role,
   sources,
@@ -68,6 +76,22 @@ export default function CollectSourcesPanel({
   onOpenForm,
 }: Props) {
   const router = useRouter()
+  const [previewSourceId, setPreviewSourceId] = useState<string | null>(null)
+  const [previewData, setPreviewData] = useState<PreviewData | null>(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
+
+  async function openPreview(sourceId: string) {
+    setPreviewSourceId(sourceId)
+    setPreviewData(null)
+    setPreviewLoading(true)
+    try {
+      const res = await fetch(`/api/collect/${sourceId}/preview`)
+      const json = await res.json()
+      setPreviewData(json)
+    } finally {
+      setPreviewLoading(false)
+    }
+  }
 
   const filteredSources = sources.filter(src => {
     const haystack = (src.title + ' ' + src.url + ' ' + (src.theme ?? '') + ' ' + (src.keywords ?? '')).toLowerCase()
@@ -156,6 +180,16 @@ export default function CollectSourcesPanel({
               가공으로
             </Btn>
           )}
+          <Btn
+            size="sm"
+            variant="ghost"
+            onClick={() => openPreview(s.source_id)}
+            disabled={s.job?.status !== 'success'}
+            title={s.job?.status !== 'success' ? '수집 성공 이력이 없습니다' : '수집 데이터 미리보기'}
+          >
+            <Eye className="w-3 h-3" />
+            미리보기
+          </Btn>
           <Btn size="sm" variant="ghost" onClick={() => onEdit(s)}>
             <Pencil className="w-3 h-3" />
             수정
@@ -270,6 +304,58 @@ export default function CollectSourcesPanel({
             columns={sourceColumns}
           />
         </div>
+      )}
+
+      {previewSourceId && (
+        <Modal
+          open={!!previewSourceId}
+          onClose={() => { setPreviewSourceId(null); setPreviewData(null) }}
+          title="수집 데이터 미리보기"
+          size="xl"
+        >
+          {previewLoading ? (
+            <div className="flex items-center justify-center py-12 gap-2 text-gray-500">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>불러오는 중…</span>
+            </div>
+          ) : !previewData || previewData.preview.length === 0 ? (
+            <div className="py-12 text-center text-gray-400 text-sm">미리보기 데이터가 없습니다.</div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span>전체 수집 행: <strong className="text-gray-700">{previewData.rows_fetched.toLocaleString()}건</strong></span>
+                {previewData.finished_at && (
+                  <span>수집 일시: <strong className="text-gray-700">{new Date(previewData.finished_at).toLocaleString('ko-KR')}</strong></span>
+                )}
+                <span className="text-gray-400">최대 20행 표시</span>
+              </div>
+              <div className="overflow-auto max-h-[60vh] border rounded-md">
+                <table className="min-w-full text-xs">
+                  <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+                    <tr>
+                      {Object.keys(previewData.preview[0]).map(col => (
+                        <th key={col} className="px-3 py-2 text-left font-semibold text-gray-600 dark:text-gray-300 whitespace-nowrap border-b">
+                          {col}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {previewData.preview.slice(0, 20).map((row, i) => (
+                      <tr key={i} className="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        {Object.values(row).map((val, j) => (
+                          <td key={j} className="px-3 py-1.5 text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[200px] overflow-hidden text-ellipsis">
+                            {val === null || val === undefined ? <span className="text-gray-300 italic">null</span> : String(val)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </Modal>
       )}
     </div>
   )
