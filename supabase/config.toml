@@ -3,4 +3,4 @@
 # GitHub Actions에서는 SUPABASE_PROJECT_ID / SUPABASE_ACCESS_TOKEN Secret을 사용합니다.
 
 [project]
-project_id = "eum-platform"
+project_id = "aazlfabntszzhnefqbpe"

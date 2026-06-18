@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [master, main]
 
 jobs:
   ci:
@@ -41,8 +41,10 @@ jobs:
       - name: Link Supabase project
         run: npx supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
 
-      - name: Dry-run Supabase migrations
-        run: npx supabase db push --include-all --dry-run
+      - name: Apply Supabase migrations
+        run: npx supabase db push --include-all
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
       - name: Deploy to Vercel
         run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
