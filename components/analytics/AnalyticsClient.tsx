@@ -12,6 +12,7 @@ import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, ScatterChart, Scatter,
   PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
+import Modal from '@/components/ui/Modal'
 import PageHeader from '@/components/ui/PageHeader'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
@@ -802,6 +803,11 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
   const [runs, setRuns] = useState<RunItem[]>([])
   const [runsLoading, setRunsLoading] = useState(false)
   const [runsError, setRunsError] = useState('')
+  const [showRegisterModal, setShowRegisterModal]   = useState(false)
+  const [registerSaving, setRegisterSaving]         = useState(false)
+  const [registerForm, setRegisterForm] = useState({
+    title: '', performed_at: '', purpose: '', result_summary: '', policy_applied: false,
+  })
 
   const [varSearch, setVarSearch] = useState('')
   const [varTypeFilter, setVarTypeFilter] = useState<Record<ColType, boolean>>({ scale: true, nominal: true, ordinal: true })
@@ -1738,9 +1744,30 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                             <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">{result.title}</h3>
                             {renderResultSummary()}
                           </div>
-                          <Btn variant="secondary" size="sm" onClick={exportCSV}>
-                            <Download className="w-3.5 h-3.5" /> CSV 난볶내기
-                          </Btn>
+                          <div className="flex gap-2">
+                            <Btn variant="secondary" size="sm" onClick={exportCSV}>
+                              <Download className="w-3.5 h-3.5" /> CSV 내보내기
+                            </Btn>
+                            <Btn
+                              size="sm"
+                              className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+                              onClick={() => {
+                                const today = new Date().toISOString().slice(0, 10)
+                                setRegisterForm({
+                                  title: result.title ?? '',
+                                  performed_at: today,
+                                  purpose: '',
+                                  result_summary: result.tables
+                                    ? `${result.tables.length}개 테이블, ${session?.total_rows ?? 0}행 분석`
+                                    : '',
+                                  policy_applied: false,
+                                })
+                                setShowRegisterModal(true)
+                              }}
+                            >
+                              <Check className="w-3.5 h-3.5" /> 실적 등록
+                            </Btn>
+                          </div>
                         </div>
                         {result.tables?.map((t, i) => (
                           <ResultTableView key={i} table={t} />
@@ -1782,6 +1809,100 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
           </div>
         </div>
       )}
+
+      {/* 분석 실적 등록 모달 */}
+      <Modal
+        open={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        title="분석 실적 등록"
+        size="md"
+      >
+        <div className="p-6 space-y-4">
+          <h3 className="text-sm font-semibold text-gray-800">분석 실적 등록</h3>
+          <p className="text-xs text-gray-500">평가편람 분석·활용 ①-1 지표에 반영됩니다.</p>
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="ar-title" className="block text-xs font-medium text-gray-600 mb-1">분석명 *</label>
+              <input
+                id="ar-title"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                value={registerForm.title}
+                onChange={e => setRegisterForm(p => ({ ...p, title: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label htmlFor="ar-performed-at" className="block text-xs font-medium text-gray-600 mb-1">수행일 *</label>
+              <input
+                id="ar-performed-at"
+                type="date"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                value={registerForm.performed_at}
+                onChange={e => setRegisterForm(p => ({ ...p, performed_at: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label htmlFor="ar-purpose" className="block text-xs font-medium text-gray-600 mb-1">분석 목적</label>
+              <input
+                id="ar-purpose"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                placeholder="예: 정책 수립을 위한 데이터 분석"
+                value={registerForm.purpose}
+                onChange={e => setRegisterForm(p => ({ ...p, purpose: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label htmlFor="ar-summary" className="block text-xs font-medium text-gray-600 mb-1">결과 요약</label>
+              <textarea
+                id="ar-summary"
+                rows={2}
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none"
+                value={registerForm.result_summary}
+                onChange={e => setRegisterForm(p => ({ ...p, result_summary: e.target.value }))}
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={registerForm.policy_applied}
+                onChange={e => setRegisterForm(p => ({ ...p, policy_applied: e.target.checked }))}
+                className="rounded"
+              />
+              정책 반영 완료
+            </label>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Btn variant="ghost" size="sm" onClick={() => setShowRegisterModal(false)}>취소</Btn>
+            <Btn
+              size="sm"
+              className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+              disabled={!registerForm.title.trim() || !registerForm.performed_at || registerSaving}
+              onClick={async () => {
+                setRegisterSaving(true)
+                try {
+                  await fetch('/api/pipeline/analysis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      title:          registerForm.title,
+                      performed_at:   registerForm.performed_at,
+                      purpose:        registerForm.purpose || undefined,
+                      datasets_used:  session ? [session.source_label] : [],
+                      result_summary: registerForm.result_summary || undefined,
+                      policy_applied: registerForm.policy_applied,
+                    }),
+                  })
+                  setShowRegisterModal(false)
+                } finally {
+                  setRegisterSaving(false)
+                }
+              }}
+            >
+              {registerSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+              등록
+            </Btn>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
