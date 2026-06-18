@@ -64,25 +64,42 @@ jobs:
       TEST_AGENCY_PASSWORD: ${{ secrets.TEST_AGENCY_PASSWORD }}
 
     steps:
+      - name: Check required secrets
+        id: check
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+        run: |
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "⚠️  NEXT_PUBLIC_SUPABASE_URL secret이 없습니다. E2E 테스트를 건너뜁니다."
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.check.outputs.skip != 'true'
 
       - name: Setup Node.js
+        if: steps.check.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
       - name: Install dependencies
+        if: steps.check.outputs.skip != 'true'
         run: npm ci
 
       - name: Install Playwright browsers
+        if: steps.check.outputs.skip != 'true'
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
+        if: steps.check.outputs.skip != 'true'
         run: npx playwright test
 
       - name: Upload Playwright report
-        if: failure()
+        if: failure() && steps.check.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
