@@ -10,7 +10,7 @@ import { subscribeTable } from '@/lib/supabase/realtime'
 import {
   Settings2, BarChart2, Search, Play, History, ArrowUpDown,
   Filter, Trash2, Edit3, AlertCircle, CheckCircle2, XCircle,
-  Loader2, Clock, Network,
+  Loader2, Clock, Network, Upload,
 } from 'lucide-react'
 import { StatCard, Badge, EmptyState, Card, Btn, PageHeader, Skeleton } from '@/components/ui'
 
@@ -577,9 +577,14 @@ export default function ProcessClient({ role, tenantId }: Props) {
               )}
             </span>
             {runResult.result.dataset_id && (
-              <Btn size="sm" onClick={() => router.push(`/analytics?dataset_id=${runResult.result.dataset_id}`)}>
-                <BarChart2 className="w-3 h-3" /> 분석으로
-              </Btn>
+              <>
+                <Btn size="sm" onClick={() => router.push(`/analytics?dataset_id=${runResult.result.dataset_id}`)}>
+                  <BarChart2 className="w-3 h-3" /> 분석으로
+                </Btn>
+                <Btn size="sm" variant="secondary" onClick={() => router.push(`/submission?dataset_id=${runResult.result.dataset_id}`)}>
+                  <Upload className="w-3 h-3" /> 포털 등록
+                </Btn>
+              </>
             )}
           </div>
           <button
