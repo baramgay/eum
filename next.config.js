@@ -49,8 +49,6 @@ function securityHeaders() {
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // ssh2/ssh2-sftp-client의 네이티브 .node 바이너리를 webpack 번들링에서 제외
-  serverExternalPackages: ['ssh2', 'ssh2-sftp-client'],
   webpack: (config) => {
     // .node 네이티브 바이너리 파일을 externals로 처리 (안전망)
     config.externals = [
@@ -66,6 +64,8 @@ const config = {
   },
   experimental: {
     serverActions: { allowedOrigins: getAllowedOrigins() },
+    // ssh2/ssh2-sftp-client의 네이티브 .node 바이너리를 webpack 번들링에서 제외
+    serverComponentsExternalPackages: ['ssh2', 'ssh2-sftp-client'],
     // webpack 빌드를 워커 스레드에서 수행하여 빌드 시간 단축
     webpackBuildWorker: true,
     // 대형 barrel import 라이브러리의 트리셰이킹/번들 최적화
