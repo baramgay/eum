@@ -49,8 +49,21 @@ function securityHeaders() {
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // ssh2의 네이티브 .node 바이너리를 webpack 번들링에서 제외
-  serverExternalPackages: ['ssh2'],
+  // ssh2/ssh2-sftp-client의 네이티브 .node 바이너리를 webpack 번들링에서 제외
+  serverExternalPackages: ['ssh2', 'ssh2-sftp-client'],
+  webpack: (config) => {
+    // .node 네이티브 바이너리 파일을 externals로 처리 (안전망)
+    config.externals = [
+      ...(Array.isArray(config.externals) ? config.externals : [config.externals].filter(Boolean)),
+      ({ request }, callback) => {
+        if (request && request.endsWith('.node')) {
+          return callback(null, `commonjs ${request}`)
+        }
+        callback()
+      },
+    ]
+    return config
+  },
   experimental: {
     serverActions: { allowedOrigins: getAllowedOrigins() },
     // webpack 빌드를 워커 스레드에서 수행하여 빌드 시간 단축
