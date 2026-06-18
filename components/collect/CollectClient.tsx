@@ -42,6 +42,7 @@ export default function CollectClient({ role, tenantId }: Props) {
 
   const [runningId, setRunningId] = useState<string | null>(null)
   const [lastRunResult, setLastRunResult] = useState<{ sourceId: string; rowsFetched: number } | null>(null)
+  const [sseProgress, setSseProgress] = useState<string | null>(null)
 
   const [search, setSearch] = useState('')
   const [sourceStatusFilter, setSourceStatusFilter] = useState('all')
@@ -190,16 +191,59 @@ export default function CollectClient({ role, tenantId }: Props) {
   async function handleRun(sourceId: string) {
     setRunningId(sourceId)
     setLastRunResult(null)
-    const res = await fetch(`/api/collect/${sourceId}/run`, { method: 'POST' })
-    setRunningId(null)
-    if (res.ok) {
-      const data = await res.json()
-      const rowsFetched: number = data.rows_fetched ?? 0
-      toast.success(`수집 완료 — ${rowsFetched.toLocaleString()}행`)
-      setLastRunResult({ sourceId, rowsFetched })
-    } else {
-      const err = await res.json().catch(() => ({ error: '알 수 없는 오류' }))
-      toast.error(`수집 실패: ${err.error ?? '오류'}`)
+    setSseProgress('수집 시작...')
+    try {
+      const res = await fetch(`/api/collect/${sourceId}/run`, {
+        method: 'POST',
+        headers: { 'Accept': 'text/event-stream' },
+      })
+
+      if (res.headers.get('content-type')?.includes('text/event-stream') && res.body) {
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop() ?? ''
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue
+            try {
+              const event = JSON.parse(line.slice(6))
+              if (event.type === 'start')   setSseProgress('수집 요청 중...')
+              if (event.type === 'fetched') setSseProgress(`${(event.rows ?? 0).toLocaleString()}행 수집됨`)
+              if (event.type === 'saved')   setSseProgress('저장 중...')
+              if (event.type === 'done') {
+                const rowsFetched: number = event.rows_fetched ?? 0
+                toast.success(`수집 완료 — ${rowsFetched.toLocaleString()}행`)
+                setLastRunResult({ sourceId, rowsFetched })
+              }
+              if (event.type === 'error') throw new Error(event.message)
+            } catch (e) {
+              if (e instanceof SyntaxError) continue
+              throw e
+            }
+          }
+        }
+      } else {
+        // JSON fallback
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: '알 수 없는 오류' }))
+          throw new Error(err.error ?? '오류')
+        }
+        const data = await res.json()
+        const rowsFetched: number = data.rows_fetched ?? 0
+        toast.success(`수집 완료 — ${rowsFetched.toLocaleString()}행`)
+        setLastRunResult({ sourceId, rowsFetched })
+      }
+    } catch (e) {
+      toast.error(`수집 실패: ${e instanceof Error ? e.message : '오류'}`)
+    } finally {
+      setRunningId(null)
+      setSseProgress(null)
     }
     await loadSources()
     await loadLogs(true)
@@ -327,24 +371,29 @@ export default function CollectClient({ role, tenantId }: Props) {
       </div>
 
       {activeTab === 'sources' && (
-        <CollectSourcesPanel
-          role={role}
-          sources={sources}
-          loading={loading}
-          search={search}
-          setSearch={setSearch}
-          statusFilter={sourceStatusFilter}
-          setStatusFilter={setSourceStatusFilter}
-          runningId={runningId}
-          lastRunResult={lastRunResult}
-          deletingId={deletingId}
-          error={sourcesError}
-          onRetry={loadSources}
-          onRun={handleRun}
-          onEdit={openEdit}
-          onDelete={handleDelete}
-          onOpenForm={openCreate}
-        />
+        <>
+          {runningId && sseProgress && (
+            <p className="text-xs text-blue-600 animate-pulse px-1 mt-1">{sseProgress}</p>
+          )}
+          <CollectSourcesPanel
+            role={role}
+            sources={sources}
+            loading={loading}
+            search={search}
+            setSearch={setSearch}
+            statusFilter={sourceStatusFilter}
+            setStatusFilter={setSourceStatusFilter}
+            runningId={runningId}
+            lastRunResult={lastRunResult}
+            deletingId={deletingId}
+            error={sourcesError}
+            onRetry={loadSources}
+            onRun={handleRun}
+            onEdit={openEdit}
+            onDelete={handleDelete}
+            onOpenForm={openCreate}
+          />
+        </>
       )}
 
       {activeTab === 'schedules' && (

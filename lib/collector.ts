@@ -436,10 +436,16 @@ export function diffRows(
   return { rows_new, rows_changed: 0, rows_deleted }
 }
 
+export type ProgressEvent =
+  | { type: 'start' }
+  | { type: 'fetched'; rows: number }
+  | { type: 'saved' }
+
 /** 수집 실행: 로그 시작 → fetch → 저장 → diff → catalog upsert → 로그 종료 */
 export async function runCollection(
   supabase: SupabaseClient,
   job: CollectionJob,
+  onProgress?: (data: ProgressEvent) => void,
 ): Promise<string> {
   const logId    = newLogId()
   const srcId    = job.source_id
@@ -473,7 +479,9 @@ export async function runCollection(
     const src = srcData as CollectionSource
 
     // 외부 API 호출
+    onProgress?.({ type: 'start' })
     const { rows, rawCount } = await fetchSource(src)
+    onProgress?.({ type: 'fetched', rows: rawCount })
 
     // 이전 수집 행 조회 (diff용) — 마지막 성공 로그의 테이블명 기반
     let prevRows: Record<string, unknown>[] = []
@@ -509,6 +517,7 @@ export async function runCollection(
       row_count:   rows.length,
       created_at:  new Date().toISOString(),
     })
+    onProgress?.({ type: 'saved' })
 
     // catalog upsert — 수집 데이터셋을 개방 목록에 노출
     await supabase.from('catalog').upsert({

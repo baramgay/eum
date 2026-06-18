@@ -101,9 +101,9 @@ export default function CollectSourceForm({
       if (!authValue) next.auth_value = '인증 값을 입력해주세요.'
     }
 
-    if (respFormat === 'json') {
+    if (respFormat === 'json' || respFormat === 'xml') {
       const jsonPath = (fd.get('json_path') as string | null)?.trim()
-      if (!jsonPath) next.json_path = 'JSON 경로를 입력해주세요.'
+      if (!jsonPath) next.json_path = '데이터 경로를 입력해주세요.'
     }
 
     const bodyError = validateRequestBody()
@@ -314,10 +314,10 @@ export default function CollectSourceForm({
           </>
         )}
 
-        {respFormat === 'json' && (
+        {(respFormat === 'json' || respFormat === 'xml') && (
           <div>
             <Label htmlFor="json_path" className="text-xs text-gray-600 dark:text-gray-400 mb-1" required>
-              JSON 경로 <span className="text-gray-400 dark:text-gray-300 font-normal">예: $.response.body.items.item</span>
+              데이터 경로 (JSON Path / XML Path) <span className="text-gray-400 dark:text-gray-300 font-normal">예: $.response.body.items.item</span>
             </Label>
             <Input
               id="json_path"
