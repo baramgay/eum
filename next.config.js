@@ -49,6 +49,8 @@ function securityHeaders() {
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // ssh2의 네이티브 .node 바이너리를 webpack 번들링에서 제외
+  serverExternalPackages: ['ssh2'],
   experimental: {
     serverActions: { allowedOrigins: getAllowedOrigins() },
     // webpack 빌드를 워커 스레드에서 수행하여 빌드 시간 단축
