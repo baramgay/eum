@@ -18,22 +18,28 @@ export const RULE_TYPES = [
 
 export type RuleType = (typeof RULE_TYPES)[number]
 
+export type WhenCondition = {
+  column: string
+  op: '==' | '!=' | '>' | '<' | '>=' | '<='
+  value: unknown
+}
+
 export type Rule =
-  | { type: 'select';    mode: 'include' | 'exclude'; columns: string[] }
-  | { type: 'rename';    from: string; to: string }
-  | { type: 'cast';      column: string; to: 'number' | 'string' | 'date' }
-  | { type: 'nullfill';  column: string; value: unknown }
-  | { type: 'nulldrop';  columns: string[] }
-  | { type: 'filter';    column: string; op: '>' | '<' | '>=' | '<=' | '==' | '!=' | 'contains' | 'startsWith' | 'endsWith'; value: unknown }
-  | { type: 'normalize'; column: string; fn: 'trim' | 'upper' | 'lower' }
-  | { type: 'derive';    target: string; expr: 'year' | 'month' | 'day' | 'quarter' | 'weekday' | 'hour' | 'dateformat'; source: string; format?: string }
-  | { type: 'dedup';     keys: string[] }
-  | { type: 'codemap';   column: string; map: Record<string, string>; fallback?: 'keep' | 'null' }
-  | { type: 'concat';    target: string; sources: string[]; separator: string }
-  | { type: 'split';     column: string; separator: string; targets: string[] }
-  | { type: 'aggregate'; groupBy: string[]; column: string; agg: AggFunc; target?: string }
-  | { type: 'join';      datasetId: string; on: string; how: 'left' | 'inner' | 'right' }
-  | { type: 'pivot';     index: string; columns: string; values: string; agg: AggFunc }
+  | { type: 'select';    mode: 'include' | 'exclude'; columns: string[]; when?: WhenCondition }
+  | { type: 'rename';    from: string; to: string; when?: WhenCondition }
+  | { type: 'cast';      column: string; to: 'number' | 'string' | 'date'; when?: WhenCondition }
+  | { type: 'nullfill';  column: string; value: unknown; when?: WhenCondition }
+  | { type: 'nulldrop';  columns: string[]; when?: WhenCondition }
+  | { type: 'filter';    column: string; op: '>' | '<' | '>=' | '<=' | '==' | '!=' | 'contains' | 'startsWith' | 'endsWith'; value: unknown; when?: WhenCondition }
+  | { type: 'normalize'; column: string; fn: 'trim' | 'upper' | 'lower'; when?: WhenCondition }
+  | { type: 'derive';    target: string; expr: 'year' | 'month' | 'day' | 'quarter' | 'weekday' | 'hour' | 'dateformat'; source: string; format?: string; when?: WhenCondition }
+  | { type: 'dedup';     keys: string[]; when?: WhenCondition }
+  | { type: 'codemap';   column: string; map: Record<string, string>; fallback?: 'keep' | 'null'; when?: WhenCondition }
+  | { type: 'concat';    target: string; sources: string[]; separator: string; when?: WhenCondition }
+  | { type: 'split';     column: string; separator: string; targets: string[]; when?: WhenCondition }
+  | { type: 'aggregate'; groupBy: string[]; column: string; agg: AggFunc; target?: string; when?: WhenCondition }
+  | { type: 'join';      datasetId: string; on: string; how: 'left' | 'inner' | 'right'; when?: WhenCondition }
+  | { type: 'pivot';     index: string; columns: string; values: string; agg: AggFunc; when?: WhenCondition }
 
 export interface ProcessError {
   rowIndex: number
@@ -576,28 +582,102 @@ function applyJoin(
 
 // ─── 메인 함수 ─────────────────────────────────────────────────────────────────
 
+function evalWhen(row: Row, cond: WhenCondition): boolean {
+  const val = row[cond.column]
+  if (val == null) return false
+  switch (cond.op) {
+    case '==': return String(val) === String(cond.value)
+    case '!=': return String(val) !== String(cond.value)
+    case '>':  return Number(val) >  Number(cond.value)
+    case '<':  return Number(val) <  Number(cond.value)
+    case '>=': return Number(val) >= Number(cond.value)
+    case '<=': return Number(val) <= Number(cond.value)
+    default:   return true
+  }
+}
+
+// 행 단위 규칙에 when 조건을 적용해 해당 행만 변환한다.
+// errors 인자가 필요 없는 단순 변환 규칙용
+function applyRowWise<R extends Rule>(
+  rows: Row[],
+  rule: R,
+  cond: WhenCondition,
+  applyFn: (single: Row[], r: R) => Row[],
+): Row[] {
+  return rows.map(row =>
+    evalWhen(row, cond) ? applyFn([row], rule)[0] : row
+  )
+}
+
 export function applyRules(data: Row[], rules: Rule[], joinData: Record<string, Row[]> = {}): ProcessResult {
   const errors: ProcessError[] = []
   let rows: Row[] = [...data]
 
   for (let i = 0; i < rules.length; i++) {
     const rule = rules[i]
+    const cond = (rule as { when?: WhenCondition }).when
+
     switch (rule.type) {
-      case 'select':    rows = applySelect(rows, rule); break
-      case 'rename':    rows = applyRename(rows, rule); break
-      case 'cast':      rows = applyCast(rows, rule, i, errors); break
-      case 'nullfill':  rows = applyNullfill(rows, rule); break
-      case 'nulldrop':  rows = applyNulldrop(rows, rule); break
-      case 'filter':    rows = applyFilter(rows, rule, i, errors); break
-      case 'normalize': rows = applyNormalize(rows, rule); break
-      case 'derive':    rows = applyDerive(rows, rule, i, errors); break
-      case 'dedup':     rows = applyDedup(rows, rule); break
-      case 'codemap':   rows = applyCodemap(rows, rule); break
-      case 'concat':    rows = applyConcat(rows, rule); break
-      case 'split':     rows = applySplit(rows, rule, i, errors); break
-      case 'aggregate': rows = applyAggregate(rows, rule); break
-      case 'join':      rows = applyJoin(rows, rule, joinData[rule.datasetId] ?? []); break
-      case 'pivot':     rows = applyPivot(rows, rule); break
+      case 'select':
+        rows = applySelect(rows, rule); break
+      case 'rename':
+        rows = cond
+          ? applyRowWise(rows, rule, cond, (r, rl) => applyRename(r, rl))
+          : applyRename(rows, rule)
+        break
+      case 'cast':
+        if (cond) {
+          rows = rows.map(row => evalWhen(row, cond) ? applyCast([row], rule, i, errors)[0] : row)
+        } else {
+          rows = applyCast(rows, rule, i, errors)
+        }
+        break
+      case 'nullfill':
+        rows = cond
+          ? applyRowWise(rows, rule, cond, (r, rl) => applyNullfill(r, rl))
+          : applyNullfill(rows, rule)
+        break
+      case 'nulldrop':
+        rows = applyNulldrop(rows, rule); break
+      case 'filter':
+        rows = applyFilter(rows, rule, i, errors); break
+      case 'normalize':
+        rows = cond
+          ? applyRowWise(rows, rule, cond, (r, rl) => applyNormalize(r, rl))
+          : applyNormalize(rows, rule)
+        break
+      case 'derive':
+        if (cond) {
+          rows = rows.map(row => evalWhen(row, cond) ? applyDerive([row], rule, i, errors)[0] : row)
+        } else {
+          rows = applyDerive(rows, rule, i, errors)
+        }
+        break
+      case 'dedup':
+        rows = applyDedup(rows, rule); break
+      case 'codemap':
+        rows = cond
+          ? applyRowWise(rows, rule, cond, (r, rl) => applyCodemap(r, rl))
+          : applyCodemap(rows, rule)
+        break
+      case 'concat':
+        rows = cond
+          ? applyRowWise(rows, rule, cond, (r, rl) => applyConcat(r, rl))
+          : applyConcat(rows, rule)
+        break
+      case 'split':
+        if (cond) {
+          rows = rows.map(row => evalWhen(row, cond) ? applySplit([row], rule, i, errors)[0] : row)
+        } else {
+          rows = applySplit(rows, rule, i, errors)
+        }
+        break
+      case 'aggregate':
+        rows = applyAggregate(rows, rule); break
+      case 'join':
+        rows = applyJoin(rows, rule, joinData[rule.datasetId] ?? []); break
+      case 'pivot':
+        rows = applyPivot(rows, rule); break
     }
   }
 

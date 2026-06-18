@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import type { AggFunc, Rule, Row, ProcessError } from '@/lib/processor'
+import type { AggFunc, Rule, Row, ProcessError, WhenCondition } from '@/lib/processor'
 import { validateRules } from '@/lib/processor'
 import Modal from '@/components/ui/Modal'
 import PreviewPanel from './PreviewPanel'
@@ -455,6 +455,61 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
                   </div>
                 </div>
                 <RuleForm rule={rule} onChange={r => updateRule(i, r)} />
+                {/* 조건부 적용 (when) */}
+                <details className="mt-2 border-t pt-2">
+                  <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600 select-none">
+                    조건 (when){(rule as Rule & { when?: WhenCondition }).when && (
+                      <span className="ml-1 text-blue-500">●</span>
+                    )}
+                  </summary>
+                  <div className="mt-2 flex flex-wrap gap-1.5 items-center text-xs">
+                    <input
+                      className="border rounded px-2 py-1 w-28"
+                      placeholder="컬럼명"
+                      value={(rule as Rule & { when?: WhenCondition }).when?.column ?? ''}
+                      onChange={e => {
+                        const cur = (rule as Rule & { when?: WhenCondition }).when
+                        const next: WhenCondition = { column: e.target.value, op: cur?.op ?? '==', value: cur?.value ?? '' }
+                        updateRule(i, e.target.value ? { ...rule, when: next } as Rule : { ...rule, when: undefined } as Rule)
+                      }}
+                    />
+                    <select
+                      className="border rounded px-2 py-1"
+                      value={(rule as Rule & { when?: WhenCondition }).when?.op ?? '=='}
+                      onChange={e => {
+                        const cur = (rule as Rule & { when?: WhenCondition }).when
+                        if (!cur) return
+                        updateRule(i, { ...rule, when: { ...cur, op: e.target.value as WhenCondition['op'] } } as Rule)
+                      }}
+                    >
+                      <option value="==">==</option>
+                      <option value="!=">!=</option>
+                      <option value=">">{'>'}</option>
+                      <option value="<">{'<'}</option>
+                      <option value=">=">{'>='}</option>
+                      <option value="<=">{'<='}</option>
+                    </select>
+                    <input
+                      className="border rounded px-2 py-1 w-28"
+                      placeholder="값"
+                      value={String((rule as Rule & { when?: WhenCondition }).when?.value ?? '')}
+                      onChange={e => {
+                        const cur = (rule as Rule & { when?: WhenCondition }).when
+                        if (!cur) return
+                        updateRule(i, { ...rule, when: { ...cur, value: e.target.value } } as Rule)
+                      }}
+                    />
+                    {(rule as Rule & { when?: WhenCondition }).when && (
+                      <button
+                        type="button"
+                        className="text-red-400 hover:text-red-600 text-xs"
+                        onClick={() => updateRule(i, { ...rule, when: undefined } as Rule)}
+                      >
+                        제거
+                      </button>
+                    )}
+                  </div>
+                </details>
               </div>
             )
           })}

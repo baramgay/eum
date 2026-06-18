@@ -63,9 +63,10 @@ interface LineageNode {
 interface Props { role: string; tenantId: string }
 
 const SOURCE_KIND_LABEL: Record<string, string> = {
-  upload:  '업로드',
-  catalog: '카탈로그',
-  gold:    'Gold 테이블',
+  upload:   '업로드',
+  catalog:  '카탈로그',
+  gold:     'Gold 테이블',
+  pipeline: '파이프라인',
 }
 
 type SortKey = 'created_desc' | 'created_asc' | 'name_asc' | 'name_desc'
@@ -463,23 +464,52 @@ export default function ProcessClient({ role, tenantId }: Props) {
                   <option value="upload">업로드 (table_name)</option>
                   <option value="catalog">카탈로그 (dataset_id)</option>
                   <option value="gold">Gold 테이블</option>
+                  <option value="pipeline">파이프라인 출력 (체이닝)</option>
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label htmlFor="proc-source-id" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                  소스 식별자 *{' '}
-                  <span className="text-gray-400 dark:text-gray-300">
-                    (upload: table_name / catalog: dataset_id)
-                  </span>
-                </label>
-                <input
-                  id="proc-source-id"
-                  value={form.source_dataset_id}
-                  onChange={e => setForm(f => ({ ...f, source_dataset_id: e.target.value }))}
-                  required
-                  placeholder="예: sub_gyeongnam_a1b2c3d4"
-                  className="w-full border rounded px-3 py-2 text-sm"
-                />
+                {form.source_kind === 'pipeline' ? (
+                  <>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">원본 파이프라인 *</label>
+                    <select
+                      value={form.source_dataset_id}
+                      onChange={e => setForm(f => ({ ...f, source_dataset_id: e.target.value }))}
+                      className="w-full border rounded px-3 py-2 text-sm"
+                      required
+                    >
+                      <option value="">파이프라인 선택...</option>
+                      {pipelines
+                        .filter(p => runsMap[p.id]?.[0]?.result_dataset_id)
+                        .map(p => {
+                          const latestRun = runsMap[p.id]?.[0]
+                          return (
+                            <option key={p.id} value={latestRun!.result_dataset_id!}>
+                              {p.name}
+                            </option>
+                          )
+                        })
+                      }
+                    </select>
+                    <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">최근 성공 실행이 있는 파이프라인만 표시됩니다.</p>
+                  </>
+                ) : (
+                  <>
+                    <label htmlFor="proc-source-id" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      소스 식별자 *{' '}
+                      <span className="text-gray-400 dark:text-gray-300">
+                        (upload: table_name / catalog: dataset_id)
+                      </span>
+                    </label>
+                    <input
+                      id="proc-source-id"
+                      value={form.source_dataset_id}
+                      onChange={e => setForm(f => ({ ...f, source_dataset_id: e.target.value }))}
+                      required
+                      placeholder="예: sub_gyeongnam_a1b2c3d4"
+                      className="w-full border rounded px-3 py-2 text-sm"
+                    />
+                  </>
+                )}
               </div>
               <div className="md:col-span-2">
                 <label htmlFor="proc-description" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">설명</label>
@@ -525,6 +555,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                   <option value="upload">업로드</option>
                   <option value="catalog">카탈로그</option>
                   <option value="gold">Gold</option>
+                  <option value="pipeline">파이프라인</option>
                 </select>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-2 border rounded-md bg-white dark:bg-gray-900 text-sm text-gray-600 dark:text-gray-400">
