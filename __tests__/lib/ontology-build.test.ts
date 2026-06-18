@@ -7,6 +7,43 @@ import {
   buildPatternDomainNodesAndLinks,
 } from '@/lib/ontology/core'
 
+const MOCK_SAMPLES: Record<string, unknown[]> = {
+  public_facility: [
+    { facility_id: 'PF001', sgg_cd: '48121', sigun: '창원시', ftype: '청년센터', name: '창원청년센터', lon: 128.68, lat: 35.23, capacity: 100 },
+    { facility_id: 'PF002', sgg_cd: '48170', sigun: '진주시', ftype: '도서관', name: '진주도서관', lon: 128.08, lat: 35.18, capacity: 50 },
+  ],
+  sports_facility: [
+    { sports_id: 'SPO001', sgg_cd: '48121', sigun: '창원시', year: 2024, gyms: 48, fields: 93, members: 10750 },
+    { sports_id: 'SPO002', sgg_cd: '48170', sigun: '진주시', year: 2024, gyms: 28, fields: 42, members: 6037 },
+  ],
+  welfare_facility: [
+    { sgg_cd: '48121', sigun: '창원시', centers: 12, beneficiaries: 3200, budget: 8000000 },
+    { sgg_cd: '48170', sigun: '진주시', centers: 8, beneficiaries: 2100, budget: 5500000 },
+  ],
+}
+const MOCK_SAMPLE_FILES = ['public_facility.json', 'sports_facility.json', 'welfare_facility.json']
+
+jest.mock('fs', () => {
+  const actual = jest.requireActual<typeof import('fs')>('fs')
+  return {
+    ...actual,
+    readFileSync: (p: unknown, enc: unknown) => {
+      const pathStr = String(p)
+      if (pathStr.includes('data') && pathStr.includes('samples')) {
+        const base = pathStr.split(/[\\/]/).pop()?.replace('.json', '') ?? ''
+        if (MOCK_SAMPLES[base]) return JSON.stringify(MOCK_SAMPLES[base])
+      }
+      return actual.readFileSync(p as string, enc as BufferEncoding)
+    },
+    readdirSync: (p: unknown) => {
+      if (String(p).includes('data') && String(p).includes('samples')) {
+        return MOCK_SAMPLE_FILES
+      }
+      return actual.readdirSync(p as string)
+    },
+  }
+})
+
 describe('loadSampleJson', () => {
   it('public_facility 샘플을 로드한다', () => {
     const rows = loadSampleJson<Record<string, unknown>>('public_facility')

@@ -1,5 +1,24 @@
 import { getGraph, listActions, recommendOntologyCandidates, loadSigunCentroids } from '@/lib/ontology/core'
 
+const MOCK_SIGUN_CENTROIDS = [
+  { sgg_cd: '48121', sigun: '창원시', lat: 35.2280, lng: 128.6811 },
+  { sgg_cd: '48170', sigun: '진주시', lat: 35.1799, lng: 128.1075 },
+  { sgg_cd: '48220', sigun: '통영시', lat: 34.8544, lng: 128.4330 },
+]
+
+jest.mock('fs', () => {
+  const actual = jest.requireActual<typeof import('fs')>('fs')
+  return {
+    ...actual,
+    readFileSync: (p: unknown, enc: unknown) => {
+      if (String(p).includes('data') && String(p).includes('sigun_centroids')) {
+        return JSON.stringify(MOCK_SIGUN_CENTROIDS)
+      }
+      return actual.readFileSync(p as string, enc as BufferEncoding)
+    },
+  }
+})
+
 describe('ontology/core', () => {
   describe('getGraph', () => {
     it('centerSgg로 필터링하면 중심 노드와 이웃만 반환한다', async () => {
