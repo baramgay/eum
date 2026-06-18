@@ -62,6 +62,11 @@ jobs:
       TEST_CENTER_PASSWORD: ${{ secrets.TEST_CENTER_PASSWORD }}
       TEST_AGENCY_EMAIL: ${{ secrets.TEST_AGENCY_EMAIL }}
       TEST_AGENCY_PASSWORD: ${{ secrets.TEST_AGENCY_PASSWORD }}
+      COLLECTION_SECRET: test-collection-secret-32chars!!!
+      CRON_SECRET: test-cron-secret-32chars-long-value!!
+      QWEN_API_KEY: test-qwen-key
+      QWEN_BASE_URL: https://llm.example.com/v1
+      QWEN_MODEL: qwen-turbo
 
     steps:
       - name: Check required secrets
