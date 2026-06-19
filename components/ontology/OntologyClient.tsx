@@ -10,9 +10,11 @@ import {
   Database,
   AlertCircle,
   RefreshCw,
+  LayoutGrid,
 } from 'lucide-react'
 import { PageHeader, Btn, Badge } from '@/components/ui'
-import type { GraphLayoutType, AnalyticsResult } from '@/lib/ontology/types'
+import type { GraphLayoutType, AnalyticsResult, OntologyGraphData } from '@/lib/ontology/types'
+import type { ScenarioKey } from '@/lib/ontology/demo-graph-meta'
 import { SGG_OPTIONS } from '@/lib/regions'
 import { useOntologyData } from './hooks/useOntologyData'
 import { useRelatedDatasets } from './hooks/useRelatedDatasets'
@@ -24,6 +26,7 @@ import GraphTab from './tabs/GraphTab'
 import NodeListTab from './tabs/NodeListTab'
 import AnalysisTab from './tabs/AnalysisTab'
 import WorkspaceTab from './tabs/WorkspaceTab'
+import ScenarioSelector from './ScenarioSelector'
 
 type Tab = '개요' | '그래프' | '노드 목록' | '분석' | '워크스페이스'
 
@@ -57,6 +60,20 @@ export default function OntologyClient() {
 
   const { recentSearches, saveSearch, clearRecent } = useRecentSearches()
 
+  const [activeTab, setActiveTab] = useState<Tab>('개요')
+  const [layout, setLayout] = useState<GraphLayoutType>('force')
+  const [analyticsResult, setAnalyticsResult] = useState<AnalyticsResult | null>(null)
+  const [copiedId, setCopiedId] = useState(false)
+
+  // 시나리오 데모 그래프 상태 — useOntologyFilters보다 먼저 선언해야 함
+  const [activeScenario, setActiveScenario] = useState<ScenarioKey | null>(null)
+  const [demoGraph, setDemoGraph] = useState<OntologyGraphData | null>(null)
+  const [demoLoading, setDemoLoading] = useState(false)
+  const [showScenarioSelector, setShowScenarioSelector] = useState(false)
+
+  // Supabase 그래프가 없으면 데모 그래프 사용
+  const activeGraph = graph ?? demoGraph
+
   const {
     nodeSearch,
     setNodeSearch,
@@ -81,18 +98,31 @@ export default function OntologyClient() {
     resetFilters,
     selectAndSearch,
     toggleType,
-  } = useOntologyFilters(graph, saveSearch)
+  } = useOntologyFilters(activeGraph, saveSearch)
 
   const { relatedDatasets, relatedLoading } = useRelatedDatasets(selectedNode)
-
-  const [activeTab, setActiveTab] = useState<Tab>('개요')
-  const [layout, setLayout] = useState<GraphLayoutType>('force')
-  const [analyticsResult, setAnalyticsResult] = useState<AnalyticsResult | null>(null)
-  const [copiedId, setCopiedId] = useState(false)
 
   useEffect(() => {
     if (activeTab !== '분석') setAnalyticsResult(null)
   }, [activeTab])
+
+  const handleScenarioSelect = useCallback(async (key: ScenarioKey) => {
+    setDemoLoading(true)
+    setShowScenarioSelector(false)
+    try {
+      const res = await fetch(`/api/ontology/demo-graph/${key}`)
+      if (!res.ok) throw new Error(await res.text())
+      const data: OntologyGraphData = await res.json()
+      setDemoGraph(data)
+      setActiveScenario(key)
+      setActiveTab('그래프')
+    } catch (e) {
+      // 오류 시 selector 다시 표시
+      setShowScenarioSelector(true)
+    } finally {
+      setDemoLoading(false)
+    }
+  }, [])
 
   const handleLayoutChange = useCallback((next: GraphLayoutType) => {
     setLayout(next)
@@ -100,16 +130,9 @@ export default function OntologyClient() {
 
   const handleAiQuery = useCallback(
     (node: { obj_id: string; obj_type: string; label: string }) => {
-      if (node.obj_type === '시군') {
-        router.push(`/ai?q=${encodeURIComponent(node.label + ' 청년 현황')}`)
-        return
-      }
-      const sigun = (graph?.nodes ?? []).find(
-        n => node.obj_id.includes(n.obj_id.split(':')[1] ?? '') && n.obj_type === '시군'
-      )
-      router.push(`/ai?q=${encodeURIComponent((sigun?.label ?? '') + ' ' + node.obj_type + ' 현황')}`)
+      router.push(`/ai?q=${encodeURIComponent(node.label)}`)
     },
-    [graph, router]
+    [router]
   )
 
   const copyId = useCallback((id: string) => {
@@ -121,13 +144,13 @@ export default function OntologyClient() {
 
   const onDatasetClick = useCallback(
     (dataset: { dataset_id: string }) => {
-      router.push(`/portal?highlight=${encodeURIComponent(dataset.dataset_id)}`)
+      router.push(`/portal?id=${encodeURIComponent(dataset.dataset_id)}`)
     },
     [router]
   )
 
   const workspace = useOntologyWorkspace({
-    graph,
+    graph: activeGraph,
     sgg,
     layout,
     selectedNode,
@@ -202,8 +225,8 @@ export default function OntologyClient() {
         </div>
       )}
 
-      {/* 시군 필터 (개요·그래프 공용) */}
-      {activeTab !== '노드 목록' && (
+      {/* 시군 필터 (Supabase 그래프 전용 — 데모 모드에서는 숨김) */}
+      {activeTab !== '노드 목록' && !activeScenario && (
         <div className="flex items-center gap-2 flex-wrap">
           <select
             value={sgg}
@@ -236,9 +259,38 @@ export default function OntologyClient() {
         </div>
       )}
 
-      {activeTab === '개요' && (
+      {/* 데모 모드 활성 배너 */}
+      {activeScenario && (
+        <div className="flex items-center justify-between px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+          <div className="flex items-center gap-2 text-xs text-indigo-700 dark:text-indigo-300">
+            <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
+            <span>샘플 데이터 모드 — {activeScenario}</span>
+            <span className="text-indigo-400">|</span>
+            <span>{demoGraph?.nodes?.length ?? 0}개 노드 · {demoGraph?.edges?.length ?? 0}개 엣지</span>
+          </div>
+          <button
+            onClick={() => setShowScenarioSelector(true)}
+            className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-medium"
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            시나리오 변경
+          </button>
+        </div>
+      )}
+
+      {/* ScenarioSelector — 개요 탭 초기 or showScenarioSelector=true */}
+      {(activeTab === '개요' && !activeGraph?.nodes?.length) || showScenarioSelector ? (
+        <ScenarioSelector
+          onSelect={handleScenarioSelect}
+          onFreeExplore={() => {
+            setShowScenarioSelector(false)
+            setActiveTab('그래프')
+          }}
+          loading={demoLoading}
+        />
+      ) : activeTab === '개요' ? (
         <OverviewTab
-          graph={graph}
+          graph={activeGraph}
           loading={loading}
           actions={actions}
           scoringKey={scoringKey}
@@ -248,12 +300,12 @@ export default function OntologyClient() {
           onBuildOntology={buildOntology}
           onRunScoring={runScoring}
         />
-      )}
+      ) : null}
 
-      {activeTab === '그래프' && (
+      {activeTab === '그래프' && !showScenarioSelector && (
         <GraphTab
-          graph={graph}
-          loading={loading}
+          graph={activeGraph}
+          loading={loading || demoLoading}
           selectedNode={selectedNode}
           onSelectNode={setSelectedNode}
           layout={layout}
@@ -269,12 +321,13 @@ export default function OntologyClient() {
           actionResult={actionResult}
           analyticsResult={analyticsResult}
           onBuildOntology={buildOntology}
+          activeScenario={activeScenario}
         />
       )}
 
-      {activeTab === '노드 목록' && (
+      {activeTab === '노드 목록' && !showScenarioSelector && (
         <NodeListTab
-          graph={graph}
+          graph={activeGraph}
           loading={loading}
           nodeSearch={nodeSearch}
           setNodeSearch={setNodeSearch}
@@ -315,9 +368,9 @@ export default function OntologyClient() {
         />
       )}
 
-      {activeTab === '분석' && (
+      {activeTab === '분석' && !showScenarioSelector && (
         <AnalysisTab
-          graph={graph}
+          graph={activeGraph}
           layout={layout}
           selectedNode={selectedNode}
           onSelectNode={setSelectedNode}
@@ -330,7 +383,7 @@ export default function OntologyClient() {
         />
       )}
 
-      {activeTab === '워크스페이스' && (
+      {activeTab === '워크스페이스' && !showScenarioSelector && (
         <WorkspaceTab
           snapshot={workspace.buildSnapshot()}
           onLoadSnapshot={workspace.loadSnapshot}

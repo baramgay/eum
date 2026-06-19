@@ -451,15 +451,42 @@ function detectPreferredChart(columns: string[], rows: Record<string, unknown>[]
   return 'bar'
 }
 
-function SourceBadge({ source, sourceUrl }: { source?: string; sourceUrl?: string }) {
+function SourceBadge({
+  source,
+  sourceUrl,
+  datasetId,
+  rowCount,
+}: {
+  source?: string
+  sourceUrl?: string
+  datasetId?: string
+  rowCount?: number
+}) {
   if (!source) return null
+
+  const label = datasetId && rowCount != null
+    ? `출처: ${source} — ${rowCount.toLocaleString()}건 기반`
+    : source
+
   const content = (
     <span className="inline-flex items-center gap-1.5">
       <Badge variant="blue" size="sm">출처</Badge>
-      <span className="text-xs text-gray-600 dark:text-gray-400">{source}</span>
-      {sourceUrl && <ExternalLink className="w-3 h-3 text-gray-400 dark:text-gray-300" />}
+      <span className="text-xs text-gray-600 dark:text-gray-400">{label}</span>
+      {(sourceUrl || datasetId) && <ExternalLink className="w-3 h-3 text-gray-400 dark:text-gray-300" />}
     </span>
   )
+
+  if (datasetId) {
+    return (
+      <a
+        href={`/portal?id=${encodeURIComponent(datasetId)}`}
+        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer"
+        title="데이터셋 포털에서 보기"
+      >
+        {content}
+      </a>
+    )
+  }
   if (sourceUrl) {
     return (
       <a
@@ -781,7 +808,12 @@ function ResultCard({
 
       <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-950 border-t space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <SourceBadge source={result.source} sourceUrl={result.source_url} />
+          <SourceBadge
+            source={result.source}
+            sourceUrl={result.source_url}
+            datasetId={result.intent?.startsWith('데이터셋조회:') ? result.intent.slice('데이터셋조회:'.length) : undefined}
+            rowCount={result.source ? result.rows.length : undefined}
+          />
           {result.follow_up && result.follow_up.length > 0 && onFollowUp && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] text-gray-400 dark:text-gray-300">추천:</span>

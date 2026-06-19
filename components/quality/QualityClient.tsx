@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   CheckCircle2, XCircle, AlertCircle, RefreshCw,
   ChevronDown, ChevronUp, History, BarChart3, ListChecks,
-  AlertTriangle, TrendingDown, TrendingUp, Activity, Filter, Download, Search,
+  AlertTriangle, TrendingDown, TrendingUp, Activity, Filter, Download, Search, FileEdit,
 } from 'lucide-react'
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line,
@@ -19,11 +19,17 @@ import Badge from '@/components/ui/Badge'
 import Btn from '@/components/ui/Btn'
 import EmptyState from '@/components/ui/EmptyState'
 import Skeleton from '@/components/ui/Skeleton'
-import { buildAreaSignals, buildQualityIssues, buildAreaComparison, type Severity } from '@/lib/quality'
+import { buildAreaSignals, buildNIASignals, buildQualityIssues, buildAreaComparison, type Severity } from '@/lib/quality'
+import NIAQualityGrid from './NIAQualityGrid'
+import DataLifecycleTimeline from './DataLifecycleTimeline'
+import OneCycleChecklist from './OneCycleChecklist'
+import QualityContractEditor from './QualityContractEditor'
+import { NIA_CHARACTERISTICS, type NIACharacteristic } from '@/lib/quality-nia'
+import type { QualityContract } from '@/lib/quality-contract'
 
 type QualityArea = 'completeness' | 'accuracy' | 'consistency' | 'recency' | 'metadata'
 
-interface RuleDetail { rule: string; violations: number; area?: QualityArea }
+interface RuleDetail { rule: string; violations: number; area?: QualityArea; niaTrait?: NIACharacteristic }
 
 interface QualityResult {
   dataset_id: string
@@ -187,7 +193,28 @@ function downloadHistoryCSV(history: QualityHistoryRow[], tableName: string) {
   URL.revokeObjectURL(url)
 }
 
-type TabKey = 'results' | 'issues' | 'history'
+type TabKey = 'results' | 'issues' | 'history' | 'nia' | 'lifecycle' | 'contract' | 'gap'
+
+type GapStatus = 'green' | 'yellow' | 'red'
+
+interface GapAreaResult {
+  label: string
+  status: GapStatus
+  value?: number
+  unit?: string
+  missing?: string[]
+}
+
+interface GapReport {
+  dataset_id: string
+  areas: {
+    A: GapAreaResult
+    B: GapAreaResult
+    C: GapAreaResult
+    D: GapAreaResult
+    E: GapAreaResult
+  }
+}
 
 export default function QualityClient() {
   const [results, setResults]   = useState<QualityResult[]>([])
@@ -201,6 +228,26 @@ export default function QualityClient() {
   const [resultDatasetFilter, setResultDatasetFilter] = useState<string>('all')
   const [compare, setCompare]   = useState<CompareResult | null>(null)
   const [areaFilter, setAreaFilter] = useState<QualityArea | 'all'>('all')
+  const [contractData, setContractData] = useState<QualityContract | null>(null)
+  const [contractLoading, setContractLoading] = useState(false)
+  const [gapReport, setGapReport] = useState<GapReport | null>(null)
+  const [gapLoading, setGapLoading] = useState(false)
+  const [gapError, setGapError] = useState<string | null>(null)
+
+  const loadContract = useCallback(async (datasetId: string) => {
+    if (!datasetId) return
+    setContractLoading(true)
+    try {
+      const res = await fetch(`/api/catalog/${encodeURIComponent(datasetId)}`)
+      if (!res.ok) return
+      const data = await res.json()
+      setContractData(data?.quality_contract ?? null)
+    } catch {
+      setContractData(null)
+    } finally {
+      setContractLoading(false)
+    }
+  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -258,10 +305,28 @@ export default function QualityClient() {
   }
 
   useEffect(() => { load() }, [load])
+  const loadGapReport = useCallback(async (datasetId: string) => {
+    if (!datasetId) return
+    setGapLoading(true)
+    setGapError(null)
+    try {
+      const res = await fetch(`/api/quality/gap-report?dataset_id=${encodeURIComponent(datasetId)}`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      setGapReport(await res.json())
+    } catch {
+      setGapError('갭 분석 데이터를 불러오지 못했습니다.')
+      setGapReport(null)
+    } finally {
+      setGapLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     if (activeTab === 'history') loadHistory()
     if (activeTab === 'history' || activeTab === 'issues') loadCompare()
-  }, [activeTab, selectedDataset, loadHistory, loadCompare])
+    if (activeTab === 'contract' && selectedDataset) loadContract(selectedDataset)
+    if (activeTab === 'gap' && selectedDataset) loadGapReport(selectedDataset)
+  }, [activeTab, selectedDataset, loadHistory, loadCompare, loadContract, loadGapReport])
 
   const signals = useMemo(() => buildAreaSignals(results), [results])
   const issues  = useMemo(() => buildQualityIssues(results), [results])
@@ -347,6 +412,9 @@ export default function QualityClient() {
     return buildAreaComparison(compare.current, compare.previous)
   }, [compare])
 
+  // NIA 9대 특성 점수 — niaTrait 직접 집계 (buildNIASignals)
+  const niaScores = useMemo(() => buildNIASignals(results), [results])
+
   const historyChartData = useMemo(() => {
     return [...history].reverse().map(h => ({
       label: new Date(h.ran_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
@@ -355,6 +423,35 @@ export default function QualityClient() {
       passed: h.passed,
     }))
   }, [history])
+
+  const historyNIAChartData = useMemo(() => {
+    const NIA_KEYS = Object.keys(NIA_CHARACTERISTICS) as NIACharacteristic[]
+    return [...history].reverse().map(h => {
+      const agg: Record<string, { v: number; c: number }> = {}
+      for (const d of (h.detail ?? [])) {
+        const trait = d.niaTrait
+        if (!trait) continue
+        if (!agg[trait]) agg[trait] = { v: 0, c: 0 }
+        agg[trait].v += d.violations
+        agg[trait].c += 1
+      }
+      const point: Record<string, number | string> = {
+        label: new Date(h.ran_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+      }
+      for (const k of NIA_KEYS) {
+        const s = agg[k]
+        point[k] = s ? Math.max(0, (1 - s.v / Math.max(1, s.c)) * 100) : -1
+      }
+      return point
+    })
+  }, [history])
+
+  const hasNIAHistory = useMemo(
+    () => historyNIAChartData.some(d =>
+      (Object.keys(NIA_CHARACTERISTICS) as NIACharacteristic[]).some(k => (d[k] as number) >= 0)
+    ),
+    [historyNIAChartData],
+  )
 
   const datasetStatusData = useMemo(() => filteredResults.map(r => ({
     name: r.table,
@@ -486,9 +583,13 @@ export default function QualityClient() {
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="flex gap-6" aria-label="품질진단 탭">
           {[
-            { key: 'results', label: '진단 결과', icon: ListChecks },
-            { key: 'issues',  label: '이슈 상세', icon: AlertTriangle },
-            { key: 'history', label: '이력 비교', icon: History },
+            { key: 'results',   label: '진단 결과',       icon: ListChecks },
+            { key: 'issues',    label: '이슈 상세',       icon: AlertTriangle },
+            { key: 'history',   label: '이력 비교',       icon: History },
+            { key: 'nia',       label: 'NIA 9대 특성',    icon: BarChart3 },
+            { key: 'lifecycle', label: '데이터 생애주기', icon: Activity },
+            { key: 'contract',  label: '품질 계약 편집',  icon: FileEdit },
+            { key: 'gap',       label: '갭 분석',         icon: AlertCircle },
           ].map(tab => (
             <button
               key={tab.key}
@@ -882,6 +983,42 @@ export default function QualityClient() {
                 </Card>
               )}
 
+              {history.length > 0 && hasNIAHistory && (
+                <Card>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">NIA 특성별 점수 추이</h3>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">측정된 특성만 표시</span>
+                  </div>
+                  <div className="h-72">
+                    <figure className="w-full h-full" role="img" aria-label="NIA 9대 특성 점수 추이 선 차트">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={historyNIAChartData} margin={{ top: 8, right: 16, left: 8, bottom: 24 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="label" tick={{ fontSize: 10 }} angle={-30} textAnchor="end" height={50} />
+                          <YAxis tick={{ fontSize: 11 }} domain={[0, 100]} unit="%" />
+                          <Tooltip formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, '']} />
+                          <Legend wrapperStyle={{ fontSize: 10 }} />
+                          {(Object.keys(NIA_CHARACTERISTICS) as NIACharacteristic[])
+                            .filter(k => historyNIAChartData.some(d => (d[k] as number) >= 0))
+                            .map(k => (
+                              <Line
+                                key={k}
+                                type="monotone"
+                                dataKey={k}
+                                name={NIA_CHARACTERISTICS[k].shortLabel}
+                                stroke={NIA_CHARACTERISTICS[k].color}
+                                strokeWidth={2}
+                                dot={{ r: 3 }}
+                                connectNulls={false}
+                              />
+                            ))}
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </figure>
+                  </div>
+                </Card>
+              )}
+
               {history.length > 0 && (
                 <Card>
                   <div className="flex items-center justify-between mb-4">
@@ -939,6 +1076,316 @@ export default function QualityClient() {
                         render: h => <Badge variant={h.passed ? 'green' : 'red'}>{h.passed ? '통과' : '실패'}</Badge>,
                       },
                     ]}
+                  />
+                </Card>
+              )}
+            </div>
+          )}
+
+          {/* NIA 9대 품질 특성 탭 */}
+          {activeTab === 'nia' && (() => {
+            const measuredNIA = niaScores.filter(s => s.score >= 0)
+            const niaRadarData = measuredNIA.map(s => ({
+              area: NIA_CHARACTERISTICS[s.characteristic].shortLabel,
+              score: s.score,
+              fullMark: 100,
+            }))
+            return (
+              <div className="space-y-4">
+                {/* NIA 레이더 차트 */}
+                {niaRadarData.length >= 3 && (
+                  <Card>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">NIA 9대 특성 레이더</h3>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">측정된 {measuredNIA.length}개 특성</span>
+                    </div>
+                    <div className="h-72">
+                      <figure className="w-full h-full" role="img" aria-label="NIA 9대 특성 레이더 차트">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RadarChart data={niaRadarData} margin={{ top: 8, right: 40, bottom: 8, left: 40 }}>
+                            <PolarGrid />
+                            <PolarAngleAxis dataKey="area" tick={{ fontSize: 11 }} />
+                            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} tickCount={6} />
+                            <Tooltip formatter={(v: unknown) => [`${Number(v).toFixed(2)}점`, 'NIA 점수']} />
+                            <Radar name="NIA 점수" dataKey="score" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.25} />
+                          </RadarChart>
+                        </ResponsiveContainer>
+                      </figure>
+                    </div>
+                  </Card>
+                )}
+
+                <Card>
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">NIA AI 데이터 품질관리 가이드라인 v4.0 — 9대 품질 특성</h3>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                      {measuredNIA.length}개 측정 / {niaScores.length - measuredNIA.length}개 미측정
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    준비성·완전성·유용성·기준 적합성·다양성·의미 정확성·구문 정확성·알고리즘 적정성·유효성
+                  </p>
+                  <NIAQualityGrid scores={niaScores} />
+                </Card>
+
+                <Card>
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">1-Cycle 자가점검 체크리스트</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    샘플(착수) → 초기(5~10%) → 중간(30%) → 보완(50%) → 최종(100%) 5단계 품질 점검
+                  </p>
+                  <OneCycleChecklist datasetId={selectedDataset ?? undefined} />
+                </Card>
+              </div>
+            )
+          })()}
+
+          {/* 데이터 생애주기 탭 */}
+          {activeTab === 'lifecycle' && (
+            <div className="space-y-4">
+              <Card>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">4단계 데이터 생애주기</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  데이터 획득·수집 → 정제 → 가공·어노테이션 → 학습 데이터 검증
+                </p>
+                <DataLifecycleTimeline />
+              </Card>
+
+              <Card>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">생애주기 단계별 품질 특성 연계</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-2 pr-4 font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">생애주기 단계</th>
+                        <th className="text-left py-2 font-medium text-gray-600 dark:text-gray-400">핵심 품질 특성</th>
+                        <th className="text-left py-2 pl-4 font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">현황</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                      {([
+                        { stage: 'acquisition', chars: ['readiness','completeness','usefulness','diversity'] as NIACharacteristic[] },
+                        { stage: 'cleansing',   chars: ['completeness','standardConformance','diversity','syntacticAccuracy'] as NIACharacteristic[] },
+                        { stage: 'annotation',  chars: ['usefulness','standardConformance','semanticAccuracy','syntacticAccuracy'] as NIACharacteristic[] },
+                        { stage: 'validation',  chars: ['algorithmicAdequacy','validity'] as NIACharacteristic[] },
+                      ] as const).map(row => {
+                        const stageScores = row.chars.map(c => niaScores.find(s => s.characteristic === c))
+                        const avgScore = stageScores
+                          .filter(s => s && s.score >= 0)
+                          .reduce((sum, s, _, arr) => sum + (s!.score / arr.length), 0)
+                        const hasData = stageScores.some(s => s && s.score >= 0)
+                        return (
+                          <tr key={row.stage}>
+                            <td className="py-2 pr-4 font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                              {row.stage === 'acquisition' ? '📥 획득·수집' :
+                               row.stage === 'cleansing'   ? '🔧 정제' :
+                               row.stage === 'annotation'  ? '🏷️ 가공·어노테이션' : '✅ 검증'}
+                            </td>
+                            <td className="py-2">
+                              <div className="flex flex-wrap gap-1">
+                                {row.chars.map(c => (
+                                  <span key={c} className="px-1.5 py-0.5 rounded text-white text-[10px]"
+                                    style={{ backgroundColor: NIA_CHARACTERISTICS[c].color + 'cc' }}>
+                                    {NIA_CHARACTERISTICS[c].shortLabel}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="py-2 pl-4 tabular-nums font-medium">
+                              {hasData ? (
+                                <span className={avgScore >= 99 ? 'text-emerald-600 dark:text-emerald-400' : avgScore >= 90 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}>
+                                  {avgScore.toFixed(1)}%
+                                </span>
+                              ) : (
+                                <span className="text-gray-400 dark:text-gray-500">미측정</span>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* 갭 분석 탭 */}
+          {activeTab === 'gap' && (
+            <div className="space-y-4">
+              <Card className="flex flex-wrap items-center gap-3">
+                <Filter className="w-4 h-4 text-gray-400" />
+                <label className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택</label>
+                <select
+                  value={selectedDataset}
+                  onChange={e => {
+                    setSelectedDataset(e.target.value)
+                    setGapReport(null)
+                    loadGapReport(e.target.value)
+                  }}
+                  className="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-2 pr-8 bg-gray-50 dark:bg-gray-950"
+                >
+                  <option value="">선택하세요</option>
+                  {results.map(r => (
+                    <option key={r.dataset_id} value={r.dataset_id}>{r.table}</option>
+                  ))}
+                </select>
+                {gapReport && (
+                  <Btn
+                    size="sm"
+                    variant="secondary"
+                    onClick={async () => {
+                      if (!selectedDataset) return
+                      const res = await fetch(`/api/quality/gap-report?dataset_id=${encodeURIComponent(selectedDataset)}`)
+                      if (!res.ok) return
+                      const json = await res.json()
+                      const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' })
+                      const url = URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = `gap-report-${selectedDataset}.json`
+                      document.body.appendChild(a)
+                      a.click()
+                      a.remove()
+                      URL.revokeObjectURL(url)
+                    }}
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    갭 리포트 JSON 다운로드
+                  </Btn>
+                )}
+              </Card>
+
+              {!selectedDataset ? (
+                <Card>
+                  <EmptyState
+                    icon={<AlertCircle className="w-6 h-6 text-gray-400" />}
+                    title="데이터셋을 선택하세요"
+                    description="갭 분석을 실행할 데이터셋을 위에서 선택하세요"
+                  />
+                </Card>
+              ) : gapLoading ? (
+                <QualitySkeleton />
+              ) : gapError ? (
+                <ErrorState message={gapError} onRetry={() => loadGapReport(selectedDataset)} />
+              ) : gapReport ? (
+                <Card>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">5대 영역 갭 분석</h3>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">데이터셋 {truncateId(gapReport.dataset_id)}</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    {(Object.entries(gapReport.areas) as [string, GapAreaResult][]).map(([key, area]) => {
+                      const statusColor = area.status === 'green'
+                        ? 'bg-green-500'
+                        : area.status === 'yellow'
+                          ? 'bg-amber-400'
+                          : 'bg-red-500'
+                      const cardBg = area.status === 'green'
+                        ? 'bg-green-50/50 border-green-200'
+                        : area.status === 'yellow'
+                          ? 'bg-amber-50/50 border-amber-200'
+                          : 'bg-red-50/50 border-red-200'
+                      const valueColor = area.status === 'green'
+                        ? 'text-green-700'
+                        : area.status === 'yellow'
+                          ? 'text-amber-700'
+                          : 'text-red-700'
+
+                      return (
+                        <div
+                          key={key}
+                          className={`rounded-xl border p-4 text-center flex flex-col items-center gap-2 ${cardBg}`}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-3 h-3 rounded-full ${statusColor}`} />
+                            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">영역 {key}</span>
+                          </div>
+                          <p className="text-sm font-bold text-gray-800 dark:text-gray-200">{area.label}</p>
+                          {area.missing !== undefined ? (
+                            <div className={`text-xs font-medium ${valueColor}`}>
+                              {area.missing.length === 0
+                                ? '누락 없음'
+                                : `누락: ${area.missing.join(', ')}`}
+                            </div>
+                          ) : (
+                            <p className={`text-lg font-bold tabular-nums ${valueColor}`}>
+                              {area.value?.toLocaleString()}
+                              <span className="text-xs font-normal ml-0.5">{area.unit}</span>
+                            </p>
+                          )}
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                            area.status === 'green' ? 'bg-green-100 text-green-700' :
+                            area.status === 'yellow' ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            {area.status === 'green' ? '양호' : area.status === 'yellow' ? '주의' : '위험'}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-950 rounded-xl border text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                    <p className="font-semibold text-gray-600 dark:text-gray-300 mb-2">기준 안내</p>
+                    <p>A 완전성 — null_rate &gt; 5% 위험 / &gt; 2% 주의</p>
+                    <p>B 정확성 — 구문정확성·유효성 위반 건수 0 양호 / 100건 미만 주의 / 100건 이상 위험</p>
+                    <p>C 일관성 — duplicate_rate &gt; 5% 위험 / &gt; 1% 주의</p>
+                    <p>D 최신성 — 마지막 수집 후 &gt; 30일 위험 / &gt; 7일 주의</p>
+                    <p>E 메타데이터 — title·description·category 누락 여부</p>
+                  </div>
+                </Card>
+              ) : null}
+            </div>
+          )}
+
+          {/* 품질 계약 편집 탭 */}
+          {activeTab === 'contract' && (
+            <div className="space-y-4">
+              {/* 데이터셋 선택 */}
+              <Card>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Filter className="w-4 h-4 text-gray-400" />
+                  <label className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택</label>
+                  <select
+                    value={selectedDataset}
+                    onChange={e => {
+                      setSelectedDataset(e.target.value)
+                      setContractData(null)
+                      loadContract(e.target.value)
+                    }}
+                    className="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1.5 pl-2 pr-8 bg-gray-50 dark:bg-gray-950"
+                  >
+                    <option value="">선택하세요</option>
+                    {results.map(r => (
+                      <option key={r.dataset_id} value={r.dataset_id}>{r.table}</option>
+                    ))}
+                  </select>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {contractData ? `현재 ${contractData.rules.length}개 규칙` : '규칙 없음'}
+                  </span>
+                </div>
+              </Card>
+
+              {contractLoading ? (
+                <Card>
+                  <div className="text-xs text-gray-400 dark:text-gray-500 text-center py-6">
+                    품질 계약 로드 중…
+                  </div>
+                </Card>
+              ) : !selectedDataset ? (
+                <Card>
+                  <EmptyState
+                    icon={<FileEdit className="w-6 h-6 text-gray-400" />}
+                    title="데이터셋을 선택하세요"
+                    description="품질 계약을 편집할 데이터셋을 위에서 선택하세요"
+                  />
+                </Card>
+              ) : (
+                <Card>
+                  <QualityContractEditor
+                    datasetId={selectedDataset}
+                    initialContract={contractData}
+                    onSaved={contract => setContractData(contract)}
                   />
                 </Card>
               )}

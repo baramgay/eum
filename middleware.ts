@@ -11,6 +11,8 @@ const PUBLIC_PREFIXES = [
   '/api/cron/',            // Vercel Cron (CRON_SECRET 자체 인증)
   '/api/openapi/webhooks', // 웹훅 수신 (각 route에서 인증)
   '/api/health',           // 서버 상태 확인
+  '/api/ontology/demo-graph/', // 샘플 시나리오 그래프 (인증 불필요)
+  '/api/ontology/text-analysis', // 텍스트 분석 (로컬 연산)
 ]
 
 export async function middleware(request: NextRequest) {

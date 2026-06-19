@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Search, Calendar, CheckCircle, AlertCircle, Database, Play, ArrowRight, Pencil, Trash2, RefreshCw, X, Eye, Loader2 } from 'lucide-react'
 import { StatCard, Badge, EmptyState, Btn, Skeleton } from '@/components/ui'
 import Modal from '@/components/ui/Modal'
@@ -25,6 +26,7 @@ interface Props {
   onEdit: (src: SourceWithJob) => void
   onDelete: (id: string) => void
   onOpenForm: () => void
+  lastErrorMsgMap?: Record<string, string | null>
 }
 
 const STATUS_VARIANT: Record<string, 'gray' | 'blue' | 'green' | 'red'> = {
@@ -74,6 +76,7 @@ export default function CollectSourcesPanel({
   onEdit,
   onDelete,
   onOpenForm,
+  lastErrorMsgMap = {},
 }: Props) {
   const router = useRouter()
   const [previewSourceId, setPreviewSourceId] = useState<string | null>(null)
@@ -145,11 +148,30 @@ export default function CollectSourcesPanel({
       label: '상태',
       sortable: true,
       sortValue: s => runningId === s.source_id ? 'running' : (s.job?.status ?? 'idle'),
-      render: s => (
-        <Badge variant={runningId === s.source_id ? 'blue' : statusToVariant(s.job?.status ?? 'idle')}>
-          {runningId === s.source_id ? 'running' : (s.job?.status ?? 'idle')}
-        </Badge>
-      ),
+      render: s => {
+        const isFailed = !runningId && (s.job?.status === 'failed' || s.job?.status === 'error')
+        const errMsg = lastErrorMsgMap[s.source_id]
+        if (isFailed) {
+          return (
+            <button
+              type="button"
+              onClick={() => errMsg
+                ? toast.error(errMsg, { duration: 6000 })
+                : toast.error('수집 실패 — 오류 상세 없음')
+              }
+              title={errMsg ?? '실패'}
+              className="cursor-pointer"
+            >
+              <Badge variant="red">실패</Badge>
+            </button>
+          )
+        }
+        return (
+          <Badge variant={runningId === s.source_id ? 'blue' : statusToVariant(s.job?.status ?? 'idle')}>
+            {runningId === s.source_id ? 'running' : (s.job?.status ?? 'idle')}
+          </Badge>
+        )
+      },
     },
     {
       key: 'last_run_at',

@@ -1147,7 +1147,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${result.title ?? '분석결과'}.csv`
+    a.download = `eum-analysis-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -1745,9 +1745,11 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                             {renderResultSummary()}
                           </div>
                           <div className="flex gap-2">
-                            <Btn variant="secondary" size="sm" onClick={exportCSV}>
-                              <Download className="w-3.5 h-3.5" /> CSV 내보내기
-                            </Btn>
+                            {result.tables && result.tables.length > 0 && (
+                              <Btn variant="secondary" size="sm" onClick={exportCSV}>
+                                <Download className="w-3.5 h-3.5" /> CSV
+                              </Btn>
+                            )}
                             <Btn
                               size="sm"
                               className="bg-purple-600 hover:bg-purple-700 border-purple-600"

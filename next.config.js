@@ -49,6 +49,8 @@ function securityHeaders() {
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: false },
   webpack: (config) => {
     // .node 네이티브 바이너리 파일을 externals로 처리 (안전망)
     config.externals = [

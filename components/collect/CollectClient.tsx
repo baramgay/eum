@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { Database, Calendar, ScrollText, Activity, Plus, ArrowRight } from 'lucide-react'
@@ -306,6 +306,19 @@ export default function CollectClient({ role, tenantId }: Props) {
     setTestResult(null)
   }
 
+  const lastErrorMsgMap = useMemo<Record<string, string | null>>(() => {
+    const map: Record<string, string | null> = {}
+    for (const src of sources) {
+      if (src.job?.status === 'failed' || src.job?.status === 'error') {
+        const lastLog = logs
+          .filter(l => l.source_id === src.source_id && (l.status === 'failed' || l.status === 'error'))
+          .sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime())[0]
+        map[src.source_id] = lastLog?.error_msg ?? null
+      }
+    }
+    return map
+  }, [sources, logs])
+
   const formSource = showForm ? null : editingSource
   const isFormOpen = showForm || !!editingSource
 
@@ -414,6 +427,7 @@ export default function CollectClient({ role, tenantId }: Props) {
             onEdit={openEdit}
             onDelete={handleDelete}
             onOpenForm={openCreate}
+            lastErrorMsgMap={lastErrorMsgMap}
           />
         </>
       )}

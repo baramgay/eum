@@ -91,6 +91,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
   const [lineageMap, setLineageMap]     = useState<Record<string, LineageNode[]>>({})
   const [lineageLoadingId, setLineageLoadingId] = useState<string | null>(null)
   const [showErrorDialog, setShowErrorDialog]   = useState(false)
+  const [selectedHistoryRun, setSelectedHistoryRun] = useState<RunRecord | null>(null)
 
   const isReadOnly = role === 'viewer'
 
@@ -759,7 +760,14 @@ export default function ProcessClient({ role, tenantId }: Props) {
                                   </td>
                                   <td className="py-2 text-right">
                                     {run.error_rows > 0 ? (
-                                      <Badge variant="red">{run.error_rows}건</Badge>
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedHistoryRun(run)}
+                                        className="cursor-pointer"
+                                        title="오류 상세 보기"
+                                      >
+                                        <Badge variant="red">오류 {run.error_rows}건 보기</Badge>
+                                      </button>
                                     ) : (
                                       <span className="text-gray-400 dark:text-gray-300">—</span>
                                     )}
@@ -832,7 +840,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
         />
       )}
 
-      {/* 오류 행 뷰어 */}
+      {/* 오류 행 뷰어 — 실행 직후 */}
       <Modal
         open={showErrorDialog}
         onClose={() => setShowErrorDialog(false)}
@@ -863,6 +871,46 @@ export default function ProcessClient({ role, tenantId }: Props) {
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.ruleIndex + 1}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-red-600">{err.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* 오류 행 뷰어 — 이력 row */}
+      <Modal
+        open={!!selectedHistoryRun}
+        onClose={() => setSelectedHistoryRun(null)}
+        title="오류 행 상세"
+        size="lg"
+      >
+        <div className="p-6 overflow-auto">
+          <h3 className="text-sm font-semibold text-gray-800 mb-3">
+            오류 {selectedHistoryRun?.error_rows ?? 0}건 (최대 100건 표시)
+          </h3>
+          {!selectedHistoryRun?.error_log?.length ? (
+            <p className="text-sm text-gray-500">오류 상세 정보가 없습니다.</p>
+          ) : (
+            <div className="overflow-auto max-h-[60vh]">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 text-left">
+                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">행 번호</th>
+                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">규칙 번호</th>
+                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">컬럼</th>
+                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">오류 내용</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(selectedHistoryRun.error_log as ProcessError[]).map((err, i) => (
+                    <tr key={i} className="hover:bg-red-50">
+                      <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{(err.rowIndex ?? i) + 1}</td>
+                      <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{typeof err.ruleIndex === 'number' ? err.ruleIndex + 1 : '—'}</td>
+                      <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>
+                      <td className="border border-gray-200 px-3 py-1.5 text-red-600">{err.message ?? JSON.stringify(err)}</td>
                     </tr>
                   ))}
                 </tbody>
