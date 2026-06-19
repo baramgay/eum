@@ -3,6 +3,8 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { sendEmail, CENTER_EMAIL } from '@/lib/email'
 import { summarizeAccessLogs } from '@/lib/telemetry'
 
+const ALERT_EMAIL_TO = process.env.ALERT_EMAIL_TO ?? CENTER_EMAIL
+
 export const runtime = 'nodejs'
 
 const ONE_HOUR_MS = 60 * 60 * 1000
@@ -62,15 +64,30 @@ export async function GET(req: NextRequest) {
 
   if (alerts.length > 0) {
     const subject = `[EUM] 시스템 알림 — ${alerts.length}개 지표 임계 초과`
+    const failedSourceList = (failedCollections ?? [])
+      .slice(0, 10)
+      .map(c => `<li>소스 ${c.source_id}: ${c.error_msg ?? '오류 없음'}</li>`)
+      .join('')
     const html = `
       <p>EUM 플랫폼 모니터링 시스템에서 다음 임계 초과를 감지했습니다.</p>
       <ul>
         ${alerts.map(a => `<li>${a}</li>`).join('')}
       </ul>
+      ${failedSourceList ? `<p><strong>수집 실패 소스 목록:</strong></p><ul>${failedSourceList}</ul>` : ''}
       <p>기준 시각: ${new Date(since).toLocaleString('ko-KR')}</p>
       <p><a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3001'}/admin/monitoring">모니터링 페이지로 이동</a></p>
     `
-    await sendEmail(CENTER_EMAIL, subject, html)
+    const recipient = ALERT_EMAIL_TO
+    await sendEmail(recipient, subject, html)
+    await sb.from('alert_logs').insert({
+      alerted_at: new Date().toISOString(),
+      recipient,
+      subject,
+      alerts,
+      failed_collections: (failedCollections ?? []).length,
+      failed_processes: (failedProcesses ?? []).length,
+      api_error_rate: api.errorRate,
+    })
   }
 
   return NextResponse.json({

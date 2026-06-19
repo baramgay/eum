@@ -1,5 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { randomHex } from '@/lib/utils'
+
+export async function POST(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+
+  const body = await req.json() as {
+    title?: string
+    description?: string
+    source?: string
+    pipeline_id?: string
+    dataset_id?: string
+    table_name?: string
+    row_count?: number
+  }
+
+  if (!body.title) {
+    return NextResponse.json({ error: 'title이 필요합니다' }, { status: 400 })
+  }
+
+  const tenantId = user.user_metadata?.tenant_id as string
+  const datasetId = body.dataset_id ?? ('cat_' + randomHex(4))
+  const service = await createServiceClient()
+
+  const { error } = await service.from('catalog').upsert({
+    dataset_id:   datasetId,
+    tenant_id:    tenantId,
+    title:        body.title,
+    description:  body.description ?? null,
+    table_name:   body.table_name ?? null,
+    rows:         body.row_count ?? 0,
+    is_open:      false,
+    ai_ready:     false,
+    high_value:   false,
+    updated_at:   new Date().toISOString(),
+    derived_from: body.source ? { source: body.source, pipeline_id: body.pipeline_id ?? null } : null,
+  }, { onConflict: 'dataset_id' })
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ dataset_id: datasetId })
+}
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient()

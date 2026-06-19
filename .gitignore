@@ -33,3 +33,4 @@ supabase/.temp/
 eum_dev.log
 
 .vercel
+.superpowers/

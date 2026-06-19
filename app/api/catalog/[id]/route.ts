@@ -46,6 +46,19 @@ export async function PATCH(req: Request, { params }: Params) {
     updates.quality_contract = body.quality_contract
   }
 
+  if ('title' in body && typeof body.title === 'string' && body.title.trim()) {
+    updates.title = body.title.trim()
+  }
+  if ('description' in body && (typeof body.description === 'string' || body.description === null)) {
+    updates.description = body.description
+  }
+  if ('keywords' in body && (typeof body.keywords === 'string' || body.keywords === null)) {
+    updates.keywords = body.keywords
+  }
+  if ('theme' in body && (typeof body.theme === 'string' || body.theme === null)) {
+    updates.theme = body.theme
+  }
+
   if (Object.keys(updates).length === 0) return jsonError('업데이트할 필드가 없습니다', 400)
 
   const { data, error } = await supabase

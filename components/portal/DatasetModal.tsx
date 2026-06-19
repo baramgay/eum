@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Modal from '@/components/ui/Modal'
 import DatasetStats from './DatasetStats'
-import { CheckCircle2, XCircle, Loader2, Copy, Check, FileJson, FileSpreadsheet, Terminal, ExternalLink } from 'lucide-react'
+import { CheckCircle2, XCircle, Loader2, Copy, Check, FileJson, FileSpreadsheet, Terminal, ExternalLink, Sparkles, GitFork, Bot } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface CatalogItem {
@@ -13,6 +13,13 @@ interface CatalogItem {
   updated_at: string | null; rows: number | null
   keywords?: string | null; is_open?: boolean; ai_ready?: boolean; api_enabled?: boolean
   download_count?: number
+}
+
+interface SuggestMetaResult {
+  title: string
+  description: string
+  category: string
+  keywords: string[]
 }
 
 interface AiCheckItem { name: string; pass: boolean; detail: string }
@@ -65,7 +72,7 @@ function DatasetPreview({ datasetId }: { datasetId: string }) {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`/api/catalog/${datasetId}/download?format=json&limit=5`)
+    fetch(`/api/catalog/${datasetId}/download?format=json&limit=10`)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then((d: { data?: Record<string, unknown>[]; rows?: Record<string, unknown>[] }) => {
         setRows(d.data ?? d.rows ?? [])
@@ -81,7 +88,7 @@ function DatasetPreview({ datasetId }: { datasetId: string }) {
   const cols = Object.keys(rows[0]).slice(0, 8)
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-400 dark:text-gray-300">최대 5행 · {cols.length}개 컬럼 미리보기</p>
+      <p className="text-xs text-gray-400 dark:text-gray-300">최대 10행 · {cols.length}개 컬럼 미리보기</p>
       <div className="overflow-x-auto rounded border text-xs">
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-950">
@@ -116,6 +123,56 @@ export default function DatasetModal({ item, onClose }: Props) {
   const [aiError, setAiError]   = useState<string | null>(null)
   const [related, setRelated]   = useState<CatalogItem[]>([])
   const [relatedLoading, setRelatedLoading] = useState(false)
+
+  const [suggestLoading, setSuggestLoading] = useState(false)
+  const [suggestError, setSuggestError]     = useState<string | null>(null)
+  const [metaForm, setMetaForm] = useState<SuggestMetaResult | null>(null)
+  const [saveLoading, setSaveLoading] = useState(false)
+
+  const handleSuggestMeta = async () => {
+    setSuggestLoading(true)
+    setSuggestError(null)
+    try {
+      const res = await fetch(`/api/catalog/${item.dataset_id}/suggest-meta`, { method: 'POST' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(body.error ?? `HTTP ${res.status}`)
+      }
+      const data = await res.json() as SuggestMetaResult
+      setMetaForm(data)
+    } catch (e) {
+      setSuggestError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setSuggestLoading(false)
+    }
+  }
+
+  const handleSaveMeta = async () => {
+    if (!metaForm) return
+    setSaveLoading(true)
+    try {
+      const res = await fetch(`/api/catalog/${item.dataset_id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: metaForm.title,
+          description: metaForm.description,
+          theme: metaForm.category,
+          keywords: metaForm.keywords.join(', '),
+        }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(body.error ?? `HTTP ${res.status}`)
+      }
+      toast.success('메타데이터가 저장되었습니다')
+      setMetaForm(null)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '저장에 실패했습니다')
+    } finally {
+      setSaveLoading(false)
+    }
+  }
 
   // AI-Ready 탭 전환 시 데이터 로드
   useEffect(() => {
@@ -267,8 +324,8 @@ export default function DatasetModal({ item, onClose }: Props) {
                 </div>
               )}
 
-              {/* 다운로드 버튼 */}
-              <div className="flex gap-2 pt-2">
+              {/* 다운로드 + 액션 버튼 */}
+              <div className="flex flex-wrap gap-2 pt-2">
                 <a
                   href={`/api/catalog/${item.dataset_id}/download?format=csv`}
                   download
@@ -283,6 +340,18 @@ export default function DatasetModal({ item, onClose }: Props) {
                 >
                   <FileJson className="w-3.5 h-3.5" /> JSON 다운로드
                 </a>
+                <button
+                  onClick={() => { router.push(`/process?source_id=${encodeURIComponent(item.dataset_id)}`); onClose() }}
+                  className="px-3 py-1.5 text-xs bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors flex items-center gap-1"
+                >
+                  <GitFork className="w-3.5 h-3.5" /> 가공 파이프라인에 추가
+                </button>
+                <button
+                  onClick={() => { router.push(`/ai?q=${encodeURIComponent(item.title)}`); onClose() }}
+                  className="px-3 py-1.5 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors flex items-center gap-1"
+                >
+                  <Bot className="w-3.5 h-3.5" /> AI로 질의
+                </button>
               </div>
 
               {/* 관련 데이터셋 */}
@@ -354,6 +423,83 @@ export default function DatasetModal({ item, onClose }: Props) {
                   </div>
                 )}
               </dl>
+
+              {/* AI 메타데이터 제안 */}
+              <div className="border-t pt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400">AI 메타데이터 제안</p>
+                  <button
+                    onClick={handleSuggestMeta}
+                    disabled={suggestLoading}
+                    className="px-3 py-1.5 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 transition-colors flex items-center gap-1"
+                  >
+                    {suggestLoading
+                      ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> 분석 중...</>
+                      : <><Sparkles className="w-3.5 h-3.5" /> AI 제안 받기</>
+                    }
+                  </button>
+                </div>
+
+                {suggestError && (
+                  <p className="text-xs text-red-500">{suggestError}</p>
+                )}
+
+                {metaForm && (
+                  <div className="space-y-3 bg-purple-50 dark:bg-purple-950 rounded-lg p-4">
+                    <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">AI 제안 결과 — 수정 후 저장하세요</p>
+                    <div className="space-y-2">
+                      <div>
+                        <label className="text-xs text-gray-500 dark:text-gray-400">제목</label>
+                        <input
+                          value={metaForm.title}
+                          onChange={e => setMetaForm(f => f ? { ...f, title: e.target.value } : f)}
+                          className="mt-0.5 w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 dark:text-gray-400">설명</label>
+                        <textarea
+                          value={metaForm.description}
+                          onChange={e => setMetaForm(f => f ? { ...f, description: e.target.value } : f)}
+                          rows={3}
+                          className="mt-0.5 w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-purple-500 resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 dark:text-gray-400">카테고리</label>
+                        <input
+                          value={metaForm.category}
+                          onChange={e => setMetaForm(f => f ? { ...f, category: e.target.value } : f)}
+                          className="mt-0.5 w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 dark:text-gray-400">키워드 (쉼표 구분)</label>
+                        <input
+                          value={metaForm.keywords.join(', ')}
+                          onChange={e => setMetaForm(f => f ? { ...f, keywords: e.target.value.split(',').map(k => k.trim()).filter(Boolean) } : f)}
+                          className="mt-0.5 w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={handleSaveMeta}
+                        disabled={saveLoading}
+                        className="px-4 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                      >
+                        {saveLoading ? '저장 중...' : '저장'}
+                      </button>
+                      <button
+                        onClick={() => setMetaForm(null)}
+                        className="px-4 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

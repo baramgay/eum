@@ -321,6 +321,32 @@ export default function ProcessClient({ role, tenantId }: Props) {
     }
   }
 
+  async function registerToPortal(pipelineId: string, result: RunResult) {
+    const pipeline = pipelines.find(p => p.id === pipelineId)
+    try {
+      const res = await fetch('/api/catalog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title:       pipeline?.name ?? '파이프라인 결과',
+          description: pipeline?.description ?? undefined,
+          source:      'processing',
+          pipeline_id: pipelineId,
+          dataset_id:  result.dataset_id,
+          table_name:  result.result_table ?? undefined,
+          row_count:   result.output_rows,
+        }),
+      })
+      if (!res.ok) {
+        await handleFetchError(res, '포털 등록 실패')
+        return
+      }
+      toast.success('포털에 등록되었습니다.')
+    } catch {
+      toast.error('포털 등록 중 오류가 발생했습니다')
+    }
+  }
+
   function lastRunStatus(id: string): RunRecord | undefined {
     return runsMap[id]?.[0]
   }
@@ -621,11 +647,11 @@ export default function ProcessClient({ role, tenantId }: Props) {
             </span>
             {runResult.result.dataset_id && (
               <>
-                <Btn size="sm" onClick={() => router.push(`/analytics?dataset_id=${runResult.result.dataset_id}`)}>
-                  <BarChart2 className="w-3 h-3" /> 분석으로
+                <Btn size="sm" onClick={() => router.push(`/analytics?pipeline_run_id=${runResult.result.run_id}&dataset_id=${runResult.result.dataset_id}`)}>
+                  <BarChart2 className="w-3 h-3" /> 분석으로 보내기
                 </Btn>
-                <Btn size="sm" variant="secondary" onClick={() => router.push(`/submission?dataset_id=${runResult.result.dataset_id}`)}>
-                  <Upload className="w-3 h-3" /> 포털 등록
+                <Btn size="sm" variant="secondary" onClick={() => registerToPortal(runResult.id, runResult.result)}>
+                  <Upload className="w-3 h-3" /> 포털에 등록
                 </Btn>
               </>
             )}
