@@ -4,9 +4,11 @@ import { Network } from 'lucide-react'
 import { Card, EmptyState, Skeleton } from '@/components/ui'
 import OntologyGraph from '../OntologyGraph'
 import DetailPanel from '../panels/DetailPanel'
+import NodeKpiPanel from '../NodeKpiPanel'
 import type { OntologyGraphData, GraphLayoutType, AnalyticsResult } from '@/lib/ontology/types'
 import type { OntologyNode } from '@/lib/ontology-utils'
 import type { RelatedDataset, ActionResult } from '../hooks/useOntologyData'
+import type { ScenarioKey } from '@/lib/ontology/demo-graph-meta'
 
 interface GraphTabProps {
   graph: OntologyGraphData | null
@@ -26,6 +28,7 @@ interface GraphTabProps {
   actionResult: ActionResult | null
   analyticsResult: AnalyticsResult | null
   onBuildOntology: () => void
+  activeScenario?: ScenarioKey | null
 }
 
 function GraphSkeleton() {
@@ -73,6 +76,7 @@ export default function GraphTab({
   actionResult,
   analyticsResult,
   onBuildOntology,
+  activeScenario,
 }: GraphTabProps) {
   return (
     <div className="grid lg:grid-cols-3 gap-5 items-start">
@@ -102,8 +106,30 @@ export default function GraphTab({
           />
         )}
       </div>
-      <div className="lg:col-span-1 min-w-0">
-        {selectedNode ? (
+      <div className="lg:col-span-1 min-w-0 space-y-4">
+        {selectedNode && activeScenario ? (
+          <>
+            <NodeKpiPanel
+              node={selectedNode}
+              scenarioKey={activeScenario}
+              onClose={() => onSelectNode(null)}
+            />
+            <DetailPanel
+              node={selectedNode}
+              actionResult={actionResult}
+              relatedDatasets={relatedDatasets}
+              relatedLoading={relatedLoading}
+              copiedId={copiedId}
+              graphNodes={graph?.nodes ?? []}
+              graphEdges={graph?.edges ?? []}
+              onClose={() => onSelectNode(null)}
+              onCopyId={onCopyId}
+              onAiQuery={onAiQuery}
+              onExploreNode={onExploreNode}
+              onDatasetClick={onDatasetClick}
+            />
+          </>
+        ) : selectedNode ? (
           <DetailPanel
             node={selectedNode}
             actionResult={actionResult}

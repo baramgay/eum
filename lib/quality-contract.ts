@@ -3,6 +3,7 @@
  * catalog.quality_contract JSONB 를 읽어 runQuality 에서 사용할 규칙 함수를 생성한다.
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { NIACharacteristic } from './quality-nia'
 
 export type ContractCheck =
   | { type: 'not_null'; column: string }
@@ -15,7 +16,17 @@ export type ContractCheck =
 export interface ContractRule {
   name: string
   area?: string
+  niaTrait?: NIACharacteristic   // NIA 9대 품질 특성 (명시 or 체크 타입별 기본값)
   check: ContractCheck
+}
+
+// 체크 타입별 기본 NIA 특성 (사용자가 명시하지 않을 때)
+const CHECK_TYPE_DEFAULT_NIA: Partial<Record<ContractCheck['type'], NIACharacteristic>> = {
+  not_null:   'completeness',
+  range:      'syntacticAccuracy',
+  in:         'standardConformance',
+  year_range: 'validity',
+  or_null:    'completeness',
 }
 
 export interface QualityContract {
@@ -63,20 +74,23 @@ async function countOrNull(sb: SupabaseClient, table: string, columns: string[])
 /**
  * 품질 계약 객체를 유효성 검사 없이 받아들인다.
  * 실패하는 규칙은 0 위반을 반환하는 안전한 함수로 대첾한다.
+ * 반환 타입은 quality.ts RuleEntry와 동일 — 3번째 요소로 NIA 특성 포함.
  */
 export function contractToRuleFns(
   tableName: string,
   contract: QualityContract,
-): Array<[string, (sb: SupabaseClient) => Promise<number>]> {
+): Array<[string, (sb: SupabaseClient) => Promise<number>, NIACharacteristic?]> {
   if (!contract?.rules || !Array.isArray(contract.rules)) return []
 
   return contract.rules.map((rule, index) => {
     const name = rule.name || `계약 규칙 ${index + 1}`
     const check = rule.check
+    const niaTrait: NIACharacteristic | undefined =
+      rule.niaTrait ?? CHECK_TYPE_DEFAULT_NIA[check.type]
 
     switch (check.type) {
       case 'not_null':
-        return [name, sb => countNull(sb, tableName, check.column)]
+        return [name, sb => countNull(sb, tableName, check.column), niaTrait]
       case 'range': {
         return [name, async sb => {
           let total = 0
@@ -89,14 +103,14 @@ export function contractToRuleFns(
             total += await countWhere(sb, tableName, check.column, includeMax ? 'gt' : 'gte', check.max)
           }
           return total
-        }]
+        }, niaTrait]
       }
       case 'in':
-        return [name, sb => countNotIn(sb, tableName, check.column, check.values)]
+        return [name, sb => countNotIn(sb, tableName, check.column, check.values), niaTrait]
       case 'year_range':
-        return [name, sb => countYearOutOfRange(sb, tableName, check.column, check.min, check.max)]
+        return [name, sb => countYearOutOfRange(sb, tableName, check.column, check.min, check.max), niaTrait]
       case 'or_null':
-        return [name, sb => countOrNull(sb, tableName, check.columns)]
+        return [name, sb => countOrNull(sb, tableName, check.columns), niaTrait]
       case 'rpc':
         return [name, async sb => {
           const { data, error } = await sb.rpc(check.name)
@@ -106,9 +120,9 @@ export function contractToRuleFns(
             return 0
           }
           return Number(data ?? 0)
-        }]
+        }, niaTrait]
       default:
-        return [name, async () => 0]
+        return [name, async () => 0, niaTrait]
     }
   })
 }

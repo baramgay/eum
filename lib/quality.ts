@@ -2,9 +2,11 @@
  * 규칙기반 품질진단 엔진 (app/quality.py → TypeScript)
  * gold 테이블: Supabase 쿼리 빌더로 위반 집계
  * 업로드 데이터: 인메모리 JSON 배열 대상 제네릭 검사
+ * NIA AI 데이터 품질관리 가이드라인 v4.0 9대 특성 태깅 지원
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { contractToRuleFns, isQualityContract } from './quality-contract'
+import type { NIACharacteristic } from './quality-nia'
 
 export const ERROR_RATE_THRESHOLD = 0.001
 export const GENERIC_THRESHOLD    = 5.0
@@ -15,6 +17,7 @@ export interface RuleDetail {
   rule: string
   violations: number
   area?: QualityArea
+  niaTrait?: NIACharacteristic   // NIA 9대 특성 태깅 (선택)
 }
 
 export interface QualityResult {
@@ -86,9 +89,9 @@ export function inferArea(ruleName: string): QualityArea {
   return 'accuracy'
 }
 
-// 각 규칙: [규칙명, 위반 집계 함수]
+// 각 규칙: [규칙명, 위반 집계 함수, NIA 특성(선택)]
 type RuleFn = (sb: SupabaseClient) => Promise<number>
-type RuleEntry = [string, RuleFn]
+type RuleEntry = [string, RuleFn, NIACharacteristic?]
 
 // 허용된 gold 테이블 목록 — SQL injection 방어용 화이트리스트
 const ALLOWED_GOLD_TABLES = new Set([
@@ -106,25 +109,28 @@ export function assertAllowedTable(tableName: string | null | undefined): string
 
 export const RULES: Record<string, RuleEntry[]> = {
   gold_youth_population: [
-    ['population 음수 금지',    sb => countWhere(sb, 'gold_youth_population', 'population', 'lt', 0)],
-    ['population NULL 금지',    sb => countNull(sb,  'gold_youth_population', 'population')],
-    ['연령대 코드 유효성',       sb => countNotIn(sb, 'gold_youth_population', 'age_band', ['20-24','25-29','30-34','35-39','20-39'])],
-    ['성별 코드 유효성',         sb => countNotIn(sb, 'gold_youth_population', 'sex', ['M','F','total'])],
-    ['연도 범위(2018-2025)',     sb => countYearOutOfRange(sb, 'gold_youth_population', 2018, 2025)],
-    ['유입/유출 음수 금지',      sb => countTwoLt(sb, 'gold_youth_population', 'inflow', 'outflow')],
+    ['population 음수 금지',       sb => countWhere(sb, 'gold_youth_population', 'population', 'lt', 0), 'syntacticAccuracy'],
+    ['population NULL 금지',       sb => countNull(sb,  'gold_youth_population', 'population'),          'completeness'],
+    ['연령대 코드 유효성',          sb => countNotIn(sb, 'gold_youth_population', 'age_band', ['20-24','25-29','30-34','35-39','20-39']), 'standardConformance'],
+    ['성별 코드 유효성',            sb => countNotIn(sb, 'gold_youth_population', 'sex', ['M','F','total']), 'standardConformance'],
+    ['연도 범위(2018-2025)',        sb => countYearOutOfRange(sb, 'gold_youth_population', 2018, 2025),   'validity'],
+    ['유입/유출 음수 금지',         sb => countTwoLt(sb, 'gold_youth_population', 'inflow', 'outflow'),   'syntacticAccuracy'],
+    ['성별 다양성(편중 감지)',       sb => countDiversityImbalance(sb, 'gold_youth_population', 'sex', ['M','F'], 3.0), 'diversity'],
   ],
   gold_business: [
-    ['사업체수 양수',           sb => countWhere(sb, 'gold_business', 'biz_count', 'lte', 0)],
-    ['종사자수 음수 금지',       sb => countWhere(sb, 'gold_business', 'employees', 'lt', 0)],
-    ['산업분류 결측 금지',       sb => countNull(sb,  'gold_business', 'industry')],
-    ['종사자>=사업체 정합성',    sb => countEmpLtBiz(sb)],
+    ['사업체수 양수',              sb => countWhere(sb, 'gold_business', 'biz_count', 'lte', 0),         'syntacticAccuracy'],
+    ['종사자수 음수 금지',          sb => countWhere(sb, 'gold_business', 'employees', 'lt', 0),          'syntacticAccuracy'],
+    ['산업분류 결측 금지',          sb => countNull(sb,  'gold_business', 'industry'),                   'completeness'],
+    ['종사자>=사업체 정합성',       sb => countEmpLtBiz(sb),                                             'validity'],
+    ['사업체 중복 레코드',          sb => countDuplicateRows(sb, 'gold_business'),                        'usefulness'],
   ],
   gold_public_facility: [
-    ['좌표 결측 금지',          sb => countNullLon(sb)],
-    ['경도 범위(경남)',          sb => countLonOutOfRange(sb)],
-    ['위도 범위(경남)',          sb => countLatOutOfRange(sb)],
-    ['정원 양수',               sb => countWhere(sb, 'gold_public_facility', 'capacity', 'lte', 0)],
-    ['시설명 결측 금지',         sb => countNull(sb,  'gold_public_facility', 'name')],
+    ['좌표 결측 금지',             sb => countNullLon(sb),                                               'completeness'],
+    ['경도 범위(경남)',             sb => countLonOutOfRange(sb),                                         'semanticAccuracy'],
+    ['위도 범위(경남)',             sb => countLatOutOfRange(sb),                                         'semanticAccuracy'],
+    ['정원 양수',                  sb => countWhere(sb, 'gold_public_facility', 'capacity', 'lte', 0),   'syntacticAccuracy'],
+    ['시설명 결측 금지',            sb => countNull(sb,  'gold_public_facility', 'name'),                 'completeness'],
+    ['시설 중복 레코드',            sb => countDuplicateRows(sb, 'gold_public_facility'),                 'usefulness'],
   ],
 }
 
@@ -180,6 +186,34 @@ async function countLatOutOfRange(sb: SupabaseClient) {
   return Number(data ?? 0)
 }
 
+// 다양성(diversity): 특정 컬럼의 클래스 분포 편중 감지
+// maxRatio 초과 시 소수 클래스 전체 레코드 수를 위반으로 반환
+async function countDiversityImbalance(
+  sb: SupabaseClient,
+  table: string,
+  col: string,
+  allowedValues: string[],
+  maxRatio: number,
+): Promise<number> {
+  const counts = await Promise.all(
+    allowedValues.map(async v => {
+      const { count } = await sb.from(table).select('*', { count: 'exact', head: true }).eq(col, v)
+      return { v, count: count ?? 0 }
+    })
+  )
+  const nonZero = counts.filter(c => c.count > 0)
+  if (nonZero.length < 2) return 0
+  const max = Math.max(...nonZero.map(c => c.count))
+  const min = Math.min(...nonZero.map(c => c.count))
+  return max / Math.max(1, min) > maxRatio ? min : 0
+}
+
+// 유용성(usefulness): 주요 컬럼 기준 중복 레코드 감지
+async function countDuplicateRows(sb: SupabaseClient, table: string): Promise<number> {
+  const { data } = await sb.rpc('count_duplicate_rows', { p_table: table }).maybeSingle()
+  return Number(data ?? 0)
+}
+
 // ─── 메인 품질 함수 ──────────────────────────────────────────────────────────
 export async function runQuality(supabase: SupabaseClient, datasetId: string): Promise<QualityResult | null> {
   const { data: cat } = await supabase
@@ -198,10 +232,11 @@ export async function runQuality(supabase: SupabaseClient, datasetId: string): P
   const total = totalRows ?? 0
 
   const detail = await Promise.all(
-    rules.map(async ([rname, fn]) => ({
+    rules.map(async ([rname, fn, niaTrait]) => ({
       rule: rname,
       violations: await fn(supabase),
       area: inferArea(rname),
+      ...(niaTrait ? { niaTrait } : {}),
     }))
   )
   const errors = detail.reduce((s, r) => s + r.violations, 0)
@@ -253,11 +288,15 @@ export async function getLatestResults(supabase: SupabaseClient): Promise<Qualit
     error_rate: r.error_rate ?? 0,
     threshold: ERROR_RATE_THRESHOLD,
     passed: r.passed ?? false,
-    detail: Array.isArray(r.detail) ? r.detail.map((d: unknown) => ({
-      rule: (d as RuleDetail).rule ?? '',
-      violations: (d as RuleDetail).violations ?? 0,
-      area: ((d as RuleDetail).area ?? inferArea((d as RuleDetail).rule ?? '')) as QualityArea,
-    })) : [],
+    detail: Array.isArray(r.detail) ? r.detail.map((d: unknown) => {
+      const rd = d as RuleDetail
+      return {
+        rule: rd.rule ?? '',
+        violations: rd.violations ?? 0,
+        area: (rd.area ?? inferArea(rd.rule ?? '')) as QualityArea,
+        ...(rd.niaTrait ? { niaTrait: rd.niaTrait } : {}),
+      }
+    }) : [],
     ran_at: r.ran_at ?? new Date().toISOString(),
   }))
 }
@@ -283,11 +322,15 @@ export async function getQualityHistory(
     errors: h.errors ?? 0,
     error_rate: h.error_rate ?? 0,
     passed: h.passed ?? false,
-    detail: Array.isArray(h.detail) ? h.detail.map((d: unknown) => ({
-      rule: (d as RuleDetail).rule ?? '',
-      violations: (d as RuleDetail).violations ?? 0,
-      area: ((d as RuleDetail).area ?? inferArea((d as RuleDetail).rule ?? '')) as QualityArea,
-    })) : [],
+    detail: Array.isArray(h.detail) ? h.detail.map((d: unknown) => {
+      const rd = d as RuleDetail
+      return {
+        rule: rd.rule ?? '',
+        violations: rd.violations ?? 0,
+        area: (rd.area ?? inferArea(rd.rule ?? '')) as QualityArea,
+        ...(rd.niaTrait ? { niaTrait: rd.niaTrait } : {}),
+      }
+    }) : [],
     ran_at: h.ran_at ?? new Date().toISOString(),
   }))
 }
@@ -353,6 +396,37 @@ function makeRecommendation(area: QualityArea, rule: string, violations: number,
     case 'metadata':
       return `[${rule}] ${violations.toLocaleString()}건 메타데이터 위반(${pct}%) — 코드값·표준 용어를 확인하여 메타데이터를 정비하세요.`
   }
+}
+
+export function buildNIASignals(results: QualityResult[]): Array<{
+  characteristic: NIACharacteristic
+  score: number
+  violations: number
+  checked: number
+}> {
+  const agg: Partial<Record<NIACharacteristic, { violations: number; checked: number }>> = {}
+
+  for (const r of results) {
+    const checkedPerRule = r.rule_count > 0 ? r.checked / r.rule_count : 0
+    for (const d of r.detail) {
+      if (!d.niaTrait) continue
+      if (!agg[d.niaTrait]) agg[d.niaTrait] = { violations: 0, checked: 0 }
+      agg[d.niaTrait]!.violations += d.violations
+      agg[d.niaTrait]!.checked += Math.max(1, Math.round(checkedPerRule))
+    }
+  }
+
+  const ALL_TRAITS: NIACharacteristic[] = [
+    'readiness', 'completeness', 'usefulness', 'standardConformance',
+    'diversity', 'semanticAccuracy', 'syntacticAccuracy', 'algorithmicAdequacy', 'validity',
+  ]
+
+  return ALL_TRAITS.map(c => {
+    const v = agg[c]
+    if (!v) return { characteristic: c, score: -1, violations: 0, checked: 0 }
+    const score = v.checked > 0 ? Math.max(0, (1 - v.violations / v.checked) * 100) : 100
+    return { characteristic: c, score: Number(score.toFixed(2)), violations: v.violations, checked: v.checked }
+  })
 }
 
 export function buildAreaSignals(results: QualityResult[]) {

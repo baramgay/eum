@@ -31,3 +31,5 @@ test_accounts.txt
 supabase/.temp/
 *.log
 eum_dev.log
+
+.vercel

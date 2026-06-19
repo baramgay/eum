@@ -1,0 +1,59 @@
+<h2>온톨로지 고도화 — 방향 선택</h2>
+<p class="subtitle">현재 시스템: D3 그래프 + 8종 레이아웃 + 5종 분석 + 17개 샘플 데이터(경남). 어떤 방향으로 고도화할까요?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>데모 시나리오 + 즉시 시각 임팩트</h3>
+      <p>페이지 진입 시 "청년 유출 분석", "공공시설 격차", "사업체 밀도 클러스터" 같은 미리 구성된 시나리오를 선택하면 해당 그래프가 즉시 펼쳐지는 방식. 샘플 데이터로 그래프가 자동 레이아웃되고 분석 결과까지 한 화면에 표시됨.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>강점</h4><ul><li>처음 보는 사람도 3초 안에 인상적인 결과</li><li>발표·시연 환경에 최적</li><li>샘플 데이터 활용도 극대화</li></ul></div>
+        <div class="cons"><h4>약점</h4><ul><li>시나리오 기획 시간 필요</li><li>고정 시나리오 외 탐색은 여전히 직접 해야 함</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>인터랙티브 대시보드 통합</h3>
+      <p>그래프 왼쪽에 시군 KPI 패널을 붙이고, 노드 클릭 시 해당 시군의 도메인별 지표가 카드로 펼쳐지는 구조. 시계열 슬라이더로 연도별 변화를 애니메이션으로 보여주고 순위 변화까지 연동.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>강점</h4><ul><li>탐색성·인터랙션 모두 높음</li><li>실제 분석 워크플로우에 가장 가까움</li><li>현재 코드베이스 확장으로 가능</li></ul></div>
+        <div class="cons"><h4>약점</h4><ul><li>레이아웃 복잡도 증가</li><li>시계열 데이터 정비 필요</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>A + B 혼합: 시나리오 진입 → 자유 탐색</h3>
+      <p>처음엔 큐레이션된 시나리오 카드(A 방식)로 빠른 인상을 주고, 시나리오 진입 후엔 인터랙티브 대시보드(B 방식)로 자유 탐색 가능하게 전환. "발표용 임팩트 + 실제 사용성" 모두 확보.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>강점</h4><ul><li>첫인상(시연) + 지속 사용성 모두 충족</li><li>온보딩 경험 자연스러움</li></ul></div>
+        <div class="cons"><h4>약점</h4><ul><li>A, B보다 구현 범위 넓음</li><li>단계별로 나눠서 진행 권장</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:2rem;padding:1rem;background:#f8f9fa;border-radius:8px;border-left:3px solid #6c757d;">
+  <p class="label">현재 온톨로지 샘플 데이터 보유 현황</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.5rem;margin-top:0.5rem;">
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">👥 청년인구 (이동/유출)</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🏭 사업체 (업종별)</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🏫 학교 인구</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🚌 대중교통</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🏥 공공병원</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🌿 대기질·수질</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🚗 교통사고</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🏠 주택재고</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🛍️ 상권</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🎭 문화시설</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">⚽ 체육시설</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🧡 복지시설</span>
+    <span style="font-size:0.8rem;padding:4px 8px;background:#e9ecef;border-radius:4px;">🌄 관광</span>
+  </div>
+</div>

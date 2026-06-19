@@ -51,6 +51,35 @@ const DEFAULT_NODE_COLOR = '#94A3B8'
 const DEFAULT_EDGE_COLOR = '#CBD5E1'
 const WORKER_THRESHOLD = 800
 
+const NODE_TYPE_ICON: Record<string, string> = {
+  '시군': '🗺',
+  '청년': '👤',
+  '정책': '📋',
+  '시설': '🏢',
+  '교통': '🚌',
+  '복지': '❤',
+  '의료': '🏥',
+  '문화': '🎭',
+  '체육': '⚽',
+  '환경': '🌿',
+  '산업': '🏭',
+  '주거': '🏠',
+  '교육': '📚',
+  '취업': '💼',
+  '관광': '✈',
+  '농업': '🌾',
+  '어업': '🐟',
+}
+
+const COMMUNITY_PALETTE = [
+  'rgba(99,102,241,0.08)',
+  'rgba(16,185,129,0.08)',
+  'rgba(245,158,11,0.08)',
+  'rgba(239,68,68,0.08)',
+  'rgba(139,92,246,0.08)',
+  'rgba(20,184,166,0.08)',
+]
+
 interface Props {
   nodes: OntologyNode[]
   edges: OntologyEdge[]
@@ -287,6 +316,33 @@ export default function OntologyGraph({
           .text(d => d.text)
       }
 
+      // CSS animations for anomaly pulse
+      svg.append('defs').append('style').text(`
+        @keyframes eum-pulse {
+          0% { opacity: 0.9; r: attr(r px); }
+          70% { opacity: 0; r: calc(attr(r px) + 12px); }
+          100% { opacity: 0; }
+        }
+        .anomaly-ring {
+          animation: eum-pulse 1.8s ease-out infinite;
+          pointer-events: none;
+        }
+      `)
+
+      // anomaly 노드 집합 (analysisResult에서 추출)
+      const anomalySet = new Set<string>(
+        analysisResult?.type === 'anomaly'
+          ? analysisResult.results.map(r => r.obj_id)
+          : []
+      )
+
+      // community 노드 → communityId 맵
+      const communityMap = new Map<string, number>(
+        analysisResult?.type === 'community'
+          ? analysisResult.communities.flatMap(c => c.nodes.map(n => [n.obj_id, c.communityId] as [string, number]))
+          : []
+      )
+
       // arrowhead marker
       svg
         .append('defs')
@@ -373,12 +429,34 @@ export default function OntologyGraph({
           onDoubleClick?.({ ...d })
         })
 
+      // 이상탐지 펄스 링 (circle 앞에 삽입)
+      node
+        .filter(d => anomalySet.has(d.obj_id))
+        .append('circle')
+        .attr('class', 'anomaly-ring')
+        .attr('r', d => (encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d)) + 4)
+        .attr('fill', 'none')
+        .attr('stroke', '#EF4444')
+        .attr('stroke-width', 2.5)
+
       node
         .append('circle')
         .attr('r', d => encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d))
         .attr('fill', d => encoding?.nodeColors.get(d.obj_id) ?? NODE_COLORS[d.obj_type] ?? DEFAULT_NODE_COLOR)
-        .attr('stroke', d => encoding?.nodeStrokes.get(d.obj_id) ?? '#fff')
-        .attr('stroke-width', lodStrokeWidth(zoomScale, false))
+        .attr('stroke', d => anomalySet.has(d.obj_id) ? '#EF4444' : (encoding?.nodeStrokes.get(d.obj_id) ?? '#fff'))
+        .attr('stroke-width', d => anomalySet.has(d.obj_id) ? 2 : lodStrokeWidth(zoomScale, false))
+
+      // 노드 타입 이모지 아이콘
+      node
+        .filter(d => !!NODE_TYPE_ICON[d.obj_type])
+        .append('text')
+        .attr('class', 'node-icon')
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'central')
+        .attr('font-size', d => Math.round((encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d)) * 0.85))
+        .style('pointer-events', 'none')
+        .style('user-select', 'none')
+        .text(d => NODE_TYPE_ICON[d.obj_type] ?? '')
 
       const labelGroup = node
         .append('g')

@@ -354,11 +354,10 @@ export function detectCommunities(nodes: OntologyNode[], edges: OntologyEdge[]):
     .sort(([a], [b]) => a - b)
     .map(([communityId, members]) => {
       const memberIds = new Set(members.map(n => n.obj_id))
-      const internalWeight = edges
-        .filter(e => memberIds.has(e.src) && memberIds.has(e.dst))
-        .reduce((sum, e) => sum + e.weight, 0)
+      const internalEdgeCount = edges
+        .filter(e => memberIds.has(e.src) && memberIds.has(e.dst)).length
       const possible = members.length * (members.length - 1) / 2
-      const density = possible > 0 ? internalWeight / possible : 0
+      const density = possible > 0 ? internalEdgeCount / possible : 0
       return {
         communityId,
         nodes: members.map(n => ({

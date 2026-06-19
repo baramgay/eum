@@ -1,0 +1,46 @@
+<h2>시나리오 구성 선택</h2>
+<p class="subtitle">온톨로지 진입 화면에 어떤 시나리오 카드를 배치할까요? (복수 선택 가능)</p>
+
+<div class="options" data-multiselect>
+
+  <div class="option" data-choice="youth" onclick="toggleSelect(this)">
+    <div class="letter">①</div>
+    <div class="content">
+      <h3>청년 유출 핫스팟</h3>
+      <p>경남 18개 시군에서 청년(20-34세) 순유출이 가장 심한 지역을 중심성 분석으로 찾고, 어느 시군으로 빠져나가는지 흐름을 엣지로 시각화. <strong>청년인구 샘플 데이터 활용.</strong></p>
+      <div style="margin-top:8px;font-size:0.78rem;color:#6c757d;">분석: Centrality + Community 탐지 / 레이아웃: Cluster</div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="service_gap" onclick="toggleSelect(this)">
+    <div class="letter">②</div>
+    <div class="content">
+      <h3>공공서비스 격차 지도</h3>
+      <p>복지·의료·문화·체육 시설 보유 현황을 노드 크기로 인코딩해 시군 간 격차를 한눈에 표시. 시설이 부족한 시군은 빨간 이상탐지 마커로 강조. <strong>4개 시설 샘플 데이터 활용.</strong></p>
+      <div style="margin-top:8px;font-size:0.78rem;color:#6c757d;">분석: Anomaly Detection / 레이아웃: Geo Grid</div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="industry" onclick="toggleSelect(this)">
+    <div class="letter">③</div>
+    <div class="content">
+      <h3>산업 클러스터 분포</h3>
+      <p>업종별 사업체 집중도 + 교통 접근성을 결합해 자연 발생한 산업 클러스터를 커뮤니티 탐지로 발견. 클러스터마다 색상 구분, 대중교통 연결이 약한 클러스터 식별. <strong>사업체 + 교통 샘플 활용.</strong></p>
+      <div style="margin-top:8px;font-size:0.78rem;color:#6c757d;">분석: Community Detection / 레이아웃: Force Cluster</div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="env" onclick="toggleSelect(this)">
+    <div class="letter">④</div>
+    <div class="content">
+      <h3>환경·안전 취약지역</h3>
+      <p>대기질 + 수질 + 교통사고 + 화재안전 4개 지표를 복합 스코어로 합산해 취약 시군을 이상탐지. 인접 시군과의 최단경로로 지원 가능 거리 계산. <strong>4개 환경·안전 샘플 활용.</strong></p>
+      <div style="margin-top:8px;font-size:0.78rem;color:#6c757d;">분석: Anomaly + Shortest Path / 레이아웃: Radial</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top:1.5rem;padding:0.8rem 1rem;background:#f0f4ff;border-radius:8px;border-left:3px solid #4a6fa5;">
+  <p style="margin:0;font-size:0.85rem;color:#4a6fa5;"><strong>구현 방식:</strong> 각 시나리오 카드 클릭 → 그래프 탭으로 전환 + 해당 데이터 자동 로딩 + 분석 자동 실행 + 결과 패널 펼침. 이후 사용자가 자유롭게 다른 레이아웃·필터 조작 가능.</p>
+</div>
