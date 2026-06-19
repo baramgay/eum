@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import {
   Upload, Database, ChevronDown, ChevronRight, PlayCircle,
   X, AlertCircle, Loader2, BarChart2, Info, Download, Search,
   RotateCcw, CheckSquare, Square, Copy, Image as ImageIcon,
-  Check, Filter, Layers, SortAsc, SortDesc, Clock,
+  Check, Filter, Layers, SortAsc, SortDesc, Clock, History,
+  FileText,
 } from 'lucide-react'
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, ScatterChart, Scatter,
@@ -65,6 +66,55 @@ interface ChartSpec {
   valueKey?: string
   stackKeys?: string[]
   groupKey?: string
+}
+
+// ────────────────────────────────────────────
+// localStorage 히스토리
+// ────────────────────────────────────────────
+
+interface LocalHistoryEntry {
+  id: string
+  dataset_id: string
+  dataset_label: string
+  analysis_type: string
+  params: {
+    assigned: Record<string, string[]>
+    optValues: Record<string, string>
+    groupValues: string[]
+    levelValues: Record<string, string[]>
+  }
+  timestamp: number
+}
+
+const LOCAL_HISTORY_KEY = 'eum_analysis_history'
+const LOCAL_HISTORY_MAX = 10
+
+function loadLocalHistory(): LocalHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_HISTORY_KEY)
+    if (!raw) return []
+    return JSON.parse(raw) as LocalHistoryEntry[]
+  } catch {
+    return []
+  }
+}
+
+function saveLocalHistory(entries: LocalHistoryEntry[]): void {
+  try {
+    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(entries.slice(0, LOCAL_HISTORY_MAX)))
+  } catch { /* ignore */ }
+}
+
+function pushLocalHistory(entry: Omit<LocalHistoryEntry, 'id' | 'timestamp'>): LocalHistoryEntry[] {
+  const prev = loadLocalHistory()
+  const next: LocalHistoryEntry = {
+    ...entry,
+    id: crypto.randomUUID(),
+    timestamp: Date.now(),
+  }
+  const updated = [next, ...prev].slice(0, LOCAL_HISTORY_MAX)
+  saveLocalHistory(updated)
+  return updated
 }
 
 // ────────────────────────────────────────────
@@ -779,6 +829,7 @@ interface Props { role: string; tenantId: string }
 
 export default function AnalyticsClient({ role, tenantId }: Props) {
   const searchParams = useSearchParams()
+  const router = useRouter()
 
   const [session, setSession]   = useState<SessionState | null>(null)
   const [loading, setLoading]   = useState(false)
@@ -812,6 +863,9 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
   const [varSearch, setVarSearch] = useState('')
   const [varTypeFilter, setVarTypeFilter] = useState<Record<ColType, boolean>>({ scale: true, nominal: true, ordinal: true })
   const [varSortAsc, setVarSortAsc] = useState(true)
+
+  const [localHistory, setLocalHistory] = useState<LocalHistoryEntry[]>([])
+  const [showHistory, setShowHistory] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -949,6 +1003,11 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
       setRunsLoading(false)
     }
   }
+
+  // localStorage 히스토리 초기 로드
+  useEffect(() => {
+    setLocalHistory(loadLocalHistory())
+  }, [])
 
   // dataset_id URL 파라미터 자동 로드 (ProcessClient "분석으로" 버튼 연동)
   useEffect(() => {
@@ -1103,6 +1162,13 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
       const json = await res.json()
       setResult(json)
       if (json.ok) {
+        const updated = pushLocalHistory({
+          dataset_id: session.session_id,
+          dataset_label: session.source_label,
+          analysis_type: selectedAnalysis.id,
+          params: { assigned, optValues, groupValues, levelValues },
+        })
+        setLocalHistory(updated)
         fetch('/api/analytics/runs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1119,6 +1185,20 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
     } finally {
       setRunning(false)
     }
+  }
+
+  // ── 히스토리 항목 재실행 ──────────────────────
+
+  function replayHistory(entry: LocalHistoryEntry) {
+    const item = ANALYSIS_MENU.flatMap(g => g.items).find(i => i.id === entry.analysis_type)
+    if (!item || !session) return
+    setSelectedAnalysis(item)
+    setAssigned(entry.params.assigned)
+    setOptValues(entry.params.optValues)
+    setGroupValues(entry.params.groupValues)
+    setLevelValues(entry.params.levelValues)
+    setResult(null)
+    setShowHistory(false)
   }
 
   // ── CSV 난볶내기 ─────────────────────────────
@@ -1515,6 +1595,61 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               </div>
             </Card>
 
+            {/* 로컬 히스토리 */}
+            <Card padding="md">
+              <div className="flex items-center justify-between mb-3">
+                <button
+                  onClick={() => setShowHistory(v => !v)}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hover:text-gray-700 dark:hover:text-gray-200"
+                >
+                  <History className="w-3.5 h-3.5" />
+                  히스토리
+                  {localHistory.length > 0 && (
+                    <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-blue-100 text-blue-700 rounded-full">{localHistory.length}</span>
+                  )}
+                  {showHistory ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                </button>
+                {localHistory.length > 0 && (
+                  <button
+                    onClick={() => {
+                      saveLocalHistory([])
+                      setLocalHistory([])
+                    }}
+                    className="text-[10px] text-gray-400 dark:text-gray-300 hover:text-red-500 transition-colors"
+                  >
+                    전체 삭제
+                  </button>
+                )}
+              </div>
+              {showHistory && (
+                localHistory.length === 0 ? (
+                  <p className="text-xs text-gray-400 dark:text-gray-300 py-2">저장된 히스토리가 없습니다.</p>
+                ) : (
+                  <div className="space-y-1 max-h-[240px] overflow-y-auto pr-1">
+                    {localHistory.map(entry => (
+                      <button
+                        key={entry.id}
+                        onClick={() => replayHistory(entry)}
+                        disabled={!session}
+                        className="w-full text-left p-2 rounded-lg border border-transparent hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        title={session ? '클릭하여 재실행' : '데이터를 먼저 로드하세요'}
+                      >
+                        <div className="flex items-center justify-between gap-2 mb-0.5">
+                          <span className="text-xs font-medium text-blue-700 dark:text-blue-400 truncate">
+                            {getAnalysisLabel(entry.analysis_type)}
+                          </span>
+                          <span className="text-[10px] text-gray-300 dark:text-gray-200 flex-shrink-0">
+                            {new Date(entry.timestamp).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-400 dark:text-gray-300 truncate">{entry.dataset_label}</p>
+                      </button>
+                    ))}
+                  </div>
+                )
+              )}
+            </Card>
+
             {/* 최근 분석 이력 */}
             <Card padding="md">
               <div className="flex items-center justify-between mb-3">
@@ -1786,6 +1921,18 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                             description="분석은 성공했으나 출력할 테이블이나 차트가 없습니다."
                           />
                         )}
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                          <Btn
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => {
+                              const analysisId = localHistory[0]?.id ?? 'latest'
+                              router.push(`/report?insert=analytics&id=${analysisId}`)
+                            }}
+                          >
+                            <FileText className="w-3.5 h-3.5" /> 보고서에 삽입
+                          </Btn>
+                        </div>
                       </>
                     ) : (
                       <div className="flex items-start gap-3 text-red-700 bg-red-50 rounded-lg p-4">

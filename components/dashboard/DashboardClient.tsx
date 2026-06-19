@@ -11,9 +11,12 @@ import Skeleton from '@/components/ui/Skeleton'
 import Btn from '@/components/ui/Btn'
 import ScoreGaugeWidget from './widgets/ScoreGaugeWidget'
 import PipelineStatusWidget from './widgets/PipelineStatusWidget'
+import PipelineDetailWidget from './widgets/PipelineDetailWidget'
 import CollectionTrendWidget from './widgets/CollectionTrendWidget'
 import RecentAnalysisWidget from './widgets/RecentAnalysisWidget'
 import QualityWidget from './widgets/QualityWidget'
+import QualitySignalWidget from './widgets/QualitySignalWidget'
+import AnalysisFavoritesWidget from './widgets/AnalysisFavoritesWidget'
 import SubmissionStatusWidget from './widgets/SubmissionStatusWidget'
 import MigrationChartWidget from './widgets/MigrationChartWidget'
 import PopulationTrendWidget from './widgets/PopulationTrendWidget'
@@ -308,6 +311,12 @@ export default function DashboardClient() {
         <PipelineStatusWidget pipeline={data.pipeline} />
         <CollectionTrendWidget trend={data.trend} />
         <RecentAnalysisWidget recentRuns={recentRuns} />
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-4">
+        <PipelineDetailWidget />
+        <QualitySignalWidget />
+        <AnalysisFavoritesWidget />
       </div>
 
       <QualityWidget qualityDims={qualityDims} qualityAvg={data.qualityAvg} />

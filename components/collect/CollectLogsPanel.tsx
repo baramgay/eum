@@ -1,10 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { RefreshCw, Filter, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react'
+import { RefreshCw, Filter, ChevronDown, ChevronUp, AlertCircle, Eye, ArrowRight } from 'lucide-react'
 import { Badge, EmptyState, Btn, Skeleton } from '@/components/ui'
+import Modal from '@/components/ui/Modal'
 import SortableTable from '@/components/common/SortableTable'
 import type { CollectLog, SourceWithJob } from './types'
+
+interface PreviewResponse {
+  preview: Record<string, unknown>[]
+  message?: string
+}
 
 interface Props {
   logs: CollectLog[]
@@ -19,6 +25,7 @@ interface Props {
   onRetry?: () => void
   onLoadMore: () => void
   onRefresh: () => void
+  onSendToProcess?: (sourceId: string) => void
 }
 
 const LOG_STATUS_VARIANT: Record<string, 'blue' | 'green' | 'red' | 'gray'> = {
@@ -40,9 +47,33 @@ export default function CollectLogsPanel({
   onRetry,
   onLoadMore,
   onRefresh,
+  onSendToProcess,
 }: Props) {
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null)
+  const [previewLogId, setPreviewLogId] = useState<string | null>(null)
+  const [previewData, setPreviewData] = useState<PreviewResponse | null>(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
   const sourceMap = new Map(sources.map(s => [s.source_id, s]))
+
+  async function openPreview(logId: string) {
+    setPreviewLogId(logId)
+    setPreviewData(null)
+    setPreviewLoading(true)
+    try {
+      const res = await fetch(`/api/collect/preview?log_id=${encodeURIComponent(logId)}`)
+      const data: PreviewResponse = await res.json()
+      setPreviewData(data)
+    } catch {
+      setPreviewData({ preview: [], message: '미리보기를 불러오지 못했습니다.' })
+    } finally {
+      setPreviewLoading(false)
+    }
+  }
+
+  function closePreview() {
+    setPreviewLogId(null)
+    setPreviewData(null)
+  }
 
   const logColumns: import('@/components/common/SortableTable').TableColumn<CollectLog>[] = [
     {
@@ -116,6 +147,32 @@ export default function CollectLogsPanel({
         )
       ),
     },
+    {
+      key: 'preview',
+      label: '미리보기',
+      render: log => (
+        log.status === 'success' ? (
+          <Btn variant="ghost" size="sm" onClick={() => openPreview(log.log_id)}>
+            <Eye className="w-3 h-3" /> 미리보기
+          </Btn>
+        ) : (
+          <span className="text-gray-300 dark:text-gray-200 text-xs">—</span>
+        )
+      ),
+    },
+    ...(onSendToProcess ? [{
+      key: 'send_to_process' as const,
+      label: '가공',
+      render: (log: CollectLog) => (
+        log.status === 'success' ? (
+          <Btn variant="ghost" size="sm" onClick={() => onSendToProcess(log.source_id)}>
+            <ArrowRight className="w-3 h-3" /> 가공으로
+          </Btn>
+        ) : (
+          <span className="text-gray-300 dark:text-gray-200 text-xs">—</span>
+        )
+      ),
+    }] : []),
   ]
 
   const isFiltered = statusFilter !== 'all' || sourceFilter !== 'all'
@@ -211,6 +268,57 @@ export default function CollectLogsPanel({
           </Btn>
         </div>
       )}
+
+      <Modal
+        open={!!previewLogId}
+        onClose={closePreview}
+        title="수집 데이터 미리보기"
+        size="xl"
+      >
+        <div className="flex items-center justify-between px-5 py-3 border-b flex-shrink-0">
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200">수집 데이터 미리보기</h3>
+          <button onClick={closePreview} className="text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 text-lg">✕</button>
+        </div>
+        <div className="p-5 overflow-auto flex-1 max-h-[70vh]">
+          {previewLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-8" />
+              ))}
+            </div>
+          ) : !previewData || previewData.preview.length === 0 ? (
+            <p className="text-sm text-gray-500">{previewData?.message ?? '미리보기 데이터 없음'}</p>
+          ) : (
+            <>
+              <p className="text-xs text-gray-400 mb-3">최대 20행 표시</p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse min-w-[600px]">
+                  <thead>
+                    <tr className="bg-gray-50 dark:bg-gray-800">
+                      {Object.keys(previewData.preview[0]).map(col => (
+                        <th key={col} className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-300 text-left whitespace-nowrap">
+                          {col}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {previewData.preview.map((row, i) => (
+                      <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                        {Object.values(row).map((val, j) => (
+                          <td key={j} className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300 max-w-[200px] truncate" title={String(val ?? '')}>
+                            {val === null || val === undefined ? <span className="text-gray-300">null</span> : String(val)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
     </div>
   )
 }

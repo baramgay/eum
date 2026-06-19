@@ -794,14 +794,78 @@ def run_linear_regression(df, variables: dict, options: dict) -> dict:
         return {"error": "statsmodels 패키지가 필요합니다 (다중 회귀)."}
 
 
-def run_survival(df, variables: dict, options: dict) -> dict:
-    try:
-        from lifelines import KaplanMeierFitter
-    except ImportError:
-        return {"error": "lifelines 패키지가 필요합니다: pip install lifelines"}
-
-    import pandas as pd
+def _km_compute(durations, events):
+    """순수 Kaplan-Meier 계산. Greenwood 95% CI 포함."""
     import numpy as np
+    pairs = sorted(zip(durations, events), key=lambda x: x[0])
+    times = []
+    survival = []
+    ci_lo = []
+    ci_hi = []
+    n_at_risk = len(pairs)
+    s = 1.0
+    greenwood = 0.0
+    prev_t = None
+    for t, e in pairs:
+        if t != prev_t:
+            if prev_t is not None:
+                se = s * math.sqrt(greenwood)
+                z = 1.959964
+                times.append(prev_t)
+                survival.append(round(s, 6))
+                ci_lo.append(round(max(0.0, s - z * se), 6))
+                ci_hi.append(round(min(1.0, s + z * se), 6))
+            prev_t = t
+        d = int(e)
+        if d and n_at_risk > 0:
+            s = s * (1 - d / n_at_risk)
+            greenwood += d / (n_at_risk * (n_at_risk - d)) if n_at_risk > d else 0.0
+        n_at_risk -= 1
+    if prev_t is not None:
+        se = s * math.sqrt(greenwood)
+        z = 1.959964
+        times.append(prev_t)
+        survival.append(round(s, 6))
+        ci_lo.append(round(max(0.0, s - z * se), 6))
+        ci_hi.append(round(min(1.0, s + z * se), 6))
+    return times, survival, ci_lo, ci_hi
+
+
+def _logrank_test(t1, e1, t2, e2):
+    """Log-rank 검정 (순수 구현, scipy 없이)."""
+    import numpy as np
+    all_times = sorted(set(t1) | set(t2))
+    o1_total = e1_total = o2_total = e2_total = 0.0
+    var_sum = 0.0
+    n1 = len(t1)
+    n2 = len(t2)
+    for t in all_times:
+        d1 = sum(1 for tt, ee in zip(t1, e1) if tt == t and ee)
+        d2 = sum(1 for tt, ee in zip(t2, e2) if tt == t and ee)
+        n1_t = sum(1 for tt in t1 if tt >= t)
+        n2_t = sum(1 for tt in t2 if tt >= t)
+        n = n1_t + n2_t
+        d = d1 + d2
+        if n < 2 or d == 0:
+            continue
+        e1_t = n1_t * d / n
+        e2_t = n2_t * d / n
+        o1_total += d1
+        e1_total += e1_t
+        o2_total += d2
+        e2_total += e2_t
+        v = n1_t * n2_t * d * (n - d) / (n * n * (n - 1)) if n > 1 else 0.0
+        var_sum += v
+    if var_sum <= 0:
+        return None, None
+    chi2 = (o1_total - e1_total) ** 2 / var_sum
+    from scipy.stats import chi2 as chi2_dist
+    p = float(chi2_dist.sf(chi2, df=1))
+    return round(chi2, 4), round(p, 4)
+
+
+def run_survival(df, variables: dict, options: dict) -> dict:
+    import pandas as pd
 
     dur_var   = (variables.get("duration") or [None])[0]
     event_var = (variables.get("event")    or [None])[0]
@@ -822,22 +886,20 @@ def run_survival(df, variables: dict, options: dict) -> dict:
     tables = []
     groups_list = [None] if not group_var else sorted(df2[group_var].dropna().unique().tolist(), key=str)
 
-    # KM 생존 함수 주요 시점 테이블
     km_rows = []
+    chart_data: list[dict] = []
     for g in groups_list:
         subset = df2 if g is None else df2[df2[group_var] == g]
         label  = "전체" if g is None else str(g)
-        kmf = KaplanMeierFitter()
-        kmf.fit(subset[dur_var], event_observed=subset[event_var])
-        sf  = kmf.survival_function_
-        ci  = kmf.confidence_interval_
-        step = max(1, len(kmf.timeline) // 20)
-        for t in kmf.timeline[::step]:
-            if t in sf.index:
-                s   = float(sf.loc[t].iloc[0])
-                lo  = float(ci.loc[t].iloc[0])
-                hi  = float(ci.loc[t].iloc[1])
-                km_rows.append([label, round(float(t), 4), round(s, 4), round(lo, 4), round(hi, 4)])
+        durations_g = subset[dur_var].tolist()
+        events_g    = subset[event_var].tolist()
+        times, surv, lo, hi = _km_compute(durations_g, events_g)
+        step = max(1, len(times) // 20)
+        for i in range(0, len(times), step):
+            km_rows.append([label, round(float(times[i]), 4), round(surv[i], 4), round(lo[i], 4), round(hi[i], 4)])
+        for i, (t, s) in enumerate(zip(times, surv)):
+            chart_data.append({"시간": round(float(t), 4), label: round(s, 4)})
+
     tables.append({
         "title": "카플란-마이어 생존 함수 (주요 시점)",
         "headers": ["집단", "시간", "S(t)", "95% CI 하한", "95% CI 상한"],
@@ -845,46 +907,60 @@ def run_survival(df, variables: dict, options: dict) -> dict:
         "footnotes": ["S(t): 시간 t까지 생존 확률", "Greenwood 공식 95% 신뢰구간"],
     })
 
-    # 중앙 생존 시간
     med_rows = []
     for g in groups_list:
         subset = df2 if g is None else df2[df2[group_var] == g]
         label  = "전체" if g is None else str(g)
-        kmf = KaplanMeierFitter()
-        kmf.fit(subset[dur_var], event_observed=subset[event_var])
-        med = kmf.median_survival_time_
-        n_ev = int(subset[event_var].sum())
-        med_str = round(float(med), 4) if (med is not None and not np.isinf(float(med))) else "미도달"
-        med_rows.append([label, len(subset), n_ev, med_str])
+        durations_g = subset[dur_var].tolist()
+        events_g    = subset[event_var].tolist()
+        times, surv, _, _ = _km_compute(durations_g, events_g)
+        n_ev = int(sum(events_g))
+        median_t = "미도달"
+        for t, s in zip(times, surv):
+            if s <= 0.5:
+                median_t = round(float(t), 4)
+                break
+        med_rows.append([label, len(subset), n_ev, median_t])
     tables.append({
         "title": "중앙 생존 시간(Median Survival Time)",
         "headers": ["집단", "N", "이벤트 수", "중앙생존시간"],
         "rows": med_rows,
     })
 
-    # Log-rank 검정 (집단 2개일 때)
     if group_var and len(groups_list) == 2:
         try:
-            from lifelines.statistics import logrank_test
             g0 = df2[df2[group_var] == groups_list[0]]
             g1 = df2[df2[group_var] == groups_list[1]]
-            lr = logrank_test(g0[dur_var], g1[dur_var],
-                              event_observed_A=g0[event_var],
-                              event_observed_B=g1[event_var])
-            tables.append({
-                "title": "Log-rank 검정",
-                "headers": ["항목", "값"],
-                "rows": [
-                    ["검정통계량", round(float(lr.test_statistic), 4)],
-                    ["p값",       round(float(lr.p_value), 4)],
-                    ["판정(α=0.05)", "유의 (두 생존 함수 차이)" if lr.p_value < 0.05 else "n.s."],
-                ],
-                "footnotes": ["귀무가설: 두 집단의 생존 함수가 동일하다"],
-            })
+            chi2, p = _logrank_test(
+                g0[dur_var].tolist(), g0[event_var].tolist(),
+                g1[dur_var].tolist(), g1[event_var].tolist(),
+            )
+            if chi2 is not None and p is not None:
+                tables.append({
+                    "title": "Log-rank 검정",
+                    "headers": ["항목", "값"],
+                    "rows": [
+                        ["카이제곱 통계량", chi2],
+                        ["p값", p],
+                        ["판정(α=0.05)", "유의 (두 생존 함수 차이)" if p < 0.05 else "n.s."],
+                    ],
+                    "footnotes": ["귀무가설: 두 집단의 생존 함수가 동일하다"],
+                })
         except Exception:
             pass
 
-    return {"title": "생존 분석 (Kaplan-Meier)", "tables": tables}
+    return {
+        "title": "생존 분석 (Kaplan-Meier)",
+        "tables": tables,
+        "charts": [
+            {
+                "type": "line",
+                "title": "Kaplan-Meier 생존 곡선",
+                "data": chart_data,
+                "xKey": "시간",
+            }
+        ] if chart_data else [],
+    }
 
 
 def run_timeseries_decompose(df, variables: dict, options: dict) -> dict:

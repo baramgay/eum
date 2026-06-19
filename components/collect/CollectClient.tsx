@@ -455,6 +455,7 @@ export default function CollectClient({ role, tenantId }: Props) {
           onRetry={() => loadLogs(true)}
           onLoadMore={() => loadLogs(false)}
           onRefresh={() => loadLogs(true)}
+          onSendToProcess={sourceId => router.push(`/process?source_id=${encodeURIComponent(sourceId)}`)}
         />
       )}
 
