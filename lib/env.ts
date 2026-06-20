@@ -1,28 +1,34 @@
 import { z } from 'zod'
 
+// GitHub Actions: 미설정 Secret은 빈 문자열("")로 전달됨 → undefined로 정규화
+const str = (s: z.ZodString) => z.preprocess(v => (v === '' ? undefined : v), s.optional())
+const optStr = z.preprocess(v => (v === '' ? undefined : v), z.string().optional())
+const optUrl = z.preprocess(v => (v === '' ? undefined : v), z.string().url().optional())
+const optEmail = z.preprocess(v => (v === '' ? undefined : v), z.string().email().optional())
+
 const sharedSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3001'),
-  NEXT_PUBLIC_KAKAO_MAP_KEY: z.string().optional(),
+  NEXT_PUBLIC_KAKAO_MAP_KEY: optStr,
 })
 
 const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  CRON_SECRET: z.string().min(1).optional(),
-  COLLECTION_SECRET: z.string().min(1).optional(),
-  QWEN_API_KEY: z.string().optional(),
-  QWEN_BASE_URL: z.string().url().optional(),
+  CRON_SECRET: str(z.string().min(1)),
+  COLLECTION_SECRET: str(z.string().min(1)),
+  QWEN_API_KEY: optStr,
+  QWEN_BASE_URL: optUrl,
   QWEN_MODEL: z.string().default('qwen-turbo'),
-  EMBEDDING_API_KEY: z.string().optional(),
-  EMBEDDING_BASE_URL: z.string().url().optional(),
-  EMBEDDING_MODEL: z.string().optional(),
-  RESEND_API_KEY: z.string().optional(),
-  RESEND_FROM_EMAIL: z.string().email().optional(),
-  CENTER_NOTIFICATION_EMAIL: z.string().email().optional(),
-  TEST_CENTER_PASSWORD: z.string().optional(),
-  TEST_AGENCY_PASSWORD: z.string().optional(),
-  TEST_USER_PASSWORD: z.string().optional(),
+  EMBEDDING_API_KEY: optStr,
+  EMBEDDING_BASE_URL: optUrl,
+  EMBEDDING_MODEL: optStr,
+  RESEND_API_KEY: optStr,
+  RESEND_FROM_EMAIL: optEmail,
+  CENTER_NOTIFICATION_EMAIL: optEmail,
+  TEST_CENTER_PASSWORD: optStr,
+  TEST_AGENCY_PASSWORD: optStr,
+  TEST_USER_PASSWORD: optStr,
 })
 
 const isServer = typeof window === 'undefined'
