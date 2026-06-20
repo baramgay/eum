@@ -23,11 +23,11 @@ function securityHeaders() {
 
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://dapi.kakao.com",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob:",
-    "font-src 'self'",
-    `connect-src ${connectSrc}`,
+    "img-src 'self' data: blob: https://*.daumcdn.net https://t1.kakaocdn.net",
+    "font-src 'self' https://cdn.jsdelivr.net",
+    `connect-src ${connectSrc} https://dapi.kakao.com https://*.daumcdn.net`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
