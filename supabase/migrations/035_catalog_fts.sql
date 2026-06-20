@@ -9,7 +9,7 @@ BEGIN
     coalesce(NEW.title, '') || ' ' ||
     coalesce(NEW.description, '') || ' ' ||
     coalesce(NEW.theme, '') || ' ' ||
-    coalesce(array_to_string(NEW.keywords, ' '), '')
+    coalesce(replace(NEW.keywords::text, ',', ' '), '')
   );
   RETURN NEW;
 END;
@@ -19,5 +19,5 @@ UPDATE catalog SET search_vector = to_tsvector('simple',
   coalesce(title, '') || ' ' ||
   coalesce(description, '') || ' ' ||
   coalesce(theme, '') || ' ' ||
-  coalesce(array_to_string(keywords, ' '), '')
+  coalesce(replace(keywords::text, ',', ' '), '')
 );
