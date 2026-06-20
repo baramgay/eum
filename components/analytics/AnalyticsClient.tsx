@@ -7,13 +7,14 @@ import {
   X, AlertCircle, Loader2, BarChart2, Info, Download, Search,
   RotateCcw, CheckSquare, Square, Copy, Image as ImageIcon,
   Check, Filter, Layers, SortAsc, SortDesc, Clock, History,
-  FileText,
+  FileText, Share2,
 } from 'lucide-react'
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, ScatterChart, Scatter,
   PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
 import Modal from '@/components/ui/Modal'
+import toast from 'react-hot-toast'
 import PageHeader from '@/components/ui/PageHeader'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
@@ -867,6 +868,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
 
   const [localHistory, setLocalHistory] = useState<LocalHistoryEntry[]>([])
   const [showHistory, setShowHistory] = useState(false)
+  const [shareCopied, setShareCopied] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -1009,6 +1011,46 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
   useEffect(() => {
     setLocalHistory(loadLocalHistory())
   }, [])
+
+  // preset URL 복원
+  useEffect(() => {
+    const preset = searchParams?.get('preset')
+    if (!preset) return
+    try {
+      const params = JSON.parse(atob(preset)) as {
+        analysisId?: string
+        assigned?: Record<string, string[]>
+        groupValues?: string[]
+        optValues?: Record<string, string>
+      }
+      if (params.analysisId) {
+        const found = ANALYSIS_MENU.flatMap(g => g.items).find(i => i.id === params.analysisId)
+        if (found) setSelectedAnalysis(found)
+      }
+      if (params.assigned)    setAssigned(params.assigned)
+      if (params.groupValues) setGroupValues(params.groupValues)
+      if (params.optValues)   setOptValues(params.optValues)
+    } catch {
+      // 잘못된 preset은 무시
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function handleShareUrl() {
+    const params = {
+      analysisId: selectedAnalysis?.id,
+      assigned,
+      groupValues,
+      optValues,
+    }
+    const encoded = btoa(JSON.stringify(params))
+    const url = `${window.location.origin}/analytics?preset=${encoded}`
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true)
+      toast.success('분석 설정 링크가 복사되었습니다')
+      setTimeout(() => setShareCopied(false), 2000)
+    }).catch(() => toast.error('클립보드 복사에 실패했습니다'))
+  }
 
   // dataset_id URL 파라미터 자동 로드 (ProcessClient "분석으로" 버튼 연동)
   useEffect(() => {
@@ -1881,7 +1923,13 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                             <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">{result.title}</h3>
                             {renderResultSummary()}
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-wrap">
+                            {selectedAnalysis && (
+                              <Btn variant="secondary" size="sm" onClick={handleShareUrl}>
+                                {shareCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+                                {shareCopied ? '복사됨' : '공유'}
+                              </Btn>
+                            )}
                             {result.tables && result.tables.length > 0 && (
                               <Btn variant="secondary" size="sm" onClick={exportCSV}>
                                 <Download className="w-3.5 h-3.5" /> CSV

@@ -10,7 +10,7 @@ import { subscribeTable } from '@/lib/supabase/realtime'
 import {
   Settings2, BarChart2, Search, Play, History, ArrowUpDown,
   Filter, Trash2, Edit3, AlertCircle, CheckCircle2, XCircle,
-  Loader2, Clock, Network, Upload,
+  Loader2, Clock, Network, Upload, PlayCircle,
 } from 'lucide-react'
 import { StatCard, Badge, EmptyState, Card, Btn, PageHeader, Skeleton } from '@/components/ui'
 import Modal from '@/components/ui/Modal'
@@ -92,6 +92,9 @@ export default function ProcessClient({ role, tenantId }: Props) {
   const [lineageLoadingId, setLineageLoadingId] = useState<string | null>(null)
   const [showErrorDialog, setShowErrorDialog]   = useState(false)
   const [selectedHistoryRun, setSelectedHistoryRun] = useState<RunRecord | null>(null)
+  const [selectedIds, setSelectedIds]           = useState<Set<string>>(new Set())
+  const [batchRunning, setBatchRunning]         = useState(false)
+  const [batchResults, setBatchResults]         = useState<{ id: string; ok: boolean; data: unknown }[] | null>(null)
 
   const isReadOnly = role === 'viewer'
 
@@ -318,6 +321,30 @@ export default function ProcessClient({ role, tenantId }: Props) {
       toast.error('파이프라인 실행 중 오류가 발생했습니다')
     } finally {
       setRunningId(null)
+    }
+  }
+
+  async function runBatch() {
+    if (isReadOnly || selectedIds.size === 0) return
+    setBatchRunning(true)
+    setBatchResults(null)
+    try {
+      const res = await fetch('/api/process/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pipeline_ids: Array.from(selectedIds) }),
+      })
+      const data = await res.json() as { results: { id: string; ok: boolean; data: unknown }[] }
+      setBatchResults(data.results ?? [])
+      const ok = (data.results ?? []).filter(r => r.ok).length
+      const fail = (data.results ?? []).length - ok
+      if (fail === 0) toast.success(`${ok}개 파이프라인 실행 완료`)
+      else toast.error(`${ok}개 성공, ${fail}개 실패`)
+      setSelectedIds(new Set())
+    } catch {
+      toast.error('배치 실행 중 오류가 발생했습니다')
+    } finally {
+      setBatchRunning(false)
     }
   }
 
@@ -665,6 +692,31 @@ export default function ProcessClient({ role, tenantId }: Props) {
         </div>
       )}
 
+      {/* 배치 실행 결과 */}
+      {batchResults && (
+        <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-medium text-blue-800 dark:text-blue-200">배치 실행 결과</span>
+            <button onClick={() => setBatchResults(null)} className="text-blue-500 text-xs hover:text-blue-700">닫기</button>
+          </div>
+          <div className="space-y-1">
+            {batchResults.map(r => {
+              const p = pipelines.find(p => p.id === r.id)
+              return (
+                <div key={r.id} className="flex items-center gap-2 text-xs">
+                  {r.ok
+                    ? <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                    : <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />}
+                  <span className={r.ok ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}>
+                    {p?.name ?? r.id}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 파이프라인 목록 */}
       {!error && pipelines.length === 0 ? (
         <EmptyState
@@ -690,13 +742,56 @@ export default function ProcessClient({ role, tenantId }: Props) {
         />
       ) : (
         <div className="grid gap-4">
+          {/* 전체 선택 + 배치 실행 헤더 */}
+          {!isReadOnly && filteredPipelines.length > 0 && (
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size === filteredPipelines.length && filteredPipelines.length > 0}
+                  onChange={e => {
+                    if (e.target.checked) setSelectedIds(new Set(filteredPipelines.map(p => p.id)))
+                    else setSelectedIds(new Set())
+                  }}
+                  className="w-4 h-4 rounded border-gray-300"
+                  aria-label="전체 선택"
+                />
+                전체 선택
+              </label>
+              {selectedIds.size > 0 && (
+                <Btn
+                  size="sm"
+                  onClick={runBatch}
+                  loading={batchRunning}
+                  disabled={batchRunning}
+                >
+                  <PlayCircle className="w-3.5 h-3.5" />
+                  선택 실행 ({selectedIds.size}개)
+                </Btn>
+              )}
+            </div>
+          )}
           {filteredPipelines.map(p => {
             const lastRun = lastRunStatus(p.id)
             return (
               <Card key={p.id} padding="md" hover>
                 {/* 카드 헤더 */}
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                  <div className="min-w-0">
+                  {!isReadOnly && (
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(p.id)}
+                      onChange={e => {
+                        const next = new Set(selectedIds)
+                        if (e.target.checked) next.add(p.id)
+                        else next.delete(p.id)
+                        setSelectedIds(next)
+                      }}
+                      className="mt-1 w-4 h-4 rounded border-gray-300 shrink-0"
+                      aria-label={`${p.name} 선택`}
+                    />
+                  )}
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <div className="font-medium text-gray-800 dark:text-gray-200 truncate">{p.name}</div>
                       {statusBadge(lastRun)}

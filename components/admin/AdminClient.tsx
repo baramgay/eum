@@ -4,11 +4,12 @@ import { useState, useMemo } from 'react'
 import {
   Search, Filter, CheckCircle, XCircle, Building2, Plus, Trash2,
   ChevronLeft, ChevronRight, RefreshCw, Users, ExternalLink,
-  ShieldCheck, ScrollText, AlertCircle, Upload,
+  ShieldCheck, ScrollText, AlertCircle, Upload, Key,
 } from 'lucide-react'
 import UserManagement from './UserManagement'
 import AuditLogViewer from './AuditLogViewer'
 import TenantStats from './TenantStats'
+import ApiKeyManager from './ApiKeyManager'
 import PageHeader from '@/components/ui/PageHeader'
 import Btn from '@/components/ui/Btn'
 import Badge from '@/components/ui/Badge'
@@ -32,7 +33,7 @@ interface Tenant {
 
 interface Props { initialTenants: Tenant[] }
 
-type Tab = 'tenants' | 'users' | 'audit'
+type Tab = 'tenants' | 'users' | 'audit' | 'api-keys'
 
 const STATUS_LABEL: Record<TenantStatus, { label: string; variant: 'amber' | 'green' | 'red' }> = {
   pending:  { label: '승인 대기', variant: 'amber' },
@@ -420,6 +421,7 @@ export default function AdminClient({ initialTenants }: Props) {
             ['tenants', '기관 관리', Building2],
             ['users', '사용자 관리', Users],
             ['audit', '감사 로그', ScrollText],
+            ['api-keys', 'API 키', Key],
           ] as [Tab, string, typeof Building2][]).map(([tab, label, Icon]) => (
             <button
               key={tab}
@@ -437,7 +439,7 @@ export default function AdminClient({ initialTenants }: Props) {
         </nav>
       </div>
 
-      {activeTab !== 'audit' && (
+      {activeTab !== 'audit' && activeTab !== 'api-keys' && (
         <Card>
           <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
             <Upload className="w-4 h-4" />
@@ -494,6 +496,12 @@ export default function AdminClient({ initialTenants }: Props) {
       {activeTab === 'users' && <UserManagement />}
 
       {activeTab === 'audit' && <AuditLogViewer />}
+
+      {activeTab === 'api-keys' && (
+        <Card>
+          <ApiKeyManager />
+        </Card>
+      )}
 
       {activeTab === 'tenants' && (<>
         <PageHeader

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Modal from '@/components/ui/Modal'
 import DatasetStats from './DatasetStats'
-import { CheckCircle2, XCircle, Loader2, Copy, Check, FileJson, FileSpreadsheet, Terminal, ExternalLink, Sparkles, GitFork, Bot } from 'lucide-react'
+import { CheckCircle2, XCircle, Loader2, Copy, Check, FileJson, FileSpreadsheet, Terminal, ExternalLink, Sparkles, GitFork, Bot, Bell, BellOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface CatalogItem {
@@ -124,6 +124,9 @@ export default function DatasetModal({ item, onClose }: Props) {
   const [related, setRelated]   = useState<CatalogItem[]>([])
   const [relatedLoading, setRelatedLoading] = useState(false)
 
+  const [subscribed, setSubscribed]     = useState(false)
+  const [subLoading, setSubLoading]     = useState(false)
+
   const [suggestLoading, setSuggestLoading] = useState(false)
   const [suggestError, setSuggestError]     = useState<string | null>(null)
   const [metaForm, setMetaForm] = useState<SuggestMetaResult | null>(null)
@@ -171,6 +174,32 @@ export default function DatasetModal({ item, onClose }: Props) {
       toast.error(e instanceof Error ? e.message : '저장에 실패했습니다')
     } finally {
       setSaveLoading(false)
+    }
+  }
+
+  // 구독 상태 초기 로드
+  useEffect(() => {
+    fetch(`/api/catalog/${item.dataset_id}/subscribe`)
+      .then(r => r.json())
+      .then((d: { subscribed?: boolean }) => setSubscribed(!!d.subscribed))
+      .catch(() => {})
+  }, [item.dataset_id])
+
+  const handleSubscribeToggle = async () => {
+    setSubLoading(true)
+    try {
+      const method = subscribed ? 'DELETE' : 'POST'
+      const res = await fetch(`/api/catalog/${item.dataset_id}/subscribe`, { method })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string }
+        throw new Error(body.error ?? `HTTP ${res.status}`)
+      }
+      setSubscribed(!subscribed)
+      toast.success(subscribed ? '구독이 해제되었습니다' : '구독이 등록되었습니다')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '구독 처리에 실패했습니다')
+    } finally {
+      setSubLoading(false)
     }
   }
 
@@ -225,10 +254,25 @@ export default function DatasetModal({ item, onClose }: Props) {
     >
       {/* 헤더 */}
       <div className="px-6 pt-5 pb-3 border-b flex-shrink-0">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 text-xl leading-none"
-        >×</button>
+        <div className="absolute right-4 top-4 flex items-center gap-2">
+          <button
+            onClick={handleSubscribeToggle}
+            disabled={subLoading}
+            aria-label={subscribed ? '구독 해제' : '구독'}
+            className={`p-1.5 rounded-md transition-colors ${
+              subscribed
+                ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950'
+                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
+          >
+            {subLoading ? <Loader2 size={16} className="animate-spin" /> : subscribed ? <BellOff size={16} /> : <Bell size={16} />}
+          </button>
+          <button
+            onClick={onClose}
+            className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 text-xl leading-none"
+            aria-label="닫기"
+          >×</button>
+        </div>
         <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-base pr-6">{item.title}</h3>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{item.theme}</span>
