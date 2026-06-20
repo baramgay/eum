@@ -308,7 +308,7 @@ export default function DashboardClient() {
 
       <ScoreGaugeWidget overall={data.overall} areas={data.areas} />
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         <PipelineStatusWidget pipeline={data.pipeline} />
         <CollectionTrendWidget trend={data.trend} />
         <RecentAnalysisWidget recentRuns={recentRuns} />

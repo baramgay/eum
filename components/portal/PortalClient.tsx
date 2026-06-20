@@ -56,7 +56,7 @@ function highlightText(text: string, query: string): ReactNode {
   const parts = text.split(pattern)
   return parts.map((part, i) =>
     pattern.test(part)
-      ? <mark key={i} className="bg-yellow-200 dark:bg-yellow-700 text-inherit rounded-sm px-0.5">{part}</mark>
+      ? <mark key={i} className="bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-200 rounded-sm px-0.5">{part}</mark>
       : part
   )
 }

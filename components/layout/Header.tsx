@@ -262,14 +262,14 @@ export default function Header({ userEmail, role }: HeaderProps) {
                     id="header-user-menu"
                     ref={userMenuRef}
                     aria-label="사용자 메뉴"
-                    className="absolute right-0 mt-1 w-44 bg-white dark:bg-gray-900 rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden z-20"
+                    className="absolute right-0 mt-1 w-44 bg-white dark:bg-gray-900 rounded-xl shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 overflow-hidden z-20"
                   >
-                      <div className="px-3 py-2.5 border-b border-gray-100">
+                      <div className="px-3 py-2.5 border-b border-gray-100 dark:border-gray-800">
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{userEmail}</p>
                       </div>
                       <button
                         onClick={signOut}
-                        className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
                       >
                         로그아웃
                       </button>
@@ -294,7 +294,7 @@ export default function Header({ userEmail, role }: HeaderProps) {
 
       {/* ── 탭 네비게이션 바 ── */}
       <div className="max-w-screen-2xl mx-auto px-2 lg:px-4">
-        <nav className="hidden md:flex overflow-x-auto scrollbar-none items-center gap-0.5 h-10 border-t border-gray-100">
+        <nav className="hidden md:flex overflow-x-auto scrollbar-none items-center gap-0.5 h-10 border-t border-gray-100 dark:border-gray-800">
           {tabs.map(t => {
             const active = isActive(t.href)
             const Icon = t.icon
@@ -306,7 +306,7 @@ export default function Header({ userEmail, role }: HeaderProps) {
                   flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium
                   flex-shrink-0 whitespace-nowrap transition-all
                   ${active
-                    ? 'bg-blue-50 text-blue-700'
+                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'}
                 `}
               >
@@ -337,7 +337,7 @@ export default function Header({ userEmail, role }: HeaderProps) {
                   onClick={() => setMobileOpen(false)}
                   className={`
                     flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl text-xs font-medium text-center transition-colors
-                    ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}
+                    ${active ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}
                   `}
                 >
                   <Icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-gray-400 dark:text-gray-300'}`} />
@@ -347,14 +347,14 @@ export default function Header({ userEmail, role }: HeaderProps) {
             })}
           </div>
           {userEmail && (
-            <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
                   {initials}
                 </div>
                 <span className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[160px]">{userEmail}</span>
               </div>
-              <button onClick={signOut} className="text-sm text-red-500 font-medium px-3 py-1 rounded-lg hover:bg-red-50">
+              <button onClick={signOut} className="text-sm text-red-500 dark:text-red-400 font-medium px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40">
                 로그아웃
               </button>
             </div>
