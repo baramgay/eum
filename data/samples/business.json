@@ -1,0 +1,4538 @@
+[
+  {
+    "id": "BIZ000001",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 2648,
+    "employees": 20926
+  },
+  {
+    "id": "BIZ000002",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 3559,
+    "employees": 23918
+  },
+  {
+    "id": "BIZ000003",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 2890,
+    "employees": 31099
+  },
+  {
+    "id": "BIZ000004",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 4055,
+    "employees": 48337
+  },
+  {
+    "id": "BIZ000005",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 2331,
+    "employees": 19203
+  },
+  {
+    "id": "BIZ000006",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 1917,
+    "employees": 21902
+  },
+  {
+    "id": "BIZ000007",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 1815,
+    "employees": 16550
+  },
+  {
+    "id": "BIZ000008",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 3668,
+    "employees": 41400
+  },
+  {
+    "id": "BIZ000009",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 3689,
+    "employees": 25430
+  },
+  {
+    "id": "BIZ000010",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 3964,
+    "employees": 43407
+  },
+  {
+    "id": "BIZ000011",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 3022,
+    "employees": 10733
+  },
+  {
+    "id": "BIZ000012",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 2701,
+    "employees": 24010
+  },
+  {
+    "id": "BIZ000013",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 3294,
+    "employees": 38606
+  },
+  {
+    "id": "BIZ000014",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 1829,
+    "employees": 6984
+  },
+  {
+    "id": "BIZ000015",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 2441,
+    "employees": 28489
+  },
+  {
+    "id": "BIZ000016",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 3085,
+    "employees": 29702
+  },
+  {
+    "id": "BIZ000017",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 3847,
+    "employees": 15260
+  },
+  {
+    "id": "BIZ000018",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 1640,
+    "employees": 8896
+  },
+  {
+    "id": "BIZ000019",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 2642,
+    "employees": 9907
+  },
+  {
+    "id": "BIZ000020",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 4402,
+    "employees": 23459
+  },
+  {
+    "id": "BIZ000021",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 3433,
+    "employees": 16999
+  },
+  {
+    "id": "BIZ000022",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 3439,
+    "employees": 40961
+  },
+  {
+    "id": "BIZ000023",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 3302,
+    "employees": 26181
+  },
+  {
+    "id": "BIZ000024",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 3777,
+    "employees": 24194
+  },
+  {
+    "id": "BIZ000025",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 3703,
+    "employees": 30731
+  },
+  {
+    "id": "BIZ000026",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 1545,
+    "employees": 7891
+  },
+  {
+    "id": "BIZ000027",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 1606,
+    "employees": 14429
+  },
+  {
+    "id": "BIZ000028",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 4204,
+    "employees": 27638
+  },
+  {
+    "id": "BIZ000029",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 1358,
+    "employees": 15940
+  },
+  {
+    "id": "BIZ000030",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 798,
+    "employees": 6012
+  },
+  {
+    "id": "BIZ000031",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 882,
+    "employees": 8518
+  },
+  {
+    "id": "BIZ000032",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 1463,
+    "employees": 9717
+  },
+  {
+    "id": "BIZ000033",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 817,
+    "employees": 3648
+  },
+  {
+    "id": "BIZ000034",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 862,
+    "employees": 6434
+  },
+  {
+    "id": "BIZ000035",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 1169,
+    "employees": 13502
+  },
+  {
+    "id": "BIZ000036",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 862,
+    "employees": 6335
+  },
+  {
+    "id": "BIZ000037",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 1278,
+    "employees": 11586
+  },
+  {
+    "id": "BIZ000038",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 942,
+    "employees": 5702
+  },
+  {
+    "id": "BIZ000039",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 903,
+    "employees": 5031
+  },
+  {
+    "id": "BIZ000040",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 1301,
+    "employees": 9474
+  },
+  {
+    "id": "BIZ000041",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 540,
+    "employees": 3781
+  },
+  {
+    "id": "BIZ000042",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 951,
+    "employees": 6206
+  },
+  {
+    "id": "BIZ000043",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 1452,
+    "employees": 11570
+  },
+  {
+    "id": "BIZ000044",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 560,
+    "employees": 3268
+  },
+  {
+    "id": "BIZ000045",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 1010,
+    "employees": 8750
+  },
+  {
+    "id": "BIZ000046",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 674,
+    "employees": 5680
+  },
+  {
+    "id": "BIZ000047",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 647,
+    "employees": 4459
+  },
+  {
+    "id": "BIZ000048",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 523,
+    "employees": 5887
+  },
+  {
+    "id": "BIZ000049",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 1137,
+    "employees": 7929
+  },
+  {
+    "id": "BIZ000050",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 782,
+    "employees": 5431
+  },
+  {
+    "id": "BIZ000051",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 948,
+    "employees": 8106
+  },
+  {
+    "id": "BIZ000052",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 695,
+    "employees": 6066
+  },
+  {
+    "id": "BIZ000053",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 1454,
+    "employees": 5186
+  },
+  {
+    "id": "BIZ000054",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 594,
+    "employees": 3727
+  },
+  {
+    "id": "BIZ000055",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 599,
+    "employees": 7134
+  },
+  {
+    "id": "BIZ000056",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 718,
+    "employees": 3979
+  },
+  {
+    "id": "BIZ000057",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 254,
+    "employees": 2165
+  },
+  {
+    "id": "BIZ000058",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 265,
+    "employees": 2932
+  },
+  {
+    "id": "BIZ000059",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 498,
+    "employees": 5459
+  },
+  {
+    "id": "BIZ000060",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 230,
+    "employees": 2139
+  },
+  {
+    "id": "BIZ000061",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 200,
+    "employees": 935
+  },
+  {
+    "id": "BIZ000062",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 210,
+    "employees": 1034
+  },
+  {
+    "id": "BIZ000063",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 194,
+    "employees": 1271
+  },
+  {
+    "id": "BIZ000064",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 376,
+    "employees": 4221
+  },
+  {
+    "id": "BIZ000065",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 442,
+    "employees": 5064
+  },
+  {
+    "id": "BIZ000066",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 521,
+    "employees": 3118
+  },
+  {
+    "id": "BIZ000067",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 352,
+    "employees": 3444
+  },
+  {
+    "id": "BIZ000068",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 314,
+    "employees": 3290
+  },
+  {
+    "id": "BIZ000069",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 291,
+    "employees": 1551
+  },
+  {
+    "id": "BIZ000070",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 246,
+    "employees": 2585
+  },
+  {
+    "id": "BIZ000071",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 328,
+    "employees": 3263
+  },
+  {
+    "id": "BIZ000072",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 426,
+    "employees": 3227
+  },
+  {
+    "id": "BIZ000073",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 246,
+    "employees": 2897
+  },
+  {
+    "id": "BIZ000074",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 194,
+    "employees": 893
+  },
+  {
+    "id": "BIZ000075",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 252,
+    "employees": 1529
+  },
+  {
+    "id": "BIZ000076",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 243,
+    "employees": 2884
+  },
+  {
+    "id": "BIZ000077",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 484,
+    "employees": 4284
+  },
+  {
+    "id": "BIZ000078",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 303,
+    "employees": 2417
+  },
+  {
+    "id": "BIZ000079",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 386,
+    "employees": 4621
+  },
+  {
+    "id": "BIZ000080",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 368,
+    "employees": 3341
+  },
+  {
+    "id": "BIZ000081",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 531,
+    "employees": 5986
+  },
+  {
+    "id": "BIZ000082",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 535,
+    "employees": 3059
+  },
+  {
+    "id": "BIZ000083",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 224,
+    "employees": 1773
+  },
+  {
+    "id": "BIZ000084",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 367,
+    "employees": 2155
+  },
+  {
+    "id": "BIZ000085",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 455,
+    "employees": 5061
+  },
+  {
+    "id": "BIZ000086",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 248,
+    "employees": 2779
+  },
+  {
+    "id": "BIZ000087",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 212,
+    "employees": 2083
+  },
+  {
+    "id": "BIZ000088",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 181,
+    "employees": 1364
+  },
+  {
+    "id": "BIZ000089",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 234,
+    "employees": 2121
+  },
+  {
+    "id": "BIZ000090",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 466,
+    "employees": 3746
+  },
+  {
+    "id": "BIZ000091",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 409,
+    "employees": 1648
+  },
+  {
+    "id": "BIZ000092",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 448,
+    "employees": 4346
+  },
+  {
+    "id": "BIZ000093",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 494,
+    "employees": 5012
+  },
+  {
+    "id": "BIZ000094",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 223,
+    "employees": 1122
+  },
+  {
+    "id": "BIZ000095",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 267,
+    "employees": 2297
+  },
+  {
+    "id": "BIZ000096",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 209,
+    "employees": 857
+  },
+  {
+    "id": "BIZ000097",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 170,
+    "employees": 1898
+  },
+  {
+    "id": "BIZ000098",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 303,
+    "employees": 1907
+  },
+  {
+    "id": "BIZ000099",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 253,
+    "employees": 2344
+  },
+  {
+    "id": "BIZ000100",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 472,
+    "employees": 3521
+  },
+  {
+    "id": "BIZ000101",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 312,
+    "employees": 2060
+  },
+  {
+    "id": "BIZ000102",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 412,
+    "employees": 1786
+  },
+  {
+    "id": "BIZ000103",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 212,
+    "employees": 812
+  },
+  {
+    "id": "BIZ000104",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 280,
+    "employees": 1499
+  },
+  {
+    "id": "BIZ000105",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 447,
+    "employees": 1821
+  },
+  {
+    "id": "BIZ000106",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 289,
+    "employees": 1523
+  },
+  {
+    "id": "BIZ000107",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 479,
+    "employees": 5376
+  },
+  {
+    "id": "BIZ000108",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 360,
+    "employees": 3318
+  },
+  {
+    "id": "BIZ000109",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 323,
+    "employees": 1426
+  },
+  {
+    "id": "BIZ000110",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 425,
+    "employees": 2157
+  },
+  {
+    "id": "BIZ000111",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 462,
+    "employees": 4185
+  },
+  {
+    "id": "BIZ000112",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 421,
+    "employees": 4359
+  },
+  {
+    "id": "BIZ000113",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 2129,
+    "employees": 19764
+  },
+  {
+    "id": "BIZ000114",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 1986,
+    "employees": 13672
+  },
+  {
+    "id": "BIZ000115",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 1419,
+    "employees": 9626
+  },
+  {
+    "id": "BIZ000116",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 1763,
+    "employees": 19477
+  },
+  {
+    "id": "BIZ000117",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 1817,
+    "employees": 20564
+  },
+  {
+    "id": "BIZ000118",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 962,
+    "employees": 7099
+  },
+  {
+    "id": "BIZ000119",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 1351,
+    "employees": 15389
+  },
+  {
+    "id": "BIZ000120",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 2109,
+    "employees": 14155
+  },
+  {
+    "id": "BIZ000121",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 839,
+    "employees": 9977
+  },
+  {
+    "id": "BIZ000122",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 1437,
+    "employees": 8954
+  },
+  {
+    "id": "BIZ000123",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 2147,
+    "employees": 25073
+  },
+  {
+    "id": "BIZ000124",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 1567,
+    "employees": 14277
+  },
+  {
+    "id": "BIZ000125",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 946,
+    "employees": 3220
+  },
+  {
+    "id": "BIZ000126",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 1311,
+    "employees": 15196
+  },
+  {
+    "id": "BIZ000127",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 912,
+    "employees": 7368
+  },
+  {
+    "id": "BIZ000128",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 866,
+    "employees": 10088
+  },
+  {
+    "id": "BIZ000129",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 2004,
+    "employees": 12309
+  },
+  {
+    "id": "BIZ000130",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 2264,
+    "employees": 12826
+  },
+  {
+    "id": "BIZ000131",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 1685,
+    "employees": 11893
+  },
+  {
+    "id": "BIZ000132",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 1218,
+    "employees": 5734
+  },
+  {
+    "id": "BIZ000133",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 2268,
+    "employees": 15207
+  },
+  {
+    "id": "BIZ000134",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 1896,
+    "employees": 10117
+  },
+  {
+    "id": "BIZ000135",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 2042,
+    "employees": 14427
+  },
+  {
+    "id": "BIZ000136",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 2272,
+    "employees": 11498
+  },
+  {
+    "id": "BIZ000137",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 2314,
+    "employees": 11548
+  },
+  {
+    "id": "BIZ000138",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 1466,
+    "employees": 15910
+  },
+  {
+    "id": "BIZ000139",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 859,
+    "employees": 2621
+  },
+  {
+    "id": "BIZ000140",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 1356,
+    "employees": 12666
+  },
+  {
+    "id": "BIZ000141",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 289,
+    "employees": 2237
+  },
+  {
+    "id": "BIZ000142",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 416,
+    "employees": 1907
+  },
+  {
+    "id": "BIZ000143",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 341,
+    "employees": 3257
+  },
+  {
+    "id": "BIZ000144",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 371,
+    "employees": 2439
+  },
+  {
+    "id": "BIZ000145",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 278,
+    "employees": 1297
+  },
+  {
+    "id": "BIZ000146",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 254,
+    "employees": 2244
+  },
+  {
+    "id": "BIZ000147",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 272,
+    "employees": 904
+  },
+  {
+    "id": "BIZ000148",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 245,
+    "employees": 1171
+  },
+  {
+    "id": "BIZ000149",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 326,
+    "employees": 2639
+  },
+  {
+    "id": "BIZ000150",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 402,
+    "employees": 1896
+  },
+  {
+    "id": "BIZ000151",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 312,
+    "employees": 3295
+  },
+  {
+    "id": "BIZ000152",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 242,
+    "employees": 2086
+  },
+  {
+    "id": "BIZ000153",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 209,
+    "employees": 676
+  },
+  {
+    "id": "BIZ000154",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 243,
+    "employees": 2210
+  },
+  {
+    "id": "BIZ000155",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 359,
+    "employees": 2028
+  },
+  {
+    "id": "BIZ000156",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 362,
+    "employees": 4028
+  },
+  {
+    "id": "BIZ000157",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 162,
+    "employees": 1127
+  },
+  {
+    "id": "BIZ000158",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 311,
+    "employees": 1113
+  },
+  {
+    "id": "BIZ000159",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 292,
+    "employees": 2483
+  },
+  {
+    "id": "BIZ000160",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 409,
+    "employees": 3470
+  },
+  {
+    "id": "BIZ000161",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 393,
+    "employees": 3994
+  },
+  {
+    "id": "BIZ000162",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 414,
+    "employees": 1494
+  },
+  {
+    "id": "BIZ000163",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 197,
+    "employees": 2257
+  },
+  {
+    "id": "BIZ000164",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 413,
+    "employees": 4491
+  },
+  {
+    "id": "BIZ000165",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 374,
+    "employees": 4004
+  },
+  {
+    "id": "BIZ000166",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 401,
+    "employees": 2628
+  },
+  {
+    "id": "BIZ000167",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 388,
+    "employees": 2223
+  },
+  {
+    "id": "BIZ000168",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 396,
+    "employees": 1734
+  },
+  {
+    "id": "BIZ000169",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 822,
+    "employees": 8944
+  },
+  {
+    "id": "BIZ000170",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 653,
+    "employees": 5175
+  },
+  {
+    "id": "BIZ000171",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 778,
+    "employees": 6549
+  },
+  {
+    "id": "BIZ000172",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 915,
+    "employees": 7286
+  },
+  {
+    "id": "BIZ000173",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 441,
+    "employees": 2850
+  },
+  {
+    "id": "BIZ000174",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 563,
+    "employees": 2598
+  },
+  {
+    "id": "BIZ000175",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 758,
+    "employees": 6899
+  },
+  {
+    "id": "BIZ000176",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 809,
+    "employees": 7683
+  },
+  {
+    "id": "BIZ000177",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 513,
+    "employees": 1712
+  },
+  {
+    "id": "BIZ000178",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 958,
+    "employees": 3079
+  },
+  {
+    "id": "BIZ000179",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 794,
+    "employees": 5539
+  },
+  {
+    "id": "BIZ000180",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 911,
+    "employees": 5336
+  },
+  {
+    "id": "BIZ000181",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 611,
+    "employees": 4676
+  },
+  {
+    "id": "BIZ000182",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 1017,
+    "employees": 6501
+  },
+  {
+    "id": "BIZ000183",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 936,
+    "employees": 3326
+  },
+  {
+    "id": "BIZ000184",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 740,
+    "employees": 2282
+  },
+  {
+    "id": "BIZ000185",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 723,
+    "employees": 5475
+  },
+  {
+    "id": "BIZ000186",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 716,
+    "employees": 3103
+  },
+  {
+    "id": "BIZ000187",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 377,
+    "employees": 1862
+  },
+  {
+    "id": "BIZ000188",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 693,
+    "employees": 2493
+  },
+  {
+    "id": "BIZ000189",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 924,
+    "employees": 8841
+  },
+  {
+    "id": "BIZ000190",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 419,
+    "employees": 3033
+  },
+  {
+    "id": "BIZ000191",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 1015,
+    "employees": 6753
+  },
+  {
+    "id": "BIZ000192",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 671,
+    "employees": 5027
+  },
+  {
+    "id": "BIZ000193",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 551,
+    "employees": 1805
+  },
+  {
+    "id": "BIZ000194",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 1051,
+    "employees": 11451
+  },
+  {
+    "id": "BIZ000195",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 443,
+    "employees": 2670
+  },
+  {
+    "id": "BIZ000196",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 726,
+    "employees": 7164
+  },
+  {
+    "id": "BIZ000197",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 701,
+    "employees": 5561
+  },
+  {
+    "id": "BIZ000198",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 798,
+    "employees": 2627
+  },
+  {
+    "id": "BIZ000199",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 1455,
+    "employees": 8969
+  },
+  {
+    "id": "BIZ000200",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 1245,
+    "employees": 4047
+  },
+  {
+    "id": "BIZ000201",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 870,
+    "employees": 9873
+  },
+  {
+    "id": "BIZ000202",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 1381,
+    "employees": 4587
+  },
+  {
+    "id": "BIZ000203",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 1511,
+    "employees": 17288
+  },
+  {
+    "id": "BIZ000204",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 952,
+    "employees": 2907
+  },
+  {
+    "id": "BIZ000205",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 1568,
+    "employees": 13273
+  },
+  {
+    "id": "BIZ000206",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 1422,
+    "employees": 7857
+  },
+  {
+    "id": "BIZ000207",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 1227,
+    "employees": 6880
+  },
+  {
+    "id": "BIZ000208",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 1470,
+    "employees": 8996
+  },
+  {
+    "id": "BIZ000209",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 1494,
+    "employees": 6668
+  },
+  {
+    "id": "BIZ000210",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 1037,
+    "employees": 11315
+  },
+  {
+    "id": "BIZ000211",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 1207,
+    "employees": 13778
+  },
+  {
+    "id": "BIZ000212",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 871,
+    "employees": 7237
+  },
+  {
+    "id": "BIZ000213",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 1370,
+    "employees": 12930
+  },
+  {
+    "id": "BIZ000214",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 545,
+    "employees": 4811
+  },
+  {
+    "id": "BIZ000215",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 1008,
+    "employees": 6882
+  },
+  {
+    "id": "BIZ000216",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 1324,
+    "employees": 12129
+  },
+  {
+    "id": "BIZ000217",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 1559,
+    "employees": 10341
+  },
+  {
+    "id": "BIZ000218",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 588,
+    "employees": 5236
+  },
+  {
+    "id": "BIZ000219",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 1383,
+    "employees": 5241
+  },
+  {
+    "id": "BIZ000220",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 1503,
+    "employees": 5433
+  },
+  {
+    "id": "BIZ000221",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 1059,
+    "employees": 11906
+  },
+  {
+    "id": "BIZ000222",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 1016,
+    "employees": 6151
+  },
+  {
+    "id": "BIZ000223",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 551,
+    "employees": 5814
+  },
+  {
+    "id": "BIZ000224",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 1410,
+    "employees": 8169
+  },
+  {
+    "id": "BIZ000225",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 87,
+    "employees": 327
+  },
+  {
+    "id": "BIZ000226",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 52,
+    "employees": 236
+  },
+  {
+    "id": "BIZ000227",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 111,
+    "employees": 396
+  },
+  {
+    "id": "BIZ000228",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 59,
+    "employees": 344
+  },
+  {
+    "id": "BIZ000229",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 107,
+    "employees": 850
+  },
+  {
+    "id": "BIZ000230",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 70,
+    "employees": 776
+  },
+  {
+    "id": "BIZ000231",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 45,
+    "employees": 358
+  },
+  {
+    "id": "BIZ000232",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 82,
+    "employees": 316
+  },
+  {
+    "id": "BIZ000233",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 105,
+    "employees": 760
+  },
+  {
+    "id": "BIZ000234",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 78,
+    "employees": 477
+  },
+  {
+    "id": "BIZ000235",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 110,
+    "employees": 824
+  },
+  {
+    "id": "BIZ000236",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 51,
+    "employees": 195
+  },
+  {
+    "id": "BIZ000237",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 128,
+    "employees": 752
+  },
+  {
+    "id": "BIZ000238",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 111,
+    "employees": 1101
+  },
+  {
+    "id": "BIZ000239",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 68,
+    "employees": 558
+  },
+  {
+    "id": "BIZ000240",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 70,
+    "employees": 258
+  },
+  {
+    "id": "BIZ000241",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 92,
+    "employees": 870
+  },
+  {
+    "id": "BIZ000242",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 122,
+    "employees": 1228
+  },
+  {
+    "id": "BIZ000243",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 87,
+    "employees": 310
+  },
+  {
+    "id": "BIZ000244",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 101,
+    "employees": 850
+  },
+  {
+    "id": "BIZ000245",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 52,
+    "employees": 319
+  },
+  {
+    "id": "BIZ000246",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 54,
+    "employees": 577
+  },
+  {
+    "id": "BIZ000247",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 54,
+    "employees": 167
+  },
+  {
+    "id": "BIZ000248",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 93,
+    "employees": 294
+  },
+  {
+    "id": "BIZ000249",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 128,
+    "employees": 1458
+  },
+  {
+    "id": "BIZ000250",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 77,
+    "employees": 462
+  },
+  {
+    "id": "BIZ000251",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 73,
+    "employees": 561
+  },
+  {
+    "id": "BIZ000252",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 94,
+    "employees": 331
+  },
+  {
+    "id": "BIZ000253",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 209,
+    "employees": 1095
+  },
+  {
+    "id": "BIZ000254",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 172,
+    "employees": 646
+  },
+  {
+    "id": "BIZ000255",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 218,
+    "employees": 757
+  },
+  {
+    "id": "BIZ000256",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 168,
+    "employees": 1976
+  },
+  {
+    "id": "BIZ000257",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 95,
+    "employees": 492
+  },
+  {
+    "id": "BIZ000258",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 164,
+    "employees": 1444
+  },
+  {
+    "id": "BIZ000259",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 191,
+    "employees": 1937
+  },
+  {
+    "id": "BIZ000260",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 103,
+    "employees": 537
+  },
+  {
+    "id": "BIZ000261",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 103,
+    "employees": 472
+  },
+  {
+    "id": "BIZ000262",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 178,
+    "employees": 2093
+  },
+  {
+    "id": "BIZ000263",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 158,
+    "employees": 622
+  },
+  {
+    "id": "BIZ000264",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 122,
+    "employees": 1299
+  },
+  {
+    "id": "BIZ000265",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 196,
+    "employees": 2091
+  },
+  {
+    "id": "BIZ000266",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 103,
+    "employees": 993
+  },
+  {
+    "id": "BIZ000267",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 236,
+    "employees": 751
+  },
+  {
+    "id": "BIZ000268",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 236,
+    "employees": 889
+  },
+  {
+    "id": "BIZ000269",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 265,
+    "employees": 2938
+  },
+  {
+    "id": "BIZ000270",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 150,
+    "employees": 702
+  },
+  {
+    "id": "BIZ000271",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 240,
+    "employees": 2480
+  },
+  {
+    "id": "BIZ000272",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 222,
+    "employees": 2602
+  },
+  {
+    "id": "BIZ000273",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 135,
+    "employees": 538
+  },
+  {
+    "id": "BIZ000274",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 225,
+    "employees": 1817
+  },
+  {
+    "id": "BIZ000275",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 136,
+    "employees": 1174
+  },
+  {
+    "id": "BIZ000276",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 186,
+    "employees": 876
+  },
+  {
+    "id": "BIZ000277",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 192,
+    "employees": 2058
+  },
+  {
+    "id": "BIZ000278",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 159,
+    "employees": 623
+  },
+  {
+    "id": "BIZ000279",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 191,
+    "employees": 825
+  },
+  {
+    "id": "BIZ000280",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 203,
+    "employees": 1758
+  },
+  {
+    "id": "BIZ000281",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 245,
+    "employees": 1979
+  },
+  {
+    "id": "BIZ000282",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 92,
+    "employees": 745
+  },
+  {
+    "id": "BIZ000283",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 92,
+    "employees": 588
+  },
+  {
+    "id": "BIZ000284",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 90,
+    "employees": 622
+  },
+  {
+    "id": "BIZ000285",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 258,
+    "employees": 1308
+  },
+  {
+    "id": "BIZ000286",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 101,
+    "employees": 640
+  },
+  {
+    "id": "BIZ000287",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 112,
+    "employees": 777
+  },
+  {
+    "id": "BIZ000288",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 234,
+    "employees": 2114
+  },
+  {
+    "id": "BIZ000289",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 232,
+    "employees": 766
+  },
+  {
+    "id": "BIZ000290",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 156,
+    "employees": 813
+  },
+  {
+    "id": "BIZ000291",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 163,
+    "employees": 1148
+  },
+  {
+    "id": "BIZ000292",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 226,
+    "employees": 1725
+  },
+  {
+    "id": "BIZ000293",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 147,
+    "employees": 1749
+  },
+  {
+    "id": "BIZ000294",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 215,
+    "employees": 1576
+  },
+  {
+    "id": "BIZ000295",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 171,
+    "employees": 1232
+  },
+  {
+    "id": "BIZ000296",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 156,
+    "employees": 516
+  },
+  {
+    "id": "BIZ000297",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 134,
+    "employees": 1204
+  },
+  {
+    "id": "BIZ000298",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 114,
+    "employees": 1080
+  },
+  {
+    "id": "BIZ000299",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 144,
+    "employees": 1064
+  },
+  {
+    "id": "BIZ000300",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 262,
+    "employees": 1986
+  },
+  {
+    "id": "BIZ000301",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 172,
+    "employees": 2017
+  },
+  {
+    "id": "BIZ000302",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 139,
+    "employees": 819
+  },
+  {
+    "id": "BIZ000303",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 121,
+    "employees": 920
+  },
+  {
+    "id": "BIZ000304",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 175,
+    "employees": 1041
+  },
+  {
+    "id": "BIZ000305",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 193,
+    "employees": 2308
+  },
+  {
+    "id": "BIZ000306",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 125,
+    "employees": 697
+  },
+  {
+    "id": "BIZ000307",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 166,
+    "employees": 1497
+  },
+  {
+    "id": "BIZ000308",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 121,
+    "employees": 844
+  },
+  {
+    "id": "BIZ000309",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 208,
+    "employees": 2363
+  },
+  {
+    "id": "BIZ000310",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 119,
+    "employees": 1151
+  },
+  {
+    "id": "BIZ000311",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 213,
+    "employees": 1429
+  },
+  {
+    "id": "BIZ000312",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 86,
+    "employees": 556
+  },
+  {
+    "id": "BIZ000313",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 162,
+    "employees": 513
+  },
+  {
+    "id": "BIZ000314",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 203,
+    "employees": 2413
+  },
+  {
+    "id": "BIZ000315",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 171,
+    "employees": 1690
+  },
+  {
+    "id": "BIZ000316",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 108,
+    "employees": 1149
+  },
+  {
+    "id": "BIZ000317",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 115,
+    "employees": 976
+  },
+  {
+    "id": "BIZ000318",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 158,
+    "employees": 636
+  },
+  {
+    "id": "BIZ000319",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 172,
+    "employees": 1503
+  },
+  {
+    "id": "BIZ000320",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 192,
+    "employees": 2011
+  },
+  {
+    "id": "BIZ000321",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 202,
+    "employees": 1045
+  },
+  {
+    "id": "BIZ000322",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 169,
+    "employees": 766
+  },
+  {
+    "id": "BIZ000323",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 122,
+    "employees": 590
+  },
+  {
+    "id": "BIZ000324",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 216,
+    "employees": 1298
+  },
+  {
+    "id": "BIZ000325",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 177,
+    "employees": 1810
+  },
+  {
+    "id": "BIZ000326",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 222,
+    "employees": 2468
+  },
+  {
+    "id": "BIZ000327",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 214,
+    "employees": 1303
+  },
+  {
+    "id": "BIZ000328",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 171,
+    "employees": 1500
+  },
+  {
+    "id": "BIZ000329",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 81,
+    "employees": 792
+  },
+  {
+    "id": "BIZ000330",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 82,
+    "employees": 283
+  },
+  {
+    "id": "BIZ000331",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 160,
+    "employees": 676
+  },
+  {
+    "id": "BIZ000332",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 82,
+    "employees": 347
+  },
+  {
+    "id": "BIZ000333",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 216,
+    "employees": 1443
+  },
+  {
+    "id": "BIZ000334",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 141,
+    "employees": 695
+  },
+  {
+    "id": "BIZ000335",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 119,
+    "employees": 824
+  },
+  {
+    "id": "BIZ000336",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 219,
+    "employees": 2055
+  },
+  {
+    "id": "BIZ000337",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 85,
+    "employees": 472
+  },
+  {
+    "id": "BIZ000338",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 119,
+    "employees": 650
+  },
+  {
+    "id": "BIZ000339",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 138,
+    "employees": 1024
+  },
+  {
+    "id": "BIZ000340",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 170,
+    "employees": 1573
+  },
+  {
+    "id": "BIZ000341",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 170,
+    "employees": 1277
+  },
+  {
+    "id": "BIZ000342",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 124,
+    "employees": 790
+  },
+  {
+    "id": "BIZ000343",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 121,
+    "employees": 1056
+  },
+  {
+    "id": "BIZ000344",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 77,
+    "employees": 511
+  },
+  {
+    "id": "BIZ000345",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 74,
+    "employees": 398
+  },
+  {
+    "id": "BIZ000346",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 61,
+    "employees": 446
+  },
+  {
+    "id": "BIZ000347",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 84,
+    "employees": 286
+  },
+  {
+    "id": "BIZ000348",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 107,
+    "employees": 512
+  },
+  {
+    "id": "BIZ000349",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 163,
+    "employees": 1061
+  },
+  {
+    "id": "BIZ000350",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 112,
+    "employees": 819
+  },
+  {
+    "id": "BIZ000351",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 172,
+    "employees": 1355
+  },
+  {
+    "id": "BIZ000352",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 116,
+    "employees": 489
+  },
+  {
+    "id": "BIZ000353",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 126,
+    "employees": 1397
+  },
+  {
+    "id": "BIZ000354",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 72,
+    "employees": 775
+  },
+  {
+    "id": "BIZ000355",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 130,
+    "employees": 953
+  },
+  {
+    "id": "BIZ000356",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 137,
+    "employees": 616
+  },
+  {
+    "id": "BIZ000357",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 139,
+    "employees": 1269
+  },
+  {
+    "id": "BIZ000358",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 140,
+    "employees": 1632
+  },
+  {
+    "id": "BIZ000359",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 153,
+    "employees": 1404
+  },
+  {
+    "id": "BIZ000360",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 167,
+    "employees": 1875
+  },
+  {
+    "id": "BIZ000361",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 137,
+    "employees": 674
+  },
+  {
+    "id": "BIZ000362",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 124,
+    "employees": 1196
+  },
+  {
+    "id": "BIZ000363",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 87,
+    "employees": 614
+  },
+  {
+    "id": "BIZ000364",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 169,
+    "employees": 2023
+  },
+  {
+    "id": "BIZ000365",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 89,
+    "employees": 541
+  },
+  {
+    "id": "BIZ000366",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 177,
+    "employees": 779
+  },
+  {
+    "id": "BIZ000367",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 116,
+    "employees": 980
+  },
+  {
+    "id": "BIZ000368",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 171,
+    "employees": 1928
+  },
+  {
+    "id": "BIZ000369",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 76,
+    "employees": 317
+  },
+  {
+    "id": "BIZ000370",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 82,
+    "employees": 318
+  },
+  {
+    "id": "BIZ000371",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 163,
+    "employees": 1429
+  },
+  {
+    "id": "BIZ000372",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 105,
+    "employees": 820
+  },
+  {
+    "id": "BIZ000373",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 155,
+    "employees": 1530
+  },
+  {
+    "id": "BIZ000374",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 68,
+    "employees": 727
+  },
+  {
+    "id": "BIZ000375",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 170,
+    "employees": 1886
+  },
+  {
+    "id": "BIZ000376",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 105,
+    "employees": 366
+  },
+  {
+    "id": "BIZ000377",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 151,
+    "employees": 1165
+  },
+  {
+    "id": "BIZ000378",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 160,
+    "employees": 737
+  },
+  {
+    "id": "BIZ000379",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 170,
+    "employees": 1778
+  },
+  {
+    "id": "BIZ000380",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 175,
+    "employees": 1525
+  },
+  {
+    "id": "BIZ000381",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 77,
+    "employees": 800
+  },
+  {
+    "id": "BIZ000382",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 116,
+    "employees": 1268
+  },
+  {
+    "id": "BIZ000383",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 165,
+    "employees": 930
+  },
+  {
+    "id": "BIZ000384",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 83,
+    "employees": 633
+  },
+  {
+    "id": "BIZ000385",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 121,
+    "employees": 675
+  },
+  {
+    "id": "BIZ000386",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 175,
+    "employees": 561
+  },
+  {
+    "id": "BIZ000387",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 154,
+    "employees": 1782
+  },
+  {
+    "id": "BIZ000388",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 71,
+    "employees": 675
+  },
+  {
+    "id": "BIZ000389",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 63,
+    "employees": 720
+  },
+  {
+    "id": "BIZ000390",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 101,
+    "employees": 884
+  },
+  {
+    "id": "BIZ000391",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 84,
+    "employees": 781
+  },
+  {
+    "id": "BIZ000392",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 94,
+    "employees": 575
+  },
+  {
+    "id": "BIZ000393",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 131,
+    "employees": 852
+  },
+  {
+    "id": "BIZ000394",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 97,
+    "employees": 328
+  },
+  {
+    "id": "BIZ000395",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 57,
+    "employees": 257
+  },
+  {
+    "id": "BIZ000396",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 98,
+    "employees": 610
+  },
+  {
+    "id": "BIZ000397",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 84,
+    "employees": 362
+  },
+  {
+    "id": "BIZ000398",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 69,
+    "employees": 632
+  },
+  {
+    "id": "BIZ000399",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 64,
+    "employees": 357
+  },
+  {
+    "id": "BIZ000400",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 74,
+    "employees": 231
+  },
+  {
+    "id": "BIZ000401",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 96,
+    "employees": 1102
+  },
+  {
+    "id": "BIZ000402",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 51,
+    "employees": 418
+  },
+  {
+    "id": "BIZ000403",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 66,
+    "employees": 741
+  },
+  {
+    "id": "BIZ000404",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 84,
+    "employees": 855
+  },
+  {
+    "id": "BIZ000405",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 125,
+    "employees": 548
+  },
+  {
+    "id": "BIZ000406",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 52,
+    "employees": 290
+  },
+  {
+    "id": "BIZ000407",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 132,
+    "employees": 1024
+  },
+  {
+    "id": "BIZ000408",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 93,
+    "employees": 1078
+  },
+  {
+    "id": "BIZ000409",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 48,
+    "employees": 258
+  },
+  {
+    "id": "BIZ000410",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 128,
+    "employees": 921
+  },
+  {
+    "id": "BIZ000411",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 71,
+    "employees": 836
+  },
+  {
+    "id": "BIZ000412",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 98,
+    "employees": 784
+  },
+  {
+    "id": "BIZ000413",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 118,
+    "employees": 783
+  },
+  {
+    "id": "BIZ000414",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 105,
+    "employees": 1246
+  },
+  {
+    "id": "BIZ000415",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 100,
+    "employees": 554
+  },
+  {
+    "id": "BIZ000416",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 95,
+    "employees": 413
+  },
+  {
+    "id": "BIZ000417",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 95,
+    "employees": 1087
+  },
+  {
+    "id": "BIZ000418",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 101,
+    "employees": 843
+  },
+  {
+    "id": "BIZ000419",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 108,
+    "employees": 850
+  },
+  {
+    "id": "BIZ000420",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 116,
+    "employees": 1357
+  },
+  {
+    "id": "BIZ000421",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 153,
+    "employees": 644
+  },
+  {
+    "id": "BIZ000422",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 158,
+    "employees": 703
+  },
+  {
+    "id": "BIZ000423",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 139,
+    "employees": 1468
+  },
+  {
+    "id": "BIZ000424",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 87,
+    "employees": 794
+  },
+  {
+    "id": "BIZ000425",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 78,
+    "employees": 848
+  },
+  {
+    "id": "BIZ000426",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 111,
+    "employees": 805
+  },
+  {
+    "id": "BIZ000427",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 108,
+    "employees": 588
+  },
+  {
+    "id": "BIZ000428",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 109,
+    "employees": 1063
+  },
+  {
+    "id": "BIZ000429",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 159,
+    "employees": 1115
+  },
+  {
+    "id": "BIZ000430",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 174,
+    "employees": 1450
+  },
+  {
+    "id": "BIZ000431",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 96,
+    "employees": 1148
+  },
+  {
+    "id": "BIZ000432",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 104,
+    "employees": 590
+  },
+  {
+    "id": "BIZ000433",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 60,
+    "employees": 384
+  },
+  {
+    "id": "BIZ000434",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 82,
+    "employees": 828
+  },
+  {
+    "id": "BIZ000435",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 85,
+    "employees": 531
+  },
+  {
+    "id": "BIZ000436",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 86,
+    "employees": 702
+  },
+  {
+    "id": "BIZ000437",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 162,
+    "employees": 1013
+  },
+  {
+    "id": "BIZ000438",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 64,
+    "employees": 203
+  },
+  {
+    "id": "BIZ000439",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 151,
+    "employees": 595
+  },
+  {
+    "id": "BIZ000440",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 139,
+    "employees": 1633
+  },
+  {
+    "id": "BIZ000441",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 150,
+    "employees": 730
+  },
+  {
+    "id": "BIZ000442",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 76,
+    "employees": 896
+  },
+  {
+    "id": "BIZ000443",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 67,
+    "employees": 560
+  },
+  {
+    "id": "BIZ000444",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 88,
+    "employees": 747
+  },
+  {
+    "id": "BIZ000445",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 159,
+    "employees": 1750
+  },
+  {
+    "id": "BIZ000446",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 97,
+    "employees": 907
+  },
+  {
+    "id": "BIZ000447",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 127,
+    "employees": 555
+  },
+  {
+    "id": "BIZ000448",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 109,
+    "employees": 789
+  },
+  {
+    "id": "BIZ000449",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 233,
+    "employees": 2032
+  },
+  {
+    "id": "BIZ000450",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 227,
+    "employees": 2262
+  },
+  {
+    "id": "BIZ000451",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 160,
+    "employees": 1085
+  },
+  {
+    "id": "BIZ000452",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 179,
+    "employees": 710
+  },
+  {
+    "id": "BIZ000453",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 118,
+    "employees": 445
+  },
+  {
+    "id": "BIZ000454",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 120,
+    "employees": 366
+  },
+  {
+    "id": "BIZ000455",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 245,
+    "employees": 2520
+  },
+  {
+    "id": "BIZ000456",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 154,
+    "employees": 1726
+  },
+  {
+    "id": "BIZ000457",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 204,
+    "employees": 1560
+  },
+  {
+    "id": "BIZ000458",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 188,
+    "employees": 1893
+  },
+  {
+    "id": "BIZ000459",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 164,
+    "employees": 1966
+  },
+  {
+    "id": "BIZ000460",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 256,
+    "employees": 2944
+  },
+  {
+    "id": "BIZ000461",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 269,
+    "employees": 1093
+  },
+  {
+    "id": "BIZ000462",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 255,
+    "employees": 2872
+  },
+  {
+    "id": "BIZ000463",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 227,
+    "employees": 1700
+  },
+  {
+    "id": "BIZ000464",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 186,
+    "employees": 1105
+  },
+  {
+    "id": "BIZ000465",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 116,
+    "employees": 708
+  },
+  {
+    "id": "BIZ000466",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 238,
+    "employees": 820
+  },
+  {
+    "id": "BIZ000467",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 169,
+    "employees": 930
+  },
+  {
+    "id": "BIZ000468",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 107,
+    "employees": 510
+  },
+  {
+    "id": "BIZ000469",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 187,
+    "employees": 1106
+  },
+  {
+    "id": "BIZ000470",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 201,
+    "employees": 1791
+  },
+  {
+    "id": "BIZ000471",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 201,
+    "employees": 1428
+  },
+  {
+    "id": "BIZ000472",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 95,
+    "employees": 478
+  },
+  {
+    "id": "BIZ000473",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 256,
+    "employees": 1509
+  },
+  {
+    "id": "BIZ000474",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 196,
+    "employees": 1637
+  },
+  {
+    "id": "BIZ000475",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 127,
+    "employees": 438
+  },
+  {
+    "id": "BIZ000476",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 101,
+    "employees": 939
+  },
+  {
+    "id": "BIZ000477",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "industry": "제조",
+    "business_count": 102,
+    "employees": 562
+  },
+  {
+    "id": "BIZ000478",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "industry": "도소매",
+    "business_count": 167,
+    "employees": 815
+  },
+  {
+    "id": "BIZ000479",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "industry": "숙박음식",
+    "business_count": 101,
+    "employees": 1024
+  },
+  {
+    "id": "BIZ000480",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "industry": "건설",
+    "business_count": 158,
+    "employees": 701
+  },
+  {
+    "id": "BIZ000481",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "industry": "정보통신",
+    "business_count": 130,
+    "employees": 870
+  },
+  {
+    "id": "BIZ000482",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "industry": "농림어업",
+    "business_count": 95,
+    "employees": 291
+  },
+  {
+    "id": "BIZ000483",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "industry": "보걸복지",
+    "business_count": 78,
+    "employees": 242
+  },
+  {
+    "id": "BIZ000484",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2023,
+    "industry": "제조",
+    "business_count": 83,
+    "employees": 704
+  },
+  {
+    "id": "BIZ000485",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2023,
+    "industry": "도소매",
+    "business_count": 142,
+    "employees": 1520
+  },
+  {
+    "id": "BIZ000486",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2023,
+    "industry": "숙박음식",
+    "business_count": 147,
+    "employees": 1631
+  },
+  {
+    "id": "BIZ000487",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2023,
+    "industry": "건설",
+    "business_count": 151,
+    "employees": 1217
+  },
+  {
+    "id": "BIZ000488",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2023,
+    "industry": "정보통신",
+    "business_count": 130,
+    "employees": 718
+  },
+  {
+    "id": "BIZ000489",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2023,
+    "industry": "농림어업",
+    "business_count": 68,
+    "employees": 453
+  },
+  {
+    "id": "BIZ000490",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2023,
+    "industry": "보걸복지",
+    "business_count": 140,
+    "employees": 1669
+  },
+  {
+    "id": "BIZ000491",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "industry": "제조",
+    "business_count": 151,
+    "employees": 1585
+  },
+  {
+    "id": "BIZ000492",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "industry": "도소매",
+    "business_count": 172,
+    "employees": 2011
+  },
+  {
+    "id": "BIZ000493",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "industry": "숙박음식",
+    "business_count": 150,
+    "employees": 839
+  },
+  {
+    "id": "BIZ000494",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "industry": "건설",
+    "business_count": 96,
+    "employees": 1110
+  },
+  {
+    "id": "BIZ000495",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "industry": "정보통신",
+    "business_count": 162,
+    "employees": 1671
+  },
+  {
+    "id": "BIZ000496",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "industry": "농림어업",
+    "business_count": 123,
+    "employees": 1373
+  },
+  {
+    "id": "BIZ000497",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "industry": "보걸복지",
+    "business_count": 176,
+    "employees": 2111
+  },
+  {
+    "id": "BIZ000498",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2025,
+    "industry": "제조",
+    "business_count": 124,
+    "employees": 1411
+  },
+  {
+    "id": "BIZ000499",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2025,
+    "industry": "도소매",
+    "business_count": 164,
+    "employees": 807
+  },
+  {
+    "id": "BIZ000500",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2025,
+    "industry": "숙박음식",
+    "business_count": 141,
+    "employees": 746
+  },
+  {
+    "id": "BIZ000501",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2025,
+    "industry": "건설",
+    "business_count": 71,
+    "employees": 360
+  },
+  {
+    "id": "BIZ000502",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2025,
+    "industry": "정보통신",
+    "business_count": 155,
+    "employees": 537
+  },
+  {
+    "id": "BIZ000503",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2025,
+    "industry": "농림어업",
+    "business_count": 73,
+    "employees": 653
+  },
+  {
+    "id": "BIZ000504",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2025,
+    "industry": "보걸복지",
+    "business_count": 79,
+    "employees": 296
+  }
+]

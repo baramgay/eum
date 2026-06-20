@@ -1,0 +1,515 @@
+[
+  {
+    "culture_id": "CUL000001",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "facilities": 63,
+    "seats": 8218,
+    "events": 1201
+  },
+  {
+    "culture_id": "CUL000002",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "facilities": 67,
+    "seats": 8172,
+    "events": 1972
+  },
+  {
+    "culture_id": "CUL000003",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "facilities": 62,
+    "seats": 5851,
+    "events": 1747
+  },
+  {
+    "culture_id": "CUL000004",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "facilities": 43,
+    "seats": 3926,
+    "events": 555
+  },
+  {
+    "culture_id": "CUL000005",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "facilities": 51,
+    "seats": 5657,
+    "events": 1522
+  },
+  {
+    "culture_id": "CUL000006",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "facilities": 69,
+    "seats": 6252,
+    "events": 943
+  },
+  {
+    "culture_id": "CUL000007",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "facilities": 20,
+    "seats": 1707,
+    "events": 528
+  },
+  {
+    "culture_id": "CUL000008",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "facilities": 14,
+    "seats": 1201,
+    "events": 218
+  },
+  {
+    "culture_id": "CUL000009",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "facilities": 22,
+    "seats": 3128,
+    "events": 373
+  },
+  {
+    "culture_id": "CUL000010",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "facilities": 6,
+    "seats": 726,
+    "events": 70
+  },
+  {
+    "culture_id": "CUL000011",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "facilities": 5,
+    "seats": 598,
+    "events": 73
+  },
+  {
+    "culture_id": "CUL000012",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "facilities": 4,
+    "seats": 424,
+    "events": 47
+  },
+  {
+    "culture_id": "CUL000013",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "facilities": 6,
+    "seats": 535,
+    "events": 90
+  },
+  {
+    "culture_id": "CUL000014",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "facilities": 7,
+    "seats": 1033,
+    "events": 151
+  },
+  {
+    "culture_id": "CUL000015",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "facilities": 5,
+    "seats": 701,
+    "events": 80
+  },
+  {
+    "culture_id": "CUL000016",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "facilities": 16,
+    "seats": 2361,
+    "events": 212
+  },
+  {
+    "culture_id": "CUL000017",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "facilities": 19,
+    "seats": 2836,
+    "events": 546
+  },
+  {
+    "culture_id": "CUL000018",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "facilities": 19,
+    "seats": 1966,
+    "events": 504
+  },
+  {
+    "culture_id": "CUL000019",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "facilities": 3,
+    "seats": 284,
+    "events": 58
+  },
+  {
+    "culture_id": "CUL000020",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "facilities": 3,
+    "seats": 470,
+    "events": 66
+  },
+  {
+    "culture_id": "CUL000021",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "facilities": 5,
+    "seats": 583,
+    "events": 117
+  },
+  {
+    "culture_id": "CUL000022",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "facilities": 9,
+    "seats": 1303,
+    "events": 232
+  },
+  {
+    "culture_id": "CUL000023",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "facilities": 10,
+    "seats": 808,
+    "events": 299
+  },
+  {
+    "culture_id": "CUL000024",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "facilities": 11,
+    "seats": 1064,
+    "events": 254
+  },
+  {
+    "culture_id": "CUL000025",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "facilities": 18,
+    "seats": 1589,
+    "events": 312
+  },
+  {
+    "culture_id": "CUL000026",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "facilities": 10,
+    "seats": 1567,
+    "events": 267
+  },
+  {
+    "culture_id": "CUL000027",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "facilities": 22,
+    "seats": 1991,
+    "events": 463
+  },
+  {
+    "culture_id": "CUL000028",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "facilities": 1,
+    "seats": 90,
+    "events": 13
+  },
+  {
+    "culture_id": "CUL000029",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "facilities": 1,
+    "seats": 128,
+    "events": 11
+  },
+  {
+    "culture_id": "CUL000030",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "facilities": 1,
+    "seats": 137,
+    "events": 15
+  },
+  {
+    "culture_id": "CUL000031",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "facilities": 3,
+    "seats": 467,
+    "events": 76
+  },
+  {
+    "culture_id": "CUL000032",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "facilities": 2,
+    "seats": 176,
+    "events": 33
+  },
+  {
+    "culture_id": "CUL000033",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "facilities": 2,
+    "seats": 184,
+    "events": 47
+  },
+  {
+    "culture_id": "CUL000034",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "facilities": 3,
+    "seats": 313,
+    "events": 84
+  },
+  {
+    "culture_id": "CUL000035",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "facilities": 3,
+    "seats": 281,
+    "events": 78
+  },
+  {
+    "culture_id": "CUL000036",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "facilities": 1,
+    "seats": 89,
+    "events": 29
+  },
+  {
+    "culture_id": "CUL000037",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "facilities": 2,
+    "seats": 188,
+    "events": 29
+  },
+  {
+    "culture_id": "CUL000038",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "facilities": 1,
+    "seats": 158,
+    "events": 22
+  },
+  {
+    "culture_id": "CUL000039",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "facilities": 2,
+    "seats": 261,
+    "events": 56
+  },
+  {
+    "culture_id": "CUL000040",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "facilities": 2,
+    "seats": 264,
+    "events": 36
+  },
+  {
+    "culture_id": "CUL000041",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "facilities": 1,
+    "seats": 90,
+    "events": 26
+  },
+  {
+    "culture_id": "CUL000042",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "facilities": 2,
+    "seats": 294,
+    "events": 59
+  },
+  {
+    "culture_id": "CUL000043",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "facilities": 2,
+    "seats": 175,
+    "events": 58
+  },
+  {
+    "culture_id": "CUL000044",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "facilities": 2,
+    "seats": 227,
+    "events": 50
+  },
+  {
+    "culture_id": "CUL000045",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "facilities": 1,
+    "seats": 103,
+    "events": 25
+  },
+  {
+    "culture_id": "CUL000046",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "facilities": 1,
+    "seats": 134,
+    "events": 23
+  },
+  {
+    "culture_id": "CUL000047",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "facilities": 1,
+    "seats": 86,
+    "events": 11
+  },
+  {
+    "culture_id": "CUL000048",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "facilities": 2,
+    "seats": 193,
+    "events": 48
+  },
+  {
+    "culture_id": "CUL000049",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "facilities": 2,
+    "seats": 256,
+    "events": 42
+  },
+  {
+    "culture_id": "CUL000050",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "facilities": 1,
+    "seats": 140,
+    "events": 12
+  },
+  {
+    "culture_id": "CUL000051",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "facilities": 2,
+    "seats": 264,
+    "events": 23
+  },
+  {
+    "culture_id": "CUL000052",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "facilities": 3,
+    "seats": 411,
+    "events": 86
+  },
+  {
+    "culture_id": "CUL000053",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "facilities": 3,
+    "seats": 353,
+    "events": 39
+  },
+  {
+    "culture_id": "CUL000054",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2024,
+    "facilities": 3,
+    "seats": 389,
+    "events": 42
+  },
+  {
+    "culture_id": "CUL000055",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "facilities": 1,
+    "seats": 100,
+    "events": 15
+  },
+  {
+    "culture_id": "CUL000056",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "facilities": 1,
+    "seats": 105,
+    "events": 25
+  },
+  {
+    "culture_id": "CUL000057",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "facilities": 1,
+    "seats": 126,
+    "events": 23
+  }
+]

@@ -1,0 +1,7582 @@
+[
+  {
+    "facility_id": "SMP-FAC00001",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 1",
+    "lon": null,
+    "lat": null,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00002",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 2",
+    "lon": 127.381442,
+    "lat": 34.555382,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00003",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 3",
+    "lon": 127.90937,
+    "lat": 35.229024,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00004",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 4",
+    "lon": 127.628489,
+    "lat": 35.642696,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00005",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 5",
+    "lon": 128.523267,
+    "lat": 34.565637,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00006",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 6",
+    "lon": 128.547637,
+    "lat": 35.122754,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00007",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 7",
+    "lon": 127.939378,
+    "lat": 35.979081,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00008",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 8",
+    "lon": 128.953352,
+    "lat": 35.047616,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00009",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 9",
+    "lon": 128.666707,
+    "lat": 35.398616,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00010",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 10",
+    "lon": 127.46588,
+    "lat": 34.924419,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00011",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 11",
+    "lon": 128.942097,
+    "lat": 35.653463,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00012",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 12",
+    "lon": 127.868128,
+    "lat": 35.199315,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00013",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 13",
+    "lon": 127.177547,
+    "lat": 35.492814,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00014",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 14",
+    "lon": 128.68254,
+    "lat": 35.890329,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00015",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 15",
+    "lon": 128.430136,
+    "lat": 35.689612,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00016",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 16",
+    "lon": 128.163531,
+    "lat": 34.807061,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00017",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 17",
+    "lon": 128.581339,
+    "lat": 35.830327,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00018",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 18",
+    "lon": 128.074867,
+    "lat": 35.239984,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00019",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 19",
+    "lon": 128.078494,
+    "lat": 35.26161,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00020",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 20",
+    "lon": 129.060823,
+    "lat": 35.286766,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00021",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 21",
+    "lon": 128.960373,
+    "lat": 34.638848,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00022",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 22",
+    "lon": null,
+    "lat": null,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00023",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 23",
+    "lon": 129.015612,
+    "lat": 35.10003,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00024",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 24",
+    "lon": 128.674712,
+    "lat": 34.867494,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00025",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 25",
+    "lon": 128.767027,
+    "lat": 35.516758,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00026",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 26",
+    "lon": 127.870615,
+    "lat": 34.757017,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00027",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 27",
+    "lon": 127.296004,
+    "lat": 35.486144,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00028",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 28",
+    "lon": 128.527088,
+    "lat": 35.959566,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00029",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 29",
+    "lon": 127.773876,
+    "lat": 35.948462,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00030",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 30",
+    "lon": 127.987148,
+    "lat": 34.60966,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00031",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 31",
+    "lon": 128.37085,
+    "lat": 35.683854,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00032",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 32",
+    "lon": 128.407613,
+    "lat": 34.784256,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00033",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 33",
+    "lon": 127.402564,
+    "lat": 35.247681,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00034",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 34",
+    "lon": 128.428661,
+    "lat": 34.621283,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00035",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 35",
+    "lon": 127.231934,
+    "lat": 34.664382,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00036",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 36",
+    "lon": 128.89689,
+    "lat": 34.651187,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00037",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 37",
+    "lon": 127.708751,
+    "lat": 35.415176,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00038",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 38",
+    "lon": 127.911641,
+    "lat": 34.503034,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00039",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 39",
+    "lon": 127.73613,
+    "lat": 35.119701,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00040",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 40",
+    "lon": 128.481963,
+    "lat": 34.568132,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00041",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 41",
+    "lon": null,
+    "lat": null,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00042",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 42",
+    "lon": 128.592662,
+    "lat": 35.77042,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00043",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 43",
+    "lon": 128.212665,
+    "lat": 35.696839,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00044",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 44",
+    "lon": 128.95927,
+    "lat": 35.676564,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00045",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 45",
+    "lon": 127.323948,
+    "lat": 35.87597,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00046",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 46",
+    "lon": 127.870803,
+    "lat": 35.545191,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00047",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 47",
+    "lon": 128.746243,
+    "lat": 35.426775,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00048",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 48",
+    "lon": 127.352031,
+    "lat": 35.393023,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00049",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 49",
+    "lon": 127.845767,
+    "lat": 35.155507,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00050",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 50",
+    "lon": 127.535029,
+    "lat": 35.499854,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00051",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 51",
+    "lon": 128.023683,
+    "lat": 35.001919,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00052",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 52",
+    "lon": null,
+    "lat": null,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00053",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 53",
+    "lon": 128.732841,
+    "lat": 35.274601,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00054",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 54",
+    "lon": 127.242576,
+    "lat": 35.796292,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00055",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 55",
+    "lon": 128.988116,
+    "lat": 34.776225,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00056",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 56",
+    "lon": 128.184881,
+    "lat": 34.626468,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00057",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 57",
+    "lon": 127.498151,
+    "lat": 34.500906,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00058",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 58",
+    "lon": 128.589469,
+    "lat": 34.698814,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00059",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 59",
+    "lon": 128.230203,
+    "lat": 35.192674,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00060",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 60",
+    "lon": null,
+    "lat": null,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00061",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 61",
+    "lon": 128.479308,
+    "lat": 34.923491,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00062",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 62",
+    "lon": 127.254533,
+    "lat": 35.04035,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00063",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 63",
+    "lon": null,
+    "lat": null,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00064",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 64",
+    "lon": 127.391438,
+    "lat": 34.72344,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00065",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 65",
+    "lon": 127.379242,
+    "lat": 35.221223,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00066",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 66",
+    "lon": 128.157047,
+    "lat": 34.619599,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00067",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 67",
+    "lon": 127.408029,
+    "lat": 35.78688,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00068",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 68",
+    "lon": 128.385293,
+    "lat": 34.584031,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00069",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 69",
+    "lon": 127.370787,
+    "lat": 34.56494,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00070",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 70",
+    "lon": 128.775193,
+    "lat": 35.681268,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00071",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 71",
+    "lon": 127.139733,
+    "lat": 34.865701,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00072",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 72",
+    "lon": 127.98935,
+    "lat": 34.92551,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00073",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 73",
+    "lon": 128.412081,
+    "lat": 34.759817,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00074",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 74",
+    "lon": 127.123311,
+    "lat": 34.572261,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00075",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 75",
+    "lon": 128.993727,
+    "lat": 34.870057,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00076",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 76",
+    "lon": 128.939366,
+    "lat": 35.554602,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00077",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 77",
+    "lon": 128.737862,
+    "lat": 35.09949,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00078",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 78",
+    "lon": null,
+    "lat": null,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00079",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 79",
+    "lon": 127.212234,
+    "lat": 34.678431,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00080",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 80",
+    "lon": 128.099062,
+    "lat": 35.737936,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00081",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 81",
+    "lon": 127.175068,
+    "lat": 35.896702,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00082",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 82",
+    "lon": 128.017633,
+    "lat": 35.604145,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00083",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 83",
+    "lon": 128.271768,
+    "lat": 35.990527,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00084",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 84",
+    "lon": 128.753638,
+    "lat": 35.822694,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00085",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 85",
+    "lon": 127.76968,
+    "lat": 35.729787,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00086",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 86",
+    "lon": 127.664136,
+    "lat": 35.134935,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00087",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 87",
+    "lon": 128.046406,
+    "lat": 34.993342,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00088",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 88",
+    "lon": 128.021014,
+    "lat": 34.988456,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00089",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 89",
+    "lon": 129.043709,
+    "lat": 35.44707,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00090",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 90",
+    "lon": 128.700897,
+    "lat": 35.990798,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00091",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 91",
+    "lon": 128.749896,
+    "lat": 35.612791,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00092",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 92",
+    "lon": 127.835549,
+    "lat": 35.513008,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00093",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 93",
+    "lon": 128.069308,
+    "lat": 35.981097,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00094",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 94",
+    "lon": 128.276498,
+    "lat": 35.048437,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00095",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 95",
+    "lon": 128.978594,
+    "lat": 35.846021,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00096",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 96",
+    "lon": 129.042132,
+    "lat": 35.248096,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00097",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 97",
+    "lon": 128.113551,
+    "lat": 35.919797,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00098",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 98",
+    "lon": 128.62052,
+    "lat": 34.928423,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00099",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 99",
+    "lon": 128.502601,
+    "lat": 35.615632,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00100",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 100",
+    "lon": 127.221988,
+    "lat": 35.99915,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00101",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 101",
+    "lon": 127.688364,
+    "lat": 35.508895,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00102",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 102",
+    "lon": 128.936736,
+    "lat": 34.6569,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00103",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 103",
+    "lon": 127.582289,
+    "lat": 35.496452,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00104",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 104",
+    "lon": 127.379811,
+    "lat": 35.552969,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00105",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 105",
+    "lon": 127.703965,
+    "lat": 34.913605,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00106",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 106",
+    "lon": 128.92325,
+    "lat": 35.440096,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00107",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 107",
+    "lon": 127.591473,
+    "lat": 35.432058,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00108",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 108",
+    "lon": 128.148478,
+    "lat": 35.251786,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00109",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 109",
+    "lon": 127.757071,
+    "lat": 35.294274,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00110",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 110",
+    "lon": 127.82584,
+    "lat": 35.137557,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00111",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 111",
+    "lon": 128.228467,
+    "lat": 35.43323,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00112",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 112",
+    "lon": 128.667586,
+    "lat": 35.387156,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00113",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 113",
+    "lon": 129.085125,
+    "lat": 35.125698,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00114",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 114",
+    "lon": 127.43076,
+    "lat": 34.895051,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00115",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 115",
+    "lon": 129.096287,
+    "lat": 34.625535,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00116",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 116",
+    "lon": 127.792072,
+    "lat": 34.56211,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00117",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 117",
+    "lon": 128.217784,
+    "lat": 35.564757,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00118",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 118",
+    "lon": 127.903238,
+    "lat": 35.273079,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00119",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 119",
+    "lon": 127.933243,
+    "lat": 35.888203,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00120",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 120",
+    "lon": 127.787159,
+    "lat": 34.545008,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00121",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 121",
+    "lon": 127.856921,
+    "lat": 34.546096,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00122",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 122",
+    "lon": 127.877933,
+    "lat": 35.581927,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00123",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 123",
+    "lon": 128.275166,
+    "lat": 35.201518,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00124",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 124",
+    "lon": 127.16588,
+    "lat": 34.513524,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00125",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 125",
+    "lon": 128.016399,
+    "lat": 34.660507,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00126",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 126",
+    "lon": 128.707587,
+    "lat": 35.509195,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00127",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 127",
+    "lon": 127.830533,
+    "lat": 35.194874,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00128",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 128",
+    "lon": 127.825432,
+    "lat": 34.962207,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00129",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 129",
+    "lon": 128.952858,
+    "lat": 34.745721,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00130",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 130",
+    "lon": 127.276141,
+    "lat": 35.500756,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00131",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 131",
+    "lon": 127.349731,
+    "lat": 35.76272,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00132",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 132",
+    "lon": null,
+    "lat": null,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00133",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 133",
+    "lon": 127.843235,
+    "lat": 35.207879,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00134",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 134",
+    "lon": 127.652774,
+    "lat": 34.738193,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00135",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 135",
+    "lon": 127.318775,
+    "lat": 35.377498,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00136",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 136",
+    "lon": 127.901879,
+    "lat": 35.621375,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00137",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 137",
+    "lon": null,
+    "lat": null,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00138",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 138",
+    "lon": 128.777643,
+    "lat": 35.801218,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00139",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 139",
+    "lon": 128.264947,
+    "lat": 35.446823,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00140",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 140",
+    "lon": 128.444184,
+    "lat": 34.532471,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00141",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 141",
+    "lon": 128.094095,
+    "lat": 35.35345,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00142",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 142",
+    "lon": 128.573569,
+    "lat": 35.76133,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00143",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 143",
+    "lon": 128.777795,
+    "lat": 35.030027,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00144",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 144",
+    "lon": 128.782974,
+    "lat": 35.661926,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00145",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 145",
+    "lon": 127.48876,
+    "lat": 35.872836,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00146",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 146",
+    "lon": 128.507487,
+    "lat": 35.300103,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00147",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 147",
+    "lon": 127.599452,
+    "lat": 35.386643,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00148",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 148",
+    "lon": 127.2011,
+    "lat": 35.519363,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00149",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 149",
+    "lon": 128.382203,
+    "lat": 35.403972,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00150",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 150",
+    "lon": 128.1747,
+    "lat": 35.166403,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00151",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 151",
+    "lon": 128.512225,
+    "lat": 35.620789,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00152",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 152",
+    "lon": 127.415038,
+    "lat": 35.541442,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00153",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 153",
+    "lon": 128.864961,
+    "lat": 35.146566,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00154",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 154",
+    "lon": 128.590016,
+    "lat": 35.356468,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00155",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 155",
+    "lon": 127.202754,
+    "lat": 35.77592,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00156",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 156",
+    "lon": 128.072551,
+    "lat": 35.847356,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00157",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 157",
+    "lon": 127.65243,
+    "lat": 35.428793,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00158",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 158",
+    "lon": 128.332886,
+    "lat": 34.982164,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00159",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 159",
+    "lon": 128.010188,
+    "lat": 35.2701,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00160",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 160",
+    "lon": null,
+    "lat": null,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00161",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 161",
+    "lon": 127.864149,
+    "lat": 35.309503,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00162",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 162",
+    "lon": 127.799977,
+    "lat": 35.657642,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00163",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 163",
+    "lon": 127.64014,
+    "lat": 35.270719,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00164",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 164",
+    "lon": 128.53183,
+    "lat": 34.596445,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00165",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 165",
+    "lon": 127.57928,
+    "lat": 35.874098,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00166",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 166",
+    "lon": 127.195365,
+    "lat": 35.02453,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00167",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 167",
+    "lon": 127.395518,
+    "lat": 34.560428,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00168",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 168",
+    "lon": 127.918032,
+    "lat": 35.881692,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00169",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 169",
+    "lon": 128.09129,
+    "lat": 35.954134,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00170",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 170",
+    "lon": 129.083149,
+    "lat": 35.972121,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00171",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 171",
+    "lon": 128.153183,
+    "lat": 34.656294,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00172",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 172",
+    "lon": 128.12852,
+    "lat": 35.57955,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00173",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 173",
+    "lon": 127.768753,
+    "lat": 35.919623,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00174",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 174",
+    "lon": 128.624379,
+    "lat": 34.65349,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00175",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 175",
+    "lon": null,
+    "lat": null,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00176",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 176",
+    "lon": 127.181755,
+    "lat": 34.906782,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00177",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 177",
+    "lon": null,
+    "lat": null,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00178",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 178",
+    "lon": 128.991424,
+    "lat": 35.605172,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00179",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 179",
+    "lon": 128.382043,
+    "lat": 35.382682,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00180",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 180",
+    "lon": 128.408448,
+    "lat": 34.666966,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00181",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 181",
+    "lon": 128.0279,
+    "lat": 35.767606,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00182",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 182",
+    "lon": 128.675817,
+    "lat": 35.033709,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00183",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 183",
+    "lon": 128.196356,
+    "lat": 34.980872,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00184",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 184",
+    "lon": 129.037486,
+    "lat": 35.905495,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00185",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 185",
+    "lon": 128.355551,
+    "lat": 35.755769,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00186",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 186",
+    "lon": 127.857252,
+    "lat": 35.492257,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00187",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 187",
+    "lon": 127.479375,
+    "lat": 35.129031,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00188",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 188",
+    "lon": 128.046463,
+    "lat": 34.848469,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00189",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 189",
+    "lon": 127.144596,
+    "lat": 34.691045,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00190",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 190",
+    "lon": 128.8858,
+    "lat": 35.085216,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00191",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 191",
+    "lon": 127.339322,
+    "lat": 35.541089,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00192",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 192",
+    "lon": 127.813637,
+    "lat": 35.322864,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00193",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 193",
+    "lon": 127.726196,
+    "lat": 35.602092,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00194",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 194",
+    "lon": 127.817958,
+    "lat": 35.625954,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00195",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 195",
+    "lon": 129.097899,
+    "lat": 35.642271,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00196",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 196",
+    "lon": 127.52385,
+    "lat": 35.598984,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00197",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "도서관",
+    "name": "창원시 도서관 197",
+    "lon": 129.084744,
+    "lat": 34.993068,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00198",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "청년센터",
+    "name": "창원시 청년센터 198",
+    "lon": 128.039334,
+    "lat": 35.536069,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00199",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "문화센터",
+    "name": "창원시 문화센터 199",
+    "lon": 128.449588,
+    "lat": 35.887913,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00200",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "ftype": "체육관",
+    "name": "창원시 체육관 200",
+    "lon": 128.233597,
+    "lat": 34.977952,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00201",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 1",
+    "lon": 128.158775,
+    "lat": 35.668063,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00202",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 2",
+    "lon": 128.498653,
+    "lat": 35.455096,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00203",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 3",
+    "lon": 128.474468,
+    "lat": 34.654058,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00204",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 4",
+    "lon": 127.313039,
+    "lat": 35.054501,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00205",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 5",
+    "lon": 128.198506,
+    "lat": 35.357778,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00206",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 6",
+    "lon": 127.209345,
+    "lat": 35.959109,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00207",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 7",
+    "lon": 128.535796,
+    "lat": 35.254514,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00208",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 8",
+    "lon": 128.171224,
+    "lat": 34.740987,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00209",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 9",
+    "lon": 128.461274,
+    "lat": 35.140638,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00210",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 10",
+    "lon": 127.17496,
+    "lat": 35.661639,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00211",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 11",
+    "lon": 128.593611,
+    "lat": 34.514063,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00212",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 12",
+    "lon": 127.670762,
+    "lat": 35.013577,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00213",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 13",
+    "lon": 129.026108,
+    "lat": 35.525523,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00214",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 14",
+    "lon": 128.394662,
+    "lat": 35.345359,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00215",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 15",
+    "lon": 128.965594,
+    "lat": 35.20252,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00216",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 16",
+    "lon": 128.138197,
+    "lat": 35.216539,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00217",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 17",
+    "lon": 129.008697,
+    "lat": 34.938312,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00218",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 18",
+    "lon": 128.105047,
+    "lat": 34.647968,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00219",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 19",
+    "lon": 128.066449,
+    "lat": 35.009303,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00220",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 20",
+    "lon": 127.376337,
+    "lat": 34.635576,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00221",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 21",
+    "lon": 128.957996,
+    "lat": 35.229419,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00222",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 22",
+    "lon": null,
+    "lat": null,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00223",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 23",
+    "lon": 128.676477,
+    "lat": 34.867547,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00224",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 24",
+    "lon": 127.485202,
+    "lat": 34.608811,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00225",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 25",
+    "lon": 127.72985,
+    "lat": 35.735616,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00226",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 26",
+    "lon": 127.303439,
+    "lat": 35.446028,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00227",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 27",
+    "lon": 127.414938,
+    "lat": 34.633158,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00228",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 28",
+    "lon": 127.332182,
+    "lat": 34.51323,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00229",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 29",
+    "lon": 128.20768,
+    "lat": 35.547057,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00230",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 30",
+    "lon": 128.743603,
+    "lat": 35.289256,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00231",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 31",
+    "lon": 128.980381,
+    "lat": 35.664508,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00232",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 32",
+    "lon": 127.936045,
+    "lat": 34.558296,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00233",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 33",
+    "lon": 128.515492,
+    "lat": 34.986398,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00234",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 34",
+    "lon": null,
+    "lat": null,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00235",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 35",
+    "lon": 128.268988,
+    "lat": 35.664447,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00236",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 36",
+    "lon": 128.850075,
+    "lat": 35.448368,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00237",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 37",
+    "lon": 127.807413,
+    "lat": 35.865,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00238",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 38",
+    "lon": 127.323132,
+    "lat": 34.872611,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00239",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 39",
+    "lon": 127.47048,
+    "lat": 34.510161,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00240",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 40",
+    "lon": 128.499809,
+    "lat": 35.434862,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00241",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 41",
+    "lon": 128.893855,
+    "lat": 35.241144,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00242",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 42",
+    "lon": 127.763386,
+    "lat": 35.56687,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00243",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 43",
+    "lon": 127.732453,
+    "lat": 35.697678,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00244",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 44",
+    "lon": 127.190484,
+    "lat": 35.9947,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00245",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 45",
+    "lon": 128.130669,
+    "lat": 35.101322,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00246",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 46",
+    "lon": 127.196882,
+    "lat": 34.64921,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00247",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 47",
+    "lon": 127.791157,
+    "lat": 35.006592,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00248",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 48",
+    "lon": 128.660167,
+    "lat": 34.604607,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00249",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 49",
+    "lon": 128.951957,
+    "lat": 35.396834,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00250",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 50",
+    "lon": 127.831979,
+    "lat": 35.375576,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00251",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 51",
+    "lon": 128.857188,
+    "lat": 34.736846,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00252",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 52",
+    "lon": 127.963887,
+    "lat": 34.863925,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00253",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 53",
+    "lon": 127.160023,
+    "lat": 35.916025,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00254",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 54",
+    "lon": 127.947969,
+    "lat": 34.671027,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00255",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 55",
+    "lon": 128.753301,
+    "lat": 35.068069,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00256",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 56",
+    "lon": 128.540653,
+    "lat": 35.851151,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00257",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 57",
+    "lon": 127.407916,
+    "lat": 35.129707,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00258",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 58",
+    "lon": 129.021662,
+    "lat": 35.192082,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00259",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 59",
+    "lon": 127.936991,
+    "lat": 35.545393,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00260",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 60",
+    "lon": 128.563674,
+    "lat": 34.741701,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00261",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "도서관",
+    "name": "진주시 도서관 61",
+    "lon": 129.019868,
+    "lat": 35.331028,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00262",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 62",
+    "lon": 127.277799,
+    "lat": 35.271387,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00263",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 63",
+    "lon": 128.939099,
+    "lat": 34.62141,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00264",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "청년센터",
+    "name": "진주시 청년센터 64",
+    "lon": 128.98003,
+    "lat": 34.647853,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00265",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 65",
+    "lon": 128.930865,
+    "lat": 35.436947,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00266",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 66",
+    "lon": 127.319547,
+    "lat": 35.393154,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00267",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "문화센터",
+    "name": "진주시 문화센터 67",
+    "lon": 127.249667,
+    "lat": 35.058973,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00268",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "ftype": "체육관",
+    "name": "진주시 체육관 68",
+    "lon": 128.146052,
+    "lat": 35.016778,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00269",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "체육관",
+    "name": "통영시 체육관 1",
+    "lon": 128.026615,
+    "lat": 35.193535,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00270",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "청년센터",
+    "name": "통영시 청년센터 2",
+    "lon": 127.995319,
+    "lat": 35.722791,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00271",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "체육관",
+    "name": "통영시 체육관 3",
+    "lon": 128.182326,
+    "lat": 34.87453,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00272",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "체육관",
+    "name": "통영시 체육관 4",
+    "lon": 128.464646,
+    "lat": 34.797634,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00273",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "문화센터",
+    "name": "통영시 문화센터 5",
+    "lon": 127.665155,
+    "lat": 35.902256,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00274",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "도서관",
+    "name": "통영시 도서관 6",
+    "lon": 127.158177,
+    "lat": 35.58917,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00275",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "문화센터",
+    "name": "통영시 문화센터 7",
+    "lon": 128.748435,
+    "lat": 34.87666,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00276",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "도서관",
+    "name": "통영시 도서관 8",
+    "lon": 128.930829,
+    "lat": 35.46362,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00277",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "체육관",
+    "name": "통영시 체육관 9",
+    "lon": 127.661347,
+    "lat": 35.159438,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00278",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "체육관",
+    "name": "통영시 체육관 10",
+    "lon": 128.474054,
+    "lat": 35.692974,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00279",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "체육관",
+    "name": "통영시 체육관 11",
+    "lon": 128.072249,
+    "lat": 35.729527,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00280",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "문화센터",
+    "name": "통영시 문화센터 12",
+    "lon": 127.991712,
+    "lat": 35.849966,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00281",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "문화센터",
+    "name": "통영시 문화센터 13",
+    "lon": 127.515515,
+    "lat": 35.976124,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00282",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "도서관",
+    "name": "통영시 도서관 14",
+    "lon": 127.935064,
+    "lat": 35.189549,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00283",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "문화센터",
+    "name": "통영시 문화센터 15",
+    "lon": 128.378339,
+    "lat": 35.345911,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00284",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "도서관",
+    "name": "통영시 도서관 16",
+    "lon": 127.627191,
+    "lat": 35.143767,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00285",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "도서관",
+    "name": "통영시 도서관 17",
+    "lon": 127.167476,
+    "lat": 35.520461,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00286",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "체육관",
+    "name": "통영시 체육관 18",
+    "lon": 128.234133,
+    "lat": 35.669709,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00287",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "도서관",
+    "name": "통영시 도서관 19",
+    "lon": null,
+    "lat": null,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00288",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "청년센터",
+    "name": "통영시 청년센터 20",
+    "lon": 127.978678,
+    "lat": 35.929978,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00289",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "도서관",
+    "name": "통영시 도서관 21",
+    "lon": 128.105357,
+    "lat": 35.109901,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00290",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "체육관",
+    "name": "통영시 체육관 22",
+    "lon": 128.250311,
+    "lat": 35.785902,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00291",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "문화센터",
+    "name": "통영시 문화센터 23",
+    "lon": 127.482105,
+    "lat": 34.838983,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00292",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "ftype": "문화센터",
+    "name": "통영시 문화센터 24",
+    "lon": 127.444877,
+    "lat": 34.62044,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00293",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "체육관",
+    "name": "사천시 체육관 1",
+    "lon": 128.133997,
+    "lat": 35.316366,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00294",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "도서관",
+    "name": "사천시 도서관 2",
+    "lon": 128.902101,
+    "lat": 35.037187,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00295",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 3",
+    "lon": null,
+    "lat": null,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00296",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "문화센터",
+    "name": "사천시 문화센터 4",
+    "lon": 128.378977,
+    "lat": 34.595705,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00297",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "문화센터",
+    "name": "사천시 문화센터 5",
+    "lon": 127.268174,
+    "lat": 34.95074,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00298",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 6",
+    "lon": 127.997802,
+    "lat": 34.927561,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00299",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "도서관",
+    "name": "사천시 도서관 7",
+    "lon": 128.980143,
+    "lat": 35.032382,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00300",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "도서관",
+    "name": "사천시 도서관 8",
+    "lon": 127.149146,
+    "lat": 35.314302,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00301",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "체육관",
+    "name": "사천시 체육관 9",
+    "lon": 128.866655,
+    "lat": 34.716708,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00302",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 10",
+    "lon": 127.290761,
+    "lat": 35.100549,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00303",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 11",
+    "lon": 128.465594,
+    "lat": 35.871758,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00304",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 12",
+    "lon": 128.619105,
+    "lat": 34.533559,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00305",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "체육관",
+    "name": "사천시 체육관 13",
+    "lon": 128.429459,
+    "lat": 34.98195,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00306",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "체육관",
+    "name": "사천시 체육관 14",
+    "lon": 127.588814,
+    "lat": 35.144984,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00307",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "문화센터",
+    "name": "사천시 문화센터 15",
+    "lon": 129.094267,
+    "lat": 34.916009,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00308",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 16",
+    "lon": 128.79671,
+    "lat": 35.190738,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00309",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "도서관",
+    "name": "사천시 도서관 17",
+    "lon": 128.512468,
+    "lat": 35.332392,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00310",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 18",
+    "lon": 128.332148,
+    "lat": 35.672826,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00311",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 19",
+    "lon": 128.917898,
+    "lat": 35.816589,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00312",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "청년센터",
+    "name": "사천시 청년센터 20",
+    "lon": 127.119331,
+    "lat": 34.599319,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00313",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "도서관",
+    "name": "사천시 도서관 21",
+    "lon": 129.006807,
+    "lat": 35.150903,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00314",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "ftype": "도서관",
+    "name": "사천시 도서관 22",
+    "lon": 127.466697,
+    "lat": 35.11084,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00315",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 1",
+    "lon": 127.538126,
+    "lat": 34.528897,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00316",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 2",
+    "lon": 127.118522,
+    "lat": 35.382684,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00317",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 3",
+    "lon": 128.20342,
+    "lat": 35.137526,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00318",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 4",
+    "lon": 128.699632,
+    "lat": 35.519775,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00319",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 5",
+    "lon": 128.117358,
+    "lat": 35.683829,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00320",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 6",
+    "lon": 127.680397,
+    "lat": 35.965913,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00321",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 7",
+    "lon": 127.258035,
+    "lat": 35.233518,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00322",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 8",
+    "lon": 128.991182,
+    "lat": 34.967749,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00323",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 9",
+    "lon": 127.368149,
+    "lat": 34.999858,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00324",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 10",
+    "lon": null,
+    "lat": null,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00325",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 11",
+    "lon": 128.018346,
+    "lat": 35.7445,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00326",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 12",
+    "lon": 128.877446,
+    "lat": 35.32966,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00327",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 13",
+    "lon": 128.162124,
+    "lat": 34.655731,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00328",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 14",
+    "lon": 128.434016,
+    "lat": 35.863446,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00329",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 15",
+    "lon": 127.852911,
+    "lat": 34.841379,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00330",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 16",
+    "lon": 128.895123,
+    "lat": 34.527483,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00331",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 17",
+    "lon": 128.110061,
+    "lat": 35.788445,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00332",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 18",
+    "lon": 127.145121,
+    "lat": 34.640831,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00333",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 19",
+    "lon": 128.295864,
+    "lat": 35.453875,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00334",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 20",
+    "lon": 128.036967,
+    "lat": 35.585618,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00335",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 21",
+    "lon": 127.845735,
+    "lat": 34.968315,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00336",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 22",
+    "lon": 127.588267,
+    "lat": 35.074472,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00337",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 23",
+    "lon": 128.383556,
+    "lat": 34.614727,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00338",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 24",
+    "lon": 127.809926,
+    "lat": 35.6522,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00339",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 25",
+    "lon": 128.231219,
+    "lat": 34.576196,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00340",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 26",
+    "lon": 128.507481,
+    "lat": 35.778816,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00341",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 27",
+    "lon": 128.44053,
+    "lat": 35.608864,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00342",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 28",
+    "lon": 127.475289,
+    "lat": 35.371792,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00343",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 29",
+    "lon": 128.922934,
+    "lat": 34.656795,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00344",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 30",
+    "lon": 129.099437,
+    "lat": 35.243506,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00345",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 31",
+    "lon": 128.652872,
+    "lat": 35.329329,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00346",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 32",
+    "lon": 127.621565,
+    "lat": 35.424051,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00347",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 33",
+    "lon": 127.89912,
+    "lat": 35.202091,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00348",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 34",
+    "lon": 127.317773,
+    "lat": 35.128639,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00349",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 35",
+    "lon": 128.620103,
+    "lat": 35.423731,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00350",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 36",
+    "lon": 128.739307,
+    "lat": 34.581434,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00351",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 37",
+    "lon": 128.168934,
+    "lat": 35.70575,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00352",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 38",
+    "lon": 128.069993,
+    "lat": 35.762661,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00353",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 39",
+    "lon": 128.916814,
+    "lat": 34.785919,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00354",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 40",
+    "lon": 128.704146,
+    "lat": 35.871892,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00355",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 41",
+    "lon": 128.944456,
+    "lat": 35.480714,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00356",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 42",
+    "lon": 128.463193,
+    "lat": 35.116336,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00357",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 43",
+    "lon": 128.195335,
+    "lat": 34.822547,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00358",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 44",
+    "lon": 127.574278,
+    "lat": 34.807473,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00359",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 45",
+    "lon": 129.056821,
+    "lat": 35.607177,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00360",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 46",
+    "lon": 127.754867,
+    "lat": 35.401222,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00361",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 47",
+    "lon": 127.860657,
+    "lat": 35.299239,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00362",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 48",
+    "lon": 128.608651,
+    "lat": 34.514785,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00363",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 49",
+    "lon": 128.897749,
+    "lat": 34.753105,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00364",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 50",
+    "lon": 128.165043,
+    "lat": 34.816105,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00365",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 51",
+    "lon": 128.848877,
+    "lat": 34.946027,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00366",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 52",
+    "lon": 128.912107,
+    "lat": 35.478255,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00367",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 53",
+    "lon": 127.667714,
+    "lat": 35.484511,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00368",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 54",
+    "lon": 127.205989,
+    "lat": 34.839816,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00369",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 55",
+    "lon": 127.540406,
+    "lat": 34.876751,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00370",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 56",
+    "lon": 127.613725,
+    "lat": 34.982112,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00371",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 57",
+    "lon": 127.212005,
+    "lat": 34.55766,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00372",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 58",
+    "lon": 128.685762,
+    "lat": 35.343864,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00373",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 59",
+    "lon": 128.339188,
+    "lat": 35.752117,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00374",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 60",
+    "lon": 127.984623,
+    "lat": 35.712041,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00375",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 61",
+    "lon": 128.225923,
+    "lat": 35.560399,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00376",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 62",
+    "lon": 128.041817,
+    "lat": 35.173348,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00377",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 63",
+    "lon": 128.949197,
+    "lat": 34.991093,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00378",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 64",
+    "lon": 128.401455,
+    "lat": 34.852444,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00379",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 65",
+    "lon": 127.110374,
+    "lat": 35.644785,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00380",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 66",
+    "lon": 128.16096,
+    "lat": 35.219551,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00381",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 67",
+    "lon": null,
+    "lat": null,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00382",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 68",
+    "lon": 127.324217,
+    "lat": 35.049718,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00383",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 69",
+    "lon": 128.106623,
+    "lat": 35.419314,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00384",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 70",
+    "lon": 128.32761,
+    "lat": 35.919432,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00385",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 71",
+    "lon": null,
+    "lat": null,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00386",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 72",
+    "lon": 127.695062,
+    "lat": 35.11852,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00387",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 73",
+    "lon": 128.714874,
+    "lat": 35.055415,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00388",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 74",
+    "lon": 128.880381,
+    "lat": 35.587032,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00389",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 75",
+    "lon": 128.030906,
+    "lat": 35.500928,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00390",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 76",
+    "lon": 127.21977,
+    "lat": 35.236578,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00391",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 77",
+    "lon": 129.03255,
+    "lat": 35.891082,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00392",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 78",
+    "lon": 128.309844,
+    "lat": 35.435484,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00393",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 79",
+    "lon": 127.466742,
+    "lat": 35.673593,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00394",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 80",
+    "lon": 128.216992,
+    "lat": 35.261363,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00395",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 81",
+    "lon": 127.669061,
+    "lat": 35.154385,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00396",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 82",
+    "lon": 127.396697,
+    "lat": 34.773524,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00397",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 83",
+    "lon": 127.192865,
+    "lat": 35.126319,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00398",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 84",
+    "lon": 127.555019,
+    "lat": 35.412935,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00399",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 85",
+    "lon": 127.622665,
+    "lat": 35.844995,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00400",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 86",
+    "lon": 127.956397,
+    "lat": 35.226457,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00401",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 87",
+    "lon": 128.95772,
+    "lat": 34.521243,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00402",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 88",
+    "lon": 128.574504,
+    "lat": 35.064704,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00403",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 89",
+    "lon": 127.961604,
+    "lat": 35.595124,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00404",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 90",
+    "lon": 127.391076,
+    "lat": 35.757862,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00405",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 91",
+    "lon": 128.336388,
+    "lat": 35.569472,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00406",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 92",
+    "lon": 127.196487,
+    "lat": 35.99987,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00407",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 93",
+    "lon": 127.1211,
+    "lat": 35.705877,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00408",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 94",
+    "lon": 127.560271,
+    "lat": 35.487304,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00409",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 95",
+    "lon": 128.958249,
+    "lat": 34.766409,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00410",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 96",
+    "lon": 127.344888,
+    "lat": 35.233777,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00411",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 97",
+    "lon": 128.444496,
+    "lat": 35.313964,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00412",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 98",
+    "lon": 128.356731,
+    "lat": 35.13257,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00413",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 99",
+    "lon": 128.306908,
+    "lat": 34.706655,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00414",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 100",
+    "lon": 128.589689,
+    "lat": 35.738126,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00415",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 101",
+    "lon": 128.249781,
+    "lat": 35.930979,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00416",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "청년센터",
+    "name": "김해시 청년센터 102",
+    "lon": 128.143549,
+    "lat": 35.599842,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00417",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 103",
+    "lon": 127.623636,
+    "lat": 34.658206,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00418",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "문화센터",
+    "name": "김해시 문화센터 104",
+    "lon": 127.41708,
+    "lat": 34.777983,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00419",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "도서관",
+    "name": "김해시 도서관 105",
+    "lon": 127.202763,
+    "lat": 35.472424,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00420",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "ftype": "체육관",
+    "name": "김해시 체육관 106",
+    "lon": null,
+    "lat": null,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00421",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "체육관",
+    "name": "밀양시 체육관 1",
+    "lon": 127.351924,
+    "lat": 35.781144,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00422",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "문화센터",
+    "name": "밀양시 문화센터 2",
+    "lon": 127.325402,
+    "lat": 34.884499,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00423",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "체육관",
+    "name": "밀양시 체육관 3",
+    "lon": 128.103593,
+    "lat": 35.113746,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00424",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "청년센터",
+    "name": "밀양시 청년센터 4",
+    "lon": 127.828554,
+    "lat": 35.685869,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00425",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "도서관",
+    "name": "밀양시 도서관 5",
+    "lon": 128.861376,
+    "lat": 35.042763,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00426",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "도서관",
+    "name": "밀양시 도서관 6",
+    "lon": 128.799681,
+    "lat": 35.843073,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00427",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "문화센터",
+    "name": "밀양시 문화센터 7",
+    "lon": 127.449634,
+    "lat": 34.905817,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00428",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "도서관",
+    "name": "밀양시 도서관 8",
+    "lon": 128.759604,
+    "lat": 34.920342,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00429",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "체육관",
+    "name": "밀양시 체육관 9",
+    "lon": 129.079359,
+    "lat": 35.243581,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00430",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "도서관",
+    "name": "밀양시 도서관 10",
+    "lon": 128.612454,
+    "lat": 34.901355,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00431",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "청년센터",
+    "name": "밀양시 청년센터 11",
+    "lon": 127.297747,
+    "lat": 35.44337,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00432",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "문화센터",
+    "name": "밀양시 문화센터 12",
+    "lon": 128.557572,
+    "lat": 35.40888,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00433",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "체육관",
+    "name": "밀양시 체육관 13",
+    "lon": 128.740168,
+    "lat": 35.631908,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00434",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "문화센터",
+    "name": "밀양시 문화센터 14",
+    "lon": 128.936981,
+    "lat": 35.643938,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00435",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "도서관",
+    "name": "밀양시 도서관 15",
+    "lon": 128.953338,
+    "lat": 34.844301,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00436",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "체육관",
+    "name": "밀양시 체육관 16",
+    "lon": 127.516738,
+    "lat": 35.4341,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00437",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "체육관",
+    "name": "밀양시 체육관 17",
+    "lon": 128.130749,
+    "lat": 35.075839,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00438",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "체육관",
+    "name": "밀양시 체육관 18",
+    "lon": 127.921137,
+    "lat": 35.182345,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00439",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "도서관",
+    "name": "밀양시 도서관 19",
+    "lon": 128.126819,
+    "lat": 35.195828,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00440",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "ftype": "도서관",
+    "name": "밀양시 도서관 20",
+    "lon": 128.800103,
+    "lat": 34.655876,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00441",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "체육관",
+    "name": "거제시 체육관 1",
+    "lon": 128.219727,
+    "lat": 34.961907,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00442",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 2",
+    "lon": 128.937047,
+    "lat": 35.167084,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00443",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 3",
+    "lon": 128.39955,
+    "lat": 34.863054,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00444",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 4",
+    "lon": 129.02203,
+    "lat": 35.245219,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00445",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 5",
+    "lon": 128.093074,
+    "lat": 35.333481,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00446",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 6",
+    "lon": 128.348301,
+    "lat": 34.596087,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00447",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "체육관",
+    "name": "거제시 체육관 7",
+    "lon": 128.824548,
+    "lat": 34.861492,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00448",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "체육관",
+    "name": "거제시 체육관 8",
+    "lon": 127.364089,
+    "lat": 35.466885,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00449",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 9",
+    "lon": 127.977669,
+    "lat": 35.261097,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00450",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 10",
+    "lon": 128.95099,
+    "lat": 35.192978,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00451",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 11",
+    "lon": 127.193211,
+    "lat": 35.223247,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00452",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 12",
+    "lon": 127.630357,
+    "lat": 34.671662,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00453",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "체육관",
+    "name": "거제시 체육관 13",
+    "lon": 127.634,
+    "lat": 35.31191,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00454",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 14",
+    "lon": 128.744826,
+    "lat": 35.003598,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00455",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 15",
+    "lon": 128.999306,
+    "lat": 35.161536,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00456",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 16",
+    "lon": 128.148414,
+    "lat": 34.534247,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00457",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 17",
+    "lon": 128.399252,
+    "lat": 35.860451,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00458",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 18",
+    "lon": 127.19059,
+    "lat": 35.734234,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00459",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 19",
+    "lon": 128.631475,
+    "lat": 34.713238,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00460",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 20",
+    "lon": 128.922304,
+    "lat": 35.247675,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00461",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "체육관",
+    "name": "거제시 체육관 21",
+    "lon": 127.66204,
+    "lat": 35.857888,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00462",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 22",
+    "lon": 127.610152,
+    "lat": 35.729978,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00463",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 23",
+    "lon": 127.825504,
+    "lat": 35.914151,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00464",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 24",
+    "lon": 127.943686,
+    "lat": 34.76023,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00465",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "체육관",
+    "name": "거제시 체육관 25",
+    "lon": 129.050031,
+    "lat": 35.551965,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00466",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 26",
+    "lon": 128.885329,
+    "lat": 34.866668,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00467",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 27",
+    "lon": 128.907612,
+    "lat": 35.936664,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00468",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 28",
+    "lon": 129.067447,
+    "lat": 35.01577,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00469",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 29",
+    "lon": 128.111706,
+    "lat": 35.024812,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00470",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 30",
+    "lon": 128.111809,
+    "lat": 34.504836,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00471",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 31",
+    "lon": 128.86,
+    "lat": 34.994504,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00472",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 32",
+    "lon": 128.358016,
+    "lat": 35.533404,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00473",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 33",
+    "lon": 127.773515,
+    "lat": 35.790816,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00474",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 34",
+    "lon": 128.364418,
+    "lat": 35.529104,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00475",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 35",
+    "lon": null,
+    "lat": null,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00476",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 36",
+    "lon": 127.329824,
+    "lat": 35.169645,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00477",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "체육관",
+    "name": "거제시 체육관 37",
+    "lon": 128.612468,
+    "lat": 35.773199,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00478",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 38",
+    "lon": 127.320109,
+    "lat": 35.209131,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00479",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 39",
+    "lon": 128.024237,
+    "lat": 34.934204,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00480",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 40",
+    "lon": 128.912492,
+    "lat": 34.617288,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00481",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 41",
+    "lon": 128.273964,
+    "lat": 35.272473,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00482",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 42",
+    "lon": 127.345541,
+    "lat": 35.805363,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00483",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 43",
+    "lon": 127.797608,
+    "lat": 35.979016,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00484",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 44",
+    "lon": 127.583991,
+    "lat": 35.840472,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00485",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "도서관",
+    "name": "거제시 도서관 45",
+    "lon": 128.67494,
+    "lat": 35.691263,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00486",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "체육관",
+    "name": "거제시 체육관 46",
+    "lon": 128.729848,
+    "lat": 35.743432,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00487",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "청년센터",
+    "name": "거제시 청년센터 47",
+    "lon": 127.182726,
+    "lat": 34.814807,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00488",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "ftype": "문화센터",
+    "name": "거제시 문화센터 48",
+    "lon": 127.257258,
+    "lat": 35.353419,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00489",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 1",
+    "lon": 129.020177,
+    "lat": 35.66931,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00490",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 2",
+    "lon": 128.581145,
+    "lat": 35.513308,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00491",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 3",
+    "lon": 128.137582,
+    "lat": 35.941213,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00492",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 4",
+    "lon": 128.03408,
+    "lat": 35.832931,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00493",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 5",
+    "lon": 127.593169,
+    "lat": 35.243687,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00494",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 6",
+    "lon": 127.28093,
+    "lat": 35.34956,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00495",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 7",
+    "lon": 127.68551,
+    "lat": 35.351436,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00496",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 8",
+    "lon": 128.671523,
+    "lat": 35.244215,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00497",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 9",
+    "lon": 128.384174,
+    "lat": 35.737925,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00498",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 10",
+    "lon": 127.1429,
+    "lat": 34.857906,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00499",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 11",
+    "lon": 128.434845,
+    "lat": 35.489489,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00500",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 12",
+    "lon": 127.159693,
+    "lat": 35.802154,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00501",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 13",
+    "lon": 128.07178,
+    "lat": 34.847921,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00502",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 14",
+    "lon": 127.948715,
+    "lat": 35.94207,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00503",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 15",
+    "lon": 128.655213,
+    "lat": 35.634689,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00504",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 16",
+    "lon": 128.067077,
+    "lat": 35.666471,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00505",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 17",
+    "lon": 128.389242,
+    "lat": 35.979309,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00506",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 18",
+    "lon": 127.26697,
+    "lat": 34.616854,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00507",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 19",
+    "lon": null,
+    "lat": null,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00508",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 20",
+    "lon": 128.084447,
+    "lat": 34.800226,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00509",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 21",
+    "lon": 127.14387,
+    "lat": 35.39045,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00510",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 22",
+    "lon": 127.445196,
+    "lat": 34.730455,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00511",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 23",
+    "lon": 128.286673,
+    "lat": 35.916931,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00512",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 24",
+    "lon": 127.1988,
+    "lat": 35.691817,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00513",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 25",
+    "lon": 127.776807,
+    "lat": 35.600606,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00514",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 26",
+    "lon": 128.042579,
+    "lat": 34.859604,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00515",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 27",
+    "lon": 128.131263,
+    "lat": 35.629021,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00516",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 28",
+    "lon": 127.257453,
+    "lat": 35.461569,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00517",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 29",
+    "lon": 127.400579,
+    "lat": 35.966836,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00518",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 30",
+    "lon": 127.811768,
+    "lat": 34.528984,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00519",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 31",
+    "lon": 127.832346,
+    "lat": 34.780531,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00520",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 32",
+    "lon": 128.793516,
+    "lat": 34.978508,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00521",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 33",
+    "lon": 127.638373,
+    "lat": 34.862164,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00522",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 34",
+    "lon": 127.796208,
+    "lat": 35.902227,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00523",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 35",
+    "lon": 128.513236,
+    "lat": 35.523544,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00524",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 36",
+    "lon": 127.994953,
+    "lat": 34.778714,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00525",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 37",
+    "lon": 127.905409,
+    "lat": 34.628981,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00526",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 38",
+    "lon": 127.526289,
+    "lat": 35.118226,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00527",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 39",
+    "lon": 128.598861,
+    "lat": 34.862002,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00528",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 40",
+    "lon": 127.552848,
+    "lat": 35.789041,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00529",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 41",
+    "lon": 127.54773,
+    "lat": 35.572907,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00530",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 42",
+    "lon": 128.177184,
+    "lat": 34.658178,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00531",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 43",
+    "lon": 128.744594,
+    "lat": 34.97345,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00532",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 44",
+    "lon": 127.292876,
+    "lat": 35.687074,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00533",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 45",
+    "lon": 127.818886,
+    "lat": 35.126097,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00534",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 46",
+    "lon": 128.650515,
+    "lat": 35.469933,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00535",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 47",
+    "lon": 128.681103,
+    "lat": 35.46194,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00536",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 48",
+    "lon": 128.996224,
+    "lat": 35.358251,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00537",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 49",
+    "lon": 127.475766,
+    "lat": 34.547157,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00538",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 50",
+    "lon": 128.236094,
+    "lat": 35.49812,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00539",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 51",
+    "lon": 128.006463,
+    "lat": 34.846764,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00540",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 52",
+    "lon": 128.316219,
+    "lat": 35.786093,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00541",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 53",
+    "lon": 128.274804,
+    "lat": 34.899874,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00542",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 54",
+    "lon": 128.009996,
+    "lat": 34.64347,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00543",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 55",
+    "lon": 127.45679,
+    "lat": 35.966727,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00544",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 56",
+    "lon": 127.196906,
+    "lat": 34.586472,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00545",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 57",
+    "lon": 127.149842,
+    "lat": 35.927942,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00546",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 58",
+    "lon": 127.625209,
+    "lat": 34.549765,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00547",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 59",
+    "lon": 127.686633,
+    "lat": 35.354622,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00548",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 60",
+    "lon": 128.699828,
+    "lat": 34.771865,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00549",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 61",
+    "lon": 128.352877,
+    "lat": 35.317871,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00550",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 62",
+    "lon": 128.651108,
+    "lat": 35.491876,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00551",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 63",
+    "lon": 129.090386,
+    "lat": 35.511617,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00552",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 64",
+    "lon": 128.645268,
+    "lat": 35.206524,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00553",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "문화센터",
+    "name": "양산시 문화센터 65",
+    "lon": 127.338944,
+    "lat": 35.217267,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00554",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 66",
+    "lon": 128.118016,
+    "lat": 34.513303,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00555",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 67",
+    "lon": 128.695966,
+    "lat": 35.386229,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00556",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "도서관",
+    "name": "양산시 도서관 68",
+    "lon": 128.974179,
+    "lat": 35.5885,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00557",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "청년센터",
+    "name": "양산시 청년센터 69",
+    "lon": 128.6764,
+    "lat": 34.75067,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00558",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "ftype": "체육관",
+    "name": "양산시 체육관 70",
+    "lon": 128.423083,
+    "lat": 35.336665,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00559",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "문화센터",
+    "name": "의령군 문화센터 1",
+    "lon": 128.662003,
+    "lat": 35.73757,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00560",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "청년센터",
+    "name": "의령군 청년센터 2",
+    "lon": 128.237081,
+    "lat": 35.169461,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00561",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "문화센터",
+    "name": "의령군 문화센터 3",
+    "lon": 128.76384,
+    "lat": 35.650139,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00562",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "청년센터",
+    "name": "의령군 청년센터 4",
+    "lon": 128.25375,
+    "lat": 35.945582,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00563",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "체육관",
+    "name": "의령군 체육관 5",
+    "lon": 127.409801,
+    "lat": 34.937569,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00564",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "체육관",
+    "name": "의령군 체육관 6",
+    "lon": 127.116157,
+    "lat": 34.798241,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00565",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "청년센터",
+    "name": "의령군 청년센터 7",
+    "lon": 128.634905,
+    "lat": 35.992771,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00566",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "문화센터",
+    "name": "의령군 문화센터 8",
+    "lon": 127.685039,
+    "lat": 35.111379,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00567",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "체육관",
+    "name": "의령군 체육관 9",
+    "lon": 128.92131,
+    "lat": 34.641837,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00568",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "체육관",
+    "name": "의령군 체육관 10",
+    "lon": 127.386795,
+    "lat": 35.749057,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00569",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "도서관",
+    "name": "의령군 도서관 11",
+    "lon": 128.632236,
+    "lat": 35.412341,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00570",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "도서관",
+    "name": "의령군 도서관 12",
+    "lon": 127.106922,
+    "lat": 35.013043,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00571",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "청년센터",
+    "name": "의령군 청년센터 13",
+    "lon": 128.234363,
+    "lat": 34.633873,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00572",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "도서관",
+    "name": "의령군 도서관 14",
+    "lon": 127.224843,
+    "lat": 35.170332,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00573",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "체육관",
+    "name": "의령군 체육관 15",
+    "lon": 127.231812,
+    "lat": 35.027246,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00574",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "도서관",
+    "name": "의령군 도서관 16",
+    "lon": 128.138016,
+    "lat": 35.473896,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00575",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "문화센터",
+    "name": "의령군 문화센터 17",
+    "lon": 127.666436,
+    "lat": 35.5223,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00576",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "체육관",
+    "name": "의령군 체육관 18",
+    "lon": 128.265814,
+    "lat": 34.865056,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00577",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "도서관",
+    "name": "의령군 도서관 19",
+    "lon": 128.798933,
+    "lat": 35.201954,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00578",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "ftype": "청년센터",
+    "name": "의령군 청년센터 20",
+    "lon": 127.181855,
+    "lat": 35.21339,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00579",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "체육관",
+    "name": "함안군 체육관 1",
+    "lon": 128.798164,
+    "lat": 35.345819,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00580",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "체육관",
+    "name": "함안군 체육관 2",
+    "lon": 128.322289,
+    "lat": 35.488636,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00581",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "문화센터",
+    "name": "함안군 문화센터 3",
+    "lon": 127.557091,
+    "lat": 34.634129,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00582",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "청년센터",
+    "name": "함안군 청년센터 4",
+    "lon": 128.782001,
+    "lat": 34.887484,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00583",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "청년센터",
+    "name": "함안군 청년센터 5",
+    "lon": 127.74788,
+    "lat": 35.015555,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00584",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "체육관",
+    "name": "함안군 체육관 6",
+    "lon": 128.165783,
+    "lat": 35.125156,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00585",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "청년센터",
+    "name": "함안군 청년센터 7",
+    "lon": 127.550984,
+    "lat": 34.63463,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00586",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "청년센터",
+    "name": "함안군 청년센터 8",
+    "lon": 128.432212,
+    "lat": 35.566029,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00587",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "문화센터",
+    "name": "함안군 문화센터 9",
+    "lon": 127.768414,
+    "lat": 34.899503,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00588",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "도서관",
+    "name": "함안군 도서관 10",
+    "lon": 127.279303,
+    "lat": 35.077999,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00589",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "청년센터",
+    "name": "함안군 청년센터 11",
+    "lon": 128.884916,
+    "lat": 34.842571,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00590",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "체육관",
+    "name": "함안군 체육관 12",
+    "lon": 128.997964,
+    "lat": 35.670604,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00591",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "청년센터",
+    "name": "함안군 청년센터 13",
+    "lon": 127.697414,
+    "lat": 35.228748,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00592",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "체육관",
+    "name": "함안군 체육관 14",
+    "lon": 127.986868,
+    "lat": 35.085757,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00593",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "도서관",
+    "name": "함안군 도서관 15",
+    "lon": 129.017847,
+    "lat": 35.492619,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00594",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "도서관",
+    "name": "함안군 도서관 16",
+    "lon": 127.405528,
+    "lat": 35.77124,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00595",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "체육관",
+    "name": "함안군 체육관 17",
+    "lon": 127.292425,
+    "lat": 35.380145,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00596",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "도서관",
+    "name": "함안군 도서관 18",
+    "lon": 127.866228,
+    "lat": 35.049372,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00597",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "문화센터",
+    "name": "함안군 문화센터 19",
+    "lon": 128.396322,
+    "lat": 34.726737,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00598",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "ftype": "청년센터",
+    "name": "함안군 청년센터 20",
+    "lon": 128.754889,
+    "lat": 35.515466,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00599",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "도서관",
+    "name": "창녕군 도서관 1",
+    "lon": 128.981992,
+    "lat": 34.965161,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00600",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "체육관",
+    "name": "창녕군 체육관 2",
+    "lon": 128.851037,
+    "lat": 35.23145,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00601",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "도서관",
+    "name": "창녕군 도서관 3",
+    "lon": 128.206547,
+    "lat": 35.317538,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00602",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "청년센터",
+    "name": "창녕군 청년센터 4",
+    "lon": 127.512741,
+    "lat": 35.838115,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00603",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "청년센터",
+    "name": "창녕군 청년센터 5",
+    "lon": 128.064019,
+    "lat": 35.529549,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00604",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "도서관",
+    "name": "창녕군 도서관 6",
+    "lon": 127.928726,
+    "lat": 34.763673,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00605",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "도서관",
+    "name": "창녕군 도서관 7",
+    "lon": 128.526858,
+    "lat": 35.045454,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00606",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "체육관",
+    "name": "창녕군 체육관 8",
+    "lon": 127.941803,
+    "lat": 35.975334,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00607",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "체육관",
+    "name": "창녕군 체육관 9",
+    "lon": 127.882653,
+    "lat": 34.54355,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00608",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "도서관",
+    "name": "창녕군 도서관 10",
+    "lon": 128.840339,
+    "lat": 34.673261,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00609",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "청년센터",
+    "name": "창녕군 청년센터 11",
+    "lon": 127.661824,
+    "lat": 35.346897,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00610",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "청년센터",
+    "name": "창녕군 청년센터 12",
+    "lon": 128.422723,
+    "lat": 34.681229,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00611",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "체육관",
+    "name": "창녕군 체육관 13",
+    "lon": 129.01493,
+    "lat": 35.237317,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00612",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "도서관",
+    "name": "창녕군 도서관 14",
+    "lon": 128.688557,
+    "lat": 35.514408,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00613",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "체육관",
+    "name": "창녕군 체육관 15",
+    "lon": 127.939248,
+    "lat": 35.725607,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00614",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "문화센터",
+    "name": "창녕군 문화센터 16",
+    "lon": 128.824806,
+    "lat": 34.92058,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00615",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "문화센터",
+    "name": "창녕군 문화센터 17",
+    "lon": 127.998432,
+    "lat": 34.711229,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00616",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "체육관",
+    "name": "창녕군 체육관 18",
+    "lon": 127.860189,
+    "lat": 35.065642,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00617",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "청년센터",
+    "name": "창녕군 청년센터 19",
+    "lon": 127.751299,
+    "lat": 35.79437,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00618",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "ftype": "문화센터",
+    "name": "창녕군 문화센터 20",
+    "lon": 128.581814,
+    "lat": 35.186076,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00619",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "도서관",
+    "name": "고성군 도서관 1",
+    "lon": 127.631216,
+    "lat": 35.625808,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00620",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "문화센터",
+    "name": "고성군 문화센터 2",
+    "lon": 128.16936,
+    "lat": 34.929036,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00621",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "문화센터",
+    "name": "고성군 문화센터 3",
+    "lon": 128.121045,
+    "lat": 35.689292,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00622",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "문화센터",
+    "name": "고성군 문화센터 4",
+    "lon": 127.629107,
+    "lat": 35.963489,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00623",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "도서관",
+    "name": "고성군 도서관 5",
+    "lon": null,
+    "lat": null,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00624",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "문화센터",
+    "name": "고성군 문화센터 6",
+    "lon": 127.407337,
+    "lat": 35.221383,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00625",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "도서관",
+    "name": "고성군 도서관 7",
+    "lon": 127.45663,
+    "lat": 35.026765,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00626",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "도서관",
+    "name": "고성군 도서관 8",
+    "lon": 128.363169,
+    "lat": 35.153336,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00627",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "청년센터",
+    "name": "고성군 청년센터 9",
+    "lon": 127.562505,
+    "lat": 35.663231,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00628",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "청년센터",
+    "name": "고성군 청년센터 10",
+    "lon": 127.539346,
+    "lat": 35.684869,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00629",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "청년센터",
+    "name": "고성군 청년센터 11",
+    "lon": 128.579483,
+    "lat": 35.319405,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00630",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "도서관",
+    "name": "고성군 도서관 12",
+    "lon": 127.94274,
+    "lat": 35.037523,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00631",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "문화센터",
+    "name": "고성군 문화센터 13",
+    "lon": 128.13007,
+    "lat": 34.703366,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00632",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "청년센터",
+    "name": "고성군 청년센터 14",
+    "lon": 127.183768,
+    "lat": 34.760346,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00633",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "청년센터",
+    "name": "고성군 청년센터 15",
+    "lon": 127.951959,
+    "lat": 35.963953,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00634",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "체육관",
+    "name": "고성군 체육관 16",
+    "lon": 128.222949,
+    "lat": 35.235868,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00635",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "문화센터",
+    "name": "고성군 문화센터 17",
+    "lon": 128.647988,
+    "lat": 35.118583,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00636",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "체육관",
+    "name": "고성군 체육관 18",
+    "lon": 127.906064,
+    "lat": 35.160111,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00637",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "체육관",
+    "name": "고성군 체육관 19",
+    "lon": 128.838837,
+    "lat": 35.177315,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00638",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "ftype": "도서관",
+    "name": "고성군 도서관 20",
+    "lon": 128.766683,
+    "lat": 35.445817,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00639",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "청년센터",
+    "name": "남해군 청년센터 1",
+    "lon": 128.743131,
+    "lat": 35.109829,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00640",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "체육관",
+    "name": "남해군 체육관 2",
+    "lon": 128.88926,
+    "lat": 34.563969,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00641",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "청년센터",
+    "name": "남해군 청년센터 3",
+    "lon": 128.453726,
+    "lat": 35.43237,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00642",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "도서관",
+    "name": "남해군 도서관 4",
+    "lon": 127.331111,
+    "lat": 35.46317,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00643",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "체육관",
+    "name": "남해군 체육관 5",
+    "lon": 128.751273,
+    "lat": 34.771272,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00644",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "문화센터",
+    "name": "남해군 문화센터 6",
+    "lon": 128.822245,
+    "lat": 34.608349,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00645",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "체육관",
+    "name": "남해군 체육관 7",
+    "lon": 128.82149,
+    "lat": 35.132254,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00646",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "문화센터",
+    "name": "남해군 문화센터 8",
+    "lon": 128.323377,
+    "lat": 35.828171,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00647",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "체육관",
+    "name": "남해군 체육관 9",
+    "lon": 127.346118,
+    "lat": 34.863957,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00648",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "청년센터",
+    "name": "남해군 청년센터 10",
+    "lon": 127.649412,
+    "lat": 35.773345,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00649",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "체육관",
+    "name": "남해군 체육관 11",
+    "lon": 128.744192,
+    "lat": 34.793924,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00650",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "문화센터",
+    "name": "남해군 문화센터 12",
+    "lon": 127.883232,
+    "lat": 34.834389,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00651",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "도서관",
+    "name": "남해군 도서관 13",
+    "lon": 127.474966,
+    "lat": 34.829203,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00652",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "도서관",
+    "name": "남해군 도서관 14",
+    "lon": 128.837864,
+    "lat": 35.066169,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00653",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "문화센터",
+    "name": "남해군 문화센터 15",
+    "lon": 127.901802,
+    "lat": 34.795686,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00654",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "문화센터",
+    "name": "남해군 문화센터 16",
+    "lon": 127.498889,
+    "lat": 35.986329,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00655",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "문화센터",
+    "name": "남해군 문화센터 17",
+    "lon": 127.882274,
+    "lat": 35.033933,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00656",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "문화센터",
+    "name": "남해군 문화센터 18",
+    "lon": 127.31846,
+    "lat": 34.774409,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00657",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "청년센터",
+    "name": "남해군 청년센터 19",
+    "lon": 128.618922,
+    "lat": 35.118376,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00658",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "ftype": "도서관",
+    "name": "남해군 도서관 20",
+    "lon": 128.562314,
+    "lat": 35.36671,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00659",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "체육관",
+    "name": "하동군 체육관 1",
+    "lon": 128.002357,
+    "lat": 35.115123,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00660",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "문화센터",
+    "name": "하동군 문화센터 2",
+    "lon": 128.756927,
+    "lat": 34.937559,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00661",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "문화센터",
+    "name": "하동군 문화센터 3",
+    "lon": 127.328772,
+    "lat": 35.88488,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00662",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "청년센터",
+    "name": "하동군 청년센터 4",
+    "lon": 128.770229,
+    "lat": 35.24935,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00663",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "문화센터",
+    "name": "하동군 문화센터 5",
+    "lon": 128.50248,
+    "lat": 35.665569,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00664",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "청년센터",
+    "name": "하동군 청년센터 6",
+    "lon": 128.31131,
+    "lat": 35.060244,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00665",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "청년센터",
+    "name": "하동군 청년센터 7",
+    "lon": 128.265697,
+    "lat": 34.877681,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00666",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "도서관",
+    "name": "하동군 도서관 8",
+    "lon": 127.777067,
+    "lat": 34.668594,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00667",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "도서관",
+    "name": "하동군 도서관 9",
+    "lon": 128.257585,
+    "lat": 35.878138,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00668",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "도서관",
+    "name": "하동군 도서관 10",
+    "lon": 127.531997,
+    "lat": 34.965586,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00669",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "체육관",
+    "name": "하동군 체육관 11",
+    "lon": 128.417437,
+    "lat": 35.089121,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00670",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "문화센터",
+    "name": "하동군 문화센터 12",
+    "lon": 128.006129,
+    "lat": 35.031222,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00671",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "도서관",
+    "name": "하동군 도서관 13",
+    "lon": 129.037918,
+    "lat": 35.14071,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00672",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "문화센터",
+    "name": "하동군 문화센터 14",
+    "lon": 128.560569,
+    "lat": 35.562136,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00673",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "문화센터",
+    "name": "하동군 문화센터 15",
+    "lon": 127.268412,
+    "lat": 35.234069,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00674",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "도서관",
+    "name": "하동군 도서관 16",
+    "lon": 129.025192,
+    "lat": 34.731775,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00675",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "도서관",
+    "name": "하동군 도서관 17",
+    "lon": 127.690787,
+    "lat": 34.948989,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00676",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "체육관",
+    "name": "하동군 체육관 18",
+    "lon": 127.28373,
+    "lat": 34.672828,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00677",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "문화센터",
+    "name": "하동군 문화센터 19",
+    "lon": 127.365278,
+    "lat": 35.02967,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00678",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "ftype": "체육관",
+    "name": "하동군 체육관 20",
+    "lon": 128.392825,
+    "lat": 35.107234,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00679",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "체육관",
+    "name": "산청군 체육관 1",
+    "lon": 128.097721,
+    "lat": 34.879375,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00680",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "체육관",
+    "name": "산청군 체육관 2",
+    "lon": null,
+    "lat": null,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00681",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "문화센터",
+    "name": "산청군 문화센터 3",
+    "lon": 128.330753,
+    "lat": 35.410486,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00682",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "도서관",
+    "name": "산청군 도서관 4",
+    "lon": 127.838164,
+    "lat": 34.9058,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00683",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "체육관",
+    "name": "산청군 체육관 5",
+    "lon": 127.639009,
+    "lat": 35.432672,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00684",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "청년센터",
+    "name": "산청군 청년센터 6",
+    "lon": 127.629264,
+    "lat": 35.363102,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00685",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "체육관",
+    "name": "산청군 체육관 7",
+    "lon": null,
+    "lat": null,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00686",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "문화센터",
+    "name": "산청군 문화센터 8",
+    "lon": 128.851297,
+    "lat": 35.038307,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00687",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "체육관",
+    "name": "산청군 체육관 9",
+    "lon": 128.57878,
+    "lat": 35.34684,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00688",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "문화센터",
+    "name": "산청군 문화센터 10",
+    "lon": 128.947546,
+    "lat": 34.702628,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00689",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "문화센터",
+    "name": "산청군 문화센터 11",
+    "lon": 127.630421,
+    "lat": 35.767646,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00690",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "도서관",
+    "name": "산청군 도서관 12",
+    "lon": 128.730887,
+    "lat": 35.885395,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00691",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "도서관",
+    "name": "산청군 도서관 13",
+    "lon": 128.178015,
+    "lat": 34.970017,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00692",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "문화센터",
+    "name": "산청군 문화센터 14",
+    "lon": 127.877635,
+    "lat": 35.023515,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00693",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "체육관",
+    "name": "산청군 체육관 15",
+    "lon": 128.482204,
+    "lat": 34.520168,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00694",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "체육관",
+    "name": "산청군 체육관 16",
+    "lon": 128.67417,
+    "lat": 34.556787,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00695",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "도서관",
+    "name": "산청군 도서관 17",
+    "lon": 128.75168,
+    "lat": 35.694382,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00696",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "문화센터",
+    "name": "산청군 문화센터 18",
+    "lon": 127.283179,
+    "lat": 35.989065,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00697",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "청년센터",
+    "name": "산청군 청년센터 19",
+    "lon": 127.536234,
+    "lat": 34.83717,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00698",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "ftype": "문화센터",
+    "name": "산청군 문화센터 20",
+    "lon": 127.149325,
+    "lat": 35.000319,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00699",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "체육관",
+    "name": "함양군 체육관 1",
+    "lon": 127.64975,
+    "lat": 34.937111,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00700",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "청년센터",
+    "name": "함양군 청년센터 2",
+    "lon": 129.001636,
+    "lat": 35.349272,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00701",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "체육관",
+    "name": "함양군 체육관 3",
+    "lon": 128.649749,
+    "lat": 34.586074,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00702",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "문화센터",
+    "name": "함양군 문화센터 4",
+    "lon": 127.427452,
+    "lat": 35.852699,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00703",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "청년센터",
+    "name": "함양군 청년센터 5",
+    "lon": 128.034855,
+    "lat": 34.801507,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00704",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "청년센터",
+    "name": "함양군 청년센터 6",
+    "lon": 127.52599,
+    "lat": 35.426167,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00705",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "체육관",
+    "name": "함양군 체육관 7",
+    "lon": 127.909458,
+    "lat": 35.673384,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00706",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "도서관",
+    "name": "함양군 도서관 8",
+    "lon": 127.823422,
+    "lat": 34.990869,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00707",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "도서관",
+    "name": "함양군 도서관 9",
+    "lon": 128.530849,
+    "lat": 35.041091,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00708",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "도서관",
+    "name": "함양군 도서관 10",
+    "lon": 127.570789,
+    "lat": 34.710828,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00709",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "청년센터",
+    "name": "함양군 청년센터 11",
+    "lon": 128.523263,
+    "lat": 35.254619,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00710",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "문화센터",
+    "name": "함양군 문화센터 12",
+    "lon": 128.876175,
+    "lat": 34.993032,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00711",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "도서관",
+    "name": "함양군 도서관 13",
+    "lon": 128.240504,
+    "lat": 35.622796,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00712",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "문화센터",
+    "name": "함양군 문화센터 14",
+    "lon": 128.968265,
+    "lat": 34.678663,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00713",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "체육관",
+    "name": "함양군 체육관 15",
+    "lon": 127.409247,
+    "lat": 35.742581,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00714",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "청년센터",
+    "name": "함양군 청년센터 16",
+    "lon": 128.374719,
+    "lat": 35.845285,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00715",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "체육관",
+    "name": "함양군 체육관 17",
+    "lon": 127.413602,
+    "lat": 35.131482,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00716",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "도서관",
+    "name": "함양군 도서관 18",
+    "lon": 129.05078,
+    "lat": 34.846383,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00717",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "도서관",
+    "name": "함양군 도서관 19",
+    "lon": 128.013181,
+    "lat": 35.293655,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00718",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "ftype": "체육관",
+    "name": "함양군 체육관 20",
+    "lon": 127.636083,
+    "lat": 34.604802,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00719",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "체육관",
+    "name": "거창군 체육관 1",
+    "lon": 128.546669,
+    "lat": 35.632942,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00720",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "체육관",
+    "name": "거창군 체육관 2",
+    "lon": 127.17585,
+    "lat": 35.969114,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00721",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "청년센터",
+    "name": "거창군 청년센터 3",
+    "lon": 128.385793,
+    "lat": 35.826818,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00722",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "청년센터",
+    "name": "거창군 청년센터 4",
+    "lon": 128.941479,
+    "lat": 35.605486,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00723",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "도서관",
+    "name": "거창군 도서관 5",
+    "lon": 127.195595,
+    "lat": 34.987588,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00724",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "체육관",
+    "name": "거창군 체육관 6",
+    "lon": null,
+    "lat": null,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00725",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "문화센터",
+    "name": "거창군 문화센터 7",
+    "lon": 128.884558,
+    "lat": 35.859037,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00726",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "체육관",
+    "name": "거창군 체육관 8",
+    "lon": 128.864806,
+    "lat": 35.795031,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00727",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "청년센터",
+    "name": "거창군 청년센터 9",
+    "lon": 128.592624,
+    "lat": 35.446142,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00728",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "문화센터",
+    "name": "거창군 문화센터 10",
+    "lon": 128.497336,
+    "lat": 35.896022,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00729",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "체육관",
+    "name": "거창군 체육관 11",
+    "lon": 128.35165,
+    "lat": 35.316868,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00730",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "문화센터",
+    "name": "거창군 문화센터 12",
+    "lon": 127.26585,
+    "lat": 35.017928,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00731",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "문화센터",
+    "name": "거창군 문화센터 13",
+    "lon": 128.816225,
+    "lat": 35.570184,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00732",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "청년센터",
+    "name": "거창군 청년센터 14",
+    "lon": 128.677751,
+    "lat": 34.590357,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00733",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "문화센터",
+    "name": "거창군 문화센터 15",
+    "lon": 128.060688,
+    "lat": 35.812466,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00734",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "도서관",
+    "name": "거창군 도서관 16",
+    "lon": 127.28196,
+    "lat": 35.654338,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00735",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "도서관",
+    "name": "거창군 도서관 17",
+    "lon": 128.474807,
+    "lat": 35.814688,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00736",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "도서관",
+    "name": "거창군 도서관 18",
+    "lon": 128.193674,
+    "lat": 34.690093,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00737",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "체육관",
+    "name": "거창군 체육관 19",
+    "lon": 127.636173,
+    "lat": 35.930866,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00738",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "ftype": "청년센터",
+    "name": "거창군 청년센터 20",
+    "lon": 127.766119,
+    "lat": 35.538248,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00739",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "도서관",
+    "name": "합천군 도서관 1",
+    "lon": 127.916388,
+    "lat": 34.815539,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00740",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "청년센터",
+    "name": "합천군 청년센터 2",
+    "lon": 128.317756,
+    "lat": 34.803093,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00741",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "도서관",
+    "name": "합천군 도서관 3",
+    "lon": 127.806648,
+    "lat": 35.456087,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00742",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "문화센터",
+    "name": "합천군 문화센터 4",
+    "lon": 129.075346,
+    "lat": 35.083038,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00743",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "청년센터",
+    "name": "합천군 청년센터 5",
+    "lon": 128.37995,
+    "lat": 34.994199,
+    "capacity": 300
+  },
+  {
+    "facility_id": "SMP-FAC00744",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "청년센터",
+    "name": "합천군 청년센터 6",
+    "lon": 127.635827,
+    "lat": 34.513569,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00745",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "도서관",
+    "name": "합천군 도서관 7",
+    "lon": 127.566928,
+    "lat": 34.843507,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00746",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "도서관",
+    "name": "합천군 도서관 8",
+    "lon": 127.408222,
+    "lat": 35.650462,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00747",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "문화센터",
+    "name": "합천군 문화센터 9",
+    "lon": 128.635215,
+    "lat": 35.061088,
+    "capacity": 200
+  },
+  {
+    "facility_id": "SMP-FAC00748",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "체육관",
+    "name": "합천군 체육관 10",
+    "lon": 127.795552,
+    "lat": 35.634611,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00749",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "도서관",
+    "name": "합천군 도서관 11",
+    "lon": 128.053227,
+    "lat": 34.892934,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00750",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "도서관",
+    "name": "합천군 도서관 12",
+    "lon": 127.44124,
+    "lat": 35.583217,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00751",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "도서관",
+    "name": "합천군 도서관 13",
+    "lon": 127.413432,
+    "lat": 34.73138,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00752",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "도서관",
+    "name": "합천군 도서관 14",
+    "lon": 127.819542,
+    "lat": 34.71414,
+    "capacity": 50
+  },
+  {
+    "facility_id": "SMP-FAC00753",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "체육관",
+    "name": "합천군 체육관 15",
+    "lon": 128.912413,
+    "lat": 35.989537,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00754",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "문화센터",
+    "name": "합천군 문화센터 16",
+    "lon": 128.920238,
+    "lat": 35.549512,
+    "capacity": 100
+  },
+  {
+    "facility_id": "SMP-FAC00755",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "청년센터",
+    "name": "합천군 청년센터 17",
+    "lon": 127.660425,
+    "lat": 35.457877,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00756",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "청년센터",
+    "name": "합천군 청년센터 18",
+    "lon": 127.889171,
+    "lat": 35.130216,
+    "capacity": 500
+  },
+  {
+    "facility_id": "SMP-FAC00757",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "체육관",
+    "name": "합천군 체육관 19",
+    "lon": 127.44667,
+    "lat": 35.154844,
+    "capacity": 0
+  },
+  {
+    "facility_id": "SMP-FAC00758",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "ftype": "청년센터",
+    "name": "합천군 청년센터 20",
+    "lon": 127.363153,
+    "lat": 35.223093,
+    "capacity": 500
+  }
+]

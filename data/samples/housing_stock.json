@@ -1,0 +1,650 @@
+[
+  {
+    "housing_id": "HOU000001",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "total_houses": 171285,
+    "apt_houses": 75025,
+    "avg_price": 28049
+  },
+  {
+    "housing_id": "HOU000002",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "total_houses": 108113,
+    "apt_houses": 55067,
+    "avg_price": 27382
+  },
+  {
+    "housing_id": "HOU000003",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "total_houses": 71294,
+    "apt_houses": 28589,
+    "avg_price": 20717
+  },
+  {
+    "housing_id": "HOU000004",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "total_houses": 173377,
+    "apt_houses": 92915,
+    "avg_price": 36935
+  },
+  {
+    "housing_id": "HOU000005",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "total_houses": 123816,
+    "apt_houses": 48652,
+    "avg_price": 38232
+  },
+  {
+    "housing_id": "HOU000006",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "total_houses": 97716,
+    "apt_houses": 41685,
+    "avg_price": 26110
+  },
+  {
+    "housing_id": "HOU000007",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "total_houses": 174120,
+    "apt_houses": 108018,
+    "avg_price": 25640
+  },
+  {
+    "housing_id": "HOU000008",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "total_houses": 112271,
+    "apt_houses": 54173,
+    "avg_price": 26207
+  },
+  {
+    "housing_id": "HOU000009",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "total_houses": 34104,
+    "apt_houses": 18474,
+    "avg_price": 31589
+  },
+  {
+    "housing_id": "HOU000010",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "total_houses": 34918,
+    "apt_houses": 21076,
+    "avg_price": 27084
+  },
+  {
+    "housing_id": "HOU000011",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "total_houses": 45246,
+    "apt_houses": 22395,
+    "avg_price": 30615
+  },
+  {
+    "housing_id": "HOU000012",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "total_houses": 43098,
+    "apt_houses": 22516,
+    "avg_price": 39349
+  },
+  {
+    "housing_id": "HOU000013",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "total_houses": 50774,
+    "apt_houses": 32667,
+    "avg_price": 24770
+  },
+  {
+    "housing_id": "HOU000014",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "total_houses": 37414,
+    "apt_houses": 19447,
+    "avg_price": 20971
+  },
+  {
+    "housing_id": "HOU000015",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "total_houses": 35190,
+    "apt_houses": 12834,
+    "avg_price": 15881
+  },
+  {
+    "housing_id": "HOU000016",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "total_houses": 32345,
+    "apt_houses": 20094,
+    "avg_price": 24770
+  },
+  {
+    "housing_id": "HOU000017",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "total_houses": 107886,
+    "apt_houses": 57408,
+    "avg_price": 35469
+  },
+  {
+    "housing_id": "HOU000018",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "total_houses": 94409,
+    "apt_houses": 50628,
+    "avg_price": 31833
+  },
+  {
+    "housing_id": "HOU000019",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "total_houses": 98985,
+    "apt_houses": 54219,
+    "avg_price": 16384
+  },
+  {
+    "housing_id": "HOU000020",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "total_houses": 142240,
+    "apt_houses": 88334,
+    "avg_price": 21392
+  },
+  {
+    "housing_id": "HOU000021",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "total_houses": 36528,
+    "apt_houses": 17616,
+    "avg_price": 20898
+  },
+  {
+    "housing_id": "HOU000022",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "total_houses": 27039,
+    "apt_houses": 10195,
+    "avg_price": 20330
+  },
+  {
+    "housing_id": "HOU000023",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "total_houses": 37128,
+    "apt_houses": 14951,
+    "avg_price": 34557
+  },
+  {
+    "housing_id": "HOU000024",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "total_houses": 50820,
+    "apt_houses": 32598,
+    "avg_price": 36618
+  },
+  {
+    "housing_id": "HOU000025",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "total_houses": 19204,
+    "apt_houses": 11506,
+    "avg_price": 22443
+  },
+  {
+    "housing_id": "HOU000026",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "total_houses": 41142,
+    "apt_houses": 20347,
+    "avg_price": 36186
+  },
+  {
+    "housing_id": "HOU000027",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "total_houses": 48046,
+    "apt_houses": 21698,
+    "avg_price": 15678
+  },
+  {
+    "housing_id": "HOU000028",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "total_houses": 62197,
+    "apt_houses": 24395,
+    "avg_price": 42236
+  },
+  {
+    "housing_id": "HOU000029",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "total_houses": 178191,
+    "apt_houses": 101082,
+    "avg_price": 22513
+  },
+  {
+    "housing_id": "HOU000030",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "total_houses": 197832,
+    "apt_houses": 116993,
+    "avg_price": 23028
+  },
+  {
+    "housing_id": "HOU000031",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "total_houses": 84720,
+    "apt_houses": 30006,
+    "avg_price": 32925
+  },
+  {
+    "housing_id": "HOU000032",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "total_houses": 87826,
+    "apt_houses": 48467,
+    "avg_price": 28194
+  },
+  {
+    "housing_id": "HOU000033",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "total_houses": 35475,
+    "apt_houses": 21169,
+    "avg_price": 17975
+  },
+  {
+    "housing_id": "HOU000034",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "total_houses": 46679,
+    "apt_houses": 19612,
+    "avg_price": 23947
+  },
+  {
+    "housing_id": "HOU000035",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "total_houses": 63536,
+    "apt_houses": 32938,
+    "avg_price": 26951
+  },
+  {
+    "housing_id": "HOU000036",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "total_houses": 48400,
+    "apt_houses": 17858,
+    "avg_price": 27414
+  },
+  {
+    "housing_id": "HOU000037",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2022,
+    "total_houses": 52299,
+    "apt_houses": 23046,
+    "avg_price": 13242
+  },
+  {
+    "housing_id": "HOU000038",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2023,
+    "total_houses": 37168,
+    "apt_houses": 23560,
+    "avg_price": 26794
+  },
+  {
+    "housing_id": "HOU000039",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2024,
+    "total_houses": 37903,
+    "apt_houses": 14371,
+    "avg_price": 31586
+  },
+  {
+    "housing_id": "HOU000040",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2025,
+    "total_houses": 46306,
+    "apt_houses": 22509,
+    "avg_price": 27471
+  },
+  {
+    "housing_id": "HOU000041",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2022,
+    "total_houses": 33706,
+    "apt_houses": 21363,
+    "avg_price": 16317
+  },
+  {
+    "housing_id": "HOU000042",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2023,
+    "total_houses": 26894,
+    "apt_houses": 10660,
+    "avg_price": 29807
+  },
+  {
+    "housing_id": "HOU000043",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2024,
+    "total_houses": 37874,
+    "apt_houses": 18816,
+    "avg_price": 26396
+  },
+  {
+    "housing_id": "HOU000044",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2025,
+    "total_houses": 20353,
+    "apt_houses": 7323,
+    "avg_price": 39668
+  },
+  {
+    "housing_id": "HOU000045",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "total_houses": 34192,
+    "apt_houses": 21718,
+    "avg_price": 29720
+  },
+  {
+    "housing_id": "HOU000046",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "total_houses": 44955,
+    "apt_houses": 24982,
+    "avg_price": 22836
+  },
+  {
+    "housing_id": "HOU000047",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "total_houses": 14141,
+    "apt_houses": 6471,
+    "avg_price": 20433
+  },
+  {
+    "housing_id": "HOU000048",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "total_houses": 36536,
+    "apt_houses": 14127,
+    "avg_price": 32790
+  },
+  {
+    "housing_id": "HOU000049",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "total_houses": 48681,
+    "apt_houses": 26718,
+    "avg_price": 19606
+  },
+  {
+    "housing_id": "HOU000050",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "total_houses": 33092,
+    "apt_houses": 11794,
+    "avg_price": 18711
+  },
+  {
+    "housing_id": "HOU000051",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "total_houses": 43798,
+    "apt_houses": 16984,
+    "avg_price": 20636
+  },
+  {
+    "housing_id": "HOU000052",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "total_houses": 38363,
+    "apt_houses": 22233,
+    "avg_price": 28928
+  },
+  {
+    "housing_id": "HOU000053",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "total_houses": 43948,
+    "apt_houses": 26848,
+    "avg_price": 29035
+  },
+  {
+    "housing_id": "HOU000054",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "total_houses": 39189,
+    "apt_houses": 24303,
+    "avg_price": 27986
+  },
+  {
+    "housing_id": "HOU000055",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "total_houses": 62758,
+    "apt_houses": 24689,
+    "avg_price": 25211
+  },
+  {
+    "housing_id": "HOU000056",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "total_houses": 47461,
+    "apt_houses": 19096,
+    "avg_price": 33987
+  },
+  {
+    "housing_id": "HOU000057",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "total_houses": 40728,
+    "apt_houses": 14436,
+    "avg_price": 23837
+  },
+  {
+    "housing_id": "HOU000058",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "total_houses": 43924,
+    "apt_houses": 19640,
+    "avg_price": 20716
+  },
+  {
+    "housing_id": "HOU000059",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "total_houses": 43578,
+    "apt_houses": 24949,
+    "avg_price": 26750
+  },
+  {
+    "housing_id": "HOU000060",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "total_houses": 24858,
+    "apt_houses": 12252,
+    "avg_price": 28056
+  },
+  {
+    "housing_id": "HOU000061",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "total_houses": 44207,
+    "apt_houses": 16919,
+    "avg_price": 17911
+  },
+  {
+    "housing_id": "HOU000062",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "total_houses": 16685,
+    "apt_houses": 6057,
+    "avg_price": 24651
+  },
+  {
+    "housing_id": "HOU000063",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "total_houses": 46371,
+    "apt_houses": 23484,
+    "avg_price": 13210
+  },
+  {
+    "housing_id": "HOU000064",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "total_houses": 15859,
+    "apt_houses": 5840,
+    "avg_price": 34838
+  },
+  {
+    "housing_id": "HOU000065",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2022,
+    "total_houses": 31452,
+    "apt_houses": 17482,
+    "avg_price": 25801
+  },
+  {
+    "housing_id": "HOU000066",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2023,
+    "total_houses": 19017,
+    "apt_houses": 7075,
+    "avg_price": 25804
+  },
+  {
+    "housing_id": "HOU000067",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2024,
+    "total_houses": 54563,
+    "apt_houses": 20172,
+    "avg_price": 28993
+  },
+  {
+    "housing_id": "HOU000068",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2025,
+    "total_houses": 39673,
+    "apt_houses": 20412,
+    "avg_price": 40070
+  },
+  {
+    "housing_id": "HOU000069",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2022,
+    "total_houses": 26553,
+    "apt_houses": 13520,
+    "avg_price": 42274
+  },
+  {
+    "housing_id": "HOU000070",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2023,
+    "total_houses": 28282,
+    "apt_houses": 10740,
+    "avg_price": 27346
+  },
+  {
+    "housing_id": "HOU000071",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2024,
+    "total_houses": 35867,
+    "apt_houses": 19557,
+    "avg_price": 13790
+  },
+  {
+    "housing_id": "HOU000072",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2025,
+    "total_houses": 43994,
+    "apt_houses": 18236,
+    "avg_price": 18580
+  }
+]

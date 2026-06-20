@@ -1,0 +1,524 @@
+[
+  {
+    "tourism_id": "TRM000001",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "attractions": 42,
+    "visitors": 132733,
+    "revenue": 2194505
+  },
+  {
+    "tourism_id": "TRM000002",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "attractions": 47,
+    "visitors": 246575,
+    "revenue": 1665937
+  },
+  {
+    "tourism_id": "TRM000003",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "attractions": 28,
+    "visitors": 86167,
+    "revenue": 1186408
+  },
+  {
+    "tourism_id": "TRM000004",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "attractions": 27,
+    "visitors": 97320,
+    "revenue": 909595
+  },
+  {
+    "tourism_id": "TRM000005",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "attractions": 29,
+    "visitors": 91582,
+    "revenue": 1202201
+  },
+  {
+    "tourism_id": "TRM000006",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "attractions": 25,
+    "visitors": 108276,
+    "revenue": 1984518
+  },
+  {
+    "tourism_id": "TRM000007",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "attractions": 28,
+    "visitors": 245015,
+    "revenue": 2780624
+  },
+  {
+    "tourism_id": "TRM000008",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "attractions": 8,
+    "visitors": 33648,
+    "revenue": 352781
+  },
+  {
+    "tourism_id": "TRM000009",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "attractions": 16,
+    "visitors": 129675,
+    "revenue": 1004484
+  },
+  {
+    "tourism_id": "TRM000010",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "attractions": 12,
+    "visitors": 104655,
+    "revenue": 1728044
+  },
+  {
+    "tourism_id": "TRM000011",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "attractions": 4,
+    "visitors": 28845,
+    "revenue": 331661
+  },
+  {
+    "tourism_id": "TRM000012",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "attractions": 5,
+    "visitors": 24289,
+    "revenue": 395559
+  },
+  {
+    "tourism_id": "TRM000013",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "attractions": 4,
+    "visitors": 14069,
+    "revenue": 174207
+  },
+  {
+    "tourism_id": "TRM000014",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "attractions": 4,
+    "visitors": 18952,
+    "revenue": 143278
+  },
+  {
+    "tourism_id": "TRM000015",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "attractions": 2,
+    "visitors": 13030,
+    "revenue": 259897
+  },
+  {
+    "tourism_id": "TRM000016",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "attractions": 2,
+    "visitors": 8306,
+    "revenue": 67344
+  },
+  {
+    "tourism_id": "TRM000017",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "attractions": 14,
+    "visitors": 44906,
+    "revenue": 274486
+  },
+  {
+    "tourism_id": "TRM000018",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "attractions": 10,
+    "visitors": 59660,
+    "revenue": 375600
+  },
+  {
+    "tourism_id": "TRM000019",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "attractions": 13,
+    "visitors": 83832,
+    "revenue": 521954
+  },
+  {
+    "tourism_id": "TRM000020",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "attractions": 4,
+    "visitors": 25548,
+    "revenue": 257981
+  },
+  {
+    "tourism_id": "TRM000021",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "attractions": 4,
+    "visitors": 24628,
+    "revenue": 456496
+  },
+  {
+    "tourism_id": "TRM000022",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "attractions": 3,
+    "visitors": 12385,
+    "revenue": 180178
+  },
+  {
+    "tourism_id": "TRM000023",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "attractions": 5,
+    "visitors": 17035,
+    "revenue": 291518
+  },
+  {
+    "tourism_id": "TRM000024",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "attractions": 6,
+    "visitors": 50581,
+    "revenue": 385807
+  },
+  {
+    "tourism_id": "TRM000025",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "attractions": 9,
+    "visitors": 66532,
+    "revenue": 1211622
+  },
+  {
+    "tourism_id": "TRM000026",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "attractions": 10,
+    "visitors": 39627,
+    "revenue": 578204
+  },
+  {
+    "tourism_id": "TRM000027",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "attractions": 13,
+    "visitors": 94475,
+    "revenue": 477992
+  },
+  {
+    "tourism_id": "TRM000028",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "attractions": 7,
+    "visitors": 32231,
+    "revenue": 507049
+  },
+  {
+    "tourism_id": "TRM000029",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "attractions": 1,
+    "visitors": 8860,
+    "revenue": 98306
+  },
+  {
+    "tourism_id": "TRM000030",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "attractions": 1,
+    "visitors": 4094,
+    "revenue": 31034
+  },
+  {
+    "tourism_id": "TRM000031",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "attractions": 0,
+    "visitors": 0,
+    "revenue": 0
+  },
+  {
+    "tourism_id": "TRM000032",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "attractions": 1,
+    "visitors": 3558,
+    "revenue": 44639
+  },
+  {
+    "tourism_id": "TRM000033",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "attractions": 2,
+    "visitors": 12603,
+    "revenue": 239211
+  },
+  {
+    "tourism_id": "TRM000034",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2023,
+    "attractions": 2,
+    "visitors": 15824,
+    "revenue": 110625
+  },
+  {
+    "tourism_id": "TRM000035",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "attractions": 1,
+    "visitors": 3864,
+    "revenue": 23043
+  },
+  {
+    "tourism_id": "TRM000036",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "attractions": 2,
+    "visitors": 6280,
+    "revenue": 48635
+  },
+  {
+    "tourism_id": "TRM000037",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2022,
+    "attractions": 1,
+    "visitors": 6128,
+    "revenue": 79235
+  },
+  {
+    "tourism_id": "TRM000038",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "attractions": 1,
+    "visitors": 4445,
+    "revenue": 75807
+  },
+  {
+    "tourism_id": "TRM000039",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "attractions": 1,
+    "visitors": 7642,
+    "revenue": 62348
+  },
+  {
+    "tourism_id": "TRM000040",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "attractions": 2,
+    "visitors": 14553,
+    "revenue": 86967
+  },
+  {
+    "tourism_id": "TRM000041",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "attractions": 1,
+    "visitors": 6296,
+    "revenue": 73778
+  },
+  {
+    "tourism_id": "TRM000042",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "attractions": 0,
+    "visitors": 0,
+    "revenue": 0
+  },
+  {
+    "tourism_id": "TRM000043",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "attractions": 1,
+    "visitors": 8155,
+    "revenue": 104086
+  },
+  {
+    "tourism_id": "TRM000044",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "attractions": 1,
+    "visitors": 6843,
+    "revenue": 104718
+  },
+  {
+    "tourism_id": "TRM000045",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "attractions": 0,
+    "visitors": 0,
+    "revenue": 0
+  },
+  {
+    "tourism_id": "TRM000046",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "attractions": 1,
+    "visitors": 3210,
+    "revenue": 49680
+  },
+  {
+    "tourism_id": "TRM000047",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "attractions": 0,
+    "visitors": 0,
+    "revenue": 0
+  },
+  {
+    "tourism_id": "TRM000048",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "attractions": 0,
+    "visitors": 0,
+    "revenue": 0
+  },
+  {
+    "tourism_id": "TRM000049",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "attractions": 0,
+    "visitors": 0,
+    "revenue": 0
+  },
+  {
+    "tourism_id": "TRM000050",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "attractions": 0,
+    "visitors": 0,
+    "revenue": 0
+  },
+  {
+    "tourism_id": "TRM000051",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "attractions": 1,
+    "visitors": 7776,
+    "revenue": 39998
+  },
+  {
+    "tourism_id": "TRM000052",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "attractions": 1,
+    "visitors": 3783,
+    "revenue": 65005
+  },
+  {
+    "tourism_id": "TRM000053",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "attractions": 1,
+    "visitors": 5960,
+    "revenue": 45844
+  },
+  {
+    "tourism_id": "TRM000054",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2022,
+    "attractions": 1,
+    "visitors": 8637,
+    "revenue": 64462
+  },
+  {
+    "tourism_id": "TRM000055",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "attractions": 1,
+    "visitors": 8784,
+    "revenue": 132519
+  },
+  {
+    "tourism_id": "TRM000056",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "attractions": 0,
+    "visitors": 0,
+    "revenue": 0
+  },
+  {
+    "tourism_id": "TRM000057",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2023,
+    "attractions": 1,
+    "visitors": 6580,
+    "revenue": 53212
+  },
+  {
+    "tourism_id": "TRM000058",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "attractions": 1,
+    "visitors": 8768,
+    "revenue": 99807
+  }
+]

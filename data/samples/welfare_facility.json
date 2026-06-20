@@ -1,0 +1,569 @@
+[
+  {
+    "welfare_id": "WEL000001",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "centers": 34,
+    "beneficiaries": 25440,
+    "budget": 5201
+  },
+  {
+    "welfare_id": "WEL000002",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "centers": 32,
+    "beneficiaries": 11248,
+    "budget": 2583
+  },
+  {
+    "welfare_id": "WEL000003",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "centers": 38,
+    "beneficiaries": 31455,
+    "budget": 8845
+  },
+  {
+    "welfare_id": "WEL000004",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "centers": 27,
+    "beneficiaries": 9744,
+    "budget": 1619
+  },
+  {
+    "welfare_id": "WEL000005",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "centers": 19,
+    "beneficiaries": 14593,
+    "budget": 2478
+  },
+  {
+    "welfare_id": "WEL000006",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "centers": 20,
+    "beneficiaries": 11787,
+    "budget": 1233
+  },
+  {
+    "welfare_id": "WEL000007",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "centers": 15,
+    "beneficiaries": 12197,
+    "budget": 2604
+  },
+  {
+    "welfare_id": "WEL000008",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "centers": 25,
+    "beneficiaries": 15854,
+    "budget": 2890
+  },
+  {
+    "welfare_id": "WEL000009",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "centers": 32,
+    "beneficiaries": 12505,
+    "budget": 2023
+  },
+  {
+    "welfare_id": "WEL000010",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "centers": 32,
+    "beneficiaries": 24932,
+    "budget": 3878
+  },
+  {
+    "welfare_id": "WEL000011",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "centers": 5,
+    "beneficiaries": 3950,
+    "budget": 687
+  },
+  {
+    "welfare_id": "WEL000012",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "centers": 13,
+    "beneficiaries": 7360,
+    "budget": 1542
+  },
+  {
+    "welfare_id": "WEL000013",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "centers": 14,
+    "beneficiaries": 7372,
+    "budget": 998
+  },
+  {
+    "welfare_id": "WEL000014",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "centers": 3,
+    "beneficiaries": 2563,
+    "budget": 719
+  },
+  {
+    "welfare_id": "WEL000015",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "centers": 2,
+    "beneficiaries": 1591,
+    "budget": 454
+  },
+  {
+    "welfare_id": "WEL000016",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "centers": 5,
+    "beneficiaries": 1831,
+    "budget": 533
+  },
+  {
+    "welfare_id": "WEL000017",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "centers": 4,
+    "beneficiaries": 2448,
+    "budget": 392
+  },
+  {
+    "welfare_id": "WEL000018",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "centers": 4,
+    "beneficiaries": 2087,
+    "budget": 617
+  },
+  {
+    "welfare_id": "WEL000019",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "centers": 4,
+    "beneficiaries": 3351,
+    "budget": 814
+  },
+  {
+    "welfare_id": "WEL000020",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "centers": 8,
+    "beneficiaries": 4485,
+    "budget": 642
+  },
+  {
+    "welfare_id": "WEL000021",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "centers": 8,
+    "beneficiaries": 7181,
+    "budget": 955
+  },
+  {
+    "welfare_id": "WEL000022",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "centers": 20,
+    "beneficiaries": 6989,
+    "budget": 1723
+  },
+  {
+    "welfare_id": "WEL000023",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "centers": 18,
+    "beneficiaries": 14070,
+    "budget": 3130
+  },
+  {
+    "welfare_id": "WEL000024",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "centers": 16,
+    "beneficiaries": 10882,
+    "budget": 2925
+  },
+  {
+    "welfare_id": "WEL000025",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "centers": 3,
+    "beneficiaries": 1605,
+    "budget": 463
+  },
+  {
+    "welfare_id": "WEL000026",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "centers": 3,
+    "beneficiaries": 1358,
+    "budget": 163
+  },
+  {
+    "welfare_id": "WEL000027",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "centers": 3,
+    "beneficiaries": 2512,
+    "budget": 493
+  },
+  {
+    "welfare_id": "WEL000028",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "centers": 10,
+    "beneficiaries": 3475,
+    "budget": 934
+  },
+  {
+    "welfare_id": "WEL000029",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "centers": 7,
+    "beneficiaries": 3259,
+    "budget": 373
+  },
+  {
+    "welfare_id": "WEL000030",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "centers": 9,
+    "beneficiaries": 3451,
+    "budget": 554
+  },
+  {
+    "welfare_id": "WEL000031",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "centers": 10,
+    "beneficiaries": 8482,
+    "budget": 2077
+  },
+  {
+    "welfare_id": "WEL000032",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "centers": 8,
+    "beneficiaries": 2921,
+    "budget": 456
+  },
+  {
+    "welfare_id": "WEL000033",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "centers": 15,
+    "beneficiaries": 4584,
+    "budget": 1202
+  },
+  {
+    "welfare_id": "WEL000034",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "centers": 0,
+    "beneficiaries": 0,
+    "budget": 0
+  },
+  {
+    "welfare_id": "WEL000035",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "centers": 1,
+    "beneficiaries": 777,
+    "budget": 209
+  },
+  {
+    "welfare_id": "WEL000036",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "centers": 1,
+    "beneficiaries": 802,
+    "budget": 213
+  },
+  {
+    "welfare_id": "WEL000037",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "centers": 2,
+    "beneficiaries": 1272,
+    "budget": 331
+  },
+  {
+    "welfare_id": "WEL000038",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2022,
+    "centers": 2,
+    "beneficiaries": 874,
+    "budget": 227
+  },
+  {
+    "welfare_id": "WEL000039",
+    "sgg_cd": "48730",
+    "sigun": "함안군",
+    "year": 2024,
+    "centers": 2,
+    "beneficiaries": 1188,
+    "budget": 122
+  },
+  {
+    "welfare_id": "WEL000040",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2024,
+    "centers": 2,
+    "beneficiaries": 1764,
+    "budget": 303
+  },
+  {
+    "welfare_id": "WEL000041",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "centers": 2,
+    "beneficiaries": 979,
+    "budget": 221
+  },
+  {
+    "welfare_id": "WEL000042",
+    "sgg_cd": "48740",
+    "sigun": "창녕군",
+    "year": 2023,
+    "centers": 1,
+    "beneficiaries": 629,
+    "budget": 183
+  },
+  {
+    "welfare_id": "WEL000043",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "centers": 2,
+    "beneficiaries": 1532,
+    "budget": 345
+  },
+  {
+    "welfare_id": "WEL000044",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "centers": 1,
+    "beneficiaries": 671,
+    "budget": 130
+  },
+  {
+    "welfare_id": "WEL000045",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "centers": 1,
+    "beneficiaries": 837,
+    "budget": 149
+  },
+  {
+    "welfare_id": "WEL000046",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "centers": 1,
+    "beneficiaries": 562,
+    "budget": 146
+  },
+  {
+    "welfare_id": "WEL000047",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "centers": 0,
+    "beneficiaries": 0,
+    "budget": 0
+  },
+  {
+    "welfare_id": "WEL000048",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "centers": 1,
+    "beneficiaries": 364,
+    "budget": 41
+  },
+  {
+    "welfare_id": "WEL000049",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "centers": 1,
+    "beneficiaries": 877,
+    "budget": 133
+  },
+  {
+    "welfare_id": "WEL000050",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "centers": 1,
+    "beneficiaries": 679,
+    "budget": 114
+  },
+  {
+    "welfare_id": "WEL000051",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "centers": 1,
+    "beneficiaries": 437,
+    "budget": 69
+  },
+  {
+    "welfare_id": "WEL000052",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "centers": 0,
+    "beneficiaries": 0,
+    "budget": 0
+  },
+  {
+    "welfare_id": "WEL000053",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "centers": 0,
+    "beneficiaries": 0,
+    "budget": 0
+  },
+  {
+    "welfare_id": "WEL000054",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "centers": 0,
+    "beneficiaries": 0,
+    "budget": 0
+  },
+  {
+    "welfare_id": "WEL000055",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "centers": 1,
+    "beneficiaries": 530,
+    "budget": 88
+  },
+  {
+    "welfare_id": "WEL000056",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "centers": 1,
+    "beneficiaries": 816,
+    "budget": 127
+  },
+  {
+    "welfare_id": "WEL000057",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "centers": 1,
+    "beneficiaries": 477,
+    "budget": 115
+  },
+  {
+    "welfare_id": "WEL000058",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "centers": 2,
+    "beneficiaries": 1057,
+    "budget": 201
+  },
+  {
+    "welfare_id": "WEL000059",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "centers": 1,
+    "beneficiaries": 743,
+    "budget": 212
+  },
+  {
+    "welfare_id": "WEL000060",
+    "sgg_cd": "48880",
+    "sigun": "거창군",
+    "year": 2023,
+    "centers": 1,
+    "beneficiaries": 401,
+    "budget": 64
+  },
+  {
+    "welfare_id": "WEL000061",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2022,
+    "centers": 1,
+    "beneficiaries": 553,
+    "budget": 60
+  },
+  {
+    "welfare_id": "WEL000062",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "centers": 0,
+    "beneficiaries": 0,
+    "budget": 0
+  },
+  {
+    "welfare_id": "WEL000063",
+    "sgg_cd": "48890",
+    "sigun": "합천군",
+    "year": 2024,
+    "centers": 1,
+    "beneficiaries": 528,
+    "budget": 58
+  }
+]

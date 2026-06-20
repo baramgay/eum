@@ -1,0 +1,650 @@
+[
+  {
+    "safety_id": "SAF000001",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "cctvs": 149,
+    "fire_stations": 10,
+    "safety_cases": 47
+  },
+  {
+    "safety_id": "SAF000002",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "cctvs": 447,
+    "fire_stations": 8,
+    "safety_cases": 141
+  },
+  {
+    "safety_id": "SAF000003",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "cctvs": 450,
+    "fire_stations": 9,
+    "safety_cases": 145
+  },
+  {
+    "safety_id": "SAF000004",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "cctvs": 639,
+    "fire_stations": 8,
+    "safety_cases": 200
+  },
+  {
+    "safety_id": "SAF000005",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "cctvs": 506,
+    "fire_stations": 6,
+    "safety_cases": 110
+  },
+  {
+    "safety_id": "SAF000006",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "cctvs": 221,
+    "fire_stations": 9,
+    "safety_cases": 77
+  },
+  {
+    "safety_id": "SAF000007",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "cctvs": 417,
+    "fire_stations": 5,
+    "safety_cases": 159
+  },
+  {
+    "safety_id": "SAF000008",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "cctvs": 458,
+    "fire_stations": 8,
+    "safety_cases": 139
+  },
+  {
+    "safety_id": "SAF000009",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "cctvs": 144,
+    "fire_stations": 3,
+    "safety_cases": 51
+  },
+  {
+    "safety_id": "SAF000010",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "cctvs": 88,
+    "fire_stations": 3,
+    "safety_cases": 18
+  },
+  {
+    "safety_id": "SAF000011",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "cctvs": 142,
+    "fire_stations": 3,
+    "safety_cases": 41
+  },
+  {
+    "safety_id": "SAF000012",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "cctvs": 132,
+    "fire_stations": 2,
+    "safety_cases": 49
+  },
+  {
+    "safety_id": "SAF000013",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "cctvs": 108,
+    "fire_stations": 3,
+    "safety_cases": 42
+  },
+  {
+    "safety_id": "SAF000014",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "cctvs": 99,
+    "fire_stations": 4,
+    "safety_cases": 31
+  },
+  {
+    "safety_id": "SAF000015",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "cctvs": 123,
+    "fire_stations": 3,
+    "safety_cases": 25
+  },
+  {
+    "safety_id": "SAF000016",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "cctvs": 141,
+    "fire_stations": 3,
+    "safety_cases": 54
+  },
+  {
+    "safety_id": "SAF000017",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "cctvs": 330,
+    "fire_stations": 7,
+    "safety_cases": 109
+  },
+  {
+    "safety_id": "SAF000018",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "cctvs": 345,
+    "fire_stations": 6,
+    "safety_cases": 98
+  },
+  {
+    "safety_id": "SAF000019",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "cctvs": 464,
+    "fire_stations": 8,
+    "safety_cases": 107
+  },
+  {
+    "safety_id": "SAF000020",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "cctvs": 414,
+    "fire_stations": 4,
+    "safety_cases": 54
+  },
+  {
+    "safety_id": "SAF000021",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "cctvs": 122,
+    "fire_stations": 3,
+    "safety_cases": 39
+  },
+  {
+    "safety_id": "SAF000022",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "cctvs": 94,
+    "fire_stations": 3,
+    "safety_cases": 18
+  },
+  {
+    "safety_id": "SAF000023",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "cctvs": 129,
+    "fire_stations": 2,
+    "safety_cases": 37
+  },
+  {
+    "safety_id": "SAF000024",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "cctvs": 131,
+    "fire_stations": 2,
+    "safety_cases": 34
+  },
+  {
+    "safety_id": "SAF000025",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "cctvs": 147,
+    "fire_stations": 4,
+    "safety_cases": 26
+  },
+  {
+    "safety_id": "SAF000026",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "cctvs": 133,
+    "fire_stations": 2,
+    "safety_cases": 26
+  },
+  {
+    "safety_id": "SAF000027",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "cctvs": 173,
+    "fire_stations": 3,
+    "safety_cases": 41
+  },
+  {
+    "safety_id": "SAF000028",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "cctvs": 129,
+    "fire_stations": 3,
+    "safety_cases": 41
+  },
+  {
+    "safety_id": "SAF000029",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "cctvs": 552,
+    "fire_stations": 9,
+    "safety_cases": 33
+  },
+  {
+    "safety_id": "SAF000030",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "cctvs": 324,
+    "fire_stations": 7,
+    "safety_cases": 92
+  },
+  {
+    "safety_id": "SAF000031",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "cctvs": 351,
+    "fire_stations": 7,
+    "safety_cases": 75
+  },
+  {
+    "safety_id": "SAF000032",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "cctvs": 473,
+    "fire_stations": 9,
+    "safety_cases": 117
+  },
+  {
+    "safety_id": "SAF000033",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "cctvs": 144,
+    "fire_stations": 3,
+    "safety_cases": 58
+  },
+  {
+    "safety_id": "SAF000034",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "cctvs": 89,
+    "fire_stations": 3,
+    "safety_cases": 22
+  },
+  {
+    "safety_id": "SAF000035",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "cctvs": 159,
+    "fire_stations": 3,
+    "safety_cases": 19
+  },
+  {
+    "safety_id": "SAF000036",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "cctvs": 124,
+    "fire_stations": 2,
+    "safety_cases": 35
+  },
+  {
+    "safety_id": "SAF000037",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2022,
+    "cctvs": 121,
+    "fire_stations": 3,
+    "safety_cases": 22
+  },
+  {
+    "safety_id": "SAF000038",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2023,
+    "cctvs": 87,
+    "fire_stations": 2,
+    "safety_cases": 24
+  },
+  {
+    "safety_id": "SAF000039",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2024,
+    "cctvs": 163,
+    "fire_stations": 3,
+    "safety_cases": 43
+  },
+  {
+    "safety_id": "SAF000040",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2025,
+    "cctvs": 163,
+    "fire_stations": 2,
+    "safety_cases": 58
+  },
+  {
+    "safety_id": "SAF000041",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2022,
+    "cctvs": 117,
+    "fire_stations": 3,
+    "safety_cases": 41
+  },
+  {
+    "safety_id": "SAF000042",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2023,
+    "cctvs": 101,
+    "fire_stations": 3,
+    "safety_cases": 30
+  },
+  {
+    "safety_id": "SAF000043",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2024,
+    "cctvs": 198,
+    "fire_stations": 3,
+    "safety_cases": 80
+  },
+  {
+    "safety_id": "SAF000044",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2025,
+    "cctvs": 143,
+    "fire_stations": 2,
+    "safety_cases": 58
+  },
+  {
+    "safety_id": "SAF000045",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "cctvs": 89,
+    "fire_stations": 1,
+    "safety_cases": 33
+  },
+  {
+    "safety_id": "SAF000046",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "cctvs": 156,
+    "fire_stations": 3,
+    "safety_cases": 44
+  },
+  {
+    "safety_id": "SAF000047",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "cctvs": 172,
+    "fire_stations": 3,
+    "safety_cases": 43
+  },
+  {
+    "safety_id": "SAF000048",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "cctvs": 146,
+    "fire_stations": 2,
+    "safety_cases": 37
+  },
+  {
+    "safety_id": "SAF000049",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "cctvs": 89,
+    "fire_stations": 1,
+    "safety_cases": 18
+  },
+  {
+    "safety_id": "SAF000050",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "cctvs": 161,
+    "fire_stations": 2,
+    "safety_cases": 41
+  },
+  {
+    "safety_id": "SAF000051",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "cctvs": 86,
+    "fire_stations": 3,
+    "safety_cases": 26
+  },
+  {
+    "safety_id": "SAF000052",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "cctvs": 138,
+    "fire_stations": 3,
+    "safety_cases": 28
+  },
+  {
+    "safety_id": "SAF000053",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "cctvs": 92,
+    "fire_stations": 3,
+    "safety_cases": 27
+  },
+  {
+    "safety_id": "SAF000054",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "cctvs": 147,
+    "fire_stations": 1,
+    "safety_cases": 57
+  },
+  {
+    "safety_id": "SAF000055",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "cctvs": 107,
+    "fire_stations": 4,
+    "safety_cases": 28
+  },
+  {
+    "safety_id": "SAF000056",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "cctvs": 123,
+    "fire_stations": 3,
+    "safety_cases": 28
+  },
+  {
+    "safety_id": "SAF000057",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "cctvs": 150,
+    "fire_stations": 2,
+    "safety_cases": 60
+  },
+  {
+    "safety_id": "SAF000058",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "cctvs": 147,
+    "fire_stations": 3,
+    "safety_cases": 36
+  },
+  {
+    "safety_id": "SAF000059",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "cctvs": 116,
+    "fire_stations": 3,
+    "safety_cases": 16
+  },
+  {
+    "safety_id": "SAF000060",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "cctvs": 105,
+    "fire_stations": 3,
+    "safety_cases": 21
+  },
+  {
+    "safety_id": "SAF000061",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "cctvs": 163,
+    "fire_stations": 2,
+    "safety_cases": 53
+  },
+  {
+    "safety_id": "SAF000062",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "cctvs": 86,
+    "fire_stations": 3,
+    "safety_cases": 29
+  },
+  {
+    "safety_id": "SAF000063",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "cctvs": 158,
+    "fire_stations": 4,
+    "safety_cases": 63
+  },
+  {
+    "safety_id": "SAF000064",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "cctvs": 129,
+    "fire_stations": 2,
+    "safety_cases": 52
+  },
+  {
+    "safety_id": "SAF000065",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2022,
+    "cctvs": 81,
+    "fire_stations": 2,
+    "safety_cases": 29
+  },
+  {
+    "safety_id": "SAF000066",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2023,
+    "cctvs": 136,
+    "fire_stations": 4,
+    "safety_cases": 41
+  },
+  {
+    "safety_id": "SAF000067",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2024,
+    "cctvs": 69,
+    "fire_stations": 3,
+    "safety_cases": 22
+  },
+  {
+    "safety_id": "SAF000068",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2025,
+    "cctvs": 111,
+    "fire_stations": 4,
+    "safety_cases": 31
+  },
+  {
+    "safety_id": "SAF000069",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2022,
+    "cctvs": 77,
+    "fire_stations": 3,
+    "safety_cases": 16
+  },
+  {
+    "safety_id": "SAF000070",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2023,
+    "cctvs": 176,
+    "fire_stations": 3,
+    "safety_cases": 33
+  },
+  {
+    "safety_id": "SAF000071",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2024,
+    "cctvs": 157,
+    "fire_stations": 4,
+    "safety_cases": 22
+  },
+  {
+    "safety_id": "SAF000072",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2025,
+    "cctvs": 151,
+    "fire_stations": 3,
+    "safety_cases": 47
+  }
+]

@@ -1,0 +1,650 @@
+[
+  {
+    "transport_id": "TRN000001",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2022,
+    "bus_routes": 42,
+    "bus_stops": 791,
+    "subway_stations": 3
+  },
+  {
+    "transport_id": "TRN000002",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2023,
+    "bus_routes": 59,
+    "bus_stops": 1313,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000003",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2024,
+    "bus_routes": 60,
+    "bus_stops": 862,
+    "subway_stations": 5
+  },
+  {
+    "transport_id": "TRN000004",
+    "sgg_cd": "48121",
+    "sigun": "창원시",
+    "year": 2025,
+    "bus_routes": 63,
+    "bus_stops": 1269,
+    "subway_stations": 3
+  },
+  {
+    "transport_id": "TRN000005",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2022,
+    "bus_routes": 46,
+    "bus_stops": 768,
+    "subway_stations": 4
+  },
+  {
+    "transport_id": "TRN000006",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2023,
+    "bus_routes": 55,
+    "bus_stops": 1017,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000007",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2024,
+    "bus_routes": 57,
+    "bus_stops": 868,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000008",
+    "sgg_cd": "48170",
+    "sigun": "진주시",
+    "year": 2025,
+    "bus_routes": 53,
+    "bus_stops": 560,
+    "subway_stations": 4
+  },
+  {
+    "transport_id": "TRN000009",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2022,
+    "bus_routes": 23,
+    "bus_stops": 409,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000010",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2023,
+    "bus_routes": 15,
+    "bus_stops": 261,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000011",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2024,
+    "bus_routes": 20,
+    "bus_stops": 413,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000012",
+    "sgg_cd": "48220",
+    "sigun": "통영시",
+    "year": 2025,
+    "bus_routes": 17,
+    "bus_stops": 318,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000013",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2022,
+    "bus_routes": 24,
+    "bus_stops": 434,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000014",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2023,
+    "bus_routes": 17,
+    "bus_stops": 318,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000015",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2024,
+    "bus_routes": 18,
+    "bus_stops": 248,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000016",
+    "sgg_cd": "48240",
+    "sigun": "사천시",
+    "year": 2025,
+    "bus_routes": 10,
+    "bus_stops": 193,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000017",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2022,
+    "bus_routes": 40,
+    "bus_stops": 404,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000018",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2023,
+    "bus_routes": 62,
+    "bus_stops": 791,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000019",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2024,
+    "bus_routes": 57,
+    "bus_stops": 948,
+    "subway_stations": 4
+  },
+  {
+    "transport_id": "TRN000020",
+    "sgg_cd": "48250",
+    "sigun": "김해시",
+    "year": 2025,
+    "bus_routes": 64,
+    "bus_stops": 1150,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000021",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2022,
+    "bus_routes": 19,
+    "bus_stops": 380,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000022",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2023,
+    "bus_routes": 13,
+    "bus_stops": 291,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000023",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2024,
+    "bus_routes": 18,
+    "bus_stops": 325,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000024",
+    "sgg_cd": "48270",
+    "sigun": "밀양시",
+    "year": 2025,
+    "bus_routes": 20,
+    "bus_stops": 333,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000025",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2022,
+    "bus_routes": 28,
+    "bus_stops": 659,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000026",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2023,
+    "bus_routes": 15,
+    "bus_stops": 495,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000027",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2024,
+    "bus_routes": 18,
+    "bus_stops": 274,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000028",
+    "sgg_cd": "48310",
+    "sigun": "거제시",
+    "year": 2025,
+    "bus_routes": 21,
+    "bus_stops": 258,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000029",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2022,
+    "bus_routes": 62,
+    "bus_stops": 1037,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000030",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2023,
+    "bus_routes": 46,
+    "bus_stops": 748,
+    "subway_stations": 3
+  },
+  {
+    "transport_id": "TRN000031",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2024,
+    "bus_routes": 49,
+    "bus_stops": 1026,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000032",
+    "sgg_cd": "48330",
+    "sigun": "양산시",
+    "year": 2025,
+    "bus_routes": 34,
+    "bus_stops": 511,
+    "subway_stations": 5
+  },
+  {
+    "transport_id": "TRN000033",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2022,
+    "bus_routes": 17,
+    "bus_stops": 465,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000034",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2023,
+    "bus_routes": 14,
+    "bus_stops": 205,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000035",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2024,
+    "bus_routes": 14,
+    "bus_stops": 385,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000036",
+    "sgg_cd": "48720",
+    "sigun": "의령군",
+    "year": 2025,
+    "bus_routes": 22,
+    "bus_stops": 524,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000037",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2022,
+    "bus_routes": 15,
+    "bus_stops": 254,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000038",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2023,
+    "bus_routes": 23,
+    "bus_stops": 419,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000039",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2024,
+    "bus_routes": 19,
+    "bus_stops": 291,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000040",
+    "sgg_cd": "48740",
+    "sigun": "함안군",
+    "year": 2025,
+    "bus_routes": 16,
+    "bus_stops": 196,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000041",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2022,
+    "bus_routes": 27,
+    "bus_stops": 687,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000042",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2023,
+    "bus_routes": 17,
+    "bus_stops": 353,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000043",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2024,
+    "bus_routes": 17,
+    "bus_stops": 296,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000044",
+    "sgg_cd": "48760",
+    "sigun": "창녕군",
+    "year": 2025,
+    "bus_routes": 19,
+    "bus_stops": 305,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000045",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2022,
+    "bus_routes": 22,
+    "bus_stops": 306,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000046",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2023,
+    "bus_routes": 14,
+    "bus_stops": 236,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000047",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2024,
+    "bus_routes": 22,
+    "bus_stops": 388,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000048",
+    "sgg_cd": "48820",
+    "sigun": "고성군",
+    "year": 2025,
+    "bus_routes": 18,
+    "bus_stops": 400,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000049",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2022,
+    "bus_routes": 25,
+    "bus_stops": 313,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000050",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2023,
+    "bus_routes": 27,
+    "bus_stops": 269,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000051",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2024,
+    "bus_routes": 11,
+    "bus_stops": 194,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000052",
+    "sgg_cd": "48840",
+    "sigun": "남해군",
+    "year": 2025,
+    "bus_routes": 23,
+    "bus_stops": 124,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000053",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2022,
+    "bus_routes": 17,
+    "bus_stops": 309,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000054",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2023,
+    "bus_routes": 18,
+    "bus_stops": 239,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000055",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2024,
+    "bus_routes": 16,
+    "bus_stops": 304,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000056",
+    "sgg_cd": "48850",
+    "sigun": "하동군",
+    "year": 2025,
+    "bus_routes": 25,
+    "bus_stops": 384,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000057",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2022,
+    "bus_routes": 19,
+    "bus_stops": 320,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000058",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2023,
+    "bus_routes": 13,
+    "bus_stops": 253,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000059",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2024,
+    "bus_routes": 15,
+    "bus_stops": 175,
+    "subway_stations": 2
+  },
+  {
+    "transport_id": "TRN000060",
+    "sgg_cd": "48860",
+    "sigun": "산청군",
+    "year": 2025,
+    "bus_routes": 19,
+    "bus_stops": 429,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000061",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2022,
+    "bus_routes": 12,
+    "bus_stops": 164,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000062",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2023,
+    "bus_routes": 16,
+    "bus_stops": 218,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000063",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2024,
+    "bus_routes": 19,
+    "bus_stops": 265,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000064",
+    "sgg_cd": "48870",
+    "sigun": "함양군",
+    "year": 2025,
+    "bus_routes": 17,
+    "bus_stops": 130,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000065",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2022,
+    "bus_routes": 16,
+    "bus_stops": 371,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000066",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2023,
+    "bus_routes": 13,
+    "bus_stops": 296,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000067",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2024,
+    "bus_routes": 17,
+    "bus_stops": 347,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000068",
+    "sgg_cd": "48890",
+    "sigun": "거창군",
+    "year": 2025,
+    "bus_routes": 12,
+    "bus_stops": 225,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000069",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2022,
+    "bus_routes": 25,
+    "bus_stops": 509,
+    "subway_stations": 3
+  },
+  {
+    "transport_id": "TRN000070",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2023,
+    "bus_routes": 12,
+    "bus_stops": 215,
+    "subway_stations": 0
+  },
+  {
+    "transport_id": "TRN000071",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2024,
+    "bus_routes": 24,
+    "bus_stops": 511,
+    "subway_stations": 1
+  },
+  {
+    "transport_id": "TRN000072",
+    "sgg_cd": "48930",
+    "sigun": "합천군",
+    "year": 2025,
+    "bus_routes": 16,
+    "bus_stops": 240,
+    "subway_stations": 0
+  }
+]
