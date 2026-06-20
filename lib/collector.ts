@@ -13,15 +13,17 @@ import {
 } from './collector/adapters/public-data-portal'
 
 // ─── auth_value 암호화/복호화 ──────────────────────────────────────────────
-const rawSecret = process.env.COLLECTION_SECRET
-if (!rawSecret) {
-  throw new Error('COLLECTION_SECRET 환경변수가 설정되지 않았습니다. 32바이트 이상의 AES-256 키를 설정해 주세요.')
+// 빌드 시 모듈 로드 오류 방지: 함수 호출 시점에 검증 (lazy init)
+function getCollectionSecret(): string {
+  const raw = process.env.COLLECTION_SECRET
+  if (!raw) throw new Error('COLLECTION_SECRET 환경변수가 설정되지 않았습니다. 32바이트 이상의 AES-256 키를 설정해 주세요.')
+  return raw.padEnd(32, '!').slice(0, 32)
 }
-const SECRET = rawSecret.padEnd(32, '!').slice(0, 32)
 
 export function encryptAuthValue(plain: string): string {
+  const secret = getCollectionSecret()
   const iv = randomBytes(16)
-  const cipher = createCipheriv('aes-256-cbc', Buffer.from(SECRET), iv)
+  const cipher = createCipheriv('aes-256-cbc', Buffer.from(secret), iv)
   const enc = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()])
   return iv.toString('hex') + ':' + enc.toString('hex')
 }
@@ -30,7 +32,8 @@ export function decryptAuthValue(encrypted: string): string {
   const [ivHex, encHex] = encrypted.split(':')
   if (!ivHex || !encHex) return encrypted  // 평문이면 그대로 반환 (하위 호환)
   try {
-    const decipher = createDecipheriv('aes-256-cbc', Buffer.from(SECRET), Buffer.from(ivHex, 'hex'))
+    const secret = getCollectionSecret()
+    const decipher = createDecipheriv('aes-256-cbc', Buffer.from(secret), Buffer.from(ivHex, 'hex'))
     return Buffer.concat([decipher.update(Buffer.from(encHex, 'hex')), decipher.final()]).toString('utf8')
   } catch {
     return encrypted  // 복호화 실패 시 원본 반환 (하위 호환)
