@@ -83,6 +83,7 @@ interface LocalHistoryEntry {
     groupValues: string[]
     levelValues: Record<string, string[]>
   }
+  result?: AnalysisResult
   timestamp: number
 }
 
@@ -1167,6 +1168,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
           dataset_label: session.source_label,
           analysis_type: selectedAnalysis.id,
           params: { assigned, optValues, groupValues, levelValues },
+          result: json as AnalysisResult,
         })
         setLocalHistory(updated)
         fetch('/api/analytics/runs', {

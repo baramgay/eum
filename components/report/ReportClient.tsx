@@ -1,8 +1,9 @@
 'use client'
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import {
   FileText, AlertTriangle, CheckCircle, MinusCircle, Building2, Target, Download, ListTodo, Image as ImageIcon,
-  Search, Filter, Loader2,
+  Search, Filter, Loader2, PlusCircle, Save, X,
 } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import {
@@ -18,7 +19,40 @@ import Btn from '@/components/ui/Btn'
 import EmptyState from '@/components/ui/EmptyState'
 import Skeleton from '@/components/ui/Skeleton'
 import CompareClient from './CompareClient'
+import { createClient } from '@/lib/supabase/client'
 
+// ── 분석 결과 삽입용 타입 ──────────────────────────────────────
+interface AnalysisResultTable {
+  title: string
+  headers: string[]
+  rows: (string | number | null)[][]
+  footnotes?: string[]
+}
+
+interface LocalHistoryEntry {
+  id: string
+  dataset_id: string
+  dataset_label: string
+  analysis_type: string
+  result?: {
+    ok: boolean
+    title?: string
+    tables?: AnalysisResultTable[]
+    error?: string
+  }
+  timestamp: number
+}
+
+type ReportBlockKind = 'heading' | 'table' | 'text'
+
+interface ReportBlock {
+  id: string
+  kind: ReportBlockKind
+  content: string
+  tableData?: { headers: string[]; rows: (string | number | null)[][] }
+}
+
+// ── 평가편람 리포트 타입 ────────────────────────────────────────
 interface Indicator { name: string; value: string; status: 'ok'|'warn'|'na'; desc: string }
 interface Area {
   name: string; weight: number; color: string
@@ -131,8 +165,144 @@ function ReportSkeleton() {
 
 interface Props { role?: string }
 
+const LOCAL_HISTORY_KEY = 'eum_analysis_history'
+
+function loadHistory(): LocalHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_HISTORY_KEY)
+    if (!raw) return []
+    return JSON.parse(raw) as LocalHistoryEntry[]
+  } catch {
+    return []
+  }
+}
+
+function makeId(): string {
+  return crypto.randomUUID()
+}
+
+function blocksToMarkdown(blocks: ReportBlock[]): string {
+  return blocks.map(b => {
+    if (b.kind === 'heading') return `## ${b.content}\n`
+    if (b.kind === 'text') return `${b.content}\n`
+    if (b.kind === 'table' && b.tableData) {
+      const header = `| ${b.tableData.headers.join(' | ')} |`
+      const sep    = `| ${b.tableData.headers.map(() => '---').join(' | ')} |`
+      const rows   = b.tableData.rows.slice(0, 20).map(
+        r => `| ${r.map(c => String(c ?? '')).join(' | ')} |`
+      )
+      return [header, sep, ...rows].join('\n') + '\n'
+    }
+    return ''
+  }).join('\n')
+}
+
 export default function ReportClient({ role }: Props) {
   const isCenter = role === 'center'
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // ── 분석 결과 삽입 블록 ────────────────────────────────────
+  const [reportBlocks, setReportBlocks]   = useState<ReportBlock[]>([])
+  const [insertBanner, setInsertBanner]   = useState<string | null>(null)
+  const [saving, setSaving]               = useState(false)
+  const [saveStatus, setSaveStatus]       = useState<'idle' | 'saved' | 'error'>('idle')
+  const [reportId, setReportId]           = useState<string | null>(null)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    const insertParam = searchParams.get('insert')
+    const idParam     = searchParams.get('id')
+    if (insertParam !== 'analytics' || !idParam) return
+
+    const history = loadHistory()
+    const entry = history.find(h => h.id === idParam) ?? history[0]
+    if (!entry) {
+      setInsertBanner('분석 결과를 찾을 수 없습니다.')
+      return
+    }
+
+    const ts = new Date(entry.timestamp).toLocaleString('ko-KR')
+    const newBlocks: ReportBlock[] = [
+      {
+        id: makeId(),
+        kind: 'heading',
+        content: `분석 결과 — ${entry.analysis_type} (${ts})`,
+      },
+    ]
+
+    if (entry.result?.tables && entry.result.tables.length > 0) {
+      const t = entry.result.tables[0]
+      newBlocks.push({
+        id: makeId(),
+        kind: 'table',
+        content: t.title,
+        tableData: { headers: t.headers, rows: t.rows.slice(0, 20) },
+      })
+    }
+
+    if (entry.result?.title) {
+      newBlocks.push({
+        id: makeId(),
+        kind: 'text',
+        content: `데이터셋: ${entry.dataset_label}`,
+      })
+    }
+
+    setReportBlocks(prev => [...prev, ...newBlocks])
+    setInsertBanner(`"${entry.analysis_type}" 분석 결과가 보고서에 삽입되었습니다.`)
+
+    const url = new URL(window.location.href)
+    url.searchParams.delete('insert')
+    url.searchParams.delete('id')
+    router.replace(url.pathname + (url.search || ''))
+  }, [searchParams, router])
+
+  // ── Supabase 자동 저장 (debounce 2초) ───────────────────────
+  const saveToSupabase = useCallback(async (blocks: ReportBlock[]) => {
+    if (blocks.length === 0) return
+    setSaving(true)
+    try {
+      const supabase = createClient()
+      if (reportId) {
+        await supabase.from('reports').update({ blocks, updated_at: new Date().toISOString() }).eq('id', reportId)
+      } else {
+        const { data: row } = await supabase
+          .from('reports')
+          .insert({ title: '분석 보고서', blocks })
+          .select('id')
+          .single()
+        if (row) setReportId(row.id)
+      }
+      setSaveStatus('saved')
+    } catch {
+      setSaveStatus('error')
+    } finally {
+      setSaving(false)
+    }
+  }, [reportId])
+
+  useEffect(() => {
+    if (reportBlocks.length === 0) return
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => saveToSupabase(reportBlocks), 2000)
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current) }
+  }, [reportBlocks, saveToSupabase])
+
+  function removeBlock(id: string) {
+    setReportBlocks(prev => prev.filter(b => b.id !== id))
+  }
+
+  function exportMarkdown() {
+    const md = blocksToMarkdown(reportBlocks)
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `분석보고서_${new Date().toISOString().slice(0, 10)}.md`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   const [data, setData]         = useState<EvalData | null>(null)
   const [targets, setTargets]   = useState<EvalTargets | null>(null)
@@ -348,6 +518,111 @@ export default function ReportClient({ role }: Props) {
 
   return (
     <div className="space-y-6 print:space-y-6">
+
+      {/* ── 분석 결과 삽입 배너 ── */}
+      {insertBanner && (
+        <div className="flex items-center justify-between gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-800 print:hidden">
+          <div className="flex items-center gap-2">
+            <PlusCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            <span>{insertBanner}</span>
+          </div>
+          <button onClick={() => setInsertBanner(null)} className="text-blue-500 hover:text-blue-700">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* ── 삽입된 분석 결과 블록 ── */}
+      {reportBlocks.length > 0 && (
+        <div className="space-y-4 print:space-y-4">
+          <div className="flex items-center justify-between print:hidden">
+            <h2 className="text-base font-semibold text-gray-800 dark:text-gray-200">삽입된 분석 결과</h2>
+            <div className="flex items-center gap-2">
+              {saving && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+              {!saving && saveStatus === 'saved' && (
+                <span className="text-xs text-green-600 flex items-center gap-1">
+                  <CheckCircle className="w-3.5 h-3.5" /> 저장됨
+                </span>
+              )}
+              {!saving && saveStatus === 'error' && (
+                <span className="text-xs text-red-500 flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5" /> 저장 실패
+                </span>
+              )}
+              <Btn
+                variant="ghost"
+                size="sm"
+                onClick={() => saveToSupabase(reportBlocks)}
+                disabled={saving}
+              >
+                <Save className="w-4 h-4" /> 저장
+              </Btn>
+              <Btn variant="secondary" size="sm" onClick={exportMarkdown}>
+                <Download className="w-4 h-4" /> 마크다운
+              </Btn>
+              <Btn variant="ghost" size="sm" onClick={() => window.print()}>
+                <FileText className="w-4 h-4" /> PDF 출력
+              </Btn>
+            </div>
+          </div>
+
+          {reportBlocks.map(block => (
+            <div key={block.id} className="relative group">
+              <button
+                onClick={() => removeBlock(block.id)}
+                className="absolute -top-2 -right-2 z-10 w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-100 hover:text-red-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
+              >
+                <X className="w-3 h-3" />
+              </button>
+
+              {block.kind === 'heading' && (
+                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-2">
+                  {block.content}
+                </h2>
+              )}
+
+              {block.kind === 'text' && (
+                <p className="text-sm text-gray-600 dark:text-gray-400">{block.content}</p>
+              )}
+
+              {block.kind === 'table' && block.tableData && (
+                <Card>
+                  {block.content && (
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{block.content}</p>
+                  )}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-950">
+                          {block.tableData.headers.map((h, i) => (
+                            <th key={i} className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                        {block.tableData.rows.map((row, ri) => (
+                          <tr key={ri} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                            {row.map((cell, ci) => (
+                              <td key={ci} className="px-3 py-2 text-gray-700 dark:text-gray-300">
+                                {cell === null ? '' : String(cell)}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              )}
+            </div>
+          ))}
+
+          <hr className="border-gray-200 dark:border-gray-700 print:hidden" />
+        </div>
+      )}
+
       {/* 헤더 */}
       <PageHeader
         title="데이터 관리 역량 평가편람 대응 리포트"

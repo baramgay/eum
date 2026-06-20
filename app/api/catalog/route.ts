@@ -63,8 +63,8 @@ export async function GET(req: NextRequest) {
     .range((page - 1) * pageSize, page * pageSize - 1)
 
   if (q.trim()) {
-    query = query.textSearch('search_vector', q.trim().split(/\s+/).join(' & '), {
-      type: 'plain',
+    query = query.textSearch('search_vector', q.trim(), {
+      type: 'websearch',
       config: 'simple',
     }) as typeof query
   }
@@ -77,10 +77,11 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     // search_vector 컬럼이 아직 없는 경우 ilike 폴백
+    const term = `%${q}%`
     const { data: fallback } = await supabase
       .from('catalog')
       .select('*')
-      .ilike('title', `%${q}%`)
+      .or(`title.ilike.${term},description.ilike.${term}`)
       .order('updated_at', { ascending: false })
       .limit(pageSize)
     return NextResponse.json({

@@ -4,10 +4,17 @@ import { Play, Activity, CheckCircle, AlertCircle, Clock, RotateCw } from 'lucid
 import { StatCard, Badge, EmptyState, Btn } from '@/components/ui'
 import type { CollectLog, SourceWithJob } from './types'
 
+interface SseProgress {
+  label: string
+  fetched: number
+  total: number | null
+}
+
 interface Props {
   sources: SourceWithJob[]
   logs: CollectLog[]
   runningId: string | null
+  sseProgress: SseProgress | null
   onRun: (sourceId: string) => void
 }
 
@@ -17,7 +24,7 @@ const STATUS_VARIANT: Record<string, 'blue' | 'green' | 'red' | 'gray'> = {
   failed:  'red',
 }
 
-export default function CollectRunsPanel({ sources, logs, runningId, onRun }: Props) {
+export default function CollectRunsPanel({ sources, logs, runningId, sseProgress, onRun }: Props) {
   const runningLogs = logs.filter(l => l.status === 'running')
   const recentLogs  = logs.filter(l => l.status !== 'running').slice(0, 10)
 
@@ -45,10 +52,33 @@ export default function CollectRunsPanel({ sources, logs, runningId, onRun }: Pr
             <RotateCw className="w-4 h-4 text-blue-600 animate-spin" />
             진행 중인 수집
           </h3>
-          {runningLogs.length === 0 ? (
+          {runningLogs.length === 0 && !runningId ? (
             <EmptyState icon="⏳" title="현재 실행 중인 수집이 없습니다" description="지금 실행 버튼으로 즉시 수집을 시작하세요." />
           ) : (
             <div className="space-y-2">
+              {runningId && sseProgress && (
+                <div className="bg-blue-50 rounded-md px-3 py-2 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-blue-700">{sseProgress.label}</p>
+                    {sseProgress.total != null && (
+                      <span className="text-xs text-blue-500">
+                        {Math.min(100, Math.round((sseProgress.fetched / sseProgress.total) * 100))}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="w-full bg-blue-100 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                      style={{
+                        width: sseProgress.total != null
+                          ? `${Math.min(100, Math.round((sseProgress.fetched / sseProgress.total) * 100))}%`
+                          : '60%',
+                        animation: sseProgress.total == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
               {runningLogs.map(log => {
                 const src = sourceMap.get(log.source_id)
                 return (

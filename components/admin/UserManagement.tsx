@@ -21,9 +21,11 @@ interface UserRecord {
 }
 
 const ROLE_LABELS: Record<string, { label: string; cls: string }> = {
+  admin:   { label: '최고 관리자', cls: 'bg-red-100 text-red-700'     },
   center:  { label: '센터 관리자', cls: 'bg-purple-100 text-purple-700' },
   agency:  { label: '기관',        cls: 'bg-blue-100 text-blue-700'   },
   viewer:  { label: '열람자',       cls: 'bg-gray-100 text-gray-600'   },
+  public:  { label: '일반 공개',   cls: 'bg-green-100 text-green-700' },
 }
 
 function RoleBadge({ role }: { role: string }) {
@@ -67,7 +69,7 @@ export default function UserManagement() {
   const [editingRole, setEditingRole] = useState<Record<string, string>>({})
   const [form, setForm] = useState({ email: '', password: '', role: 'agency', tenant_id: '' })
   const [tenants, setTenants] = useState<Tenant[]>([])
-  const [roleFilter, setRoleFilter] = useState<'all' | 'center' | 'agency' | 'viewer'>('all')
+  const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'center' | 'agency' | 'viewer' | 'public'>('all')
   const [page, setPage]           = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
@@ -113,7 +115,10 @@ export default function UserManagement() {
 
   async function changeField(uid: string, field: 'role' | 'tenant_id', value: string | null) {
     setEditingRole(p => ({ ...p, [uid]: field === 'role' ? (value ?? '') : p[uid] }))
-    await fetch(`/api/admin/users/${uid}`, {
+    const endpoint = field === 'role'
+      ? `/api/admin/users/${uid}/role`
+      : `/api/admin/users/${uid}`
+    await fetch(endpoint, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ [field]: value }),
@@ -200,9 +205,11 @@ export default function UserManagement() {
                 onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
                 className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
+                <option value="admin">최고 관리자</option>
                 <option value="center">센터 관리자</option>
                 <option value="agency">기관</option>
                 <option value="viewer">열람자</option>
+                <option value="public">일반 공개</option>
               </select>
             </div>
             {form.role === 'agency' && (
@@ -253,9 +260,11 @@ export default function UserManagement() {
           className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">모든 역할</option>
+          <option value="admin">최고 관리자</option>
           <option value="center">센터 관리자</option>
           <option value="agency">기관</option>
           <option value="viewer">열람자</option>
+          <option value="public">일반 공개</option>
         </select>
       </div>
 
@@ -309,9 +318,11 @@ export default function UserManagement() {
                         disabled={isBusy(u.id)}
                         className="text-xs border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
                       >
+                        <option value="admin">최고 관리자</option>
                         <option value="center">센터 관리자</option>
                         <option value="agency">기관</option>
                         <option value="viewer">열람자</option>
+                        <option value="public">일반 공개</option>
                       </select>
                     </td>
                     <td className="px-4 py-2">

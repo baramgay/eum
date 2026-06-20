@@ -22,6 +22,7 @@ import MigrationChartWidget from './widgets/MigrationChartWidget'
 import PopulationTrendWidget from './widgets/PopulationTrendWidget'
 import SettlementRankWidget from './widgets/SettlementRankWidget'
 import DataUsageWidget from './widgets/DataUsageWidget'
+import LineageWidget from './widgets/LineageWidget'
 
 export interface AreaScore { name: string; score: number; color: string; weight: number }
 export interface CollectionTrendRow {
@@ -332,6 +333,10 @@ export default function DashboardClient() {
       {settlement.length > 0 && <SettlementRankWidget settlement={settlement} />}
 
       <DataUsageWidget />
+
+      <div className="col-span-full">
+        <LineageWidget />
+      </div>
     </div>
   )
 }

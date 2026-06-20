@@ -44,7 +44,7 @@ export default function CollectClient({ role, tenantId }: Props) {
 
   const [runningId, setRunningId] = useState<string | null>(null)
   const [lastRunResult, setLastRunResult] = useState<{ sourceId: string; rowsFetched: number; datasetId?: string } | null>(null)
-  const [sseProgress, setSseProgress] = useState<string | null>(null)
+  const [sseProgress, setSseProgress] = useState<{ label: string; fetched: number; total: number | null } | null>(null)
 
   const [search, setSearch] = useState('')
   const [sourceStatusFilter, setSourceStatusFilter] = useState('all')
@@ -193,7 +193,7 @@ export default function CollectClient({ role, tenantId }: Props) {
   async function handleRun(sourceId: string) {
     setRunningId(sourceId)
     setLastRunResult(null)
-    setSseProgress('수집 시작...')
+    setSseProgress({ label: '수집 시작...', fetched: 0, total: null })
     try {
       const res = await fetch(`/api/collect/${sourceId}/run`, {
         method: 'POST',
@@ -215,9 +215,27 @@ export default function CollectClient({ role, tenantId }: Props) {
             if (!line.startsWith('data: ')) continue
             try {
               const event = JSON.parse(line.slice(6))
-              if (event.type === 'start')   setSseProgress('수집 요청 중...')
-              if (event.type === 'fetched') setSseProgress(`${(event.rows ?? 0).toLocaleString()}행 수집됨`)
-              if (event.type === 'saved')   setSseProgress('저장 중...')
+              if (event.type === 'start') {
+                setSseProgress({ label: '수집 요청 중...', fetched: 0, total: null })
+              }
+              if (event.type === 'progress') {
+                const fetched: number = event.fetched ?? 0
+                const total: number | null = event.total ?? null
+                setSseProgress({
+                  label: total != null
+                    ? `${fetched.toLocaleString()} / ${total.toLocaleString()}행 수집 중...`
+                    : `${fetched.toLocaleString()}행 수집 중...`,
+                  fetched,
+                  total,
+                })
+              }
+              if (event.type === 'fetched') {
+                const rows: number = event.rows ?? 0
+                setSseProgress({ label: `${rows.toLocaleString()}행 수집 완료, 저장 중...`, fetched: rows, total: rows })
+              }
+              if (event.type === 'saved') {
+                setSseProgress(prev => prev ? { ...prev, label: '저장 완료...' } : null)
+              }
               if (event.type === 'done') {
                 const rowsFetched: number = event.rows_fetched ?? 0
                 toast.success(`수집 완료 — ${rowsFetched.toLocaleString()}행`)
@@ -408,7 +426,27 @@ export default function CollectClient({ role, tenantId }: Props) {
       {activeTab === 'sources' && (
         <>
           {runningId && sseProgress && (
-            <p className="text-xs text-blue-600 animate-pulse px-1 mt-1">{sseProgress}</p>
+            <div className="px-1 mt-1 space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-blue-600">{sseProgress.label}</p>
+                {sseProgress.total != null && (
+                  <p className="text-xs text-gray-400">
+                    {Math.min(100, Math.round((sseProgress.fetched / sseProgress.total) * 100))}%
+                  </p>
+                )}
+              </div>
+              <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                  style={{
+                    width: sseProgress.total != null
+                      ? `${Math.min(100, Math.round((sseProgress.fetched / sseProgress.total) * 100))}%`
+                      : '100%',
+                    animation: sseProgress.total == null ? 'pulse 1.5s ease-in-out infinite' : undefined,
+                  }}
+                />
+              </div>
+            </div>
           )}
           <CollectSourcesPanel
             role={role}
@@ -464,6 +502,7 @@ export default function CollectClient({ role, tenantId }: Props) {
           sources={sources}
           logs={logs}
           runningId={runningId}
+          sseProgress={sseProgress}
           onRun={handleRun}
         />
       )}

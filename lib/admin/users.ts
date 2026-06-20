@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const userRoleSchema = z.enum(['center', 'agency', 'viewer'])
+export const userRoleSchema = z.enum(['admin', 'center', 'agency', 'viewer', 'public'])
 
 export const createUserSchema = z.object({
   email:     z.string().email('이메일 형식이 아닙니다'),

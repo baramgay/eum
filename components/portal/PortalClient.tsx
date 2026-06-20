@@ -49,6 +49,18 @@ interface UsageSummary {
   recentDatasets: { datasetId: string; title: string; updatedAt: string }[]
 }
 
+function highlightText(text: string, query: string): ReactNode {
+  if (!query.trim()) return text
+  const terms = query.trim().split(/\s+/).filter(Boolean)
+  const pattern = new RegExp(`(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi')
+  const parts = text.split(pattern)
+  return parts.map((part, i) =>
+    pattern.test(part)
+      ? <mark key={i} className="bg-yellow-200 dark:bg-yellow-700 text-inherit rounded-sm px-0.5">{part}</mark>
+      : part
+  )
+}
+
 const SORT_OPTIONS = [
   { value: 'updated_at', label: '최신순' },
   { value: 'title',      label: '이름순' },
@@ -387,9 +399,13 @@ export default function PortalClient() {
                 <Badge variant="blue">{item.theme}</Badge>
                 <Badge variant="gray">{item.format}</Badge>
               </div>
-              <h3 className="font-medium text-gray-800 dark:text-gray-200 text-sm mb-1">{item.title}</h3>
+              <h3 className="font-medium text-gray-800 dark:text-gray-200 text-sm mb-1">
+                {highlightText(item.title, query)}
+              </h3>
               {item.description && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">{item.description}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">
+                  {highlightText(item.description, query)}
+                </p>
               )}
               {item.keywords && (
                 <div className="flex flex-wrap gap-1 mb-2">
@@ -399,7 +415,7 @@ export default function PortalClient() {
                       onClick={e => { e.stopPropagation(); setSearchInput(k); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                       className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-1.5 py-0.5 rounded"
                     >
-                      #{k}
+                      #{highlightText(k, query)}
                     </button>
                   ))}
                 </div>

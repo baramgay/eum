@@ -181,6 +181,8 @@ interface FetchResult {
   pagesFetched?: number
 }
 
+type PageProgressCallback = (fetched: number, total: number | null, page: number) => void
+
 const MAX_ROWS         = 100_000
 const FETCH_TIMEOUT_MS = 30_000  // 공공데이터 API는 느릴 수 있음
 const MAX_RETRIES      = 3
@@ -277,7 +279,10 @@ async function parseResponse(res: Response, src: CollectionSource): Promise<Reco
 }
 
 /** auth_type별 헤더 구성, resp_format별 파싱, 페이지네이션 자동 처리 */
-export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
+export async function fetchSource(
+  src: CollectionSource,
+  onPageProgress?: PageProgressCallback,
+): Promise<FetchResult> {
   const paginationType = src.pagination_type ?? 'none'
 
   // 페이지네이션 없음 또는 CSV
@@ -285,6 +290,7 @@ export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
     const res = await fetchWithRetry(src.url, src)
     const rows = await parseResponse(res, src)
     const rawCount = rows.length
+    onPageProgress?.(rawCount, rawCount, 1)
     return { rows: rows.slice(0, MAX_ROWS), rawCount }
   }
 
@@ -324,6 +330,7 @@ export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
 
       allRows.push(...pageRows)
       pagesFetched++
+      onPageProgress?.(allRows.length, totalCount, pagesFetched)
 
       // 종료 조건
       const done =
@@ -359,6 +366,7 @@ export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
       const pageRows = await parseResponse(res, src)
       allRows.push(...pageRows)
       pagesFetched++
+      onPageProgress?.(allRows.length, null, pagesFetched)
       if (pageRows.length < pageSize) break
       offset += pageSize
     }
@@ -387,6 +395,7 @@ export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
 
       allRows.push(...pageRows)
       pagesFetched++
+      onPageProgress?.(allRows.length, null, pagesFetched)
 
       if (pageRows.length < pageSize) break
 
@@ -409,6 +418,7 @@ export async function fetchSource(src: CollectionSource): Promise<FetchResult> {
   // 기타: 단순 fetch
   const res = await fetchWithRetry(src.url, src)
   const rows = await parseResponse(res, src)
+  onPageProgress?.(rows.length, rows.length, 1)
   return { rows: rows.slice(0, MAX_ROWS), rawCount: rows.length }
 }
 
@@ -438,7 +448,8 @@ export function diffRows(
 
 export type ProgressEvent =
   | { type: 'start' }
-  | { type: 'fetched'; rows: number }
+  | { type: 'progress'; fetched: number; total: number | null; page: number }
+  | { type: 'fetched'; rows: number; total: number }
   | { type: 'saved' }
 
 /** 수집 실행: 로그 시작 → fetch → 저장 → diff → catalog upsert → 로그 종료 */
@@ -480,8 +491,10 @@ export async function runCollection(
 
     // 외부 API 호출
     onProgress?.({ type: 'start' })
-    const { rows, rawCount } = await fetchSource(src)
-    onProgress?.({ type: 'fetched', rows: rawCount })
+    const { rows, rawCount } = await fetchSource(src, (fetched, total, page) => {
+      onProgress?.({ type: 'progress', fetched, total, page })
+    })
+    onProgress?.({ type: 'fetched', rows: rawCount, total: rawCount })
 
     // 이전 수집 행 조회 (diff용) — 마지막 성공 로그의 테이블명 기반
     let prevRows: Record<string, unknown>[] = []
