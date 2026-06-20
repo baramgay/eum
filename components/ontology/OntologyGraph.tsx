@@ -109,6 +109,7 @@ export default function OntologyGraph({
 }: Props) {
   const [yearFilter, setYearFilter] = useState<number | null>(null)
   const [showMap, setShowMap] = useState(false)
+  const [tooltip, setTooltip] = useState<{ node: SimNode; x: number; y: number } | null>(null)
 
   const allYears = useMemo(
     () => Array.from(new Set(nodes.map(n => extractYear(n.props)).filter((y): y is number => y != null))).sort((a, b) => a - b),
@@ -212,6 +213,27 @@ export default function OntologyGraph({
 
       const svg = select(svgRef.current)
       svg.selectAll('*').remove()
+
+      // ── Visual defs ──────────────────────────────────────────────────────
+      const mainDefs = svg.append('defs')
+
+      // Dot-grid background pattern
+      const dotPattern = mainDefs.append('pattern')
+        .attr('id', 'eum-dot-grid').attr('width', 24).attr('height', 24)
+        .attr('patternUnits', 'userSpaceOnUse')
+      dotPattern.append('circle').attr('cx', 1).attr('cy', 1).attr('r', 1).attr('fill', 'rgba(255,255,255,0.055)')
+
+      // Glow filter for selected/hovered nodes
+      const glowFilter = mainDefs.append('filter')
+        .attr('id', 'eum-glow').attr('x', '-60%').attr('y', '-60%').attr('width', '220%').attr('height', '220%')
+      glowFilter.append('feGaussianBlur').attr('in', 'SourceGraphic').attr('stdDeviation', '5').attr('result', 'blur')
+      const glowMerge = glowFilter.append('feMerge')
+      glowMerge.append('feMergeNode').attr('in', 'blur')
+      glowMerge.append('feMergeNode').attr('in', 'SourceGraphic')
+      // ─────────────────────────────────────────────────────────────────────
+
+      // Dot-grid background rect (below the transform group)
+      svg.append('rect').attr('width', '100%').attr('height', '100%').attr('fill', 'url(#eum-dot-grid)')
 
       const g = svg.append('g')
       gRef.current = g
@@ -364,11 +386,12 @@ export default function OntologyGraph({
       const link = g
         .append('g')
         .attr('class', 'links')
-        .selectAll('line')
+        .selectAll('path')
         .data(simLinks)
         .enter()
-        .append('line')
+        .append('path')
         .attr('class', 'graph-link')
+        .attr('fill', 'none')
         .attr('stroke', d => encoding?.edgeColors.get(edgeLookupKey(d)) ?? EDGE_COLORS[d.rel] ?? DEFAULT_EDGE_COLOR)
         .attr('stroke-width', d => encoding?.edgeWidths.get(edgeLookupKey(d)) ?? Math.max(1, Math.sqrt(d.weight ?? 1) * 1.1))
         .attr('stroke-opacity', linkBaseOpacity(zoomScale))
@@ -418,8 +441,23 @@ export default function OntologyGraph({
               d.fy = null
             })
         )
-        .on('mouseenter', (_event, d) => setHovered({ ...d }))
-        .on('mouseleave', () => setHovered(null))
+        .on('mouseenter', (event, d) => {
+          setHovered({ ...d })
+          if (wrapRef.current) {
+            const rect = wrapRef.current.getBoundingClientRect()
+            setTooltip({ node: d, x: event.clientX - rect.left + 14, y: event.clientY - rect.top - 14 })
+          }
+        })
+        .on('mousemove', (event, d) => {
+          if (wrapRef.current) {
+            const rect = wrapRef.current.getBoundingClientRect()
+            setTooltip({ node: d, x: event.clientX - rect.left + 14, y: event.clientY - rect.top - 14 })
+          }
+        })
+        .on('mouseleave', () => {
+          setHovered(null)
+          setTooltip(null)
+        })
         .on('click', (_event, d) => {
           const n = { ...d }
           setSelected(n)
@@ -439,11 +477,21 @@ export default function OntologyGraph({
         .attr('stroke', '#EF4444')
         .attr('stroke-width', 2.5)
 
+      // 노드 타입 외곽 링 — 타입 색상을 낮은 opacity로 표시
+      node
+        .append('circle')
+        .attr('class', 'node-type-ring')
+        .attr('r', d => (encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d)) + 3.5)
+        .attr('fill', 'none')
+        .attr('stroke', d => NODE_COLORS[d.obj_type] ?? DEFAULT_NODE_COLOR)
+        .attr('stroke-width', 1.5)
+        .attr('stroke-opacity', 0.45)
+
       node
         .append('circle')
         .attr('r', d => encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d))
         .attr('fill', d => encoding?.nodeColors.get(d.obj_id) ?? NODE_COLORS[d.obj_type] ?? DEFAULT_NODE_COLOR)
-        .attr('stroke', d => anomalySet.has(d.obj_id) ? '#EF4444' : (encoding?.nodeStrokes.get(d.obj_id) ?? '#fff'))
+        .attr('stroke', d => anomalySet.has(d.obj_id) ? '#EF4444' : (encoding?.nodeStrokes.get(d.obj_id) ?? 'rgba(255,255,255,0.6)'))
         .attr('stroke-width', d => anomalySet.has(d.obj_id) ? 2 : lodStrokeWidth(zoomScale, false))
 
       // 노드 타입 이모지 아이콘
@@ -547,12 +595,20 @@ export default function OntologyGraph({
           .alphaDecay(0.03)
       }
 
+      const arcPath = (d: SimLink): string => {
+        const sx = (d.source as SimNode).x ?? 0
+        const sy = (d.source as SimNode).y ?? 0
+        const tx = (d.target as SimNode).x ?? 0
+        const ty = (d.target as SimNode).y ?? 0
+        const dx = tx - sx, dy = ty - sy
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist < 1) return `M${sx},${sy}`
+        const dr = dist * 0.45
+        return `M${sx},${sy}A${dr},${dr} 0 0,1 ${tx},${ty}`
+      }
+
       sim.on('tick', () => {
-        link
-          .attr('x1', d => (d.source as SimNode).x ?? 0)
-          .attr('y1', d => (d.source as SimNode).y ?? 0)
-          .attr('x2', d => (d.target as SimNode).x ?? 0)
-          .attr('y2', d => (d.target as SimNode).y ?? 0)
+        link.attr('d', arcPath)
 
         linkLabel
           .attr('x', d => (((d.source as SimNode).x ?? 0) + ((d.target as SimNode).x ?? 0)) / 2)
@@ -862,6 +918,20 @@ export default function OntologyGraph({
             }
           }}
         />
+
+        {/* 노드 호버 툴팁 */}
+        {tooltip && (
+          <div
+            className="absolute z-30 pointer-events-none bg-gray-800/95 backdrop-blur-sm text-white text-xs rounded-xl px-3 py-2.5 shadow-xl border border-white/10 max-w-[240px]"
+            style={{ left: tooltip.x, top: tooltip.y }}
+          >
+            <div className="font-semibold text-white mb-0.5 truncate">{tooltip.node.label}</div>
+            <div className="text-gray-400">{tooltip.node.obj_type}</div>
+            {(tooltip.node.degree ?? 0) > 0 && (
+              <div className="text-gray-500 mt-0.5">연결 {tooltip.node.degree}개</div>
+            )}
+          </div>
+        )}
 
         {/* 지도 오버레이 (Kakao Map 통합은 TODO) */}
         {showMap && (

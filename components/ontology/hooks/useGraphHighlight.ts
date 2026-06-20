@@ -69,7 +69,7 @@ export function useGraphHighlight({
       .style('opacity', d => nodeLabelOpacity(d as SimNode, zoomScale, showNodeLabels, focusId, focusNeighbors))
 
     gRef.current
-      .selectAll<SVGLineElement, SimLink>('.graph-link')
+      .selectAll<SVGPathElement, SimLink>('.graph-link')
       .transition()
       .duration(150)
       .style('opacity', d => {
