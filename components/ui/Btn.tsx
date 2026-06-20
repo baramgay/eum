@@ -1,5 +1,5 @@
 'use client'
-import { ButtonHTMLAttributes } from 'react'
+import { ButtonHTMLAttributes, ReactNode } from 'react'
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost'
 type Size = 'sm' | 'md' | 'lg'
@@ -8,6 +8,7 @@ interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
   size?: Size
   loading?: boolean
+  icon?: ReactNode
 }
 
 const variantClass: Record<Variant, string> = {
@@ -22,7 +23,7 @@ const sizeClass: Record<Size, string> = {
   lg: 'text-base px-5 py-2.5 rounded-xl',
 }
 
-export default function Btn({ variant = 'primary', size = 'md', loading, children, disabled, className = '', ...props }: BtnProps) {
+export default function Btn({ variant = 'primary', size = 'md', loading, icon, children, disabled, className = '', ...props }: BtnProps) {
   return (
     <button
       disabled={disabled || loading}
@@ -30,6 +31,7 @@ export default function Btn({ variant = 'primary', size = 'md', loading, childre
       {...props}
     >
       {loading && <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />}
+      {icon && !loading && icon}
       {children}
     </button>
   )
