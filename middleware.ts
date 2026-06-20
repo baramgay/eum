@@ -2,6 +2,9 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { recordAccessLog } from '@/lib/telemetry'
 
+// 개발 단계 인증 우회 — Vercel 환경 변수 DEV_BYPASS=true 설정 시 로그인 없이 접속
+const DEV_BYPASS = process.env.DEV_BYPASS === 'true'
+
 // 인증 없이 접근 가능한 경로
 // 주의: /api/ 전체를 공개로 열면 모든 API 인증이 각 route에만 의존하므로 명시적으로 한정
 const PUBLIC_PREFIXES = [
@@ -48,6 +51,12 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
+
+  // 개발 bypass: 모든 인증·역할 검사 생략, 그대로 통과
+  if (DEV_BYPASS) {
+    logAccess(supabaseResponse)
+    return supabaseResponse
+  }
 
   const isPublic = PUBLIC_PREFIXES.some(p => pathname.startsWith(p))
 
