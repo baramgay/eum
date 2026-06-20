@@ -15,38 +15,23 @@ comment on column public.ontology_workspaces.snapshot is '그래프 필터, 레�
 alter table public.ontology_workspaces enable row level security;
 
 -- 사용자는 자신의 워크스페이스만 조회/생성/수정/삭제
-create policy if not exists "ontology_workspaces_select_own"
-  on public.ontology_workspaces
-  for select
-  to authenticated
-  using ( (select auth.uid()) = user_id );
-
-create policy if not exists "ontology_workspaces_insert_own"
-  on public.ontology_workspaces
-  for insert
-  to authenticated
-  with check ( (select auth.uid()) = user_id );
-
-create policy if not exists "ontology_workspaces_update_own"
-  on public.ontology_workspaces
-  for update
-  to authenticated
-  using ( (select auth.uid()) = user_id )
-  with check ( (select auth.uid()) = user_id );
-
-create policy if not exists "ontology_workspaces_delete_own"
-  on public.ontology_workspaces
-  for delete
-  to authenticated
-  using ( (select auth.uid()) = user_id );
-
--- 관리자는 모든 워크스페이스 접근 가능(서비스 롤을 통한 관리용)
-create policy if not exists "ontology_workspaces_admin_all"
-  on public.ontology_workspaces
-  for all
-  to service_role
-  using (true)
-  with check (true);
+do $$ begin
+  if not exists (select 1 from pg_policies where tablename='ontology_workspaces' and policyname='ontology_workspaces_select_own') then
+    create policy "ontology_workspaces_select_own" on public.ontology_workspaces for select to authenticated using ((select auth.uid()) = user_id);
+  end if;
+  if not exists (select 1 from pg_policies where tablename='ontology_workspaces' and policyname='ontology_workspaces_insert_own') then
+    create policy "ontology_workspaces_insert_own" on public.ontology_workspaces for insert to authenticated with check ((select auth.uid()) = user_id);
+  end if;
+  if not exists (select 1 from pg_policies where tablename='ontology_workspaces' and policyname='ontology_workspaces_update_own') then
+    create policy "ontology_workspaces_update_own" on public.ontology_workspaces for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+  end if;
+  if not exists (select 1 from pg_policies where tablename='ontology_workspaces' and policyname='ontology_workspaces_delete_own') then
+    create policy "ontology_workspaces_delete_own" on public.ontology_workspaces for delete to authenticated using ((select auth.uid()) = user_id);
+  end if;
+  if not exists (select 1 from pg_policies where tablename='ontology_workspaces' and policyname='ontology_workspaces_admin_all') then
+    create policy "ontology_workspaces_admin_all" on public.ontology_workspaces for all to service_role using (true) with check (true);
+  end if;
+end $$;
 
 -- 인덱스
 create index if not exists idx_ontology_workspaces_user_id

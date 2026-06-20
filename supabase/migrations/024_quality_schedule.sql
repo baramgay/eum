@@ -19,20 +19,17 @@ CREATE INDEX IF NOT EXISTS idx_quality_schedules_next_run  ON quality_schedules(
 
 ALTER TABLE quality_schedules ENABLE ROW LEVEL SECURITY;
 
--- 스케줄 조회는 누구나 가능
-CREATE POLICY IF NOT EXISTS quality_schedules_select ON quality_schedules FOR SELECT
-  TO authenticated USING (true);
-
--- 스케줄 생성/수정/삭제는 센터(admin) 권한만 허용
-CREATE POLICY IF NOT EXISTS quality_schedules_insert ON quality_schedules FOR INSERT
-  TO authenticated WITH CHECK (
-    (auth.jwt() -> 'user_metadata' ->> 'role') = 'center'
-  );
-CREATE POLICY IF NOT EXISTS quality_schedules_update ON quality_schedules FOR UPDATE
-  TO authenticated USING (
-    (auth.jwt() -> 'user_metadata' ->> 'role') = 'center'
-  );
-CREATE POLICY IF NOT EXISTS quality_schedules_delete ON quality_schedules FOR DELETE
-  TO authenticated USING (
-    (auth.jwt() -> 'user_metadata' ->> 'role') = 'center'
-  );
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'quality_schedules' AND policyname = 'quality_schedules_select') THEN
+    CREATE POLICY quality_schedules_select ON quality_schedules FOR SELECT TO authenticated USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'quality_schedules' AND policyname = 'quality_schedules_insert') THEN
+    CREATE POLICY quality_schedules_insert ON quality_schedules FOR INSERT TO authenticated WITH CHECK ((auth.jwt() -> 'user_metadata' ->> 'role') = 'center');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'quality_schedules' AND policyname = 'quality_schedules_update') THEN
+    CREATE POLICY quality_schedules_update ON quality_schedules FOR UPDATE TO authenticated USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'center');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'quality_schedules' AND policyname = 'quality_schedules_delete') THEN
+    CREATE POLICY quality_schedules_delete ON quality_schedules FOR DELETE TO authenticated USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'center');
+  END IF;
+END $$;

@@ -23,10 +23,14 @@ CREATE INDEX IF NOT EXISTS idx_data_lineage_target_table ON data_lineage(target_
 
 ALTER TABLE data_lineage ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS data_lineage_select ON data_lineage FOR SELECT
-  TO authenticated USING (true);
-CREATE POLICY IF NOT EXISTS data_lineage_insert ON data_lineage FOR INSERT
-  TO authenticated WITH CHECK (false);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'data_lineage' AND policyname = 'data_lineage_select') THEN
+    CREATE POLICY data_lineage_select ON data_lineage FOR SELECT TO authenticated USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'data_lineage' AND policyname = 'data_lineage_insert') THEN
+    CREATE POLICY data_lineage_insert ON data_lineage FOR INSERT TO authenticated WITH CHECK (false);
+  END IF;
+END $$;
 
 -- 파생 테이블을 동적으로 생성하는 RPC.
 -- SECURITY DEFINER 로 정의되어 있으므로 서비스 롤 호출 시 DDL 권한으로 실행된다.

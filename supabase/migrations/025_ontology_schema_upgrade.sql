@@ -38,6 +38,11 @@ create index if not exists idx_onto_objects_props_jsonb_gin on public.onto_objec
 -- 2. onto_links 의 PK/FK 정리
 -- ──────────────────────────────────────────────────────────────────────────
 
+-- 고아 링크 제거 (onto_objects 에 없는 src/dst 참조 제거 — FK 추가 전 필수)
+delete from public.onto_links
+where src not in (select obj_id from public.onto_objects)
+   or dst not in (select obj_id from public.onto_objects);
+
 -- 중복 엣지 제거 (동일 src/rel/dst 그룹에서 가장 큰 weight 하나만 유지)
 with ranked as (
   select ctid,
@@ -126,15 +131,17 @@ end $$;
 -- 4. 워크스페이스 협업 컬럼 추가
 -- ──────────────────────────────────────────────────────────────────────────
 
-alter table if exists public.ontology_workspaces
-  add column if not exists share_token text unique,
-  add column if not exists notes text;
-
-comment on column public.ontology_workspaces.share_token is '읽기 전용 공유 링크 토큰';
-comment on column public.ontology_workspaces.notes is '워크스페이스 메모';
-
-create index if not exists idx_ontology_workspaces_share_token
-  on public.ontology_workspaces(share_token);
+do $$
+begin
+  if exists (select 1 from pg_tables where schemaname = 'public' and tablename = 'ontology_workspaces') then
+    alter table public.ontology_workspaces
+      add column if not exists share_token text unique,
+      add column if not exists notes text;
+    if not exists (select 1 from pg_indexes where schemaname = 'public' and tablename = 'ontology_workspaces' and indexname = 'idx_ontology_workspaces_share_token') then
+      create index idx_ontology_workspaces_share_token on public.ontology_workspaces(share_token);
+    end if;
+  end if;
+end $$;
 
 -- ──────────────────────────────────────────────────────────────────────────
 -- 5. Gold 테이블 updated_at 추가 + 자동 갱신 트리거
@@ -149,7 +156,16 @@ alter table if exists public.gold_business
 alter table if exists public.gold_public_facility
   add column if not exists updated_at timestamptz not null default now();
 
--- updated_at 자동 갱신 트리거 (함수는 021_ontology_workspace.sql 에서 정의)
+-- updated_at 자동 갱신 함수 (030에 정의되나 여기서 먼저 필요 — CREATE OR REPLACE로 멱등성 유지)
+create or replace function public.update_updated_at_column()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+-- updated_at 자동 갱신 트리거
 do $$
 begin
   if not exists (
