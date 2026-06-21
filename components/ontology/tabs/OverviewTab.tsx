@@ -142,6 +142,47 @@ export default function OverviewTab({
         </Card>
       </div>
 
+      {/* Lineage summary */}
+      {graph && graph.nodes && graph.nodes.length > 0 && (
+        <Card>
+          <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">계보 요약</h3>
+          <dl className="space-y-1 text-sm">
+            {(() => {
+              const edgeSet = graph.edges ?? []
+              const dstSet = new Set(edgeSet.map(e => e.dst))
+              const srcSet = new Set(edgeSet.map(e => e.src))
+              const sourceNodes = graph.nodes.filter(n => !dstSet.has(n.obj_id))
+              const leafNodes = graph.nodes.filter(n => !srcSet.has(n.obj_id))
+              const degreeMap = new Map<string, number>()
+              edgeSet.forEach(e => {
+                degreeMap.set(e.src, (degreeMap.get(e.src) ?? 0) + 1)
+                degreeMap.set(e.dst, (degreeMap.get(e.dst) ?? 0) + 1)
+              })
+              const sortedByDeg = [...degreeMap.entries()].sort((a, b) => b[1] - a[1])
+              const topNode = sortedByDeg[0] ? graph.nodes.find(n => n.obj_id === sortedByDeg[0][0]) : null
+              return (
+                <>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500 dark:text-gray-400">소스 노드 (진입점)</dt>
+                    <dd className="font-medium">{sourceNodes.length.toLocaleString()}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500 dark:text-gray-400">리프 노드 (최종 출력)</dt>
+                    <dd className="font-medium">{leafNodes.length.toLocaleString()}</dd>
+                  </div>
+                  {topNode && (
+                    <div className="flex justify-between">
+                      <dt className="text-gray-500 dark:text-gray-400">최다 연결 노드</dt>
+                      <dd className="font-medium text-right">{topNode.label} <span className="text-gray-400">({sortedByDeg[0][1]})</span></dd>
+                    </div>
+                  )}
+                </>
+              )
+            })()}
+          </dl>
+        </Card>
+      )}
+
       {actionResult && !scoring && (
         <div className="bg-white dark:bg-gray-900 rounded-lg border shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b bg-indigo-50">

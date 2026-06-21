@@ -15,7 +15,7 @@ export interface OntologyGraphData {
 }
 
 /** 레이아웃 종류 */
-export type GraphLayoutType = 'force' | 'cluster' | 'galaxy' | 'circular' | 'hierarchical' | 'radial' | 'geo' | 'time'
+export type GraphLayoutType = 'force' | 'cluster' | 'galaxy' | 'circular' | 'hierarchical' | 'radial' | 'geo' | 'time' | 'lineage'
 
 /** 그래프 시뮬레이션에서 사용하는 위치 정보 */
 export interface SimulationNodePosition {

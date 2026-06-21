@@ -37,6 +37,8 @@ import {
   linkBaseOpacity,
   buildGeoGrid,
   buildTimeAxis,
+  computeLineageLayout,
+  bfsPath,
 } from '@/lib/ontology/layout-helpers'
 import GraphToolbar from './GraphToolbar'
 import MiniMap from './MiniMap'
@@ -148,6 +150,16 @@ function drawDotGrid(ctx: CanvasRenderingContext2D, width: number, height: numbe
   }
 }
 
+// ─── Node status helpers ──────────────────────────────────────────────────────
+
+function parseNodeStatus(props: string): 'error' | 'stale' | 'building' | 'ok' {
+  const lower = props.toLowerCase()
+  if (lower.includes('status=error') || lower.includes('오류')) return 'error'
+  if (lower.includes('status=stale') || lower.includes('만료') || lower.includes('미갱신')) return 'stale'
+  if (lower.includes('status=building') || lower.includes('수집중') || lower.includes('처리중')) return 'building'
+  return 'ok'
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function OntologyGraph({
@@ -166,6 +178,10 @@ export default function OntologyGraph({
   const [yearFilter, setYearFilter] = useState<number | null>(null)
   const [showMap, setShowMap] = useState(false)
   const [tooltip, setTooltip] = useState<{ node: SimNode; x: number; y: number } | null>(null)
+  const [pathStart, setPathStart] = useState<string | null>(null)
+  const [highlightPath, setHighlightPath] = useState<Set<string>>(new Set())
+  const [highlightPathEdges, setHighlightPathEdges] = useState<Set<string>>(new Set())
+  const [colorMode, setColorMode] = useState<'type' | 'status' | 'layer'>('type')
 
   const allYears = useMemo(
     () =>
@@ -250,6 +266,7 @@ export default function OntologyGraph({
   const nodesRef = useRef<SimNode[]>([])
   const linksRef = useRef<SimLink[]>([])
   const rafRef = useRef<number>(0)
+  const frameRef = useRef<number>(0)
   const anomalySetRef = useRef<Set<string>>(new Set())
   const communityMapRef = useRef<Map<string, number>>(new Map())
   // parallel edge set: canonical key "minId|maxId" → true if both directions exist
@@ -410,13 +427,28 @@ export default function OntologyGraph({
         else edgeOpacity = Math.max(0.15, baseOpacity * 0.4)
       }
 
-      const color = EDGE_COLORS[l.rel] ?? DEFAULT_EDGE_COLOR
-      ctx.strokeStyle = color
-      ctx.fillStyle = color
-      const rawW = Math.max(1, Math.sqrt(l.weight ?? 1) * 1.1)
-      const isFocusEdge = focusId && (sid === focusId || tid === focusId)
-      ctx.lineWidth = isFocusEdge ? rawW + 1.5 : rawW
-      ctx.globalAlpha = edgeOpacity
+      const edgeKey = `${sid}|${tid}`
+      const isPathEdge = highlightPathEdges.size > 0 && highlightPathEdges.has(edgeKey)
+
+      if (highlightPathEdges.size > 0 && !isPathEdge) {
+        ctx.strokeStyle = EDGE_COLORS[l.rel] ?? DEFAULT_EDGE_COLOR
+        ctx.fillStyle = EDGE_COLORS[l.rel] ?? DEFAULT_EDGE_COLOR
+        ctx.lineWidth = Math.max(1, Math.sqrt(l.weight ?? 1) * 1.1)
+        ctx.globalAlpha = edgeOpacity * 0.12
+      } else if (isPathEdge) {
+        ctx.strokeStyle = '#60A5FA'
+        ctx.fillStyle = '#60A5FA'
+        ctx.lineWidth = 3
+        ctx.globalAlpha = 1
+      } else {
+        const color = EDGE_COLORS[l.rel] ?? DEFAULT_EDGE_COLOR
+        ctx.strokeStyle = color
+        ctx.fillStyle = color
+        const rawW = Math.max(1, Math.sqrt(l.weight ?? 1) * 1.1)
+        const isFocusEdge = focusId && (sid === focusId || tid === focusId)
+        ctx.lineWidth = isFocusEdge ? rawW + 1.5 : rawW
+        ctx.globalAlpha = edgeOpacity
+      }
 
       const curvature = hasReverse ? 0.18 : 0.12
       const side = hasReverse ? 1 : 0
@@ -454,13 +486,25 @@ export default function OntologyGraph({
       const nx = n.x ?? 0
       const ny = n.y ?? 0
       const r = encoding?.nodeRadii.get(n.obj_id) ?? baseNodeRadius(n)
-      const color = encoding?.nodeColors.get(n.obj_id) ?? NODE_COLORS[n.obj_type] ?? DEFAULT_NODE_COLOR
+      let color = encoding?.nodeColors.get(n.obj_id) ?? NODE_COLORS[n.obj_type] ?? DEFAULT_NODE_COLOR
+      if (colorMode === 'status') {
+        const s = parseNodeStatus(n.props ?? '')
+        color = s === 'error' ? '#EF4444' : s === 'stale' ? '#F59E0B' : s === 'building' ? '#3B82F6' : '#10B981'
+      } else if (colorMode === 'layer') {
+        const layerColors: Record<string, string> = {
+          '시군': '#6366F1', '청년': '#8B5CF6', '정책': '#EC4899', '시설': '#F59E0B',
+          '교통': '#14B8A6', '복지': '#10B981', '의료': '#EF4444', '문화': '#3B82F6',
+        }
+        color = layerColors[n.obj_type] ?? DEFAULT_NODE_COLOR
+      }
       const isAnomaly = anomalySetRef.current.has(n.obj_id)
       const isFocus = n.obj_id === focusId
       const isNeighbor = focusNeighbors?.has(n.obj_id) ?? false
 
       let nodeOpacity = 1
       if (focusId && !isFocus && !isNeighbor) nodeOpacity = 0.15
+      const isPathNode = highlightPath.size > 0 && highlightPath.has(n.obj_id)
+      if (highlightPath.size > 0 && !isPathNode) nodeOpacity = Math.min(nodeOpacity, 0.15)
 
       ctx.globalAlpha = nodeOpacity
 
@@ -485,6 +529,52 @@ export default function OntologyGraph({
       ctx.globalAlpha = nodeOpacity * 0.45
       ctx.stroke()
       ctx.globalAlpha = nodeOpacity
+
+      // Status ring
+      const nodeStatus = parseNodeStatus(n.props ?? '')
+      if (nodeStatus !== 'ok') {
+        ctx.save()
+        const outerR = r + 6
+        if (nodeStatus === 'error') {
+          ctx.strokeStyle = '#EF4444'
+          ctx.lineWidth = 2.5
+          ctx.globalAlpha = nodeOpacity
+          ctx.beginPath()
+          ctx.arc(nx, ny, outerR, 0, Math.PI * 2)
+          ctx.stroke()
+          // ! badge
+          ctx.fillStyle = '#EF4444'
+          ctx.beginPath()
+          ctx.arc(nx + r * 0.7, ny - r * 0.7, 5, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.fillStyle = '#fff'
+          ctx.font = 'bold 6px sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText('!', nx + r * 0.7, ny - r * 0.7)
+          ctx.textBaseline = 'alphabetic'
+        } else if (nodeStatus === 'stale') {
+          ctx.strokeStyle = '#F59E0B'
+          ctx.lineWidth = 2
+          ctx.setLineDash([4, 3])
+          ctx.globalAlpha = nodeOpacity * 0.85
+          ctx.beginPath()
+          ctx.arc(nx, ny, outerR, 0, Math.PI * 2)
+          ctx.stroke()
+          ctx.setLineDash([])
+        } else if (nodeStatus === 'building') {
+          // animated arc using frameRef
+          const progress = (frameRef.current % 120) / 120
+          ctx.strokeStyle = '#3B82F6'
+          ctx.lineWidth = 2.5
+          ctx.globalAlpha = nodeOpacity * 0.9
+          ctx.beginPath()
+          const startAngle = progress * Math.PI * 2 - Math.PI / 2
+          ctx.arc(nx, ny, outerR, startAngle, startAngle + Math.PI * 1.2)
+          ctx.stroke()
+        }
+        ctx.restore()
+      }
 
       // Main circle
       ctx.beginPath()
@@ -541,6 +631,15 @@ export default function OntologyGraph({
 
     ctx.restore()
     ctx.restore()
+
+    // Increment frame counter for animations
+    frameRef.current++
+
+    // Re-schedule if any building nodes need animation
+    const hasBuilding = nodesRef.current.some(n => parseNodeStatus(n.props ?? '') === 'building')
+    if (hasBuilding) {
+      rafRef.current = requestAnimationFrame(drawFrame)
+    }
   }
 
   // ── Zoom controls (canvas-native) ────────────────────────────────────────────
@@ -613,6 +712,7 @@ export default function OntologyGraph({
     NODE_COLORS,
     EDGE_COLORS,
     layout,
+    colorMode,
   ])
 
   // ── applyLayout (pure position mutation, unchanged logic) ────────────────────
@@ -731,6 +831,15 @@ export default function OntologyGraph({
           }
         })
       }
+    }
+
+    if (effectiveLayout === 'lineage') {
+      const positions = computeLineageLayout(simNodes, edges, width, height)
+      positions.forEach((p, id) => {
+        const n = nodeMap.get(id)
+        if (n) { n.x = p.x; n.y = p.y }
+      })
+      return
     }
   }
 
@@ -875,6 +984,30 @@ export default function OntologyGraph({
       function onClick(e: MouseEvent) {
         const rect = canvas.getBoundingClientRect()
         const node = getNodeAt(e.clientX - rect.left, e.clientY - rect.top)
+        if (e.shiftKey && node) {
+          if (!pathStart) {
+            setPathStart(node.obj_id)
+            setHighlightPath(new Set([node.obj_id]))
+            setHighlightPathEdges(new Set())
+          } else {
+            const path = bfsPath(pathStart, node.obj_id, displayEdges)
+            if (path) {
+              setHighlightPath(new Set(path))
+              const edgeKeys = new Set<string>()
+              for (let i = 0; i < path.length - 1; i++) {
+                edgeKeys.add(`${path[i]}|${path[i + 1]}`)
+                edgeKeys.add(`${path[i + 1]}|${path[i]}`)
+              }
+              setHighlightPathEdges(edgeKeys)
+            }
+            setPathStart(null)
+          }
+          return
+        }
+        // Normal click — reset path
+        setPathStart(null)
+        setHighlightPath(new Set())
+        setHighlightPathEdges(new Set())
         if (node) {
           setSelected({ ...node })
           onSelectProp?.({ ...node })
@@ -1117,6 +1250,35 @@ export default function OntologyGraph({
           height={height}
         />
 
+        {/* Color mode selector */}
+        <div className="absolute bottom-14 right-3 z-10 flex flex-col gap-1">
+          {(['type', 'status', 'layer'] as const).map(mode => (
+            <button
+              key={mode}
+              onClick={() => setColorMode(mode)}
+              className={`px-2 py-0.5 text-[10px] rounded font-medium transition-all ${
+                colorMode === mode
+                  ? 'bg-white/20 text-white ring-1 ring-white/40'
+                  : 'bg-black/20 text-white/50 hover:bg-black/30'
+              }`}
+            >
+              {mode === 'type' ? '유형' : mode === 'status' ? '상태' : '계층'}
+            </button>
+          ))}
+        </div>
+
+        {/* Status color legend */}
+        {colorMode === 'status' && (
+          <div className="absolute bottom-32 right-3 z-10 bg-black/60 rounded-lg p-2 space-y-1">
+            {([['#10B981', '정상'], ['#F59E0B', '만료'], ['#3B82F6', '수집중'], ['#EF4444', '오류']] as const).map(([c, l]) => (
+              <div key={l} className="flex items-center gap-1.5 text-[10px] text-white">
+                <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: c }} />
+                {l}
+              </div>
+            ))}
+          </div>
+        )}
+
         <canvas
           ref={canvasRef}
           data-testid="ontology-graph-canvas"
@@ -1125,6 +1287,13 @@ export default function OntologyGraph({
           className="w-full h-full cursor-grab active:cursor-grabbing"
           style={{ display: 'block' }}
         />
+
+        {/* BFS 경로 탐색 힌트 */}
+        {pathStart && (
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 bg-blue-600/90 text-white text-xs px-3 py-1 rounded-full shadow-lg pointer-events-none">
+            Shift+클릭으로 경로 탐색 종점 선택
+          </div>
+        )}
 
         {/* 노드 호버 툴팁 */}
         {tooltip && (

@@ -341,6 +341,109 @@ export function buildTimeAxis(
   return { ticks, xScale, yScale }
 }
 
+/**
+ * Kahn's topological sort → left-to-right DAG layout (Sugiyama-style)
+ * Handles cycles by falling back to degree-based ordering
+ */
+export function computeLineageLayout(
+  nodes: OntologyNode[],
+  edges: OntologyEdge[],
+  width: number,
+  height: number
+): Map<string, { x: number; y: number }> {
+  const positions = new Map<string, { x: number; y: number }>()
+  if (nodes.length === 0) return positions
+
+  // Build adjacency + in-degree
+  const inDegree = new Map<string, number>()
+  const outAdj = new Map<string, string[]>()
+  nodes.forEach(n => { inDegree.set(n.obj_id, 0); outAdj.set(n.obj_id, []) })
+  edges.forEach(e => {
+    if (!inDegree.has(e.dst) || !outAdj.has(e.src)) return
+    inDegree.set(e.dst, (inDegree.get(e.dst) ?? 0) + 1)
+    outAdj.get(e.src)!.push(e.dst)
+  })
+
+  // Kahn's BFS topological sort
+  const layer = new Map<string, number>()
+  const queue: string[] = []
+  inDegree.forEach((deg, id) => { if (deg === 0) queue.push(id) })
+
+  let processed = 0
+  while (queue.length > 0) {
+    const id = queue.shift()!
+    processed++
+    const currentLayer = layer.get(id) ?? 0
+    outAdj.get(id)?.forEach(dst => {
+      layer.set(dst, Math.max(layer.get(dst) ?? 0, currentLayer + 1))
+      inDegree.set(dst, (inDegree.get(dst) ?? 1) - 1)
+      if (inDegree.get(dst) === 0) queue.push(dst)
+    })
+  }
+
+  // Fallback for cycle nodes: assign layer 0
+  if (processed < nodes.length) {
+    nodes.forEach(n => {
+      if (!layer.has(n.obj_id)) layer.set(n.obj_id, 0)
+    })
+  }
+
+  // Group by layer
+  const byLayer = new Map<number, string[]>()
+  nodes.forEach(n => {
+    const l = layer.get(n.obj_id) ?? 0
+    if (!byLayer.has(l)) byLayer.set(l, [])
+    byLayer.get(l)!.push(n.obj_id)
+  })
+
+  const maxLayer = Math.max(...Array.from(byLayer.keys()), 0)
+  const xPadding = 80
+  const yPadding = 60
+  const layerWidth = maxLayer > 0 ? (width - xPadding * 2) / maxLayer : width - xPadding * 2
+
+  byLayer.forEach((ids, l) => {
+    const count = ids.length
+    const x = xPadding + l * layerWidth
+    ids.forEach((id, i) => {
+      const y = yPadding + ((i + 0.5) / count) * (height - yPadding * 2)
+      positions.set(id, { x, y })
+    })
+  })
+
+  return positions
+}
+
+/** BFS shortest path between two nodes (undirected) */
+export function bfsPath(srcId: string, dstId: string, edges: OntologyEdge[]): string[] | null {
+  if (srcId === dstId) return [srcId]
+  const adj = new Map<string, string[]>()
+  edges.forEach(e => {
+    if (!adj.has(e.src)) adj.set(e.src, [])
+    if (!adj.has(e.dst)) adj.set(e.dst, [])
+    adj.get(e.src)!.push(e.dst)
+    adj.get(e.dst)!.push(e.src)
+  })
+  const visited = new Set<string>([srcId])
+  const parent = new Map<string, string>()
+  const queue = [srcId]
+  while (queue.length > 0) {
+    const curr = queue.shift()!
+    for (const next of adj.get(curr) ?? []) {
+      if (visited.has(next)) continue
+      visited.add(next)
+      parent.set(next, curr)
+      if (next === dstId) {
+        const path: string[] = []
+        let c: string | undefined = dstId
+        while (c !== undefined) { path.unshift(c); c = parent.get(c) }
+        return path
+      }
+      queue.push(next)
+    }
+  }
+  return null
+}
+
 /** Worker 결과/기타 초기 위치를 SimNode 포맷으로 변환 */
 export function normalizePositions(
   nodes: OntologyNode[],

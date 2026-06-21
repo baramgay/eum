@@ -63,6 +63,7 @@ const LAYOUT_OPTIONS: { value: GraphLayoutType; label: string; title: string }[]
   { value: 'radial',      label: 'Radial',      title: '방사형 배치' },
   { value: 'geo',         label: 'Geo',         title: '실제 지리좌표 배치' },
   { value: 'time',        label: 'Time',        title: '시간축 배치' },
+  { value: 'lineage',     label: 'Lineage',     title: '계보 DAG 배치 (데이터 흐름)' },
 ]
 
 const LAYOUT_HELP = LAYOUT_OPTIONS
