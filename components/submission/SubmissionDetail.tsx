@@ -32,10 +32,10 @@ const STATUS_LABEL: Record<string, string> = {
   submitted: '검토 대기', review: '검토 중', approved: '승인', rejected: '반려',
 }
 const STATUS_COLOR: Record<string, string> = {
-  submitted: 'bg-yellow-100 text-yellow-700',
-  review:    'bg-blue-100 text-blue-700',
-  approved:  'bg-green-100 text-green-700',
-  rejected:  'bg-red-100 text-red-700',
+  submitted: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+  review:    'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+  approved:  'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+  rejected:  'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
 }
 
 type Tab = 'info' | 'preview' | 'comments'
@@ -171,7 +171,7 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
           )}
 
           {error && (
-            <div className="m-5 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+            <div className="m-5 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">{error}</div>
           )}
 
           {!loading && detail && (
@@ -207,8 +207,8 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
                   {detail.meta.quality_summary && (
                     <div className={`px-4 py-3 rounded-lg border text-sm ${
                       detail.meta.quality_summary.includes('통과')
-                        ? 'bg-green-50 border-green-200 text-green-800'
-                        : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300'
+                        : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-300'
                     }`}>
                       <span className="font-medium">품질 요약: </span>{detail.meta.quality_summary}
                     </div>

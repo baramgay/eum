@@ -252,8 +252,8 @@ export default function EditTab() {
 
         {/* 노드 추가 폼 */}
         {showAddNode && (
-          <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-3">
-            <p className="text-sm font-medium text-gray-700">새 노드</p>
+          <div className="mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 space-y-3">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">새 노드</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input type="text" placeholder="obj_id (선택, 자동생성 가능)" value={addNodeForm.obj_id}
                 onChange={e => setAddNodeForm(f => ({ ...f, obj_id: e.target.value }))}
@@ -279,7 +279,7 @@ export default function EditTab() {
 
         <div className="overflow-auto max-h-72 border border-gray-200 rounded-lg">
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 sticky top-0">
+            <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0">
               <tr>
                 <th className="px-3 py-2 text-left font-medium text-gray-600">ID</th>
                 <th className="px-3 py-2 text-left font-medium text-gray-600">Label</th>
@@ -295,7 +295,7 @@ export default function EditTab() {
                 </td></tr>
               )}
               {filteredNodes.map(node => (
-                <tr key={node.obj_id} className="hover:bg-gray-50">
+                <tr key={node.obj_id} className="hover:bg-gray-50 dark:hover:bg-gray-950">
                   {editingNodeId === node.obj_id && editingNode ? (
                     <>
                       <td className="px-3 py-2 text-gray-500 font-mono text-xs">{node.obj_id}</td>
@@ -379,8 +379,8 @@ export default function EditTab() {
 
         {/* 엣지 추가 폼 */}
         {showAddEdge && (
-          <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-3">
-            <p className="text-sm font-medium text-gray-700">새 엣지</p>
+          <div className="mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 space-y-3">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">새 엣지</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">src (출발 노드 ID)</label>
@@ -427,7 +427,7 @@ export default function EditTab() {
 
         <div className="overflow-auto max-h-72 border border-gray-200 rounded-lg">
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 sticky top-0">
+            <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0">
               <tr>
                 <th className="px-3 py-2 text-left font-medium text-gray-600">src</th>
                 <th className="px-3 py-2 text-left font-medium text-gray-600">rel</th>
@@ -445,7 +445,7 @@ export default function EditTab() {
               {filteredEdges.map(edge => {
                 const key = edgeKey(edge)
                 return (
-                  <tr key={key} className="hover:bg-gray-50">
+                  <tr key={key} className="hover:bg-gray-50 dark:hover:bg-gray-950">
                     <td className="px-3 py-2 font-mono text-xs text-gray-600 max-w-[12rem] truncate">{edge.src}</td>
                     <td className="px-3 py-2"><Badge variant="blue">{edge.rel}</Badge></td>
                     <td className="px-3 py-2 font-mono text-xs text-gray-600 max-w-[12rem] truncate">{edge.dst}</td>

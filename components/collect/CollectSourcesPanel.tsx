@@ -273,8 +273,8 @@ export default function CollectSourcesPanel({
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm text-red-700">
+        <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-300">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
           </div>

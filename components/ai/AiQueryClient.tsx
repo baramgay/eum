@@ -222,9 +222,9 @@ function SqlQueryPanel() {
 
       {/* 오류 */}
       {state.error && (
-        <Card className="!p-3 border-red-200 bg-red-50 flex items-start gap-2">
+        <Card className="!p-3 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 flex items-start gap-2">
           <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700">{state.error}</p>
+          <p className="text-sm text-red-700 dark:text-red-300">{state.error}</p>
         </Card>
       )}
 
@@ -326,12 +326,12 @@ const DEFAULT_EXAMPLES: ExampleItem[] = [
 ]
 
 const CATEGORY_COLORS: Record<string, string> = {
-  '정착': 'bg-emerald-100 text-emerald-700',
-  '사업체': 'bg-blue-100 text-blue-700',
-  '인구': 'bg-amber-100 text-amber-700',
-  '소득': 'bg-purple-100 text-purple-700',
-  '시설': 'bg-cyan-100 text-cyan-700',
-  '제조업': 'bg-indigo-100 text-indigo-700',
+  '정착': 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
+  '사업체': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+  '인구': 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
+  '소득': 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
+  '시설': 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300',
+  '제조업': 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300',
 }
 
 const BAR_COLORS = [
@@ -480,7 +480,7 @@ function SourceBadge({
     return (
       <a
         href={`/portal?id=${encodeURIComponent(datasetId)}`}
-        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer"
+        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors cursor-pointer"
         title="데이터셋 포털에서 보기"
       >
         {content}
@@ -493,7 +493,7 @@ function SourceBadge({
         href={sourceUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 hover:bg-blue-100 transition-colors"
+        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
         title="출처 페이지 새 창 열기"
       >
         {content}
@@ -677,7 +677,7 @@ function ResultCard({
       </div>
 
       {result.hint && (
-        <div className="px-4 py-2 text-sm text-amber-700 bg-amber-50 border-b">
+        <div className="px-4 py-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border-b">
           {result.hint}
         </div>
       )}
@@ -1187,7 +1187,7 @@ export default function AiQueryClient() {
                   onClick={() => switchConversation(conv.id)}
                   className={`flex items-center gap-2 flex-1 min-w-0 px-3 py-2 rounded-md text-left ${
                     conv.id === currentId
-                      ? 'bg-blue-50 text-blue-800'
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
                   }`}
                 >
@@ -1382,18 +1382,18 @@ export default function AiQueryClient() {
           )}
 
           {error && messages.length === 0 && (
-            <Card className="!p-4 bg-red-50 border-red-200 flex items-start gap-3">
+            <Card className="!p-4 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-red-800">질의 처리 중 오류가 발생했습니다</p>
-                <p className="text-sm text-red-700 mt-0.5">{error}</p>
+                <p className="text-sm font-medium text-red-800 dark:text-red-200">질의 처리 중 오류가 발생했습니다</p>
+                <p className="text-sm text-red-700 dark:text-red-300 mt-0.5">{error}</p>
               </div>
               <Btn
                 onClick={retryLast}
                 variant="secondary"
                 size="sm"
                 loading={loading}
-                className="border-red-200 text-red-700 hover:bg-red-100"
+                className="border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40"
               >
                 <RotateCcw className="w-3.5 h-3.5" /> 다시 시도
               </Btn>
@@ -1464,7 +1464,7 @@ export default function AiQueryClient() {
               onClick={() => setShowExamples(p => !p)}
               variant="secondary"
               size="md"
-              className={`px-3 ${showExamples ? 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100' : ''}`}
+              className={`px-3 ${showExamples ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40' : ''}`}
               title="추천 질문"
               aria-label="추천 질문"
             >

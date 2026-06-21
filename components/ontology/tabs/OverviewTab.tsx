@@ -185,11 +185,11 @@ export default function OverviewTab({
 
       {actionResult && !scoring && (
         <div className="bg-white dark:bg-gray-900 rounded-lg border shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b bg-indigo-50">
-            <h3 className="font-medium text-indigo-800 text-sm">
+          <div className="px-4 py-3 border-b bg-indigo-50 dark:bg-indigo-900/20">
+            <h3 className="font-medium text-indigo-800 dark:text-indigo-200 text-sm">
               {actionResult.action} — 우선순위 시군 (상위 {actionResult.results.length}개)
             </h3>
-            <p className="text-xs text-indigo-600 mt-0.5">{actionResult.method}</p>
+            <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">{actionResult.method}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">

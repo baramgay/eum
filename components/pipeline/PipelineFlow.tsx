@@ -60,19 +60,19 @@ interface FlowData {
 
 // ────── 헬퍼 ──────
 const STEP_META: Record<StepKey, { icon: typeof Database; color: string; bg: string; border: string }> = {
-  collect: { icon: Database,   color: 'text-blue-600',   bg: 'bg-blue-50',   border: 'border-blue-200' },
-  process: { icon: Settings2,  color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
-  analyze: { icon: BarChart2,  color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200' },
-  quality: { icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' },
-  open:    { icon: Globe,      color: 'text-amber-600',  bg: 'bg-amber-50',  border: 'border-amber-200' },
+  collect: { icon: Database,    color: 'text-blue-600 dark:text-blue-400',    bg: 'bg-blue-50 dark:bg-blue-900/20',    border: 'border-blue-200 dark:border-blue-800' },
+  process: { icon: Settings2,   color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-200 dark:border-purple-800' },
+  analyze: { icon: BarChart2,   color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-900/20', border: 'border-violet-200 dark:border-violet-800' },
+  quality: { icon: ShieldCheck, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-200 dark:border-emerald-800' },
+  open:    { icon: Globe,       color: 'text-amber-600 dark:text-amber-400',  bg: 'bg-amber-50 dark:bg-amber-900/20',  border: 'border-amber-200 dark:border-amber-800' },
 }
 
 function statusMeta(status: StepStatus) {
   switch (status) {
-    case 'success': return { icon: CheckCircle, cls: 'bg-green-100 text-green-700 border-green-200', label: '성공' }
-    case 'running': return { icon: RefreshCw, cls: 'bg-blue-100 text-blue-700 border-blue-200', label: '진행중' }
-    case 'failed':  return { icon: AlertTriangle, cls: 'bg-red-100 text-red-700 border-red-200', label: '실패' }
-    default:        return { icon: Clock, cls: 'bg-gray-100 text-gray-500 border-gray-200', label: '대기' }
+    case 'success': return { icon: CheckCircle, cls: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800', label: '성공' }
+    case 'running': return { icon: RefreshCw,   cls: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800', label: '진행중' }
+    case 'failed':  return { icon: AlertTriangle, cls: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800', label: '실패' }
+    default:        return { icon: Clock, cls: 'bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700', label: '대기' }
   }
 }
 
@@ -124,8 +124,8 @@ function StepCard({
         onClick={onClick}
         whileHover={{ y: -2 }}
         whileTap={{ scale: 0.98 }}
-        className={`w-full text-left rounded-xl border p-4 transition-all bg-white hover:shadow-md ${
-          active ? `ring-2 ring-offset-2 ring-blue-400 border-blue-300` : 'border-gray-200'
+        className={`w-full text-left rounded-xl border p-4 transition-all bg-white dark:bg-gray-900 hover:shadow-md ${
+          active ? `ring-2 ring-offset-2 ring-blue-400 border-blue-300 dark:ring-offset-gray-950 dark:border-blue-700` : 'border-gray-200 dark:border-gray-700'
         }`}
       >
         <div className="flex items-center justify-between mb-2">
@@ -137,10 +137,10 @@ function StepCard({
             <Icon className="w-4 h-4" />
           </span>
         </div>
-        <p className="text-sm font-bold text-gray-800">{step.label}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{step.desc}</p>
-        <div className="mt-3 text-xs text-gray-500 space-y-0.5">
-          <p>건수: <span className="font-semibold text-gray-700">{step.count.toLocaleString()}건</span></p>
+        <p className="text-sm font-bold text-gray-800 dark:text-gray-100">{step.label}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{step.desc}</p>
+        <div className="mt-3 text-xs text-gray-500 dark:text-gray-400 space-y-0.5">
+          <p>건수: <span className="font-semibold text-gray-700 dark:text-gray-300">{step.count.toLocaleString()}건</span></p>
           <p>마지막: {formatDateTime(step.lastAt)}</p>
           {step.nextAt && <p>다음: {formatDateTime(step.nextAt)}</p>}
         </div>
@@ -163,27 +163,27 @@ function StepDetail({ step, onClose }: { step: PipelineStep; onClose: () => void
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
-      className="bg-white rounded-xl border shadow-sm overflow-hidden"
+      className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden"
     >
-      <div className={`px-5 py-3 border-b flex items-center justify-between ${meta.bg}`}>
+      <div className={`px-5 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between ${meta.bg}`}>
         <div className="flex items-center gap-2">
           <Icon className={`w-4 h-4 ${meta.color}`} />
-          <h4 className="text-sm font-bold text-gray-800">{step.label} 단계 상세</h4>
-          <span className="text-xs text-gray-500">({step.items.length}건)</span>
+          <h4 className="text-sm font-bold text-gray-800 dark:text-gray-100">{step.label} 단계 상세</h4>
+          <span className="text-xs text-gray-500 dark:text-gray-400">({step.items.length}건)</span>
         </div>
         <div className="flex items-center gap-2">
           <Link
             href={step.href}
-            className="text-xs flex items-center gap-0.5 text-blue-600 hover:underline"
+            className="text-xs flex items-center gap-0.5 text-blue-600 dark:text-blue-400 hover:underline"
           >
             관리로 이동 <ChevronRight className="w-3 h-3" />
           </Link>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-sm">✕</button>
+          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm">✕</button>
         </div>
       </div>
       <div className="max-h-80 overflow-auto">
         {step.items.length === 0 ? (
-          <div className="text-center py-8 text-gray-400 text-sm">등록된 항목이 없습니다.</div>
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">등록된 항목이 없습니다.</div>
         ) : (
           <SortableTable
             caption={`${step.label} 단계 상세 항목`}
@@ -228,7 +228,7 @@ function StepDetail({ step, onClose }: { step: PipelineStep; onClose: () => void
 function Timeline({ runs }: { runs: TimelineRun[] }) {
   if (runs.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-400 text-sm">
+      <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">
         최근 실행 이력이 없습니다.
       </div>
     )
@@ -236,7 +236,7 @@ function Timeline({ runs }: { runs: TimelineRun[] }) {
 
   return (
     <div className="relative pl-5">
-      <div className="absolute left-[9px] top-2 bottom-2 w-0.5 bg-gray-100" />
+      <div className="absolute left-[9px] top-2 bottom-2 w-0.5 bg-gray-100 dark:bg-gray-800" />
       {runs.map((run, idx) => {
         const { icon: StatusIcon, cls } = statusMeta(run.status)
         const meta = STEP_META[run.source]
@@ -249,20 +249,20 @@ function Timeline({ runs }: { runs: TimelineRun[] }) {
             transition={{ delay: idx * 0.05 }}
             className="relative mb-4 last:mb-0"
           >
-            <div className={`absolute -left-[11px] top-1.5 w-5 h-5 rounded-full border-2 bg-white flex items-center justify-center ${cls.replace(/bg-\w+-100/, 'border-current').replace(/text-\w+-700/, '')}`}>
+            <div className={`absolute -left-[11px] top-1.5 w-5 h-5 rounded-full border-2 bg-white dark:bg-gray-900 flex items-center justify-center ${cls.replace(/bg-\w+-100/, 'border-current').replace(/text-\w+-700/, '')}`}>
               <StatusIcon className={`w-2.5 h-2.5 ${run.status === 'running' ? 'animate-spin' : ''}`} />
             </div>
-            <div className="ml-6 bg-white border rounded-lg p-3 hover:shadow-sm transition-shadow">
+            <div className="ml-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:shadow-sm transition-shadow">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border ${meta.bg} ${meta.color} ${meta.border}`}>
                   <Icon className="w-3 h-3" />
                   {run.source_label}
                 </span>
-                <span className="text-xs text-gray-400">{timeAgo(run.started_at)}</span>
-                <span className="text-xs text-gray-300">·</span>
-                <span className="text-xs text-gray-400">{formatDateTime(run.started_at)}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">{timeAgo(run.started_at)}</span>
+                <span className="text-xs text-gray-300 dark:text-gray-600">·</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">{formatDateTime(run.started_at)}</span>
               </div>
-              <p className="text-sm text-gray-700 mt-1.5">{run.message}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1.5">{run.message}</p>
             </div>
           </ReducedMotionDiv>
         )}
@@ -356,17 +356,17 @@ export default function PipelineFlow() {
   return (
     <div className="space-y-6">
       {/* 흐름도 카드 */}
-      <div className="bg-white rounded-xl border shadow-sm p-5">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="text-base font-bold text-gray-800">수집 → 가공 → 분석 → 품질 → 개방</h3>
-            <p className="text-xs text-gray-500 mt-0.5">데이터가 플랫폼을 통과하는 5단계 자동 파이프라인</p>
+            <h3 className="text-base font-bold text-gray-800 dark:text-gray-100">수집 → 가공 → 분석 → 품질 → 개방</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">데이터가 플랫폼을 통과하는 5단계 자동 파이프라인</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={loadData}
               disabled={refreshing}
-              className="flex items-center gap-1.5 px-3 py-2 border text-gray-600 text-sm rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               새로고침
@@ -385,11 +385,11 @@ export default function PipelineFlow() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 animate-pulse">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-36 bg-gray-100 rounded-xl" />
+              <div key={i} className="h-36 bg-gray-100 dark:bg-gray-800 rounded-xl" />
             ))}
           </div>
         ) : !data ? (
-          <div className="text-center py-12 text-gray-400 text-sm">
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500 text-sm">
             파이프라인 데이터를 불러올 수 없습니다.
           </div>
         ) : (
@@ -423,45 +423,45 @@ export default function PipelineFlow() {
               {activeStepData ? (
                 <StepDetail key={activeStepData.key} step={activeStepData} onClose={() => setActiveStep(null)} />
               ) : (
-                <div className="bg-gray-50 border border-dashed rounded-xl p-8 text-center text-gray-400 text-sm">
+                <div className="bg-gray-50 dark:bg-gray-800 border border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center text-gray-400 dark:text-gray-500 text-sm">
                   단계를 선택하면 상세 항목이 표시됩니다.
                 </div>
               )}
             </AnimatePresence>
           </div>
           <div className="space-y-3">
-            <div className="bg-white rounded-xl border p-4">
-              <p className="text-xs text-gray-500">수집 소스</p>
-              <p className="text-2xl font-bold text-blue-600">{data.stats.collectCount}</p>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400">수집 소스</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{data.stats.collectCount}</p>
             </div>
-            <div className="bg-white rounded-xl border p-4">
-              <p className="text-xs text-gray-500">가공 파이프라인</p>
-              <p className="text-2xl font-bold text-purple-600">{data.stats.processCount}</p>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400">가공 파이프라인</p>
+              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{data.stats.processCount}</p>
             </div>
-            <div className="bg-white rounded-xl border p-4">
-              <p className="text-xs text-gray-500">품질진단 통과</p>
-              <p className="text-2xl font-bold text-green-600">
-                {data.stats.qualityPass}<span className="text-sm text-gray-400 font-normal">/{data.stats.qualityTotal}</span>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400">품질진단 통과</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                {data.stats.qualityPass}<span className="text-sm text-gray-400 dark:text-gray-500 font-normal">/{data.stats.qualityTotal}</span>
               </p>
             </div>
-            <div className="bg-white rounded-xl border p-4">
-              <p className="text-xs text-gray-500">개방 데이터셋</p>
-              <p className="text-2xl font-bold text-amber-600">{data.stats.openCount}</p>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400">개방 데이터셋</p>
+              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{data.stats.openCount}</p>
             </div>
           </div>
         </div>
       )}
 
       {/* 실행 이력 타임라인 */}
-      <div className="bg-white rounded-xl border shadow-sm p-5">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
         <div className="flex items-center gap-2 mb-4">
-          <History className="w-4 h-4 text-gray-500" />
-          <h3 className="text-base font-bold text-gray-800">파이프라인 실행 이력</h3>
+          <History className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          <h3 className="text-base font-bold text-gray-800 dark:text-gray-100">파이프라인 실행 이력</h3>
         </div>
         {loading ? (
           <div className="space-y-4 animate-pulse">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-20 bg-gray-100 rounded-lg" />
+              <div key={i} className="h-20 bg-gray-100 dark:bg-gray-800 rounded-lg" />
             ))}
           </div>
         ) : (

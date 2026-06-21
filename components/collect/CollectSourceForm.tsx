@@ -443,29 +443,29 @@ export default function CollectSourceForm({
 
       {/* 테스트 결과 */}
       {testResult && (
-        <div className={`rounded-md p-3 text-sm ${testResult.ok ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+        <div className={`rounded-md p-3 text-sm ${testResult.ok ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'}`}>
           {testResult.ok ? (
             <div>
-              <p className="font-medium text-green-700 mb-1">
+              <p className="font-medium text-green-700 dark:text-green-300 mb-1">
                 테스트 성공 — 총 {testResult.rows_fetched?.toLocaleString()}행
                 {testResult.pages_fetched && testResult.pages_fetched > 1 && ` (${testResult.pages_fetched}페이지)`}
               </p>
               {testResult.columns && testResult.columns.length > 0 && (
-                <p className="text-xs text-green-600 mb-2">컬럼: {testResult.columns.join(', ')}</p>
+                <p className="text-xs text-green-600 dark:text-green-400 mb-2">컬럼: {testResult.columns.join(', ')}</p>
               )}
               {testResult.preview && testResult.preview.length > 0 && (
                 <div className="overflow-x-auto">
                   <table className="text-xs border-collapse w-full">
                     <thead>
-                      <tr className="bg-green-100">
+                      <tr className="bg-green-100 dark:bg-green-900/40">
                         {testResult.columns?.map(c => (
-                          <th key={c} className="border border-green-200 px-2 py-1 text-left font-medium text-green-800">{c}</th>
+                          <th key={c} className="border border-green-200 dark:border-green-700 px-2 py-1 text-left font-medium text-green-800 dark:text-green-200">{c}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {testResult.preview.slice(0, 5).map((row, i) => (
-                        <tr key={i} className="hover:bg-green-50">
+                        <tr key={i} className="hover:bg-green-50 dark:hover:bg-green-900/20">
                           {testResult.columns?.map(c => (
                             <td key={c} className="border border-green-100 px-2 py-0.5 text-gray-700 dark:text-gray-300 max-w-[120px] truncate">
                               {row[c] != null ? String(row[c]) : <span className="text-gray-300 dark:text-gray-200">—</span>}
@@ -479,7 +479,7 @@ export default function CollectSourceForm({
               )}
             </div>
           ) : (
-            <p className="text-red-600 font-medium">오류: {testResult.error}</p>
+            <p className="text-red-600 dark:text-red-400 font-medium">오류: {testResult.error}</p>
           )}
         </div>
       )}

@@ -18,6 +18,7 @@ import { extent } from 'd3-array'
 import { scaleLinear, scaleBand } from 'd3-scale'
 import { hierarchy, tree } from 'd3-hierarchy'
 import { Btn } from '@/components/ui'
+import { useTheme } from '@/components/theme/ThemeProvider'
 import KakaoOntologyMap from '@/components/ontology/KakaoOntologyMap'
 import type { OntologyNode, OntologyEdge } from '@/lib/ontology-utils'
 import { parseProps } from '@/lib/ontology-utils'
@@ -139,7 +140,8 @@ function drawEdge(
 function makeDotGridPattern(
   ctx: CanvasRenderingContext2D,
   spacing: number,
-  dpr: number
+  dpr: number,
+  dotColor: string
 ): CanvasPattern | null {
   const tileSize = Math.round(spacing * dpr)
   const offscreen = document.createElement('canvas')
@@ -147,7 +149,7 @@ function makeDotGridPattern(
   offscreen.height = tileSize
   const octx = offscreen.getContext('2d')
   if (!octx) return null
-  octx.fillStyle = 'rgba(255,255,255,0.055)'
+  octx.fillStyle = dotColor
   octx.beginPath()
   octx.arc(tileSize / 2, tileSize / 2, 1.2 * dpr, 0, Math.PI * 2)
   octx.fill()
@@ -162,13 +164,15 @@ function drawDotGrid(
   tx: number,
   ty: number,
   patternRef: { current: CanvasPattern | null },
-  dprRef: { current: number }
+  dprRef: { current: number },
+  isDark: boolean
 ) {
   const dpr = window.devicePixelRatio || 1
   const spacing = 24 * k
-  // Rebuild pattern tile only when DPR changes (very rare)
+  const dotColor = isDark ? 'rgba(255,255,255,0.055)' : 'rgba(0,0,0,0.07)'
+  // Rebuild pattern when DPR or theme changes
   if (patternRef.current === null || dprRef.current !== dpr) {
-    patternRef.current = makeDotGridPattern(ctx, spacing / k, dpr)
+    patternRef.current = makeDotGridPattern(ctx, spacing / k, dpr, dotColor)
     dprRef.current = dpr
   }
   const pattern = patternRef.current
@@ -208,6 +212,10 @@ export default function OntologyGraph({
   onLayoutChange,
   analysisResult = null,
 }: Props) {
+  const { resolvedTheme } = useTheme()
+  const themeRef = useRef<'light' | 'dark'>('light')
+  useEffect(() => { themeRef.current = resolvedTheme }, [resolvedTheme])
+
   const [yearFilter, setYearFilter] = useState<number | null>(null)
   const [showMap, setShowMap] = useState(false)
   const [tooltip, setTooltip] = useState<{ node: SimNode; x: number; y: number } | null>(null)
@@ -382,12 +390,14 @@ export default function OntologyGraph({
     }
     ctx.save()
     ctx.scale(dpr, dpr)
-    ctx.clearRect(0, 0, cssW, cssH)
+    const isDark = themeRef.current === 'dark'
+    ctx.fillStyle = isDark ? '#111827' : '#F9FAFB'
+    ctx.fillRect(0, 0, cssW, cssH)
 
     const { k, x, y } = transformRef.current
 
     // 1. Dot-grid background (in screen space, not world space)
-    drawDotGrid(ctx, cssW, cssH, k, x, y, dotGridPatternRef, dotGridDprRef)
+    drawDotGrid(ctx, cssW, cssH, k, x, y, dotGridPatternRef, dotGridDprRef, isDark)
 
     ctx.save()
     ctx.translate(x, y)
@@ -429,7 +439,7 @@ export default function OntologyGraph({
     // ── 3. Geo/Time background grid ──────────────────────────────────────────
     if ((layout as string) === 'geo') {
       const { lines, labels } = buildGeoGrid(width, height)
-      ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+      ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'
       ctx.lineWidth = 1
       lines.forEach(l => {
         ctx.beginPath()
@@ -437,7 +447,7 @@ export default function OntologyGraph({
         ctx.lineTo(l.x2, l.y2)
         ctx.stroke()
       })
-      ctx.fillStyle = 'rgba(255,255,255,0.25)'
+      ctx.fillStyle = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.35)'
       ctx.font = '10px sans-serif'
       ctx.textAlign = 'right'
       labels.forEach(l => ctx.fillText(l.text, l.x, l.y))
@@ -450,14 +460,16 @@ export default function OntologyGraph({
       ticks
         .filter(t => t.type === 'year')
         .forEach(t => {
-          ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+          ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'
           ctx.beginPath()
           ctx.moveTo(t.x, 60)
           ctx.lineTo(t.x, height - 60)
           ctx.stroke()
         })
       ticks.forEach(t => {
-        ctx.fillStyle = t.type === 'year' ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.25)'
+        ctx.fillStyle = isDark
+          ? (t.type === 'year' ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.25)')
+          : (t.type === 'year' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.35)')
         ctx.font = `${t.type === 'year' ? 10 : 9}px sans-serif`
         ctx.textAlign = t.type === 'year' ? 'center' : 'right'
         ctx.fillText(t.text, t.x, t.y)
@@ -533,7 +545,7 @@ export default function OntologyGraph({
         ctx.globalAlpha = opacity
         ctx.font = '500 10px sans-serif'
         ctx.textAlign = 'center'
-        ctx.fillStyle = '#E2E8F0'
+        ctx.fillStyle = isDark ? '#E2E8F0' : '#374151'
         ctx.fillText(l.rel, mx, my)
       })
       ctx.globalAlpha = 1
@@ -643,7 +655,7 @@ export default function OntologyGraph({
       if (sw > 0) {
         ctx.strokeStyle = isAnomaly
           ? '#EF4444'
-          : encoding?.nodeStrokes.get(n.obj_id) ?? 'rgba(255,255,255,0.6)'
+          : encoding?.nodeStrokes.get(n.obj_id) ?? (isDark ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.9)')
         ctx.lineWidth = isAnomaly ? 2 : sw
         ctx.stroke()
       }
@@ -672,14 +684,14 @@ export default function OntologyGraph({
         const ly = ny + r + 4
 
         ctx.globalAlpha = nodeOpacity * labelOpacity
-        ctx.fillStyle = 'rgba(0,0,0,0.45)'
+        ctx.fillStyle = isDark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.88)'
         ctx.beginPath()
         ctx.roundRect(lx, ly - 2, tw, 14, 3)
         ctx.fill()
-        ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+        ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
         ctx.lineWidth = 0.5
         ctx.stroke()
-        ctx.fillStyle = '#fff'
+        ctx.fillStyle = isDark ? '#fff' : '#111827'
         ctx.fillText(labelText, nx, ly + 9)
       }
 
@@ -787,6 +799,13 @@ export default function OntologyGraph({
     layout,
     colorMode,
   ])
+
+  // Redraw on theme change — also invalidate dot-grid pattern cache
+  useEffect(() => {
+    dotGridPatternRef.current = null
+    scheduleFrame()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedTheme])
 
   // ── applyLayout (pure position mutation, unchanged logic) ────────────────────
   function applyLayout(
@@ -1303,7 +1322,7 @@ export default function OntologyGraph({
 
       <div
         ref={wrapRef}
-        className="relative bg-gray-900 rounded-lg overflow-hidden"
+        className="relative bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden"
         style={{ height: fullscreen ? '100vh' : height }}
       >
         {/* Analysis overlay legend */}
@@ -1596,25 +1615,25 @@ export default function OntologyGraph({
       )}
 
       {selected && (
-        <div className="bg-white border rounded-lg p-4 shadow-sm">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: NODE_COLORS[selected.obj_type] ?? DEFAULT_NODE_COLOR }}
               />
-              <span className="font-medium text-gray-800">{selected.label}</span>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+              <span className="font-medium text-gray-800 dark:text-gray-200">{selected.label}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
                 {selected.obj_type}
               </span>
-              <span className="text-xs text-gray-400">연결 {degrees.get(selected.obj_id) ?? 0}개</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">연결 {degrees.get(selected.obj_id) ?? 0}개</span>
             </div>
             <button
               onClick={() => {
                 setSelected(null)
                 onSelectProp?.(null)
               }}
-              className="text-gray-400 hover:text-gray-600 text-xs"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs"
             >
               닫기
             </button>

@@ -252,8 +252,8 @@ export default function NodeProfile({
                   <div className="min-w-0">
                     <div className="flex items-center gap-1 flex-wrap">
                       <p className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">{ds.title}</p>
-                      {ds.ai_ready && <span className="text-[9px] px-1 py-0.5 bg-emerald-100 text-emerald-700 rounded font-medium">AI</span>}
-                      {ds.is_open && <span className="text-[9px] px-1 py-0.5 bg-blue-100 text-blue-700 rounded font-medium">공개</span>}
+                      {ds.ai_ready && <span className="text-[9px] px-1 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded font-medium">AI</span>}
+                      {ds.is_open && <span className="text-[9px] px-1 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-medium">공개</span>}
                     </div>
                     <p className="text-[10px] text-gray-400 dark:text-gray-300">{ds.theme} · {ds.rows != null ? `${ds.rows.toLocaleString()}행` : '—'}</p>
                   </div>

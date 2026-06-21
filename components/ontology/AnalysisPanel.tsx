@@ -89,7 +89,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
             onClick={() => { setType(key); setResult(null); setError(null); onResult?.(null) }}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
               type === key
-                ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300'
                 : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
             }`}
           >
@@ -190,7 +190,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-100 rounded-xl p-3 text-xs text-red-700">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl p-3 text-xs text-red-700 dark:text-red-300">
           {error}
         </div>
       )}

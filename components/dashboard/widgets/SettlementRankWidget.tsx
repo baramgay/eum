@@ -106,11 +106,11 @@ export default function SettlementRankWidget({ settlement }: SettlementRankWidge
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b bg-indigo-50">
-        <h3 className="text-base font-semibold text-indigo-800">
+      <div className="px-5 py-4 border-b bg-indigo-50 dark:bg-indigo-900/20">
+        <h3 className="text-base font-semibold text-indigo-800 dark:text-indigo-200">
           경남 시군별 청년 정착잠재지수 종합순위
         </h3>
-        <p className="text-xs text-indigo-600 mt-0.5">
+        <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
           KT/KB/KCB/주민등록 4대 데이터소스 통합 — 2018~2025 경남빅데이터센터 분석
         </p>
       </div>

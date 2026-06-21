@@ -275,22 +275,22 @@ export default function DatasetModal({ item, onClose }: Props) {
         </div>
         <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-base pr-6">{item.title}</h3>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{item.theme}</span>
+            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">{item.theme}</span>
             <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded">{item.format}</span>
             {item.quality_summary && (
               <span className={`text-xs px-2 py-0.5 rounded ${
                 item.quality_summary.includes('통과')
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-yellow-100 text-yellow-700'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                  : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
               }`}>
                 {item.quality_summary.includes('통과') ? '품질 통과' : '품질 확인 필요'}
               </span>
             )}
             {item.api_enabled && (
-              <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">API</span>
+              <span className="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded">API</span>
             )}
             {item.ai_ready && (
-              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">AI-Ready</span>
+              <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded">AI-Ready</span>
             )}
           </div>
           {/* 탭 버튼 */}
@@ -361,8 +361,8 @@ export default function DatasetModal({ item, onClose }: Props) {
               {item.quality_summary && (
                 <div className={`px-4 py-2.5 rounded-lg text-xs ${
                   item.quality_summary.includes('통과')
-                    ? 'bg-green-50 text-green-700'
-                    : 'bg-yellow-50 text-yellow-700'
+                    ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                    : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
                 }`}>
                   {item.quality_summary}
                 </div>
@@ -579,15 +579,15 @@ export default function DatasetModal({ item, onClose }: Props) {
                   {/* 종합 결과 뱃지 */}
                   <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
                     aiData.ai_ready
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-yellow-50 border-yellow-200'
+                      ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                      : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
                   }`}>
                     {aiData.ai_ready
-                      ? <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
-                      : <XCircle className="w-6 h-6 text-yellow-600 flex-shrink-0" />
+                      ? <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0" />
+                      : <XCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
                     }
                     <div>
-                      <p className={`text-sm font-semibold ${aiData.ai_ready ? 'text-green-700' : 'text-yellow-700'}`}>
+                      <p className={`text-sm font-semibold ${aiData.ai_ready ? 'text-green-700 dark:text-green-300' : 'text-yellow-700 dark:text-yellow-300'}`}>
                         {aiData.ai_ready ? 'AI-Ready 충족' : 'AI-Ready 미충족'}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -607,7 +607,7 @@ export default function DatasetModal({ item, onClose }: Props) {
                       <div
                         key={i}
                         className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${
-                          c.pass ? 'bg-white dark:bg-gray-900 border-green-100' : 'bg-red-50 border-red-100'
+                          c.pass ? 'bg-white dark:bg-gray-900 border-green-100 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800'
                         }`}
                       >
                         {c.pass

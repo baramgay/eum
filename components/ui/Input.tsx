@@ -20,7 +20,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
           'transition-all',
           'disabled:opacity-60 disabled:cursor-not-allowed',
-          hasError && 'border-red-300 focus:ring-red-500 bg-red-50/30',
+          hasError && 'border-red-300 dark:border-red-700 focus:ring-red-500 bg-red-50/30 dark:bg-red-900/20',
           className
         )}
         aria-invalid={hasError || undefined}

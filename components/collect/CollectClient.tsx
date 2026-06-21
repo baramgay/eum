@@ -405,8 +405,8 @@ export default function CollectClient({ role, tenantId }: Props) {
 
       {/* 수집 완료 배너 — 가공 탭 연동 */}
       {lastRunResult && !runningId && (
-        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center justify-between gap-4 text-sm">
-          <span className="text-green-700">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg px-4 py-3 flex items-center justify-between gap-4 text-sm">
+          <span className="text-green-700 dark:text-green-400">
             수집 완료 — {lastRunResult.rowsFetched.toLocaleString()}행
           </span>
           <Btn

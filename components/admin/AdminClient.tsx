@@ -453,7 +453,7 @@ export default function AdminClient({ initialTenants }: Props) {
                 type="file"
                 accept=".csv,text/csv"
                 onChange={e => setBulkFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-gray-600 dark:text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-gray-600 dark:text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/40"
               />
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">
                 {bulkType === 'users'
@@ -521,7 +521,7 @@ export default function AdminClient({ initialTenants }: Props) {
         {showForm && (
           <Card>
             <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-4">신규 기관 등록</h3>
-            {error && <div className="mb-3 text-red-600 text-sm bg-red-50 px-3 py-2 rounded">{error}</div>}
+            {error && <div className="mb-3 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">{error}</div>}
             <form onSubmit={createTenant} className="grid md:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="admin-tenant-id" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">기관 코드 *</label>
@@ -579,7 +579,7 @@ export default function AdminClient({ initialTenants }: Props) {
         )}
 
         {listError && (
-          <div className="flex items-center justify-between gap-3 text-red-600 text-sm bg-red-50 px-3 py-2 rounded">
+          <div className="flex items-center justify-between gap-3 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">
             <span className="flex items-center gap-1.5">
               <AlertCircle className="w-4 h-4" />
               {listError}

@@ -353,7 +353,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                 }}
                 onClick={() => fileInputRef.current?.click()}
                 className={`w-full relative border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
-                  isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  isDragging ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                 }`}
               >
                 <p className="text-gray-500 dark:text-gray-300 text-sm">
@@ -392,7 +392,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                       size="sm"
                       variant={checks.preview ? 'secondary' : 'primary'}
                       onClick={() => updateCheck('preview', true)}
-                      className={checks.preview ? '!bg-green-50 !text-green-700 !border-green-200' : ''}
+                      className={checks.preview ? '!bg-green-50 dark:!bg-green-900/20 !text-green-700 dark:!text-green-300 !border-green-200 dark:!border-green-800' : ''}
                     >
                       {checks.preview ? <><CheckCircle2 className="w-3.5 h-3.5" /> 확인 완료</> : '미리보기 확인'}
                     </Btn>
@@ -402,9 +402,9 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                       <span
                         key={s.name}
                         className={`text-xs px-2 py-0.5 rounded-full font-mono ${
-                          s.type === 'NUMBER' ? 'bg-blue-100 text-blue-700'
-                          : s.type === 'DATE' ? 'bg-green-100 text-green-700'
-                          : s.type === 'BOOLEAN' ? 'bg-purple-100 text-purple-700'
+                          s.type === 'NUMBER' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                          : s.type === 'DATE' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                          : s.type === 'BOOLEAN' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
                           : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                         }`}
                       >
@@ -456,7 +456,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
             )}
 
             {/* 심사 요청 체크리스트 */}
-            <div className={`rounded-xl border p-4 space-y-2 ${formTouched && !allChecked ? 'bg-red-50 border-red-200' : 'bg-gray-50 dark:bg-gray-950'}`}>
+            <div className={`rounded-xl border p-4 space-y-2 ${formTouched && !allChecked ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-gray-50 dark:bg-gray-950'}`}>
               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" /> 심사 요청 전 체크리스트
               </h4>
@@ -583,7 +583,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
       ) : (
         <Card className="overflow-hidden p-0">
           {role === 'center' && (
-            <div className="px-4 py-2.5 bg-blue-50 border-b text-xs text-blue-600 flex items-center gap-1.5">
+            <div className="px-4 py-2.5 bg-blue-50 dark:bg-blue-900/20 border-b text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5" />
               행을 클릭하면 상세 내용 확인 및 심사가 가능합니다.
             </div>
@@ -605,7 +605,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                   <tr
                     key={item.submission_id}
                     onClick={role === 'center' ? () => setSelectedId(item.submission_id) : undefined}
-                    className={`transition-colors ${role === 'center' ? 'cursor-pointer hover:bg-blue-50/60' : 'hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                    className={`transition-colors ${role === 'center' ? 'cursor-pointer hover:bg-blue-50/60 dark:hover:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-950'}`}
                   >
                     <td className="px-4 py-3 text-gray-800 dark:text-gray-200">
                       <span className="font-medium">{item.title}</span>

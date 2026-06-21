@@ -159,10 +159,10 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 
 function SeverityBadge({ severity }: { severity: Severity }) {
   const config = {
-    critical: { label: '심각', className: 'bg-red-100 text-red-700 ring-red-200' },
-    high:     { label: '높음', className: 'bg-orange-100 text-orange-700 ring-orange-200' },
-    medium:   { label: '보통', className: 'bg-amber-100 text-amber-700 ring-amber-200' },
-    low:      { label: '낮음', className: 'bg-blue-100 text-blue-700 ring-blue-200' },
+    critical: { label: '심각', className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-red-200 dark:ring-red-800' },
+    high:     { label: '높음', className: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 ring-orange-200 dark:ring-orange-800' },
+    medium:   { label: '보통', className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 ring-amber-200 dark:ring-amber-800' },
+    low:      { label: '낮음', className: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 ring-blue-200 dark:ring-blue-800' },
   }[severity]
   return (
     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ring-1 ${config.className}`}>
@@ -493,8 +493,8 @@ export default function QualityClient() {
                 key={sig.name}
                 padding="sm"
                 className={`text-center ${
-                  sig.status === 'pass' ? 'bg-green-50/50 border-green-200' :
-                  sig.status === 'fail' ? 'bg-red-50/50 border-red-200' :
+                  sig.status === 'pass' ? 'bg-green-50/50 dark:bg-green-900/15 border-green-200 dark:border-green-800' :
+                  sig.status === 'fail' ? 'bg-red-50/50 dark:bg-red-900/15 border-red-200 dark:border-red-800' :
                   'bg-gray-50 dark:bg-gray-950 border-gray-200 dark:border-gray-700'
                 }`}
               >
@@ -664,7 +664,7 @@ export default function QualityClient() {
                   <Card key={r.dataset_id} padding="sm" hover className="overflow-hidden">
                     <button
                       type="button"
-                      className={`w-full px-4 py-3 flex items-center justify-between text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${r.passed ? 'bg-green-50' : 'bg-red-50'}`}
+                      className={`w-full px-4 py-3 flex items-center justify-between text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${r.passed ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
                       onClick={() => setExpanded(p => ({ ...p, [r.dataset_id]: !p[r.dataset_id] }))}
                       aria-expanded={isOpen}
                       aria-label={`${r.table} 품질 결과 상세 ${isOpen ? '닫기' : '펼치기'}`}
@@ -793,7 +793,7 @@ export default function QualityClient() {
                       onClick={() => setAreaFilter(key)}
                       className={`inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
                         active
-                          ? 'bg-blue-50 border-blue-200 text-blue-700'
+                          ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400'
                           : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
                       }`}
                     >
@@ -1281,15 +1281,15 @@ export default function QualityClient() {
                           ? 'bg-amber-400'
                           : 'bg-red-500'
                       const cardBg = area.status === 'green'
-                        ? 'bg-green-50/50 border-green-200'
+                        ? 'bg-green-50/50 dark:bg-green-900/15 border-green-200 dark:border-green-800'
                         : area.status === 'yellow'
-                          ? 'bg-amber-50/50 border-amber-200'
-                          : 'bg-red-50/50 border-red-200'
+                          ? 'bg-amber-50/50 dark:bg-amber-900/15 border-amber-200 dark:border-amber-800'
+                          : 'bg-red-50/50 dark:bg-red-900/15 border-red-200 dark:border-red-800'
                       const valueColor = area.status === 'green'
-                        ? 'text-green-700'
+                        ? 'text-green-700 dark:text-green-400'
                         : area.status === 'yellow'
-                          ? 'text-amber-700'
-                          : 'text-red-700'
+                          ? 'text-amber-700 dark:text-amber-400'
+                          : 'text-red-700 dark:text-red-400'
 
                       return (
                         <div
@@ -1314,9 +1314,9 @@ export default function QualityClient() {
                             </p>
                           )}
                           <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                            area.status === 'green' ? 'bg-green-100 text-green-700' :
-                            area.status === 'yellow' ? 'bg-amber-100 text-amber-700' :
-                            'bg-red-100 text-red-700'
+                            area.status === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
+                            area.status === 'yellow' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+                            'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
                           }`}>
                             {area.status === 'green' ? '양호' : area.status === 'yellow' ? '주의' : '위험'}
                           </span>

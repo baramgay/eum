@@ -638,7 +638,7 @@ export default function FacilityMap({ facilities }: Props) {
                   onClick={() => toggleCompare(f)}
                   className={`shrink-0 p-1.5 rounded-full border transition-all ${
                     compareSet.has(f.facility_id)
-                      ? 'bg-blue-50 border-blue-200 text-blue-600'
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400'
                       : 'border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300'
                   }`}
                   title={compareSet.has(f.facility_id) ? '비교 목록에서 제거' : '비교에 추가'}
@@ -686,8 +686,8 @@ export default function FacilityMap({ facilities }: Props) {
                   onClick={() => toggleCompare(selectedFacility)}
                   className={`p-2 rounded-full transition-colors ${
                     compareSet.has(selectedFacility.facility_id)
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'hover:bg-gray-100 text-gray-500'
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500'
                   }`}
                   title="비교에 추가"
                 >
@@ -771,7 +771,7 @@ export default function FacilityMap({ facilities }: Props) {
                 <p className="text-xs font-semibold text-gray-700 mb-2">제공 서비스</p>
                 <div className="flex flex-wrap gap-1.5">
                   {detail.services.map(s => (
-                    <span key={s} className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+                    <span key={s} className="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full">
                       {s}
                     </span>
                   ))}
@@ -849,7 +849,7 @@ export default function FacilityMap({ facilities }: Props) {
                 <span className="text-sm font-semibold text-gray-800">
                   {drilldown.type === 'heatmap' ? '히트맵 영역 상세' : `클러스터 ${drilldown.cluster.id} 상세`}
                 </span>
-                <span className="bg-orange-50 text-orange-600 text-xs px-2 py-0.5 rounded-full font-medium">
+                <span className="bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 text-xs px-2 py-0.5 rounded-full font-medium">
                   {drilldown.list.length}개소
                 </span>
               </div>

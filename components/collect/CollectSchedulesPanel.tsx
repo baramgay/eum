@@ -144,26 +144,26 @@ export default function CollectSchedulesPanel({ sources, loading, updatingSource
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="bg-blue-50 rounded-lg p-4 text-sm">
-          <div className="flex items-center gap-2 text-blue-700 font-medium mb-1">
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm">
+          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 font-medium mb-1">
             <Calendar className="w-4 h-4" />
             매일 자정
           </div>
-          <p className="text-blue-600 text-xs">매일 00:00에 수집을 실행합니다.</p>
+          <p className="text-blue-600 dark:text-blue-400 text-xs">매일 00:00에 수집을 실행합니다.</p>
         </div>
-        <div className="bg-purple-50 rounded-lg p-4 text-sm">
-          <div className="flex items-center gap-2 text-purple-700 font-medium mb-1">
+        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 text-sm">
+          <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300 font-medium mb-1">
             <CheckCircle2 className="w-4 h-4" />
             매주 월요일
           </div>
-          <p className="text-purple-600 text-xs">매주 월요일 00:00에 수집을 실행합니다.</p>
+          <p className="text-purple-600 dark:text-purple-400 text-xs">매주 월요일 00:00에 수집을 실행합니다.</p>
         </div>
-        <div className="bg-emerald-50 rounded-lg p-4 text-sm">
-          <div className="flex items-center gap-2 text-emerald-700 font-medium mb-1">
+        <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 text-sm">
+          <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-medium mb-1">
             <XCircle className="w-4 h-4" />
             매월 1일
           </div>
-          <p className="text-emerald-600 text-xs">매월 1일 00:00에 수집을 실행합니다.</p>
+          <p className="text-emerald-600 dark:text-emerald-400 text-xs">매월 1일 00:00에 수집을 실행합니다.</p>
         </div>
       </div>
     </div>

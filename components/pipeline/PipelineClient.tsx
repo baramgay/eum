@@ -176,14 +176,14 @@ function AnalysisTab() {
       )}
 
       {showForm && (
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 space-y-3">
-          <h4 className="text-sm font-semibold text-purple-800">분석 실적 신규 등록</h4>
+        <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4 space-y-3">
+          <h4 className="text-sm font-semibold text-purple-800 dark:text-purple-300">분석 실적 신규 등록</h4>
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="pl-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석명 *</label>
               <input
                 id="pl-title"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 placeholder="예: 경남 청년인구 이동패턴 분석"
                 value={form.title}
                 onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
@@ -194,7 +194,7 @@ function AnalysisTab() {
               <input
                 id="pl-performed-at"
                 type="date"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 value={form.performed_at}
                 onChange={e => setForm(p => ({ ...p, performed_at: e.target.value }))}
               />
@@ -203,7 +203,7 @@ function AnalysisTab() {
               <label htmlFor="pl-purpose" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석 목적</label>
               <input
                 id="pl-purpose"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 placeholder="정책활용 / 서비스개선 / 사회문제해결"
                 value={form.purpose}
                 onChange={e => setForm(p => ({ ...p, purpose: e.target.value }))}
@@ -213,7 +213,7 @@ function AnalysisTab() {
               <label htmlFor="pl-datasets" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">활용 데이터셋 (쉼표 구분)</label>
               <input
                 id="pl-datasets"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 placeholder="주민등록인구통계, 청년지원사업현황"
                 value={form.datasets_used}
                 onChange={e => setForm(p => ({ ...p, datasets_used: e.target.value }))}
@@ -223,7 +223,7 @@ function AnalysisTab() {
               <label htmlFor="pl-result-summary" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">결과 요약</label>
               <textarea
                 id="pl-result-summary"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 rows={2}
                 placeholder="분석 결과 및 정책 제언 요약"
                 value={form.result_summary}
@@ -455,12 +455,12 @@ function SyntheticTab() {
 
       {/* 가점 현황 배지 */}
       {!loading && !error && (
-        <div className={`rounded-xl p-4 flex items-center gap-4 ${bonusScore >= 5 ? 'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200'}`}>
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold ${bonusScore >= 5 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+        <div className={`rounded-xl p-4 flex items-center gap-4 ${bonusScore >= 5 ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'}`}>
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-bold ${bonusScore >= 5 ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400' : 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400'}`}>
             +{bonusScore}
           </div>
           <div>
-            <p className={`text-sm font-semibold ${bonusScore >= 5 ? 'text-green-700' : 'text-blue-700'}`}>
+            <p className={`text-sm font-semibold ${bonusScore >= 5 ? 'text-green-700 dark:text-green-400' : 'text-blue-700 dark:text-blue-400'}`}>
               현재 가점 {bonusScore}점 / 최대 5점
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -479,14 +479,14 @@ function SyntheticTab() {
       )}
 
       {showForm && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
-          <h4 className="text-sm font-semibold text-blue-800">가명정보·합성데이터 실적 등록</h4>
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 space-y-3">
+          <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300">가명정보·합성데이터 실적 등록</h4>
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="pl-case-type" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">유형 *</label>
               <select
                 id="pl-case-type"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 value={form.case_type}
                 onChange={e => setForm(p => ({ ...p, case_type: e.target.value as 'synthetic' | 'anonymized' }))}
               >
@@ -499,7 +499,7 @@ function SyntheticTab() {
               <input
                 id="pl-opened-at"
                 type="date"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 value={form.opened_at}
                 onChange={e => setForm(p => ({ ...p, opened_at: e.target.value }))}
               />
@@ -508,7 +508,7 @@ function SyntheticTab() {
               <label htmlFor="pl-syn-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">데이터명 *</label>
               <input
                 id="pl-syn-title"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 placeholder="예: 경남 복지서비스 이용 합성데이터"
                 value={form.title}
                 onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
@@ -518,7 +518,7 @@ function SyntheticTab() {
               <label htmlFor="pl-dataset-id" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">연관 데이터셋 ID</label>
               <input
                 id="pl-dataset-id"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 placeholder="catalog 데이터셋 ID"
                 value={form.dataset_id}
                 onChange={e => setForm(p => ({ ...p, dataset_id: e.target.value }))}
@@ -529,7 +529,7 @@ function SyntheticTab() {
               <input
                 id="pl-portal-url"
                 type="url"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 placeholder="https://data.go.kr/..."
                 value={form.portal_url}
                 onChange={e => setForm(p => ({ ...p, portal_url: e.target.value }))}
@@ -580,7 +580,7 @@ function SyntheticTab() {
                 onClick={() => setTypeFilter(t)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                   typeFilter === t
-                    ? 'bg-blue-50 border-blue-200 text-blue-700'
+                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300'
                     : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
                 }`}
               >
@@ -616,7 +616,7 @@ function SyntheticTab() {
         <div className="space-y-2">
           {filtered.map(c => (
             <Card key={c.case_id} padding="sm" hover className="flex items-start gap-3">
-              <div className="mt-0.5 w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <div className="mt-0.5 w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                 <FlaskConical className="w-4 h-4 text-blue-600" />
               </div>
               <div className="flex-1 min-w-0">
@@ -749,7 +749,7 @@ function TargetsTab() {
                   min={0}
                   max={f.unit === '%' ? 100 : 100}
                   step={f.unit === '%' ? 5 : 1}
-                  className="w-20 px-2 py-1.5 text-sm border rounded-lg text-right focus:ring-2 focus:ring-amber-300 focus:outline-none"
+                  className="w-20 px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-right focus:ring-2 focus:ring-amber-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                   value={targets[f.key]}
                   onChange={e => setTargets(p => ({ ...p, [f.key]: Number(e.target.value) }))}
                 />
@@ -762,7 +762,7 @@ function TargetsTab() {
           <Btn
             size="sm"
             className={saved
-              ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-100'
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40'
               : 'bg-amber-500 hover:bg-amber-600 border-amber-500'}
             loading={saving}
             onClick={save}
@@ -776,10 +776,10 @@ function TargetsTab() {
         </div>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
         <div className="flex items-start gap-2">
-          <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-          <div className="text-xs text-amber-700 space-y-1">
+          <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+          <div className="text-xs text-amber-700 dark:text-amber-300 space-y-1">
             <p className="font-medium">목표 설정 안내</p>
             <p>편람 기준: 개방율 80% 이상, AI-Ready 50% 이상, 품질진단 통과율 100%, 가명·합성 2건 이상.</p>
           </div>
@@ -877,7 +877,7 @@ function QualitativeTab() {
       </div>
 
       {naCount > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2 text-xs text-amber-700">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
           <span>{naCount}개 지표가 아직 입력되지 않았습니다. 실적을 입력하면 평가 점수에 반영됩니다.</span>
         </div>
@@ -896,8 +896,8 @@ function QualitativeTab() {
                       onClick={() => setDraft(p => ({ ...p, status: s }))}
                       className={`px-3 py-1 text-xs rounded-full border transition-colors ${
                         draft.status === s
-                          ? STATUS_BADGE[s] === 'green' ? 'bg-green-100 text-green-700 border-green-200' :
-                            STATUS_BADGE[s] === 'amber' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                          ? STATUS_BADGE[s] === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800' :
+                            STATUS_BADGE[s] === 'amber' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800' :
                             'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'
                           : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
                       }`}
@@ -907,7 +907,7 @@ function QualitativeTab() {
                   ))}
                 </div>
                 <textarea
-                  className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-300 focus:outline-none resize-none"
+                  className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-300 focus:outline-none resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                   rows={3}
                   placeholder="실적 내용, 증빙 자료, 이행 현황 등을 간략히 기재하세요"
                   value={draft.note}
@@ -945,7 +945,7 @@ function QualitativeTab() {
                 <Btn
                   size="sm"
                   variant="secondary"
-                  className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                  className="text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                   onClick={() => startEdit(inp)}
                 >
                   입력
@@ -968,10 +968,10 @@ const PERFORMANCE_TABS: { key: PerformanceTab; label: string; Icon: React.Elemen
 ]
 
 const ACTIVE_STYLE: Record<string, string> = {
-  purple: 'border-purple-500 text-purple-700 bg-purple-50',
-  blue:   'border-blue-500 text-blue-700 bg-blue-50',
-  indigo: 'border-indigo-500 text-indigo-700 bg-indigo-50',
-  amber:  'border-amber-500 text-amber-700 bg-amber-50',
+  purple: 'border-purple-500 text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/20',
+  blue:   'border-blue-500 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20',
+  indigo: 'border-indigo-500 text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20',
+  amber:  'border-amber-500 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20',
 }
 
 export default function PipelineClient() {
@@ -997,7 +997,7 @@ export default function PipelineClient() {
               onClick={() => setMainTab(key as MainTab)}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px whitespace-nowrap ${
                 active
-                  ? 'border-blue-600 text-blue-700 bg-blue-50'
+                  ? 'border-blue-600 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
               }`}
             >

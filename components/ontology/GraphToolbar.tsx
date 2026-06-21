@@ -193,8 +193,8 @@ export default function GraphToolbar({
                     role="option"
                     aria-selected={selectedNodeId === n.obj_id}
                     onClick={() => handleSelect(n)}
-                    className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-indigo-50 ${
-                      selectedNodeId === n.obj_id ? 'bg-indigo-50 text-indigo-700' : ''
+                    className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-indigo-50 dark:hover:bg-indigo-900/20 ${
+                      selectedNodeId === n.obj_id ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300' : ''
                     }`}
                   >
                     <span className="truncate pr-2">{n.label}</span>
@@ -260,8 +260,8 @@ export default function GraphToolbar({
               title="전체 연도 표시"
               className={`text-[11px] px-2 py-0.5 rounded-full border ${
                 yearFilter === null
-                  ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-                  : 'text-gray-500 border-gray-200 hover:bg-gray-50'
+                  ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                  : 'text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               전체

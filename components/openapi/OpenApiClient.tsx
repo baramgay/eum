@@ -322,7 +322,7 @@ export default function OpenApiClient() {
     <div className="space-y-6">
       <PageHeader title="개방 API 관리" subtitle="공공데이터 외부 연계 API 키 발급 및 웹훅 설정" />
       <Card className="text-center py-16">
-        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <AlertCircle className="w-7 h-7 text-red-500" />
         </div>
         <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-1">데이터 로딩 실패</h3>
@@ -371,8 +371,8 @@ export default function OpenApiClient() {
         <div className="space-y-4">
           {/* 발급 직후 평문 키 표시 */}
           {newPlain && (
-            <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
-              <p className="text-sm font-medium text-green-800 mb-1">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-4">
+              <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">
                 API 키가 발급되었습니다. 지금 복사하세요 — 다시 확인할 수 없습니다.
               </p>
               <div className="flex items-center gap-2 mt-2">
@@ -386,7 +386,7 @@ export default function OpenApiClient() {
                     navigator.clipboard.writeText(newPlain)
                     toast.success('API 키를 복사했습니다')
                   }}
-                  className="text-green-700 border-green-300 hover:bg-green-100"
+                  className="text-green-700 dark:text-green-300 border-green-300 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40"
                 >
                   <Copy className="w-3.5 h-3.5" /> 복사
                 </Btn>

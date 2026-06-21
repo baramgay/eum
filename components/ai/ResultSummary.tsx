@@ -11,7 +11,7 @@ export default function ResultSummary({ summary, topN, filterDescription }: Resu
   if (!summary && !topN && !filterDescription) return null
 
   return (
-    <div className="px-4 py-2.5 bg-blue-50/70 border-b text-sm space-y-1.5">
+    <div className="px-4 py-2.5 bg-blue-50/70 dark:bg-blue-900/20 border-b text-sm space-y-1.5">
       {summary && (
         <div className="flex items-start gap-2">
           <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />

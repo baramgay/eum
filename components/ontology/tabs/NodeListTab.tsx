@@ -98,7 +98,7 @@ function TypeChip({
       onClick={onClick}
       className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-colors ${
         active
-          ? 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'
+          ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/40'
           : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-300 line-through hover:bg-gray-50 dark:hover:bg-gray-950'
       }`}
       title={active ? '클릭하여 제외' : '클릭하여 포함'}
@@ -246,7 +246,7 @@ export default function NodeListTab({
                 <button
                   key={n.obj_id}
                   onClick={() => selectAndSearch(n, onSwitchToGraph)}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-indigo-50 flex items-center justify-between"
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-indigo-50 dark:hover:bg-indigo-900/20 flex items-center justify-between"
                 >
                   <span className="truncate">{n.label}</span>
                   <span className="text-xs text-gray-400 dark:text-gray-300 ml-2 flex-shrink-0">{n.obj_type}</span>

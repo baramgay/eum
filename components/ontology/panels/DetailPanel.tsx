@@ -147,12 +147,12 @@ export default function DetailPanel({
 
       {/* Priority score bar */}
       {priorityScore !== null && (
-        <div className="mb-3 p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+        <div className="mb-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-indigo-700">우선순위 점수</span>
-            <span className="text-sm font-bold text-indigo-800">{priorityScore}</span>
+            <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">우선순위 점수</span>
+            <span className="text-sm font-bold text-indigo-800 dark:text-indigo-200">{priorityScore}</span>
           </div>
-          <div className="w-full bg-indigo-200 rounded-full h-2">
+          <div className="w-full bg-indigo-200 dark:bg-indigo-800 rounded-full h-2">
             <div
               className="bg-indigo-500 h-2 rounded-full transition-all"
               style={{ width: `${Math.max(4, (priorityScore / maxPriority) * 100)}%` }}

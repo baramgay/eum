@@ -74,9 +74,9 @@ const SECTIONS: Section[] = [
       ]},
       { type: 'h', text: '역할(Role) 안내' },
       { type: 'roles', items: [
-        { badge: 'center', color: 'bg-blue-50 text-blue-700 ring-blue-200',  desc: '경남빅데이터센터 — 모든 기능 접근, 기관 관리, 데이터 심사' },
-        { badge: 'agency', color: 'bg-green-50 text-green-700 ring-green-200', desc: '입주 기관 — 데이터 등록·제출, 공개 데이터 열람' },
-        { badge: 'viewer', color: 'bg-gray-50 text-gray-600 ring-gray-200',  desc: '일반 사용자 — 공개 데이터 포털, AI 질의, 지도 열람' },
+        { badge: 'center', color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 ring-blue-200 dark:ring-blue-800',  desc: '경남빅데이터센터 — 모든 기능 접근, 기관 관리, 데이터 심사' },
+        { badge: 'agency', color: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 ring-green-200 dark:ring-green-800', desc: '입주 기관 — 데이터 등록·제출, 공개 데이터 열람' },
+        { badge: 'viewer', color: 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 ring-gray-200 dark:ring-gray-700',  desc: '일반 사용자 — 공개 데이터 포털, AI 질의, 지도 열람' },
       ]},
     ],
   },
@@ -578,16 +578,16 @@ function renderBlock(block: Block, idx: number) {
       )
     case 'tip':
       return (
-        <div key={idx} className="flex items-start gap-3 bg-blue-50 rounded-xl p-4 my-4 border border-blue-100">
+        <div key={idx} className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 my-4 border border-blue-100 dark:border-blue-800">
           <Info className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-blue-700 leading-6">{block.text}</p>
+          <p className="text-sm text-blue-700 dark:text-blue-300 leading-6">{block.text}</p>
         </div>
       )
     case 'warn':
       return (
-        <div key={idx} className="flex items-start gap-3 bg-amber-50 rounded-xl p-4 my-4 border border-amber-100">
+        <div key={idx} className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 my-4 border border-amber-100 dark:border-amber-800">
           <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-700 leading-6">{block.text}</p>
+          <p className="text-sm text-amber-700 dark:text-amber-300 leading-6">{block.text}</p>
         </div>
       )
     case 'code':
@@ -734,7 +734,7 @@ export default function ManualClient({ role }: { role: string }) {
                     <span className="font-medium leading-5 flex-1">{s.title}</span>
                     {s.role === 'center' && (
                       <span className={`text-xs px-1.5 py-0.5 rounded-md font-medium ${
-                        isActive ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-600'
+                        isActive ? 'bg-white/20 text-white' : 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
                       }`}>
                         센터
                       </span>
@@ -771,13 +771,13 @@ export default function ManualClient({ role }: { role: string }) {
             <div className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm">
               {/* 섹션 헤더 */}
               <div className="flex items-center gap-4 px-8 py-6 border-b border-gray-100">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 ring-1 ring-blue-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-100 dark:ring-blue-800 flex items-center justify-center flex-shrink-0">
                   <ActiveIcon className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{active.title}</h2>
                   {active.role === 'center' && (
-                    <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium ring-1 ring-blue-200">
+                    <span className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium ring-1 ring-blue-200 dark:ring-blue-800">
                       센터 전용 기능
                     </span>
                   )}
@@ -808,7 +808,7 @@ export default function ManualClient({ role }: { role: string }) {
                 {activeIdx < visibleSections.length - 1 && (
                   <button
                     onClick={() => setActiveId(visibleSections[activeIdx + 1].id)}
-                    className="flex items-center gap-1.5 text-xs text-blue-600 border border-blue-200 rounded-xl px-3.5 py-2 hover:bg-blue-50 transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-xl px-3.5 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                   >
                     다음
                     <ChevronRight className="w-3.5 h-3.5" />

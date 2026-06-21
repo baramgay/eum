@@ -288,7 +288,7 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
     case 'join':
       return (
         <div className="flex flex-col gap-1 text-xs">
-          <div className="bg-amber-50 border border-amber-200 rounded px-2 py-1 text-amber-700 text-[10px]">
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded px-2 py-1 text-amber-700 dark:text-amber-300 text-[10px]">
             서버 실행 시 처리됩니다 (미리보기에서는 걸러집니다)
           </div>
           <div className="flex gap-1">
@@ -413,9 +413,9 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
 
       <div className="p-4 space-y-3 overflow-y-auto flex-1">
           {hasErrors && (
-            <div className="bg-red-50 border border-red-200 rounded p-3 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-              <div className="text-xs text-red-700">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-3 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+              <div className="text-xs text-red-700 dark:text-red-300">
                 <p className="font-semibold mb-1">저장 전 아래 오류를 해결하세요</p>
                 <ul className="space-y-0.5">
                   {validationErrors.map(e => (
@@ -433,10 +433,10 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
             const meta = RULE_TYPES.find(t => t.value === rule.type)
             const isInvalid = validationErrors.some(e => e.index === i)
             return (
-              <div key={i} className={`border rounded p-3 ${isInvalid ? 'bg-red-50 border-red-200' : 'bg-gray-50 dark:bg-gray-950'}`}>
+              <div key={i} className={`border rounded p-3 ${isInvalid ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-gray-50 dark:bg-gray-950'}`}>
                 <div className="flex items-center justify-between mb-2">
                   <span className={`text-xs font-semibold px-2 py-0.5 rounded flex items-center gap-1 ${
-                    isInvalid ? 'bg-red-100 text-red-700' : 'bg-blue-50 text-blue-700'
+                    isInvalid ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300' : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
                   }`}>
                     {meta?.icon}
                     {i + 1}. {meta?.label ?? rule.type}

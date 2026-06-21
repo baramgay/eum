@@ -28,12 +28,12 @@ export default function DatasetStats({ datasetId }: { datasetId: string }) {
   return (
     <div className="space-y-4">
       {stats.sampled && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-xs text-yellow-700">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded p-2 text-xs text-yellow-700 dark:text-yellow-300">
           대용량 데이터: 상위 50,000행 기준 통계
         </div>
       )}
       {stats.source === 'upload' && (
-        <div className="bg-amber-50 border border-amber-200 rounded p-2 text-xs text-amber-700">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded p-2 text-xs text-amber-700 dark:text-amber-300">
           미리보기(20행) 기준 통계입니다.
         </div>
       )}
@@ -54,9 +54,9 @@ export default function DatasetStats({ datasetId }: { datasetId: string }) {
                 <td className="px-3 py-1.5 font-mono text-gray-700 dark:text-gray-300 max-w-[120px] truncate">{c.name}</td>
                 <td className="px-3 py-1.5">
                   <span className={`px-1.5 py-0.5 rounded text-xs ${
-                    c.type === 'number' ? 'bg-blue-100 text-blue-700'
-                    : c.type === 'date' ? 'bg-green-100 text-green-700'
-                    : c.type === 'boolean' ? 'bg-purple-100 text-purple-700'
+                    c.type === 'number' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                    : c.type === 'date' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                    : c.type === 'boolean' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                   }`}>{c.type}</span>
                 </td>

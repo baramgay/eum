@@ -21,11 +21,11 @@ interface UserRecord {
 }
 
 const ROLE_LABELS: Record<string, { label: string; cls: string }> = {
-  admin:   { label: '최고 관리자', cls: 'bg-red-100 text-red-700'     },
-  center:  { label: '센터 관리자', cls: 'bg-purple-100 text-purple-700' },
-  agency:  { label: '기관',        cls: 'bg-blue-100 text-blue-700'   },
-  viewer:  { label: '열람자',       cls: 'bg-gray-100 text-gray-600'   },
-  public:  { label: '일반 공개',   cls: 'bg-green-100 text-green-700' },
+  admin:   { label: '최고 관리자', cls: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'       },
+  center:  { label: '센터 관리자', cls: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' },
+  agency:  { label: '기관',        cls: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'   },
+  viewer:  { label: '열람자',       cls: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'     },
+  public:  { label: '일반 공개',   cls: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' },
 }
 
 function RoleBadge({ role }: { role: string }) {
@@ -175,7 +175,7 @@ export default function UserManagement() {
           <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
             <UserCog size={16} />신규 사용자 등록
           </h3>
-          {error && <div className="mb-3 text-red-600 text-sm bg-red-50 px-3 py-2 rounded">{error}</div>}
+          {error && <div className="mb-3 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">{error}</div>}
           <form onSubmit={createUser} className="grid md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="user-email" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">이메일 *</label>
@@ -243,7 +243,7 @@ export default function UserManagement() {
       )}
 
       {!showForm && error && (
-        <div className="flex items-center justify-between gap-3 text-red-600 text-sm bg-red-50 px-3 py-2 rounded">
+        <div className="flex items-center justify-between gap-3 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">
           <span>{error}</span>
           <Btn size="sm" variant="secondary" onClick={() => loadUsers(page)} loading={loading}>
             <RefreshCw size={14} />

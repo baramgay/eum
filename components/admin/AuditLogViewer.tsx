@@ -31,21 +31,21 @@ interface Pagination {
 }
 
 const ACTION_LABELS: Record<string, { label: string; color: string; icon: typeof ShieldCheck }> = {
-  approved:          { label: '승인', color: 'text-green-700 bg-green-100', icon: ShieldCheck },
-  rejected:          { label: '반려', color: 'text-red-700 bg-red-100', icon: ShieldCheck },
-  submitted:         { label: '제출', color: 'text-blue-700 bg-blue-100', icon: FileText },
-  review:            { label: '검토', color: 'text-gray-700 bg-gray-100', icon: FileText },
-  created_tenant:    { label: '기관 등록', color: 'text-blue-700 bg-blue-100', icon: Building2 },
-  updated_tenant:    { label: '기관 수정', color: 'text-amber-700 bg-amber-100', icon: Building2 },
-  deleted_tenant:    { label: '기관 삭제', color: 'text-red-700 bg-red-100', icon: Building2 },
-  onboarded_tenant:  { label: '입주 처리', color: 'text-green-700 bg-green-100', icon: Building2 },
-  issued_api_key:    { label: 'API 키 발급', color: 'text-purple-700 bg-purple-100', icon: Key },
-  revoked_api_key:   { label: 'API 키 폐기', color: 'text-red-700 bg-red-100', icon: Key },
-  created_user:      { label: '사용자 등록', color: 'text-blue-700 bg-blue-100', icon: User },
-  updated_user:      { label: '사용자 수정', color: 'text-amber-700 bg-amber-100', icon: User },
-  deleted_user:      { label: '사용자 삭제', color: 'text-red-700 bg-red-100', icon: User },
-  banned_user:       { label: '사용자 비활성', color: 'text-red-700 bg-red-100', icon: User },
-  unbanned_user:     { label: '사용자 활성', color: 'text-green-700 bg-green-100', icon: User },
+  approved:          { label: '승인', color: 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30', icon: ShieldCheck },
+  rejected:          { label: '반려', color: 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30', icon: ShieldCheck },
+  submitted:         { label: '제출', color: 'text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30', icon: FileText },
+  review:            { label: '검토', color: 'text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800', icon: FileText },
+  created_tenant:    { label: '기관 등록', color: 'text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30', icon: Building2 },
+  updated_tenant:    { label: '기관 수정', color: 'text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30', icon: Building2 },
+  deleted_tenant:    { label: '기관 삭제', color: 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30', icon: Building2 },
+  onboarded_tenant:  { label: '입주 처리', color: 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30', icon: Building2 },
+  issued_api_key:    { label: 'API 키 발급', color: 'text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30', icon: Key },
+  revoked_api_key:   { label: 'API 키 폐기', color: 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30', icon: Key },
+  created_user:      { label: '사용자 등록', color: 'text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30', icon: User },
+  updated_user:      { label: '사용자 수정', color: 'text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30', icon: User },
+  deleted_user:      { label: '사용자 삭제', color: 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30', icon: User },
+  banned_user:       { label: '사용자 비활성', color: 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30', icon: User },
+  unbanned_user:     { label: '사용자 활성', color: 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30', icon: User },
 }
 
 const ACTIONS = Object.keys(ACTION_LABELS)
@@ -145,7 +145,7 @@ export default function AuditLogViewer() {
       </div>
 
       {error && (
-        <div className="flex items-center justify-between gap-3 text-red-600 text-sm bg-red-50 px-3 py-2 rounded">
+        <div className="flex items-center justify-between gap-3 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded">
           <span>{error}</span>
           <Btn size="sm" variant="secondary" onClick={() => load(pagination.page)} loading={loading}>
             <RefreshCw size={14} />

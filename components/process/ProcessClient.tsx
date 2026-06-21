@@ -385,22 +385,22 @@ export default function ProcessClient({ role, tenantId }: Props) {
   }) {
     const sources = Array.isArray(node.source_ids) ? node.source_ids : [sourceDatasetId]
     return (
-      <div className="mt-2 p-3 bg-blue-50 border border-blue-100 rounded text-xs text-blue-800">
+      <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded text-xs text-blue-800 dark:text-blue-300">
         <div className="flex items-center gap-2 mb-2 font-medium">
           <Network className="w-3.5 h-3.5" /> 데이터 계보
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {sources.map((s, i) => (
-            <span key={i} className="px-2 py-1 bg-white border border-blue-200 rounded truncate max-w-[140px]" title={s}>
+            <span key={i} className="px-2 py-1 bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-700 rounded truncate max-w-[140px]" title={s}>
               {s}
             </span>
           ))}
           <span className="text-blue-400">→</span>
-          <span className="px-2 py-1 bg-white border border-blue-200 rounded truncate max-w-[140px]" title={pipelineName}>
+          <span className="px-2 py-1 bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-700 rounded truncate max-w-[140px]" title={pipelineName}>
             {pipelineName}
           </span>
           <span className="text-blue-400">→</span>
-          <span className="px-2 py-1 bg-white border border-blue-200 rounded truncate max-w-[140px]" title={node.target_table}>
+          <span className="px-2 py-1 bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-700 rounded truncate max-w-[140px]" title={node.target_table}>
             {node.target_table}
           </span>
         </div>
@@ -464,7 +464,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
       />
 
       {isReadOnly && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700 flex items-center gap-2">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm text-amber-700 dark:text-amber-300 flex items-center gap-2">
           <AlertCircle className="w-4 h-4" />
           viewer 권한으로는 조회만 가능합니다.
         </div>
@@ -472,7 +472,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
 
       {/* 오류 알림 및 재시도 */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700 flex items-center justify-between gap-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-sm text-red-700 dark:text-red-300 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
@@ -657,7 +657,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
 
       {/* 실행 결과 알림 */}
       {runResult && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-700 flex items-start justify-between">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-sm text-green-700 dark:text-green-400 flex items-start justify-between">
           <div className="flex items-center gap-3 flex-wrap">
             <span>
               실행 완료 — 입력 {runResult.result.input_rows.toLocaleString()}행
@@ -978,7 +978,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
             <div className="overflow-auto max-h-[60vh]">
               <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="bg-gray-50 text-left">
+                  <tr className="bg-gray-50 dark:bg-gray-900 text-left">
                     <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">행 번호</th>
                     <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">규칙 번호</th>
                     <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">컬럼</th>
@@ -987,7 +987,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                 </thead>
                 <tbody>
                   {runResult.result.errors.map((err, i) => (
-                    <tr key={i} className="hover:bg-red-50">
+                    <tr key={i} className="hover:bg-red-50 dark:hover:bg-red-900/20">
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.rowIndex + 1}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.ruleIndex + 1}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>
@@ -1018,7 +1018,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
             <div className="overflow-auto max-h-[60vh]">
               <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="bg-gray-50 text-left">
+                  <tr className="bg-gray-50 dark:bg-gray-900 text-left">
                     <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">행 번호</th>
                     <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">규칙 번호</th>
                     <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">컬럼</th>
@@ -1027,7 +1027,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                 </thead>
                 <tbody>
                   {(selectedHistoryRun.error_log as ProcessError[]).map((err, i) => (
-                    <tr key={i} className="hover:bg-red-50">
+                    <tr key={i} className="hover:bg-red-50 dark:hover:bg-red-900/20">
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{(err.rowIndex ?? i) + 1}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{typeof err.ruleIndex === 'number' ? err.ruleIndex + 1 : '—'}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>

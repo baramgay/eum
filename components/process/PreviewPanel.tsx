@@ -127,7 +127,7 @@ export default function PreviewPanel({ before, after, errors }: PreviewPanelProp
                         <td
                           key={c}
                           className={`border px-2 py-1 whitespace-nowrap ${
-                            isErr ? 'bg-red-100 text-red-700' : isChanged ? 'bg-green-50 text-green-800' : ''
+                            isErr ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' : isChanged ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200' : ''
                           }`}
                           title={isChanged ? '변경됨' : undefined}
                         >
@@ -163,11 +163,11 @@ export default function PreviewPanel({ before, after, errors }: PreviewPanelProp
       </div>
 
       {errors.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded p-3">
-          <p className="text-xs font-semibold text-red-700 mb-2">오류 목록 ({errors.length}건)</p>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-3">
+          <p className="text-xs font-semibold text-red-700 dark:text-red-300 mb-2">오류 목록 ({errors.length}건)</p>
           <ul className="space-y-1 max-h-40 overflow-auto">
             {errors.map((e, i) => (
-              <li key={i} className="text-xs text-red-600">
+              <li key={i} className="text-xs text-red-600 dark:text-red-400">
                 행 {e.rowIndex + 1} / 규칙 {e.ruleIndex + 1}
                 {e.column && ` / 컬럼: ${e.column}`} — {e.message}
               </li>

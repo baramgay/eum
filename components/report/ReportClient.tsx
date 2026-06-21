@@ -115,9 +115,9 @@ function indicatorAction(ind: Indicator): { action: string; pts: number; difficu
 }
 
 const DIFFICULTY_BADGE: Record<string, string> = {
-  '쉬움': 'bg-green-50 text-green-700',
-  '보통': 'bg-yellow-50 text-yellow-700',
-  '어려움': 'bg-red-50 text-red-700',
+  '쉬움': 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300',
+  '보통': 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300',
+  '어려움': 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300',
 }
 
 function ReportSkeleton() {
@@ -521,12 +521,12 @@ export default function ReportClient({ role }: Props) {
 
       {/* ── 분석 결과 삽입 배너 ── */}
       {insertBanner && (
-        <div className="flex items-center justify-between gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-800 print:hidden">
+        <div className="flex items-center justify-between gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3 text-sm text-blue-800 dark:text-blue-300 print:hidden">
           <div className="flex items-center gap-2">
-            <PlusCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            <PlusCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
             <span>{insertBanner}</span>
           </div>
-          <button onClick={() => setInsertBanner(null)} className="text-blue-500 hover:text-blue-700">
+          <button onClick={() => setInsertBanner(null)} className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-200">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -678,7 +678,7 @@ export default function ReportClient({ role }: Props) {
               onClick={() => setReportMode(mode)}
               className={`px-4 py-2 text-sm font-medium rounded-t-md border-b-2 transition-colors ${
                 reportMode === mode
-                  ? 'border-blue-600 text-blue-700 bg-blue-50'
+                  ? 'border-blue-600 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
               }`}
             >
@@ -693,7 +693,7 @@ export default function ReportClient({ role }: Props) {
 
       {/* 리포트 요약 배너 */}
       {reportMode === 'report' && data && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800 print:hidden">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-300 print:hidden">
           <p>
             <strong>{selectedTenantName ?? '전체 집계'}</strong> 기준{' '}
             <strong>{today}</strong> 자동 산출 결과, 종합 점수는{' '}
@@ -726,9 +726,9 @@ export default function ReportClient({ role }: Props) {
                 <div className="pb-2 text-gray-400 dark:text-gray-300 text-base">/ {totalPoints}점</div>
               </div>
               {bonusScore > 0 && (
-                <div className="mt-1 flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-3 py-1">
-                  <span className="text-green-700 text-sm font-semibold">+{bonusScore}점 가점</span>
-                  <span className="text-green-600 text-xs">→ 합계 {grandTotal}점</span>
+                <div className="mt-1 flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-full px-3 py-1">
+                  <span className="text-green-700 dark:text-green-300 text-sm font-semibold">+{bonusScore}점 가점</span>
+                  <span className="text-green-600 dark:text-green-400 text-xs">→ 합계 {grandTotal}점</span>
                 </div>
               )}
               <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2 mt-3">
@@ -909,23 +909,23 @@ export default function ReportClient({ role }: Props) {
 
           {/* 개선 액션 아이템 To-Do */}
           {actionItems.length > 0 && (
-            <div className="bg-amber-50 rounded-xl border border-amber-200 overflow-hidden">
-              <div className="px-5 py-3 flex items-center gap-2 border-b border-amber-200">
-                <ListTodo className="w-4 h-4 text-amber-700" />
-                <span className="font-semibold text-amber-800 text-sm">
+            <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 overflow-hidden">
+              <div className="px-5 py-3 flex items-center gap-2 border-b border-amber-200 dark:border-amber-800">
+                <ListTodo className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                <span className="font-semibold text-amber-800 dark:text-amber-300 text-sm">
                   우선 개선 액션 — {actionItems.length}개 지표 미충족
                 </span>
-                <span className="text-xs text-amber-600 ml-1">점수 기여도 높은 순</span>
+                <span className="text-xs text-amber-600 dark:text-amber-400 ml-1">점수 기여도 높은 순</span>
               </div>
-              <div className="divide-y divide-amber-100">
+              <div className="divide-y divide-amber-100 dark:divide-amber-800/50">
                 {actionItems.slice(0, 6).map((item, i) => (
-                  <div key={i} className="px-5 py-3 flex items-start gap-3 hover:bg-amber-100/50 transition-colors">
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center mt-0.5">
+                  <div key={i} className="px-5 py-3 flex items-start gap-3 hover:bg-amber-100/50 dark:hover:bg-amber-900/30 transition-colors">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-xs font-bold flex items-center justify-center mt-0.5">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs text-amber-600 font-medium">{item.area}</span>
+                        <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">{item.area}</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">›</span>
                         <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{item.action}</span>
                       </div>
@@ -960,13 +960,13 @@ export default function ReportClient({ role }: Props) {
                     onClick={() => setStatusFilter(key)}
                     className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
                       statusFilter === key
-                        ? 'bg-blue-50 border-blue-200 text-blue-700 font-medium'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-medium'
                         : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
                     }`}
                   >
                     {key === 'all' ? '전체' : STATUS_LABEL[key as StatusKey]}
                     <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                      statusFilter === key ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                      statusFilter === key ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                     }`}>
                       {statusCounts[key === 'all' ? 'all' : key as StatusKey]}
                     </span>
