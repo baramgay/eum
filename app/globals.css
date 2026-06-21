@@ -1,4 +1,4 @@
-@import 'pretendard/dist/web/static/pretendard.css';
+/* Pretendard font is loaded via next/font/local in layout.tsx */
 
 @tailwind base;
 @tailwind components;

@@ -13,8 +13,8 @@ export async function GET(req: Request) {
   const top = Math.min(parseInt(searchParams.get('top') ?? '20', 10), 100)
 
   const [{ data: nodes }, { data: edges }] = await Promise.all([
-    supabase.from('onto_objects').select('*'),
-    supabase.from('onto_links').select('*'),
+    supabase.from('onto_objects').select('obj_id,obj_type,label,props'),
+    supabase.from('onto_links').select('src,rel,dst,weight'),
   ])
 
   if (!nodes?.length) {

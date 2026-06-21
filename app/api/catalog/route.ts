@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from('catalog')
-    .select('*', { count: 'exact' })
+    .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract', { count: 'exact' })
     .order('updated_at', { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
     const term = `%${q}%`
     const { data: fallback } = await supabase
       .from('catalog')
-      .select('*')
+      .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract')
       .or(`title.ilike.${term},description.ilike.${term}`)
       .order('updated_at', { ascending: false })
       .limit(pageSize)
@@ -97,6 +97,7 @@ export async function GET(req: NextRequest) {
     .from('catalog')
     .select('theme')
     .not('theme', 'is', null)
+    .limit(500)
   const uniqueThemes = Array.from(
     new Set(
       (themeRows ?? [])

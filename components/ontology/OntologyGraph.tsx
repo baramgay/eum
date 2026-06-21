@@ -136,18 +136,51 @@ function drawEdge(
   drawArrow(ctx, cpx, cpy, tx, ty)
 }
 
-function drawDotGrid(ctx: CanvasRenderingContext2D, width: number, height: number, k: number, tx: number, ty: number) {
-  const spacing = 24
-  ctx.fillStyle = 'rgba(255,255,255,0.055)'
-  const startX = ((tx % (spacing * k)) + spacing * k) % (spacing * k)
-  const startY = ((ty % (spacing * k)) + spacing * k) % (spacing * k)
-  for (let x = startX - spacing * k; x < width; x += spacing * k) {
-    for (let y = startY - spacing * k; y < height; y += spacing * k) {
-      ctx.beginPath()
-      ctx.arc(x, y, 1.2, 0, Math.PI * 2)
-      ctx.fill()
-    }
+function makeDotGridPattern(
+  ctx: CanvasRenderingContext2D,
+  spacing: number,
+  dpr: number
+): CanvasPattern | null {
+  const tileSize = Math.round(spacing * dpr)
+  const offscreen = document.createElement('canvas')
+  offscreen.width = tileSize
+  offscreen.height = tileSize
+  const octx = offscreen.getContext('2d')
+  if (!octx) return null
+  octx.fillStyle = 'rgba(255,255,255,0.055)'
+  octx.beginPath()
+  octx.arc(tileSize / 2, tileSize / 2, 1.2 * dpr, 0, Math.PI * 2)
+  octx.fill()
+  return ctx.createPattern(offscreen, 'repeat')
+}
+
+function drawDotGrid(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  k: number,
+  tx: number,
+  ty: number,
+  patternRef: { current: CanvasPattern | null },
+  dprRef: { current: number }
+) {
+  const dpr = window.devicePixelRatio || 1
+  const spacing = 24 * k
+  // Rebuild pattern tile only when DPR changes (very rare)
+  if (patternRef.current === null || dprRef.current !== dpr) {
+    patternRef.current = makeDotGridPattern(ctx, spacing / k, dpr)
+    dprRef.current = dpr
   }
+  const pattern = patternRef.current
+  if (!pattern) return
+  // Offset the pattern so dots shift with pan/zoom
+  const ox = ((tx % spacing) + spacing) % spacing - spacing / 2
+  const oy = ((ty % spacing) + spacing) % spacing - spacing / 2
+  ctx.save()
+  ctx.translate(ox, oy)
+  ctx.fillStyle = pattern
+  ctx.fillRect(-spacing, -spacing, width + spacing * 2, height + spacing * 2)
+  ctx.restore()
 }
 
 // ─── Node status helpers ──────────────────────────────────────────────────────
@@ -271,6 +304,13 @@ export default function OntologyGraph({
   const communityMapRef = useRef<Map<string, number>>(new Map())
   // parallel edge set: canonical key "minId|maxId" → true if both directions exist
   const parallelEdgeSetRef = useRef<Set<string>>(new Set())
+  // per-node status cache — recomputed when nodes change, not every frame
+  const nodeStatusCacheRef = useRef<Map<string, 'error' | 'stale' | 'building' | 'ok'>>(new Map())
+  // directed edge set for parallel-edge detection — recomputed when links change, not every frame
+  const edgeDirSetRef = useRef<Set<string>>(new Set())
+  // offscreen canvas for dot-grid pattern tile (size-invariant, redrawn only on DPR change)
+  const dotGridPatternRef = useRef<CanvasPattern | null>(null)
+  const dotGridDprRef = useRef<number>(0)
 
   // ── Export PNG (canvas native) ───────────────────────────────────────────────
   const exportPng = useCallback(() => {
@@ -324,7 +364,7 @@ export default function OntologyGraph({
     const { k, x, y } = transformRef.current
 
     // 1. Dot-grid background (in screen space, not world space)
-    drawDotGrid(ctx, cssW, cssH, k, x, y)
+    drawDotGrid(ctx, cssW, cssH, k, x, y, dotGridPatternRef, dotGridDprRef)
 
     ctx.save()
     ctx.translate(x, y)
@@ -335,13 +375,8 @@ export default function OntologyGraph({
     const focusId = state.hovered?.obj_id ?? selected?.obj_id ?? null
     const focusNeighbors = focusId ? neighborMap.get(focusId) : null
 
-    // Build parallel-edge lookup: check if reverse edge exists
-    const edgeDirSet = new Set<string>()
-    simLinks.forEach(l => {
-      const s = (l.source as SimNode).obj_id ?? String(l.source)
-      const t = (l.target as SimNode).obj_id ?? String(l.target)
-      edgeDirSet.add(`${s}|${t}`)
-    })
+    // Build parallel-edge lookup: pre-computed in useEffect, not rebuilt per frame
+    const edgeDirSet = edgeDirSetRef.current
 
     // ── 2. Community halos ───────────────────────────────────────────────────
     if (communityMapRef.current.size > 0 && k > 0.2) {
@@ -488,7 +523,7 @@ export default function OntologyGraph({
       const r = encoding?.nodeRadii.get(n.obj_id) ?? baseNodeRadius(n)
       let color = encoding?.nodeColors.get(n.obj_id) ?? NODE_COLORS[n.obj_type] ?? DEFAULT_NODE_COLOR
       if (colorMode === 'status') {
-        const s = parseNodeStatus(n.props ?? '')
+        const s = nodeStatusCacheRef.current.get(n.obj_id) ?? 'ok'
         color = s === 'error' ? '#EF4444' : s === 'stale' ? '#F59E0B' : s === 'building' ? '#3B82F6' : '#10B981'
       } else if (colorMode === 'layer') {
         const layerColors: Record<string, string> = {
@@ -531,7 +566,7 @@ export default function OntologyGraph({
       ctx.globalAlpha = nodeOpacity
 
       // Status ring
-      const nodeStatus = parseNodeStatus(n.props ?? '')
+      const nodeStatus = nodeStatusCacheRef.current.get(n.obj_id) ?? 'ok'
       if (nodeStatus !== 'ok') {
         ctx.save()
         const outerR = r + 6
@@ -636,7 +671,7 @@ export default function OntologyGraph({
     frameRef.current++
 
     // Re-schedule if any building nodes need animation
-    const hasBuilding = nodesRef.current.some(n => parseNodeStatus(n.props ?? '') === 'building')
+    const hasBuilding = nodesRef.current.some(n => nodeStatusCacheRef.current.get(n.obj_id) === 'building')
     if (hasBuilding) {
       rafRef.current = requestAnimationFrame(drawFrame)
     }
@@ -866,6 +901,20 @@ export default function OntologyGraph({
 
       nodesRef.current = simNodes
       linksRef.current = simLinks
+
+      // Populate per-node status cache (avoids repeated string parsing in drawFrame)
+      const statusCache = new Map<string, 'error' | 'stale' | 'building' | 'ok'>()
+      simNodes.forEach(n => statusCache.set(n.obj_id, parseNodeStatus(n.props ?? '')))
+      nodeStatusCacheRef.current = statusCache
+
+      // Populate directed-edge set for parallel-edge detection (avoids per-frame Set rebuild)
+      const dirSet = new Set<string>()
+      simLinks.forEach(l => {
+        const s = (l.source as SimNode).obj_id ?? String(l.source)
+        const t = (l.target as SimNode).obj_id ?? String(l.target)
+        dirSet.add(`${s}|${t}`)
+      })
+      edgeDirSetRef.current = dirSet
 
       // Analysis overlays
       anomalySetRef.current = new Set<string>(

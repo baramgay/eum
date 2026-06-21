@@ -5,7 +5,6 @@ import {
   FileText, AlertTriangle, CheckCircle, MinusCircle, Building2, Target, Download, ListTodo, Image as ImageIcon,
   Search, Filter, Loader2, PlusCircle, Save, X,
 } from 'lucide-react'
-import html2canvas from 'html2canvas'
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis,
   PieChart, Pie,
@@ -385,6 +384,7 @@ export default function ReportClient({ role }: Props) {
     if (!reportRef.current || !data) return
     setDownloadingPng(true)
     try {
+      const html2canvas = (await import('html2canvas')).default
       const canvas = await html2canvas(reportRef.current, {
         scale: 2,
         backgroundColor: '#ffffff',

@@ -10,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Pretendard', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-pretendard)', 'Pretendard', 'system-ui', 'sans-serif'],
       },
       colors: {
         'eum-blue': '#1457b8',

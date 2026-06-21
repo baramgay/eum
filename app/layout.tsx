@@ -1,8 +1,25 @@
 import type { Metadata } from 'next'
+import localFont from 'next/font/local'
 import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import RealtimeProvider from '@/components/realtime/RealtimeProvider'
 import './globals.css'
+
+const pretendard = localFont({
+  src: [
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-Thin.subset.woff2',      weight: '100', style: 'normal' },
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-ExtraLight.subset.woff2', weight: '200', style: 'normal' },
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-Light.subset.woff2',      weight: '300', style: 'normal' },
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-Regular.subset.woff2',    weight: '400', style: 'normal' },
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-Medium.subset.woff2',     weight: '500', style: 'normal' },
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-SemiBold.subset.woff2',   weight: '600', style: 'normal' },
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-Bold.subset.woff2',       weight: '700', style: 'normal' },
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-ExtraBold.subset.woff2',  weight: '800', style: 'normal' },
+    { path: '../node_modules/pretendard/dist/web/static/woff2-subset/Pretendard-Black.subset.woff2',      weight: '900', style: 'normal' },
+  ],
+  variable: '--font-pretendard',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: '이음(EUM) — 경남 공공데이터 개방 플랫폼',
@@ -24,7 +41,7 @@ const themeScript = `
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning className={pretendard.variable}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
