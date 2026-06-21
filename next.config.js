@@ -23,7 +23,7 @@ function securityHeaders() {
 
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://dapi.kakao.com https://*.kakaocdn.net",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://dapi.kakao.com https://*.kakaocdn.net https://*.daumcdn.net",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://*.daumcdn.net https://*.kakaocdn.net https://map.kakao.com",
     "font-src 'self' https://cdn.jsdelivr.net",
