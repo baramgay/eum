@@ -29,6 +29,8 @@ interface GraphTabProps {
   analyticsResult: AnalyticsResult | null
   onBuildOntology: () => void
   activeScenario?: ScenarioKey | null
+  onNodeUpdated?: (node: OntologyNode) => void
+  onNodeDeleted?: (objId: string) => void
 }
 
 function GraphSkeleton() {
@@ -77,6 +79,8 @@ export default function GraphTab({
   analyticsResult,
   onBuildOntology,
   activeScenario,
+  onNodeUpdated,
+  onNodeDeleted,
 }: GraphTabProps) {
   return (
     <div className="grid lg:grid-cols-3 gap-5 items-start">
@@ -127,6 +131,8 @@ export default function GraphTab({
               onAiQuery={onAiQuery}
               onExploreNode={onExploreNode}
               onDatasetClick={onDatasetClick}
+              onNodeUpdated={onNodeUpdated}
+              onNodeDeleted={onNodeDeleted}
             />
           </>
         ) : selectedNode ? (
@@ -143,6 +149,8 @@ export default function GraphTab({
             onAiQuery={onAiQuery}
             onExploreNode={onExploreNode}
             onDatasetClick={onDatasetClick}
+            onNodeUpdated={onNodeUpdated}
+            onNodeDeleted={onNodeDeleted}
           />
         ) : relatedLoading ? (
           <DetailSkeleton />

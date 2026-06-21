@@ -123,6 +123,7 @@ export function useOntologyData() {
 
   return {
     graph,
+    setGraph,
     actions,
     building,
     sgg,

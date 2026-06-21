@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from 'react'
 import { Card, Btn } from '@/components/ui'
-import { Check, Copy, X, Info, GitMerge, Link2 } from 'lucide-react'
+import { Check, Copy, X, Info, GitMerge, Link2, Pencil, Loader2, Trash2 } from 'lucide-react'
 import NodeProfile from '../NodeProfile'
+import toast from 'react-hot-toast'
 import type { OntologyNode } from '@/lib/ontology-utils'
 import type { RelatedDataset, ActionResult } from '../hooks/useOntologyData'
 
@@ -20,9 +21,11 @@ interface DetailPanelProps {
   onAiQuery: (node: OntologyNode) => void
   onExploreNode: (node: OntologyNode) => void
   onDatasetClick: (dataset: RelatedDataset) => void
+  onNodeUpdated?: (updated: OntologyNode) => void
+  onNodeDeleted?: (objId: string) => void
 }
 
-type Tab = 'info' | 'lineage' | 'related'
+type Tab = 'info' | 'lineage' | 'related' | 'edit'
 
 function buildLineageChain(
   nodeId: string,
@@ -62,8 +65,52 @@ export default function DetailPanel({
   onAiQuery,
   onExploreNode,
   onDatasetClick,
+  onNodeUpdated,
+  onNodeDeleted,
 }: DetailPanelProps) {
   const [tab, setTab] = useState<Tab>('info')
+
+  /* ── 편집 탭 상태 ── */
+  const [editLabel, setEditLabel] = useState(node.label)
+  const [editObjType, setEditObjType] = useState(node.obj_type)
+  const [editProps, setEditProps] = useState(node.props ?? '')
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/ontology/nodes/${encodeURIComponent(node.obj_id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label: editLabel, obj_type: editObjType, props: editProps }),
+      })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? '저장 실패') }
+      const updated = await res.json()
+      toast.success('저장되었습니다')
+      onNodeUpdated?.(updated)
+    } catch (e) {
+      toast.error(String(e))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!confirm(`"${node.label}" 노드를 삭제하시겠습니까?\n연결된 엣지도 함께 삭제될 수 있습니다.`)) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/ontology/nodes/${encodeURIComponent(node.obj_id)}`, { method: 'DELETE' })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error ?? '삭제 실패') }
+      toast.success('삭제되었습니다')
+      onNodeDeleted?.(node.obj_id)
+      onClose()
+    } catch (e) {
+      toast.error(String(e))
+    } finally {
+      setDeleting(false)
+    }
+  }
   const priorityScore = actionResult?.results.find(r => r.sigun === node.label)?.priority_score ?? null
   const maxPriority = actionResult?.results?.[0]?.priority_score ?? 1
 
@@ -80,6 +127,7 @@ export default function DetailPanel({
     { id: 'info', label: '정보', icon: <Info className="w-3 h-3" /> },
     { id: 'lineage', label: '계보', icon: <GitMerge className="w-3 h-3" /> },
     { id: 'related', label: '관련', icon: <Link2 className="w-3 h-3" /> },
+    { id: 'edit', label: '편집', icon: <Pencil className="w-3 h-3" /> },
   ]
 
   return (
@@ -194,6 +242,56 @@ export default function DetailPanel({
           onExploreNode={onExploreNode}
           onDatasetClick={onDatasetClick}
         />
+      )}
+
+      {tab === 'edit' && (
+        <div className="space-y-3">
+          <p className="text-[10px] font-mono text-gray-400 dark:text-gray-500 break-all">{node.obj_id}</p>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">이름 (Label)</label>
+            <input
+              value={editLabel}
+              onChange={e => setEditLabel(e.target.value)}
+              className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">유형 (Type)</label>
+            <input
+              value={editObjType}
+              onChange={e => setEditObjType(e.target.value)}
+              className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">속성 (Props)</label>
+            <textarea
+              value={editProps}
+              onChange={e => setEditProps(e.target.value)}
+              rows={4}
+              placeholder="key=value;key2=value2"
+              className="w-full px-3 py-2 text-xs font-mono bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            />
+          </div>
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 flex items-center justify-center gap-1.5 h-8 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 transition-colors"
+            >
+              {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+              저장
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg disabled:opacity-50 transition-colors"
+            >
+              {deleting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+              삭제
+            </button>
+          </div>
+        </div>
       )}
     </Card>
   )

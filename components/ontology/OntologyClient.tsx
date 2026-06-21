@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { PageHeader, Btn, Badge } from '@/components/ui'
 import type { GraphLayoutType, AnalyticsResult, OntologyGraphData } from '@/lib/ontology/types'
+import type { OntologyNode } from '@/lib/ontology-utils'
 import type { ScenarioKey } from '@/lib/ontology/demo-graph-meta'
 import { SGG_OPTIONS } from '@/lib/regions'
 import { useOntologyData } from './hooks/useOntologyData'
@@ -46,6 +47,7 @@ export default function OntologyClient() {
 
   const {
     graph,
+    setGraph,
     actions,
     building,
     sgg,
@@ -126,6 +128,25 @@ export default function OntologyClient() {
       setDemoLoading(false)
     }
   }, [])
+
+  const handleNodeUpdated = useCallback((updated: OntologyNode) => {
+    const patcher = (prev: OntologyGraphData | null) =>
+      prev ? { ...prev, nodes: prev.nodes.map(n => n.obj_id === updated.obj_id ? { ...n, ...updated } : n) } : prev
+    if (graph) setGraph(patcher)
+    else setDemoGraph(patcher)
+  }, [graph, setGraph])
+
+  const handleNodeDeleted = useCallback((objId: string) => {
+    const patcher = (prev: OntologyGraphData | null) =>
+      prev ? {
+        ...prev,
+        nodes: prev.nodes.filter(n => n.obj_id !== objId),
+        edges: prev.edges.filter(e => e.src !== objId && e.dst !== objId),
+      } : prev
+    if (graph) setGraph(patcher)
+    else setDemoGraph(patcher)
+    setSelectedNode(null)
+  }, [graph, setGraph])
 
   const handleLayoutChange = useCallback((next: GraphLayoutType) => {
     setLayout(next)
@@ -325,6 +346,8 @@ export default function OntologyClient() {
           analyticsResult={analyticsResult}
           onBuildOntology={buildOntology}
           activeScenario={activeScenario}
+          onNodeUpdated={handleNodeUpdated}
+          onNodeDeleted={handleNodeDeleted}
         />
       )}
 
