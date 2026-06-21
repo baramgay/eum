@@ -208,6 +208,7 @@ function MapInner(
   const onCenterRef = useRef(onCenterChange)
   const [loadState, setLoadState] = useState<'loading' | 'error' | 'ready'>('loading')
   const [retry, setRetry] = useState(0)
+  const [zoomLevel, setZoomLevel] = useState<number | null>(null)
 
   facilitiesRef.current = facilities
   layerModeRef.current = layerMode
@@ -304,11 +305,15 @@ function MapInner(
 
         infoWindowRef.current = new kakao.maps.InfoWindow({ zIndex: 10 })
 
+        setZoomLevel(map.getLevel())
+
         const idleHandler = () => {
           const center = map.getCenter()
           onCenterRef.current?.({ lat: center.getLat(), lng: center.getLng() })
 
           const level = map.getLevel()
+          setZoomLevel(level)
+
           const nextLabelMode = layerModeRef.current === 'marker' && level <= 7
           if (labelModeRef.current !== nextLabelMode) {
             labelModeRef.current = nextLabelMode
@@ -359,6 +364,15 @@ function MapInner(
     applyLayer(facilities, layerMode)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [facilities, layerMode, selectedFacilityId, heatmapMode, heatmapValueMode, heatmapPalette, clusterOptions])
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return
+      infoWindowRef.current?.close()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   function clearLayers() {
     const kakao = window.kakao
@@ -837,6 +851,33 @@ function MapInner(
         aria-label="경상남도 공공시설 지도"
         style={{ height: '100%', width: '100%' }}
       />
+      {loadState === 'ready' && zoomLevel !== null && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '12px',
+            right: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '4px 10px',
+            background: 'rgba(255,255,255,0.92)',
+            borderRadius: '999px',
+            boxShadow: '0 1px 6px rgba(0,0,0,0.12)',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            fontSize: '11px',
+            color: '#475569',
+            pointerEvents: 'none',
+            backdropFilter: 'blur(4px)',
+            zIndex: 10,
+          }}
+        >
+          <span style={{ color: '#94A3B8' }}>줌</span>
+          <span style={{ fontWeight: 700, color: '#1E293B' }}>{zoomLevel}</span>
+          <span style={{ color: '#CBD5E1', margin: '0 2px' }}>·</span>
+          <span style={{ color: '#94A3B8' }}>ESC 인포창 닫기</span>
+        </div>
+      )}
       {loadState !== 'ready' && (
         <div
           style={{
