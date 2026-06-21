@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import DatasetModal from './DatasetModal'
@@ -124,6 +124,20 @@ export default function PortalClient() {
   const [selectedDataset, setSelectedDataset] = useState<CatalogItem | null>(null)
   const [usage, setUsage]               = useState<UsageSummary | null>(null)
   const [tenantName, setTenantName]     = useState('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // '/' 키 → 검색창 포커스
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== '/' || selectedDataset) return
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      e.preventDefault()
+      searchInputRef.current?.focus()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [selectedDataset])
 
   // 검색 디바운스 (300ms)
   useEffect(() => {
@@ -280,9 +294,10 @@ export default function PortalClient() {
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
           <input
+            ref={searchInputRef}
             value={searchInput}
             onChange={e => setSearchInput(e.target.value)}
-            placeholder="데이터셋 검색..."
+            placeholder="데이터셋 검색... (/ 키)"
             className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
