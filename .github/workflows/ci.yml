@@ -4,6 +4,16 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_call:
+    secrets:
+      NEXT_PUBLIC_SUPABASE_URL: { required: false }
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: { required: false }
+      NEXT_PUBLIC_KAKAO_MAP_KEY: { required: false }
+      COLLECTION_SECRET: { required: false }
+      SUPABASE_SERVICE_ROLE_KEY: { required: false }
+      QWEN_API_KEY: { required: false }
+      QWEN_BASE_URL: { required: false }
+      QWEN_MODEL: { required: false }
 
 jobs:
   ci:
