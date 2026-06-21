@@ -215,6 +215,9 @@ export default function OntologyGraph({
   const [highlightPath, setHighlightPath] = useState<Set<string>>(new Set())
   const [highlightPathEdges, setHighlightPathEdges] = useState<Set<string>>(new Set())
   const [colorMode, setColorMode] = useState<'type' | 'status' | 'layer'>('type')
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; node: SimNode } | null>(null)
+  const [hoveredEdge, setHoveredEdge] = useState<{ rel: string; weight: number; x: number; y: number } | null>(null)
+  const pinnedNodesRef = useRef<Set<string>>(new Set())
 
   const allYears = useMemo(
     () =>
@@ -342,6 +345,26 @@ export default function OntologyGraph({
         return dx * dx + dy * dy <= r * r
       }) ?? null
     )
+  }
+
+  function getEdgeAt(ex: number, ey: number): { rel: string; weight: number } | null {
+    const { k, x, y } = transformRef.current
+    const wx = (ex - x) / k
+    const wy = (ey - y) / k
+    const threshold = 8 / k
+    for (const l of linksRef.current) {
+      const src = l.source as SimNode
+      const tgt = l.target as SimNode
+      const sx = src.x ?? 0; const sy = src.y ?? 0
+      const tx2 = tgt.x ?? 0; const ty2 = tgt.y ?? 0
+      const dx = tx2 - sx; const dy = ty2 - sy
+      const len2 = dx * dx + dy * dy
+      if (len2 === 0) continue
+      const t = Math.max(0, Math.min(1, ((wx - sx) * dx + (wy - sy) * dy) / len2))
+      const px = sx + t * dx; const py = sy + t * dy
+      if (Math.hypot(wx - px, wy - py) < threshold) return { rel: l.rel, weight: l.weight ?? 1 }
+    }
+    return null
   }
 
   // ── Main draw function ───────────────────────────────────────────────────────
@@ -732,6 +755,21 @@ export default function OntologyGraph({
     if (selected) focusNode(selected.obj_id)
   }, [selected, focusNode])
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return
+      setContextMenu(null)
+      setPathStart(null)
+      setHighlightPath(new Set())
+      setHighlightPathEdges(new Set())
+      setSelected(null)
+      onSelectProp?.(null)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [onSelectProp, setSelected])
+
   // Redraw on highlight/state changes
   useEffect(() => {
     scheduleFrame()
@@ -1008,8 +1046,10 @@ export default function OntologyGraph({
           const node: SimNode | undefined = (event as any)._draggingNode
           if (!node) return
           if (!event.active) simRef.current?.alphaTarget(0)
-          node.fx = null
-          node.fy = null
+          if (!pinnedNodesRef.current.has(node.obj_id)) {
+            node.fx = null
+            node.fy = null
+          }
         })
 
       // Apply drag after zoom so drag can steal pointer events for nodes
@@ -1018,19 +1058,30 @@ export default function OntologyGraph({
       // ── Canvas pointer events ───────────────────────────────────────────────
       function onMouseMove(e: MouseEvent) {
         const rect = canvas.getBoundingClientRect()
-        const node = getNodeAt(e.clientX - rect.left, e.clientY - rect.top)
+        const ex = e.clientX - rect.left
+        const ey = e.clientY - rect.top
+        const node = getNodeAt(ex, ey)
         if (node) {
           canvas.style.cursor = 'pointer'
           setHovered({ ...node })
-          setTooltip({ node, x: e.clientX - rect.left + 14, y: e.clientY - rect.top - 14 })
+          setTooltip({ node, x: ex + 14, y: ey - 14 })
+          setHoveredEdge(null)
         } else {
-          canvas.style.cursor = 'grab'
+          const edge = getEdgeAt(ex, ey)
+          if (edge) {
+            canvas.style.cursor = 'crosshair'
+            setHoveredEdge({ ...edge, x: ex + 14, y: ey - 14 })
+          } else {
+            canvas.style.cursor = 'grab'
+            setHoveredEdge(null)
+          }
           setHovered(null)
           setTooltip(null)
         }
       }
 
       function onClick(e: MouseEvent) {
+        setContextMenu(null)
         const rect = canvas.getBoundingClientRect()
         const node = getNodeAt(e.clientX - rect.left, e.clientY - rect.top)
         if (e.shiftKey && node) {
@@ -1077,12 +1128,25 @@ export default function OntologyGraph({
       function onMouseLeave() {
         setHovered(null)
         setTooltip(null)
+        setHoveredEdge(null)
+      }
+
+      function onContextMenu(e: MouseEvent) {
+        e.preventDefault()
+        const rect = canvas.getBoundingClientRect()
+        const node = getNodeAt(e.clientX - rect.left, e.clientY - rect.top)
+        if (node) {
+          setContextMenu({ x: e.clientX - rect.left, y: e.clientY - rect.top, node })
+        } else {
+          setContextMenu(null)
+        }
       }
 
       canvas.addEventListener('mousemove', onMouseMove)
       canvas.addEventListener('click', onClick)
       canvas.addEventListener('dblclick', onDblClick)
       canvas.addEventListener('mouseleave', onMouseLeave)
+      canvas.addEventListener('contextmenu', onContextMenu)
 
       // ── Force simulation ────────────────────────────────────────────────────
       const clusterCenters = computeClusterPositions(simNodes, edges, width, height, 100)
@@ -1162,6 +1226,7 @@ export default function OntologyGraph({
         canvas.removeEventListener('click', onClick)
         canvas.removeEventListener('dblclick', onDblClick)
         canvas.removeEventListener('mouseleave', onMouseLeave)
+        canvas.removeEventListener('contextmenu', onContextMenu)
         select(canvas).on('.zoom', null)
         select(canvas).on('.drag', null)
       }
@@ -1345,16 +1410,116 @@ export default function OntologyGraph({
         )}
 
         {/* 노드 호버 툴팁 */}
-        {tooltip && (
+        {tooltip && !contextMenu && (
           <div
             className="absolute z-30 pointer-events-none bg-gray-800/95 backdrop-blur-sm text-white text-xs rounded-xl px-3 py-2.5 shadow-xl border border-white/10 max-w-[240px]"
-            style={{ left: tooltip.x, top: tooltip.y }}
+            style={{ left: Math.min(tooltip.x, width - 260), top: Math.max(tooltip.y, 4) }}
           >
             <div className="font-semibold text-white mb-0.5 truncate">{tooltip.node.label}</div>
-            <div className="text-gray-400">{tooltip.node.obj_type}</div>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-gray-400">{tooltip.node.obj_type}</span>
+              {(() => {
+                const s = nodeStatusCacheRef.current.get(tooltip.node.obj_id)
+                if (!s || s === 'ok') return null
+                const cfg = s === 'error'
+                  ? { cls: 'bg-red-900/60 text-red-300', label: '오류' }
+                  : s === 'stale'
+                  ? { cls: 'bg-yellow-900/60 text-yellow-300', label: '만료' }
+                  : { cls: 'bg-blue-900/60 text-blue-300', label: '수집중' }
+                return <span className={`text-[9px] px-1 py-0.5 rounded ${cfg.cls}`}>{cfg.label}</span>
+              })()}
+            </div>
             {(tooltip.node.degree ?? 0) > 0 && (
               <div className="text-gray-500 mt-0.5">연결 {tooltip.node.degree}개</div>
             )}
+            {pinnedNodesRef.current.has(tooltip.node.obj_id) && (
+              <div className="text-indigo-400 mt-0.5 text-[10px]">📌 핀 고정됨</div>
+            )}
+            <div className="mt-1.5 text-gray-600 text-[10px] border-t border-white/10 pt-1.5 space-y-0.5">
+              <div>클릭: 선택 · 더블클릭: AI 질의</div>
+              <div>우클릭: 메뉴 · Shift+클릭: 경로</div>
+            </div>
+          </div>
+        )}
+
+        {/* 엣지 호버 툴팁 */}
+        {hoveredEdge && !contextMenu && (
+          <div
+            className="absolute z-30 pointer-events-none bg-gray-700/95 backdrop-blur-sm text-white text-[11px] rounded-lg px-2.5 py-1.5 shadow-lg border border-white/10"
+            style={{ left: Math.min(hoveredEdge.x, width - 160), top: Math.max(hoveredEdge.y, 4) }}
+          >
+            <div className="font-medium text-gray-200">{hoveredEdge.rel}</div>
+            <div className="text-gray-500">가중치 {hoveredEdge.weight}</div>
+          </div>
+        )}
+
+        {/* 우클릭 컨텍스트 메뉴 */}
+        {contextMenu && (
+          <div
+            className="absolute z-50 bg-gray-800/98 backdrop-blur-sm rounded-xl shadow-2xl border border-white/15 py-1.5 min-w-[168px]"
+            style={{
+              left: Math.min(contextMenu.x, width - 180),
+              top: Math.min(contextMenu.y, height - 220),
+            }}
+          >
+            <div className="px-3 py-1.5 text-[10px] text-gray-400 font-medium border-b border-white/10 mb-1 truncate">
+              {contextMenu.node.label}
+              <span className="ml-1.5 text-gray-600">{contextMenu.node.obj_type}</span>
+            </div>
+            {[
+              {
+                label: '노드 선택',
+                icon: '◎',
+                onClick: () => {
+                  setSelected({ ...contextMenu.node })
+                  onSelectProp?.({ ...contextMenu.node })
+                },
+              },
+              {
+                label: 'AI 질의',
+                icon: '✦',
+                onClick: () => onDoubleClick?.({ ...contextMenu.node }),
+              },
+              {
+                label: '화면 중앙',
+                icon: '⊕',
+                onClick: () => focusNode(contextMenu.node.obj_id),
+              },
+              {
+                label: '경로 시작점 설정',
+                icon: '→',
+                onClick: () => {
+                  setPathStart(contextMenu.node.obj_id)
+                  setHighlightPath(new Set([contextMenu.node.obj_id]))
+                  setHighlightPathEdges(new Set())
+                },
+              },
+              {
+                label: pinnedNodesRef.current.has(contextMenu.node.obj_id) ? '핀 해제' : '핀 고정',
+                icon: '📌',
+                onClick: () => {
+                  const n = nodesRef.current.find(x => x.obj_id === contextMenu.node.obj_id)
+                  if (!n) return
+                  if (pinnedNodesRef.current.has(n.obj_id)) {
+                    pinnedNodesRef.current.delete(n.obj_id)
+                    n.fx = null; n.fy = null
+                  } else {
+                    pinnedNodesRef.current.add(n.obj_id)
+                    n.fx = n.x; n.fy = n.y
+                  }
+                  simRef.current?.alpha(0.1).restart()
+                },
+              },
+            ].map(item => (
+              <button
+                key={item.label}
+                onClick={() => { item.onClick(); setContextMenu(null) }}
+                className="w-full text-left flex items-center gap-2 px-3 py-1.5 text-xs text-gray-200 hover:bg-white/10 transition-colors"
+              >
+                <span className="text-gray-500 w-4 text-center flex-shrink-0">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
           </div>
         )}
 
