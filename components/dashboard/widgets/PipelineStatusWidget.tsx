@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Database, CheckCircle2, XCircle, Activity } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import StatCard from '@/components/ui/StatCard'
@@ -12,7 +13,10 @@ interface PipelineStatusWidgetProps {
 export default function PipelineStatusWidget({ pipeline }: PipelineStatusWidgetProps) {
   return (
     <Card>
-      <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">오늘의 파이프라인 현황</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">오늘의 파이프라인 현황</h3>
+        <Link href="/pipeline" className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition-colors">바로가기 →</Link>
+      </div>
       <div className="grid grid-cols-2 gap-3">
         <StatCard
           label="수집 소스"

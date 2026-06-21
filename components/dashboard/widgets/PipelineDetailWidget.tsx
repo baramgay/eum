@@ -9,6 +9,7 @@ import {
   Play,
   Loader2,
 } from 'lucide-react'
+import Link from 'next/link'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Skeleton from '@/components/ui/Skeleton'
@@ -55,9 +56,10 @@ export default function PipelineDetailWidget() {
 
   return (
     <Card>
-      <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">
-        파이프라인 현황 (24시간)
-      </h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">파이프라인 현황 (24시간)</h3>
+        <Link href="/pipeline" className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition-colors">바로가기 →</Link>
+      </div>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">

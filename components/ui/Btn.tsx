@@ -1,5 +1,5 @@
 'use client'
-import { ButtonHTMLAttributes, ReactNode } from 'react'
+import { ButtonHTMLAttributes, ReactNode, useState } from 'react'
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost'
 type Size = 'sm' | 'md' | 'lg'
@@ -24,10 +24,14 @@ const sizeClass: Record<Size, string> = {
 }
 
 export default function Btn({ variant = 'primary', size = 'md', loading, icon, children, disabled, className = '', ...props }: BtnProps) {
+  const [isPressed, setIsPressed] = useState(false)
   return (
     <button
       disabled={disabled || loading}
-      className={`inline-flex items-center gap-1.5 border font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed ${variantClass[variant]} ${sizeClass[size]} ${className}`}
+      className={`inline-flex items-center gap-1.5 border font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed ${variantClass[variant]} ${sizeClass[size]} ${isPressed ? 'scale-[0.97] ring-2 ring-current/30' : ''} ${className}`}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
       {...props}
     >
       {loading && <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />}

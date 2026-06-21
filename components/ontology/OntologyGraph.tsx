@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { select } from 'd3-selection'
-import 'd3-transition'
 import { zoom, zoomIdentity } from 'd3-zoom'
+import type { ZoomBehavior, ZoomTransform } from 'd3-zoom'
 import { drag } from 'd3-drag'
 import {
   forceSimulation,
@@ -18,6 +18,7 @@ import { extent } from 'd3-array'
 import { scaleLinear, scaleBand } from 'd3-scale'
 import { hierarchy, tree } from 'd3-hierarchy'
 import { Btn } from '@/components/ui'
+import KakaoOntologyMap from '@/components/ontology/KakaoOntologyMap'
 import type { OntologyNode, OntologyEdge } from '@/lib/ontology-utils'
 import { parseProps } from '@/lib/ontology-utils'
 import type { GraphLayoutType, AnalyticsResult } from '@/lib/ontology/types'
@@ -41,9 +42,7 @@ import GraphToolbar from './GraphToolbar'
 import MiniMap from './MiniMap'
 import {
   useGraphState,
-  useGraphHighlight,
   baseNodeRadius,
-  edgeLookupKey,
 } from './hooks'
 import type { SimNode, SimLink } from './hooks'
 
@@ -94,6 +93,63 @@ interface Props {
   analysisResult?: AnalyticsResult | null
 }
 
+// ─── Canvas drawing helpers ───────────────────────────────────────────────────
+
+function drawArrow(
+  ctx: CanvasRenderingContext2D,
+  cpx: number,
+  cpy: number,
+  tx: number,
+  ty: number
+) {
+  const angle = Math.atan2(ty - cpy, tx - cpx)
+  const len = 8
+  ctx.beginPath()
+  ctx.moveTo(tx, ty)
+  ctx.lineTo(tx - len * Math.cos(angle - 0.4), ty - len * Math.sin(angle - 0.4))
+  ctx.lineTo(tx - len * Math.cos(angle + 0.4), ty - len * Math.sin(angle + 0.4))
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawEdge(
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  tx: number,
+  ty: number,
+  curvature = 0.15,
+  side = 1
+) {
+  const mx = (sx + tx) / 2
+  const my = (sy + ty) / 2
+  const dx = tx - sx
+  const dy = ty - sy
+  const cpx = mx - dy * curvature * side
+  const cpy = my + dx * curvature * side
+  ctx.beginPath()
+  ctx.moveTo(sx, sy)
+  ctx.quadraticCurveTo(cpx, cpy, tx, ty)
+  ctx.stroke()
+  drawArrow(ctx, cpx, cpy, tx, ty)
+}
+
+function drawDotGrid(ctx: CanvasRenderingContext2D, width: number, height: number, k: number, tx: number, ty: number) {
+  const spacing = 24
+  ctx.fillStyle = 'rgba(255,255,255,0.055)'
+  const startX = ((tx % (spacing * k)) + spacing * k) % (spacing * k)
+  const startY = ((ty % (spacing * k)) + spacing * k) % (spacing * k)
+  for (let x = startX - spacing * k; x < width; x += spacing * k) {
+    for (let y = startY - spacing * k; y < height; y += spacing * k) {
+      ctx.beginPath()
+      ctx.arc(x, y, 1.2, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function OntologyGraph({
   nodes,
   edges,
@@ -112,7 +168,10 @@ export default function OntologyGraph({
   const [tooltip, setTooltip] = useState<{ node: SimNode; x: number; y: number } | null>(null)
 
   const allYears = useMemo(
-    () => Array.from(new Set(nodes.map(n => extractYear(n.props)).filter((y): y is number => y != null))).sort((a, b) => a - b),
+    () =>
+      Array.from(
+        new Set(nodes.map(n => extractYear(n.props)).filter((y): y is number => y != null))
+      ).sort((a, b) => a - b),
     [nodes]
   )
 
@@ -131,6 +190,7 @@ export default function OntologyGraph({
     [edges, displayNodeIds]
   )
 
+  // ── Graph state (non-SVG parts only) ────────────────────────────────────────
   const state = useGraphState({
     nodes: displayNodes,
     edges: displayEdges,
@@ -147,10 +207,7 @@ export default function OntologyGraph({
 
   const {
     wrapRef,
-    svgRef,
     simRef,
-    gRef,
-    zoomRef,
     lastMinimapUpdateRef,
     selected,
     setSelected,
@@ -173,7 +230,6 @@ export default function OntologyGraph({
     toggleRel,
     togglePhysics,
     toggleFullscreen,
-    exportPng,
     handleLayoutChange,
     handleToolbarSelect,
     runWorkerLayout,
@@ -185,86 +241,558 @@ export default function OntologyGraph({
     exporting,
     setShowNodeLabels,
     setShowRelLabels,
-    resetZoom,
-    zoomBy,
-    fitToBounds,
   } = state
 
-  useGraphHighlight({
-    gRef,
+  // ── Canvas-specific refs ────────────────────────────────────────────────────
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const transformRef = useRef<{ k: number; x: number; y: number }>({ k: 1, x: 0, y: 0 })
+  const zoomBehaviorRef = useRef<ZoomBehavior<HTMLCanvasElement, unknown> | null>(null)
+  const nodesRef = useRef<SimNode[]>([])
+  const linksRef = useRef<SimLink[]>([])
+  const rafRef = useRef<number>(0)
+  const anomalySetRef = useRef<Set<string>>(new Set())
+  const communityMapRef = useRef<Map<string, number>>(new Map())
+  // parallel edge set: canonical key "minId|maxId" → true if both directions exist
+  const parallelEdgeSetRef = useRef<Set<string>>(new Set())
+
+  // ── Export PNG (canvas native) ───────────────────────────────────────────────
+  const exportPng = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const url = canvas.toDataURL('image/png')
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `eum-ontology-${new Date().toISOString().slice(0, 10)}.png`
+    a.click()
+  }, [])
+
+  // ── Schedule a rAF draw ──────────────────────────────────────────────────────
+  function scheduleFrame() {
+    cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(drawFrame)
+  }
+
+  // ── Hit testing ──────────────────────────────────────────────────────────────
+  function getNodeAt(ex: number, ey: number): SimNode | null {
+    const { k, x, y } = transformRef.current
+    const wx = (ex - x) / k
+    const wy = (ey - y) / k
+    return (
+      nodesRef.current.find(n => {
+        const dx = (n.x ?? 0) - wx
+        const dy = (n.y ?? 0) - wy
+        const r = baseNodeRadius(n) + 4
+        return dx * dx + dy * dy <= r * r
+      }) ?? null
+    )
+  }
+
+  // ── Main draw function ───────────────────────────────────────────────────────
+  function drawFrame() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const dpr = window.devicePixelRatio || 1
+    const cssW = canvas.clientWidth || width
+    const cssH = canvas.clientHeight || height
+    if (canvas.width !== cssW * dpr || canvas.height !== cssH * dpr) {
+      canvas.width = cssW * dpr
+      canvas.height = cssH * dpr
+    }
+    ctx.save()
+    ctx.scale(dpr, dpr)
+    ctx.clearRect(0, 0, cssW, cssH)
+
+    const { k, x, y } = transformRef.current
+
+    // 1. Dot-grid background (in screen space, not world space)
+    drawDotGrid(ctx, cssW, cssH, k, x, y)
+
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.scale(k, k)
+
+    const simNodes = nodesRef.current
+    const simLinks = linksRef.current
+    const focusId = state.hovered?.obj_id ?? selected?.obj_id ?? null
+    const focusNeighbors = focusId ? neighborMap.get(focusId) : null
+
+    // Build parallel-edge lookup: check if reverse edge exists
+    const edgeDirSet = new Set<string>()
+    simLinks.forEach(l => {
+      const s = (l.source as SimNode).obj_id ?? String(l.source)
+      const t = (l.target as SimNode).obj_id ?? String(l.target)
+      edgeDirSet.add(`${s}|${t}`)
+    })
+
+    // ── 2. Community halos ───────────────────────────────────────────────────
+    if (communityMapRef.current.size > 0 && k > 0.2) {
+      const communityGroups = new Map<number, SimNode[]>()
+      simNodes.forEach(n => {
+        const cid = communityMapRef.current.get(n.obj_id)
+        if (cid !== undefined) {
+          if (!communityGroups.has(cid)) communityGroups.set(cid, [])
+          communityGroups.get(cid)!.push(n)
+        }
+      })
+      communityGroups.forEach((members, cid) => {
+        if (members.length === 0) return
+        const cx = members.reduce((s, n) => s + (n.x ?? 0), 0) / members.length
+        const cy = members.reduce((s, n) => s + (n.y ?? 0), 0) / members.length
+        const maxR =
+          Math.max(...members.map(n => Math.hypot((n.x ?? 0) - cx, (n.y ?? 0) - cy))) +
+          baseNodeRadius(members[0]) +
+          20
+        ctx.beginPath()
+        ctx.arc(cx, cy, Math.max(maxR, 30), 0, Math.PI * 2)
+        ctx.fillStyle = COMMUNITY_PALETTE[cid % COMMUNITY_PALETTE.length]
+        ctx.fill()
+      })
+    }
+
+    // ── 3. Geo/Time background grid ──────────────────────────────────────────
+    if ((layout as string) === 'geo') {
+      const { lines, labels } = buildGeoGrid(width, height)
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+      ctx.lineWidth = 1
+      lines.forEach(l => {
+        ctx.beginPath()
+        ctx.moveTo(l.x1, l.y1)
+        ctx.lineTo(l.x2, l.y2)
+        ctx.stroke()
+      })
+      ctx.fillStyle = 'rgba(255,255,255,0.25)'
+      ctx.font = '10px sans-serif'
+      ctx.textAlign = 'right'
+      labels.forEach(l => ctx.fillText(l.text, l.x, l.y))
+    }
+
+    if ((layout as string) === 'time') {
+      const years = simNodes.map(n => extractYear(n.props)).filter((y): y is number => y != null)
+      const { ticks } = buildTimeAxis(width, height, years, simNodes.map(n => n.obj_type))
+      ctx.lineWidth = 1
+      ticks
+        .filter(t => t.type === 'year')
+        .forEach(t => {
+          ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+          ctx.beginPath()
+          ctx.moveTo(t.x, 60)
+          ctx.lineTo(t.x, height - 60)
+          ctx.stroke()
+        })
+      ticks.forEach(t => {
+        ctx.fillStyle = t.type === 'year' ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.25)'
+        ctx.font = `${t.type === 'year' ? 10 : 9}px sans-serif`
+        ctx.textAlign = t.type === 'year' ? 'center' : 'right'
+        ctx.fillText(t.text, t.x, t.y)
+      })
+    }
+
+    // ── 4. Edges ─────────────────────────────────────────────────────────────
+    const baseOpacity = linkBaseOpacity(k)
+
+    simLinks.forEach(l => {
+      const src = l.source as SimNode
+      const tgt = l.target as SimNode
+      const sx = src.x ?? 0
+      const sy = src.y ?? 0
+      const tx2 = tgt.x ?? 0
+      const ty2 = tgt.y ?? 0
+
+      const sid = src.obj_id
+      const tid = tgt.obj_id
+      const hasReverse = edgeDirSet.has(`${tid}|${sid}`)
+
+      let edgeOpacity = baseOpacity
+      if (focusId) {
+        if (sid === focusId || tid === focusId) edgeOpacity = 1
+        else edgeOpacity = Math.max(0.15, baseOpacity * 0.4)
+      }
+
+      const color = EDGE_COLORS[l.rel] ?? DEFAULT_EDGE_COLOR
+      ctx.strokeStyle = color
+      ctx.fillStyle = color
+      const rawW = Math.max(1, Math.sqrt(l.weight ?? 1) * 1.1)
+      const isFocusEdge = focusId && (sid === focusId || tid === focusId)
+      ctx.lineWidth = isFocusEdge ? rawW + 1.5 : rawW
+      ctx.globalAlpha = edgeOpacity
+
+      const curvature = hasReverse ? 0.18 : 0.12
+      const side = hasReverse ? 1 : 0
+      drawEdge(ctx, sx, sy, tx2, ty2, curvature, side)
+    })
+    ctx.globalAlpha = 1
+
+    // ── 5. Edge labels (LOD: zoom > 0.6) ────────────────────────────────────
+    if (k > 0.6) {
+      simLinks.forEach(l => {
+        const src = l.source as SimNode
+        const tgt = l.target as SimNode
+        const sid = src.obj_id
+        const tid = tgt.obj_id
+        const opacity = linkLabelOpacity(
+          { source: { obj_id: sid }, target: { obj_id: tid } },
+          k,
+          showRelLabels,
+          focusId
+        )
+        if (opacity <= 0) return
+        const mx = ((src.x ?? 0) + (tgt.x ?? 0)) / 2
+        const my = ((src.y ?? 0) + (tgt.y ?? 0)) / 2 - 5
+        ctx.globalAlpha = opacity
+        ctx.font = '500 10px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.fillStyle = '#E2E8F0'
+        ctx.fillText(l.rel, mx, my)
+      })
+      ctx.globalAlpha = 1
+    }
+
+    // ── 6. Nodes ─────────────────────────────────────────────────────────────
+    simNodes.forEach(n => {
+      const nx = n.x ?? 0
+      const ny = n.y ?? 0
+      const r = encoding?.nodeRadii.get(n.obj_id) ?? baseNodeRadius(n)
+      const color = encoding?.nodeColors.get(n.obj_id) ?? NODE_COLORS[n.obj_type] ?? DEFAULT_NODE_COLOR
+      const isAnomaly = anomalySetRef.current.has(n.obj_id)
+      const isFocus = n.obj_id === focusId
+      const isNeighbor = focusNeighbors?.has(n.obj_id) ?? false
+
+      let nodeOpacity = 1
+      if (focusId && !isFocus && !isNeighbor) nodeOpacity = 0.15
+
+      ctx.globalAlpha = nodeOpacity
+
+      // Anomaly outer glow
+      if (isAnomaly) {
+        ctx.save()
+        ctx.shadowColor = '#EF4444'
+        ctx.shadowBlur = 14 / k
+        ctx.beginPath()
+        ctx.arc(nx, ny, r + 4, 0, Math.PI * 2)
+        ctx.strokeStyle = '#EF4444'
+        ctx.lineWidth = 2.5
+        ctx.stroke()
+        ctx.restore()
+      }
+
+      // Type ring
+      ctx.beginPath()
+      ctx.arc(nx, ny, r + 3.5, 0, Math.PI * 2)
+      ctx.strokeStyle = NODE_COLORS[n.obj_type] ?? DEFAULT_NODE_COLOR
+      ctx.lineWidth = 1.5
+      ctx.globalAlpha = nodeOpacity * 0.45
+      ctx.stroke()
+      ctx.globalAlpha = nodeOpacity
+
+      // Main circle
+      ctx.beginPath()
+      ctx.arc(nx, ny, r, 0, Math.PI * 2)
+      ctx.fillStyle = color
+      ctx.fill()
+      const sw = lodStrokeWidth(k, isFocus)
+      if (sw > 0) {
+        ctx.strokeStyle = isAnomaly
+          ? '#EF4444'
+          : encoding?.nodeStrokes.get(n.obj_id) ?? 'rgba(255,255,255,0.6)'
+        ctx.lineWidth = isAnomaly ? 2 : sw
+        ctx.stroke()
+      }
+
+      // Emoji icon
+      const icon = NODE_TYPE_ICON[n.obj_type]
+      if (icon) {
+        const fontSize = Math.round(r * 0.85)
+        ctx.font = `${fontSize}px sans-serif`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(icon, nx, ny)
+      }
+
+      // Node label (LOD: zoom > 0.35)
+      const labelOpacity = nodeLabelOpacity(n, k, showNodeLabels, focusId, focusNeighbors)
+      if (labelOpacity > 0) {
+        const maxLen = 10
+        const labelText = n.label.length > maxLen ? `${n.label.slice(0, maxLen)}…` : n.label
+        const fontSize = 9
+        ctx.font = `600 ${fontSize}px sans-serif`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'alphabetic'
+        const tw = Math.min(n.label.length, 10) * 5.5 + 4
+        const lx = nx - tw / 2
+        const ly = ny + r + 4
+
+        ctx.globalAlpha = nodeOpacity * labelOpacity
+        ctx.fillStyle = 'rgba(0,0,0,0.45)'
+        ctx.beginPath()
+        ctx.roundRect(lx, ly - 2, tw, 14, 3)
+        ctx.fill()
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+        ctx.lineWidth = 0.5
+        ctx.stroke()
+        ctx.fillStyle = '#fff'
+        ctx.fillText(labelText, nx, ly + 9)
+      }
+
+      ctx.globalAlpha = 1
+      ctx.textBaseline = 'alphabetic'
+    })
+
+    ctx.restore()
+    ctx.restore()
+  }
+
+  // ── Zoom controls (canvas-native) ────────────────────────────────────────────
+  const resetZoom = useCallback(() => {
+    const canvas = canvasRef.current
+    const zb = zoomBehaviorRef.current
+    if (!canvas || !zb) return
+    select(canvas).transition().duration(500).call(zb.transform as any, zoomIdentity)
+  }, [])
+
+  const zoomBy = useCallback((factor: number) => {
+    const canvas = canvasRef.current
+    const zb = zoomBehaviorRef.current
+    if (!canvas || !zb) return
+    select(canvas).transition().duration(250).call(zb.scaleBy as any, factor)
+  }, [])
+
+  const fitToBounds = useCallback(() => {
+    const canvas = canvasRef.current
+    const zb = zoomBehaviorRef.current
+    const simNodes = nodesRef.current
+    if (!canvas || !zb || simNodes.length === 0) return
+    const xs = simNodes.map(n => n.x ?? 0)
+    const ys = simNodes.map(n => n.y ?? 0)
+    const [minX, maxX] = [Math.min(...xs), Math.max(...xs)]
+    const [minY, maxY] = [Math.min(...ys), Math.max(...ys)]
+    const bw = maxX - minX || 1
+    const bh = maxY - minY || 1
+    const scale = Math.min((width - 80) / bw, (height - 80) / bh, 2)
+    const transform = zoomIdentity
+      .translate(width / 2, height / 2)
+      .scale(scale)
+      .translate(-(minX + bw / 2), -(minY + bh / 2))
+    select(canvas).transition().duration(600).call(zb.transform as any, transform)
+  }, [width, height])
+
+  const focusNode = useCallback(
+    (nodeId: string) => {
+      const canvas = canvasRef.current
+      const zb = zoomBehaviorRef.current
+      const target = nodesRef.current.find(n => n.obj_id === nodeId)
+      if (!canvas || !zb || !target || target.x == null || target.y == null) return
+      const scale = 1.4
+      const transform = zoomIdentity
+        .translate(width / 2, height / 2)
+        .scale(scale)
+        .translate(-target.x, -target.y)
+      select(canvas).transition().duration(600).call(zb.transform as any, transform)
+    },
+    [width, height]
+  )
+
+  // Focus when selection changes
+  useEffect(() => {
+    if (selected) focusNode(selected.obj_id)
+  }, [selected, focusNode])
+
+  // Redraw on highlight/state changes
+  useEffect(() => {
+    scheduleFrame()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state.hovered,
     selected,
-    hovered: state.hovered,
-    neighborMap,
     showNodeLabels,
     showRelLabels,
     zoomScale,
+    neighborMap,
+    encoding,
     NODE_COLORS,
     EDGE_COLORS,
-    encoding,
-  })
+    layout,
+  ])
 
-  // Main render effect
+  // ── applyLayout (pure position mutation, unchanged logic) ────────────────────
+  function applyLayout(
+    simNodes: SimNode[],
+    _simLinks: SimLink[],
+    effectiveLayout: GraphLayoutType,
+    workerPositions?: Map<string, { obj_id: string; x: number; y: number; vx?: number; vy?: number }>
+  ) {
+    const nodeMap = new Map(simNodes.map(n => [n.obj_id, n]))
+
+    if (effectiveLayout === 'force') {
+      if (workerPositions && workerPositions.size > 0) {
+        simNodes.forEach(n => {
+          const p = workerPositions.get(n.obj_id)
+          if (p) {
+            n.x = p.x
+            n.y = p.y
+            n.vx = p.vx ?? 0
+            n.vy = p.vy ?? 0
+          }
+        })
+      }
+      return
+    }
+
+    if (effectiveLayout === 'cluster' || effectiveLayout === 'galaxy') {
+      const positions = computeClusterPositions(
+        simNodes,
+        edges,
+        width,
+        height,
+        effectiveLayout === 'cluster' ? 85 : 130
+      )
+      positions.forEach((p, id) => {
+        const n = nodeMap.get(id)
+        if (n) { n.x = p.x; n.y = p.y }
+      })
+      return
+    }
+
+    if (effectiveLayout === 'circular') {
+      const positions = computeCircularPositions(simNodes, edges, width, height)
+      positions.forEach((p, id) => {
+        const n = nodeMap.get(id)
+        if (n) { n.x = p.x; n.y = p.y }
+      })
+      return
+    }
+
+    if (effectiveLayout === 'hierarchical') {
+      const rootId = findRootNodeId(simNodes, edges)
+      const treeData = buildHierarchy(simNodes, edges, rootId)
+      const root = hierarchy(treeData as any)
+      const treeLayout = tree().size([width - 120, height - 120]) as any
+      treeLayout(root)
+      root.each((d: any) => {
+        const n = nodeMap.get(d.data.id)
+        if (n) { n.x = (d.x ?? 0) + 60; n.y = (d.y ?? 0) + 60 }
+      })
+      return
+    }
+
+    if (effectiveLayout === 'radial') {
+      const rootId = findRootNodeId(simNodes, edges)
+      const treeData = buildHierarchy(simNodes, edges, rootId)
+      const root = hierarchy(treeData as any)
+      const radius = Math.min(width, height) / 2 - 80
+      const treeLayout = tree().size([2 * Math.PI, radius]) as any
+      treeLayout(root)
+      root.each((d: any) => {
+        const n = nodeMap.get(d.data.id)
+        if (n) {
+          const p = radialToCartesian(d.x ?? 0, d.y ?? 0)
+          n.x = p.x + width / 2
+          n.y = p.y + height / 2
+        }
+      })
+      return
+    }
+
+    if (effectiveLayout === 'geo') {
+      const coords = simNodes
+        .map(n => ({ n, coord: extractGeoCoord(n.props) }))
+        .filter(x => x.coord)
+      if (coords.length > 0) {
+        const lngs = coords.map(c => c.coord!.lng)
+        const lats = coords.map(c => c.coord!.lat)
+        const [minLng, maxLng] = extent(lngs) as [number, number]
+        const [minLat, maxLat] = extent(lats) as [number, number]
+        const xScale = scaleLinear().domain([minLng, maxLng]).range([80, width - 80])
+        const yScale = scaleLinear().domain([minLat, maxLat]).range([height - 80, 80])
+        coords.forEach(({ n, coord }) => {
+          const target = nodeMap.get(n.obj_id)
+          if (target && coord) {
+            target.x = xScale(coord.lng)
+            target.y = yScale(coord.lat)
+          }
+        })
+      }
+      return
+    }
+
+    if (effectiveLayout === 'time') {
+      const withYear = simNodes.map(n => ({ n, year: extractYear(n.props) })).filter(x => x.year != null)
+      if (withYear.length > 0) {
+        const years = withYear.map(x => x.year as number)
+        const [minYear, maxYear] = extent(years) as [number, number]
+        const xScale = scaleLinear().domain([minYear, maxYear]).range([100, width - 100])
+        const yScale = scaleBand(simNodes.map(n => n.obj_type), [height - 80, 80]).padding(0.2)
+        withYear.forEach(({ n, year }) => {
+          const target = nodeMap.get(n.obj_id)
+          if (target && year != null) {
+            target.x = xScale(year)
+            target.y = (yScale(n.obj_type) ?? height / 2) + yScale.bandwidth() / 2
+          }
+        })
+      }
+    }
+  }
+
+  // ── Main effect: setup simulation + canvas events ────────────────────────────
   useEffect(() => {
-    if (!svgRef.current || nodes.length === 0) return
+    if (!canvasRef.current || displayNodes.length === 0) return
     let cancelled = false
 
     async function init() {
       simRef.current?.stop()
 
-      const svg = select(svgRef.current)
-      svg.selectAll('*').remove()
+      const canvas = canvasRef.current!
 
-      // ── Visual defs ──────────────────────────────────────────────────────
-      const mainDefs = svg.append('defs')
-
-      // Dot-grid background pattern
-      const dotPattern = mainDefs.append('pattern')
-        .attr('id', 'eum-dot-grid').attr('width', 24).attr('height', 24)
-        .attr('patternUnits', 'userSpaceOnUse')
-      dotPattern.append('circle').attr('cx', 1).attr('cy', 1).attr('r', 1).attr('fill', 'rgba(255,255,255,0.055)')
-
-      // Glow filter for selected/hovered nodes
-      const glowFilter = mainDefs.append('filter')
-        .attr('id', 'eum-glow').attr('x', '-60%').attr('y', '-60%').attr('width', '220%').attr('height', '220%')
-      glowFilter.append('feGaussianBlur').attr('in', 'SourceGraphic').attr('stdDeviation', '5').attr('result', 'blur')
-      const glowMerge = glowFilter.append('feMerge')
-      glowMerge.append('feMergeNode').attr('in', 'blur')
-      glowMerge.append('feMergeNode').attr('in', 'SourceGraphic')
-      // ─────────────────────────────────────────────────────────────────────
-
-      // Dot-grid background rect (below the transform group)
-      svg.append('rect').attr('width', '100%').attr('height', '100%').attr('fill', 'url(#eum-dot-grid)')
-
-      const g = svg.append('g')
-      gRef.current = g
-
-      zoomRef.current = zoom<SVGSVGElement, unknown>()
-        .scaleExtent([0.2, 4])
-        .on('zoom', event => {
-          g.attr('transform', event.transform)
-          state.transformRef.current = event.transform
-          setZoomScale(event.transform.k)
-        })
-
-      svg.call(zoomRef.current as any)
-
-      const simNodes: SimNode[] = nodes.map(n => ({ ...n, degree: degrees.get(n.obj_id) ?? 0 }))
+      // Build sim data
+      const simNodes: SimNode[] = displayNodes.map(n => ({
+        ...n,
+        degree: degrees.get(n.obj_id) ?? 0,
+      }))
       const nodeMap = new Map(simNodes.map(n => [n.obj_id, n]))
 
-      const simLinks: SimLink[] = edges
+      const simLinks: SimLink[] = displayEdges
         .filter(e => activeRels.has(e.rel) && nodeMap.has(e.src) && nodeMap.has(e.dst))
         .map(e => ({ source: e.src, target: e.dst, rel: e.rel, weight: e.weight }))
 
+      nodesRef.current = simNodes
+      linksRef.current = simLinks
+
+      // Analysis overlays
+      anomalySetRef.current = new Set<string>(
+        analysisResult?.type === 'anomaly'
+          ? analysisResult.results.map(r => r.obj_id)
+          : []
+      )
+      communityMapRef.current = new Map<string, number>(
+        analysisResult?.type === 'community'
+          ? analysisResult.communities.flatMap(c =>
+              c.nodes.map(n => [n.obj_id, c.communityId] as [string, number])
+            )
+          : []
+      )
+
+      // Parallel edge detection
+      const edgePairSet = new Set<string>()
+      displayEdges.forEach(e => {
+        const key = [e.src, e.dst].sort().join('|')
+        edgePairSet.add(key)
+      })
+      parallelEdgeSetRef.current = edgePairSet
+
       let effectiveLayout = layout
 
-      if ((layout === 'geo' || layout === 'time') && !supportsLayout(layout, nodes)) {
+      if ((layout === 'geo' || layout === 'time') && !supportsLayout(layout, displayNodes)) {
         console.warn(
           `[OntologyGraph] layout '${layout}' requires ${layout === 'geo' ? 'lat/lng props' : 'year props'}, falling back to force`
         )
         effectiveLayout = 'force'
       }
 
-      let workerPositions: Map<string, { obj_id: string; x: number; y: number; vx?: number; vy?: number }> | undefined
+      // Web Worker for large graphs
+      let workerPositions:
+        | Map<string, { obj_id: string; x: number; y: number; vx?: number; vy?: number }>
+        | undefined
       if (effectiveLayout === 'force' && simNodes.length > WORKER_THRESHOLD) {
         setWorkerLoading(true)
         try {
@@ -280,271 +808,101 @@ export default function OntologyGraph({
 
       applyLayout(simNodes, simLinks, effectiveLayout, workerPositions)
 
-      // Geo/Time layout backgrounds
-      if (effectiveLayout === 'geo') {
-        const { lines, labels } = buildGeoGrid(width, height)
-        const grid = g.append('g').attr('class', 'geo-grid')
-        grid
-          .selectAll('line')
-          .data(lines)
-          .enter()
-          .append('line')
-          .attr('x1', d => d.x1)
-          .attr('y1', d => d.y1)
-          .attr('x2', d => d.x2)
-          .attr('y2', d => d.y2)
-          .attr('stroke', 'rgba(255,255,255,0.06)')
-          .attr('stroke-width', 1)
-        grid
-          .selectAll('text')
-          .data(labels)
-          .enter()
-          .append('text')
-          .attr('x', d => d.x)
-          .attr('y', d => d.y)
-          .attr('fill', 'rgba(255,255,255,0.25)')
-          .attr('font-size', 10)
-          .attr('text-anchor', 'end')
-          .text(d => d.text)
-      }
-
-      if (effectiveLayout === 'time') {
-        const years = simNodes.map(n => extractYear(n.props)).filter((y): y is number => y != null)
-        const { ticks } = buildTimeAxis(width, height, years, simNodes.map(n => n.obj_type))
-        const axis = g.append('g').attr('class', 'time-axis')
-        axis
-          .selectAll('line.time-grid')
-          .data(ticks.filter(t => t.type === 'year'))
-          .enter()
-          .append('line')
-          .attr('class', 'time-grid')
-          .attr('x1', d => d.x)
-          .attr('y1', 60)
-          .attr('x2', d => d.x)
-          .attr('y2', height - 60)
-          .attr('stroke', 'rgba(255,255,255,0.06)')
-          .attr('stroke-width', 1)
-        axis
-          .selectAll('text')
-          .data(ticks)
-          .enter()
-          .append('text')
-          .attr('x', d => d.x)
-          .attr('y', d => d.y)
-          .attr('fill', d => (d.type === 'year' ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.25)'))
-          .attr('font-size', d => (d.type === 'year' ? 10 : 9))
-          .attr('text-anchor', d => (d.type === 'year' ? 'middle' : 'end'))
-          .attr('dy', d => (d.type === 'year' ? 0 : '0.35em'))
-          .text(d => d.text)
-      }
-
-      // CSS animations for anomaly pulse
-      svg.append('defs').append('style').text(`
-        @keyframes eum-pulse {
-          0% { opacity: 0.9; r: attr(r px); }
-          70% { opacity: 0; r: calc(attr(r px) + 12px); }
-          100% { opacity: 0; }
-        }
-        .anomaly-ring {
-          animation: eum-pulse 1.8s ease-out infinite;
-          pointer-events: none;
-        }
-      `)
-
-      // anomaly 노드 집합 (analysisResult에서 추출)
-      const anomalySet = new Set<string>(
-        analysisResult?.type === 'anomaly'
-          ? analysisResult.results.map(r => r.obj_id)
-          : []
-      )
-
-      // community 노드 → communityId 맵
-      const communityMap = new Map<string, number>(
-        analysisResult?.type === 'community'
-          ? analysisResult.communities.flatMap(c => c.nodes.map(n => [n.obj_id, c.communityId] as [string, number]))
-          : []
-      )
-
-      // arrowhead marker
-      svg
-        .append('defs')
-        .selectAll('marker')
-        .data(Object.keys(EDGE_COLORS).concat(['default']))
-        .enter()
-        .append('marker')
-        .attr('id', d => `arrow-${d}`)
-        .attr('viewBox', '0 -4 8 8')
-        .attr('refX', 14)
-        .attr('refY', 0)
-        .attr('markerWidth', 5)
-        .attr('markerHeight', 5)
-        .attr('orient', 'auto')
-        .append('path')
-        .attr('fill', d => EDGE_COLORS[d] ?? DEFAULT_EDGE_COLOR)
-        .attr('d', 'M0,-4L8,0L0,4')
-
-      const link = g
-        .append('g')
-        .attr('class', 'links')
-        .selectAll('path')
-        .data(simLinks)
-        .enter()
-        .append('path')
-        .attr('class', 'graph-link')
-        .attr('fill', 'none')
-        .attr('stroke', d => encoding?.edgeColors.get(edgeLookupKey(d)) ?? EDGE_COLORS[d.rel] ?? DEFAULT_EDGE_COLOR)
-        .attr('stroke-width', d => encoding?.edgeWidths.get(edgeLookupKey(d)) ?? Math.max(1, Math.sqrt(d.weight ?? 1) * 1.1))
-        .attr('stroke-opacity', linkBaseOpacity(zoomScale))
-        .attr('marker-end', d => `url(#arrow-${EDGE_COLORS[d.rel] ? d.rel : 'default'})`)
-
-      const linkLabel = g
-        .append('g')
-        .attr('class', 'link-labels')
-        .selectAll('text')
-        .data(simLinks)
-        .enter()
-        .append('text')
-        .attr('class', 'graph-link-label')
-        .attr('font-size', 10)
-        .attr('font-weight', 500)
-        .attr('fill', '#E2E8F0')
-        .attr('text-anchor', 'middle')
-        .attr('dy', -5)
-        .style('pointer-events', 'none')
-        .style('text-shadow', '0 1px 2px rgba(0,0,0,0.8)')
-        .style('opacity', d => linkLabelOpacity(d as SimLink, zoomScale, showRelLabels, null))
-        .text(d => d.rel)
-
-      const node = g
-        .append('g')
-        .attr('class', 'nodes')
-        .selectAll('g')
-        .data(simNodes)
-        .enter()
-        .append('g')
-        .attr('class', 'graph-node')
-        .attr('cursor', 'pointer')
-        .call(
-          drag<SVGGElement, SimNode>()
-            .on('start', (event, d) => {
-              if (!event.active) simRef.current?.alphaTarget(0.3).restart()
-              d.fx = d.x
-              d.fy = d.y
-            })
-            .on('drag', (event, d) => {
-              d.fx = event.x
-              d.fy = event.y
-            })
-            .on('end', (event, d) => {
-              if (!event.active) simRef.current?.alphaTarget(0)
-              d.fx = null
-              d.fy = null
-            })
-        )
-        .on('mouseenter', (event, d) => {
-          setHovered({ ...d })
-          if (wrapRef.current) {
-            const rect = wrapRef.current.getBoundingClientRect()
-            setTooltip({ node: d, x: event.clientX - rect.left + 14, y: event.clientY - rect.top - 14 })
-          }
+      // ── D3 Zoom on canvas ───────────────────────────────────────────────────
+      const zb = zoom<HTMLCanvasElement, unknown>()
+        .scaleExtent([0.1, 4])
+        .on('zoom', e => {
+          const t: ZoomTransform = e.transform
+          transformRef.current = { k: t.k, x: t.x, y: t.y }
+          // Also sync to useGraphState.transformRef for MiniMap
+          state.transformRef.current = t as unknown as typeof state.transformRef.current
+          setZoomScale(t.k)
+          scheduleFrame()
         })
-        .on('mousemove', (event, d) => {
-          if (wrapRef.current) {
-            const rect = wrapRef.current.getBoundingClientRect()
-            setTooltip({ node: d, x: event.clientX - rect.left + 14, y: event.clientY - rect.top - 14 })
-          }
+      zoomBehaviorRef.current = zb
+      select(canvas).call(zb)
+
+      // ── D3 drag on canvas ───────────────────────────────────────────────────
+      const dragBehavior = drag<HTMLCanvasElement, unknown>()
+        .filter(event => {
+          // Only drag if the pointer is on a node
+          const rect = canvas.getBoundingClientRect()
+          const node = getNodeAt(event.clientX - rect.left, event.clientY - rect.top)
+          return node !== null
         })
-        .on('mouseleave', () => {
+        .on('start', event => {
+          const rect = canvas.getBoundingClientRect()
+          const node = getNodeAt(event.clientX - rect.left, event.clientY - rect.top)
+          if (!node) return
+          if (!event.active) simRef.current?.alphaTarget(0.3).restart()
+          node.fx = node.x
+          node.fy = node.y
+          ;(event as any)._draggingNode = node
+        })
+        .on('drag', event => {
+          const node: SimNode | undefined = (event as any)._draggingNode
+          if (!node) return
+          const { k, x, y } = transformRef.current
+          node.fx = (event.x - x) / k
+          node.fy = (event.y - y) / k
+        })
+        .on('end', event => {
+          const node: SimNode | undefined = (event as any)._draggingNode
+          if (!node) return
+          if (!event.active) simRef.current?.alphaTarget(0)
+          node.fx = null
+          node.fy = null
+        })
+
+      // Apply drag after zoom so drag can steal pointer events for nodes
+      select(canvas).call(dragBehavior as any)
+
+      // ── Canvas pointer events ───────────────────────────────────────────────
+      function onMouseMove(e: MouseEvent) {
+        const rect = canvas.getBoundingClientRect()
+        const node = getNodeAt(e.clientX - rect.left, e.clientY - rect.top)
+        if (node) {
+          canvas.style.cursor = 'pointer'
+          setHovered({ ...node })
+          setTooltip({ node, x: e.clientX - rect.left + 14, y: e.clientY - rect.top - 14 })
+        } else {
+          canvas.style.cursor = 'grab'
           setHovered(null)
           setTooltip(null)
-        })
-        .on('click', (_event, d) => {
-          const n = { ...d }
-          setSelected(n)
-          onSelectProp?.(n)
-        })
-        .on('dblclick', (_event, d) => {
-          onDoubleClick?.({ ...d })
-        })
+        }
+      }
 
-      // 이상탐지 펄스 링 (circle 앞에 삽입)
-      node
-        .filter(d => anomalySet.has(d.obj_id))
-        .append('circle')
-        .attr('class', 'anomaly-ring')
-        .attr('r', d => (encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d)) + 4)
-        .attr('fill', 'none')
-        .attr('stroke', '#EF4444')
-        .attr('stroke-width', 2.5)
+      function onClick(e: MouseEvent) {
+        const rect = canvas.getBoundingClientRect()
+        const node = getNodeAt(e.clientX - rect.left, e.clientY - rect.top)
+        if (node) {
+          setSelected({ ...node })
+          onSelectProp?.({ ...node })
+        } else {
+          setSelected(null)
+          onSelectProp?.(null)
+        }
+      }
 
-      // 노드 타입 외곽 링 — 타입 색상을 낮은 opacity로 표시
-      node
-        .append('circle')
-        .attr('class', 'node-type-ring')
-        .attr('r', d => (encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d)) + 3.5)
-        .attr('fill', 'none')
-        .attr('stroke', d => NODE_COLORS[d.obj_type] ?? DEFAULT_NODE_COLOR)
-        .attr('stroke-width', 1.5)
-        .attr('stroke-opacity', 0.45)
+      let lastClickTime = 0
+      let lastClickNode: SimNode | null = null
+      function onDblClick(e: MouseEvent) {
+        const rect = canvas.getBoundingClientRect()
+        const node = getNodeAt(e.clientX - rect.left, e.clientY - rect.top)
+        if (node) onDoubleClick?.({ ...node })
+      }
 
-      node
-        .append('circle')
-        .attr('r', d => encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d))
-        .attr('fill', d => encoding?.nodeColors.get(d.obj_id) ?? NODE_COLORS[d.obj_type] ?? DEFAULT_NODE_COLOR)
-        .attr('stroke', d => anomalySet.has(d.obj_id) ? '#EF4444' : (encoding?.nodeStrokes.get(d.obj_id) ?? 'rgba(255,255,255,0.6)'))
-        .attr('stroke-width', d => anomalySet.has(d.obj_id) ? 2 : lodStrokeWidth(zoomScale, false))
+      function onMouseLeave() {
+        setHovered(null)
+        setTooltip(null)
+      }
 
-      // 노드 타입 이모지 아이콘
-      node
-        .filter(d => !!NODE_TYPE_ICON[d.obj_type])
-        .append('text')
-        .attr('class', 'node-icon')
-        .attr('text-anchor', 'middle')
-        .attr('dominant-baseline', 'central')
-        .attr('font-size', d => Math.round((encoding?.nodeRadii.get(d.obj_id) ?? baseNodeRadius(d)) * 0.85))
-        .style('pointer-events', 'none')
-        .style('user-select', 'none')
-        .text(d => NODE_TYPE_ICON[d.obj_type] ?? '')
+      canvas.addEventListener('mousemove', onMouseMove)
+      canvas.addEventListener('click', onClick)
+      canvas.addEventListener('dblclick', onDblClick)
+      canvas.addEventListener('mouseleave', onMouseLeave)
 
-      const labelGroup = node
-        .append('g')
-        .attr('class', 'node-label')
-        .style('opacity', d => nodeLabelOpacity(d as SimNode, zoomScale, showNodeLabels, null, null))
-        .style('pointer-events', 'none')
-
-      labelGroup
-        .append('rect')
-        .attr('x', d => {
-          const len = Math.min(d.label.length, 10)
-          return -(len * 5.5 + 4) / 2
-        })
-        .attr('y', -8)
-        .attr('width', d => Math.min(d.label.length, 10) * 5.5 + 4)
-        .attr('height', 14)
-        .attr('rx', 3)
-        .attr('fill', 'rgba(0,0,0,0.45)')
-        .attr('stroke', 'rgba(255,255,255,0.1)')
-        .attr('stroke-width', 0.5)
-
-      labelGroup
-        .append('text')
-        .attr('text-anchor', 'middle')
-        .attr('dy', '0.35em')
-        .attr('font-size', 9)
-        .attr('font-weight', 600)
-        .attr('fill', '#fff')
-        .style('text-shadow', '0 1px 2px rgba(0,0,0,0.7)')
-        .style('paint-order', 'stroke')
-        .text(d => {
-          const maxLen = 10
-          return d.label.length > maxLen ? `${d.label.slice(0, maxLen)}…` : d.label
-        })
-
-      node.append('title').text(d => `${d.label} (${d.obj_type})`)
-
-      const sim = forceSimulation<SimNode>(simNodes)
-
-      const sigunIds = simNodes.filter(n => n.obj_type === '시군').map(n => n.obj_id)
+      // ── Force simulation ────────────────────────────────────────────────────
       const clusterCenters = computeClusterPositions(simNodes, edges, width, height, 100)
       const clusterForceX = forceX<SimNode>(d => {
         if (d.obj_type === '시군') return clusterCenters.get(d.obj_id)?.x ?? width / 2
@@ -560,6 +918,8 @@ export default function OntologyGraph({
           edges.find(e => e.src === d.obj_id && e.dst.startsWith('sigun:'))?.dst
         return clusterCenters.get(parent ?? '')?.y ?? height / 2
       }).strength(0.06)
+
+      const sim = forceSimulation<SimNode>(simNodes)
 
       if (effectiveLayout === 'force') {
         const linkDistance = Math.min(180, Math.max(45, 700 / Math.sqrt(simNodes.length)))
@@ -595,27 +955,8 @@ export default function OntologyGraph({
           .alphaDecay(0.03)
       }
 
-      const arcPath = (d: SimLink): string => {
-        const sx = (d.source as SimNode).x ?? 0
-        const sy = (d.source as SimNode).y ?? 0
-        const tx = (d.target as SimNode).x ?? 0
-        const ty = (d.target as SimNode).y ?? 0
-        const dx = tx - sx, dy = ty - sy
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < 1) return `M${sx},${sy}`
-        const dr = dist * 0.45
-        return `M${sx},${sy}A${dr},${dr} 0 0,1 ${tx},${ty}`
-      }
-
       sim.on('tick', () => {
-        link.attr('d', arcPath)
-
-        linkLabel
-          .attr('x', d => (((d.source as SimNode).x ?? 0) + ((d.target as SimNode).x ?? 0)) / 2)
-          .attr('y', d => (((d.source as SimNode).y ?? 0) + ((d.target as SimNode).y ?? 0)) / 2)
-
-        node.attr('transform', d => `translate(${d.x ?? 0},${d.y ?? 0})`)
-
+        scheduleFrame()
         const now = performance.now()
         if (now - lastMinimapUpdateRef.current > 250) {
           lastMinimapUpdateRef.current = now
@@ -626,156 +967,34 @@ export default function OntologyGraph({
       simRef.current = sim
       if (paused) sim.stop()
 
-      const fitOnce = () => {
-        const bounds = (g.node() as SVGGElement)?.getBBox()
-        if (bounds && bounds.width > 0 && bounds.height > 0) {
-          fitToBounds()
-        }
-      }
-      if (!paused) {
-        sim.on('end', () => {
-          fitOnce()
-          sim.on('end', null)
-        })
-      } else {
-        setTimeout(fitOnce, 100)
-      }
-    }
+      sim.on('end', () => {
+        fitToBounds()
+        sim.on('end', null)
+        setNodePositions(simNodes.map(n => ({ obj_id: n.obj_id, x: n.x ?? 0, y: n.y ?? 0 })))
+      })
 
-    function applyLayout(
-      simNodes: SimNode[],
-      _simLinks: SimLink[],
-      effectiveLayout: GraphLayoutType,
-      workerPositions?: Map<string, { obj_id: string; x: number; y: number; vx?: number; vy?: number }>
-    ) {
-      const nodeMap = new Map(simNodes.map(n => [n.obj_id, n]))
+      scheduleFrame()
 
-      if (effectiveLayout === 'force') {
-        if (workerPositions && workerPositions.size > 0) {
-          simNodes.forEach(n => {
-            const p = workerPositions.get(n.obj_id)
-            if (p) {
-              n.x = p.x
-              n.y = p.y
-              n.vx = p.vx ?? 0
-              n.vy = p.vy ?? 0
-            }
-          })
-        }
-        return
-      }
-
-      if (effectiveLayout === 'cluster' || effectiveLayout === 'galaxy') {
-        const positions = computeClusterPositions(
-          simNodes,
-          edges,
-          width,
-          height,
-          effectiveLayout === 'cluster' ? 85 : 130
-        )
-        positions.forEach((p, id) => {
-          const n = nodeMap.get(id)
-          if (n) {
-            n.x = p.x
-            n.y = p.y
-          }
-        })
-        return
-      }
-
-      if (effectiveLayout === 'circular') {
-        const positions = computeCircularPositions(simNodes, edges, width, height)
-        positions.forEach((p, id) => {
-          const n = nodeMap.get(id)
-          if (n) {
-            n.x = p.x
-            n.y = p.y
-          }
-        })
-        return
-      }
-
-      if (effectiveLayout === 'hierarchical') {
-        const rootId = findRootNodeId(simNodes, edges)
-        const treeData = buildHierarchy(simNodes, edges, rootId)
-        const root = hierarchy(treeData as any)
-        const treeLayout = tree().size([width - 120, height - 120]) as any
-        treeLayout(root)
-        root.each((d: any) => {
-          const n = nodeMap.get(d.data.id)
-          if (n) {
-            n.x = (d.x ?? 0) + 60
-            n.y = (d.y ?? 0) + 60
-          }
-        })
-        return
-      }
-
-      if (effectiveLayout === 'radial') {
-        const rootId = findRootNodeId(simNodes, edges)
-        const treeData = buildHierarchy(simNodes, edges, rootId)
-        const root = hierarchy(treeData as any)
-        const radius = Math.min(width, height) / 2 - 80
-        const treeLayout = tree().size([2 * Math.PI, radius]) as any
-        treeLayout(root)
-        root.each((d: any) => {
-          const n = nodeMap.get(d.data.id)
-          if (n) {
-            const p = radialToCartesian(d.x ?? 0, d.y ?? 0)
-            n.x = p.x + width / 2
-            n.y = p.y + height / 2
-          }
-        })
-        return
-      }
-
-      if (effectiveLayout === 'geo') {
-        const coords = simNodes
-          .map(n => ({ n, coord: extractGeoCoord(n.props) }))
-          .filter(x => x.coord)
-        if (coords.length > 0) {
-          const lngs = coords.map(c => c.coord!.lng)
-          const lats = coords.map(c => c.coord!.lat)
-          const [minLng, maxLng] = extent(lngs) as [number, number]
-          const [minLat, maxLat] = extent(lats) as [number, number]
-          const xScale = scaleLinear().domain([minLng, maxLng]).range([80, width - 80])
-          const yScale = scaleLinear().domain([minLat, maxLat]).range([height - 80, 80])
-          coords.forEach(({ n, coord }) => {
-            const target = nodeMap.get(n.obj_id)
-            if (target && coord) {
-              target.x = xScale(coord.lng)
-              target.y = yScale(coord.lat)
-            }
-          })
-        }
-        return
-      }
-
-      if (effectiveLayout === 'time') {
-        const withYear = simNodes.map(n => ({ n, year: extractYear(n.props) })).filter(x => x.year != null)
-        if (withYear.length > 0) {
-          const years = withYear.map(x => x.year as number)
-          const [minYear, maxYear] = extent(years) as [number, number]
-          const xScale = scaleLinear().domain([minYear, maxYear]).range([100, width - 100])
-          const yScale = scaleBand(simNodes.map(n => n.obj_type), [height - 80, 80]).padding(0.2)
-          withYear.forEach(({ n, year }) => {
-            const target = nodeMap.get(n.obj_id)
-            if (target && year != null) {
-              target.x = xScale(year)
-              target.y = (yScale(n.obj_type) ?? height / 2) + yScale.bandwidth() / 2
-            }
-          })
-        }
+      return () => {
+        canvas.removeEventListener('mousemove', onMouseMove)
+        canvas.removeEventListener('click', onClick)
+        canvas.removeEventListener('dblclick', onDblClick)
+        canvas.removeEventListener('mouseleave', onMouseLeave)
+        select(canvas).on('.zoom', null)
+        select(canvas).on('.drag', null)
       }
     }
 
-    init()
+    let cleanup: (() => void) | undefined
+    init().then(c => { if (c) cleanup = c })
 
     return () => {
       cancelled = true
       simRef.current?.stop()
+      cancelAnimationFrame(rafRef.current)
+      cleanup?.()
     }
-    // paused is intentionally excluded: play/pause is handled by togglePhysics to avoid rebuilding the graph
+    // paused intentionally excluded — handled by togglePhysics
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     displayNodes,
@@ -786,11 +1005,6 @@ export default function OntologyGraph({
     degrees,
     onSelectProp,
     onDoubleClick,
-    showNodeLabels,
-    showRelLabels,
-    zoomScale,
-    NODE_COLORS,
-    EDGE_COLORS,
     layout,
     runWorkerLayout,
     setZoomScale,
@@ -799,13 +1013,9 @@ export default function OntologyGraph({
     setHovered,
     setSelected,
     simRef,
-    svgRef,
-    gRef,
-    zoomRef,
     lastMinimapUpdateRef,
     encoding,
-    fitToBounds,
-    // paused is intentionally excluded: play/pause is handled by togglePhysics to avoid rebuilding the graph
+    analysisResult,
   ])
 
   const selectedProps = selected ? parseProps(selected.props) : {}
@@ -849,7 +1059,7 @@ export default function OntologyGraph({
         className="relative bg-gray-900 rounded-lg overflow-hidden"
         style={{ height: fullscreen ? '100vh' : height }}
       >
-        {/* analysis overlay legend */}
+        {/* Analysis overlay legend */}
         {encoding && encoding.legend.length > 0 && (
           <div className="absolute top-3 left-3 bg-gray-900/80 backdrop-blur-sm text-white text-xs rounded-xl p-3 space-y-1.5 z-10 shadow-lg border border-white/10 max-w-[180px]">
             <div className="font-semibold text-gray-200 mb-1">분석 오버레이</div>
@@ -866,7 +1076,7 @@ export default function OntologyGraph({
           </div>
         )}
 
-        {/* legend */}
+        {/* Legend */}
         <div className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm text-white text-xs rounded-xl p-3 space-y-1.5 z-10 shadow-lg border border-white/10">
           <div className="font-semibold text-gray-200 mb-1">노드 타입</div>
           {Object.entries(NODE_COLORS).map(([k, c]) => (
@@ -885,38 +1095,35 @@ export default function OntologyGraph({
           ))}
         </div>
 
-        {/* stats */}
+        {/* Stats */}
         <div className="absolute bottom-3 left-3 bg-black/60 text-white text-[10px] rounded-lg px-2.5 py-1.5 z-10 space-y-0.5">
           <div>노드 {displayNodes.length}개 · 엣지 {displayEdges.length}개</div>
           {layout && <div>레이아웃: {layout}</div>}
           {state.workerLoading && <div>Worker 레이아웃 계산 중...</div>}
           {selected && <div>선택: {selected.label}</div>}
-          {state.hovered && state.hovered.obj_id !== selected?.obj_id && <div>포인터: {state.hovered.label}</div>}
+          {state.hovered && state.hovered.obj_id !== selected?.obj_id && (
+            <div>포인터: {state.hovered.label}</div>
+          )}
         </div>
 
         <MiniMap
           nodes={state.nodePositions}
-          transform={{ x: state.transformRef.current.x, y: state.transformRef.current.y, k: state.transformRef.current.k }}
+          transform={{
+            x: transformRef.current.x,
+            y: transformRef.current.y,
+            k: transformRef.current.k,
+          }}
           width={width}
           height={height}
         />
 
-        <svg
-          ref={svgRef}
-          data-testid="ontology-graph-svg"
+        <canvas
+          ref={canvasRef}
+          data-testid="ontology-graph-canvas"
           role="img"
           aria-label={`온톨로지 그래프, 노드 ${displayNodes.length}개, 엣지 ${displayEdges.length}개${selected ? `, 선택된 노드 ${selected.label}` : ''}`}
-          width="100%"
-          height="100%"
-          viewBox={`0 0 ${width} ${height}`}
-          preserveAspectRatio="xMidYMid meet"
           className="w-full h-full cursor-grab active:cursor-grabbing"
-          onClick={e => {
-            if (e.target === e.currentTarget) {
-              setSelected(null)
-              onSelectProp?.(null)
-            }
-          }}
+          style={{ display: 'block' }}
         />
 
         {/* 노드 호버 툴팁 */}
@@ -933,32 +1140,16 @@ export default function OntologyGraph({
           </div>
         )}
 
-        {/* 지도 오버레이 (Kakao Map 통합은 TODO) */}
+        {/* 지도 오버레이 — Kakao 지도 패널 */}
         {showMap && (
-          <div className="absolute bottom-14 left-3 z-20 bg-gray-900/90 backdrop-blur-sm border border-white/10 rounded-xl p-3 w-64 max-h-72 overflow-auto shadow-lg">
-            <div className="text-xs font-semibold text-gray-200 mb-2 flex items-center justify-between">
-              <span>Geo 노드</span>
-              <span className="text-[10px] text-gray-400">Kakao Map 통합 TODO</span>
-            </div>
-            {nodes.filter(n => extractGeoCoord(n.props)).length === 0 ? (
-              <p className="text-[11px] text-gray-400">geo 좌표를 가진 노드가 없습니다</p>
-            ) : (
-              <ul className="space-y-1">
-                {nodes
-                  .filter(n => extractGeoCoord(n.props))
-                  .map(n => {
-                    const coord = extractGeoCoord(n.props)
-                    return (
-                      <li key={n.obj_id} className="text-[11px] text-gray-300 flex justify-between">
-                        <span className="truncate pr-2">{n.label}</span>
-                        <span className="text-gray-500 flex-shrink-0">
-                          {coord?.lat.toFixed(3)}, {coord?.lng.toFixed(3)}
-                        </span>
-                      </li>
-                    )
-                  })}
-              </ul>
-            )}
+          <div className="absolute bottom-14 left-3 z-20 rounded-xl overflow-hidden shadow-xl w-80 h-72 border border-white/10">
+            <KakaoOntologyMap
+              nodes={displayNodes}
+              links={displayEdges}
+              selectedId={selected?.obj_id ?? null}
+              onSelect={node => onSelectProp?.(node)}
+              className="w-full h-full"
+            />
           </div>
         )}
 
@@ -1012,7 +1203,9 @@ export default function OntologyGraph({
                 ))}
               </ul>
               {displayNodes.length > 50 && (
-                <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2">외 {displayNodes.length - 50}개 노드가 더 있습니다.</p>
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2">
+                  외 {displayNodes.length - 50}개 노드가 더 있습니다.
+                </p>
               )}
             </div>
           </div>
@@ -1028,7 +1221,9 @@ export default function OntologyGraph({
                 style={{ backgroundColor: NODE_COLORS[selected.obj_type] ?? DEFAULT_NODE_COLOR }}
               />
               <span className="font-medium text-gray-800">{selected.label}</span>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{selected.obj_type}</span>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                {selected.obj_type}
+              </span>
               <span className="text-xs text-gray-400">연결 {degrees.get(selected.obj_id) ?? 0}개</span>
             </div>
             <button

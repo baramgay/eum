@@ -1,3 +1,5 @@
+'use client'
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 
 type Color = 'blue' | 'green' | 'amber' | 'red' | 'purple' | 'gray'
@@ -8,6 +10,7 @@ interface StatCardProps {
   icon?: ReactNode
   trend?: string
   trendUp?: boolean
+  draggable?: boolean
 }
 const colorMap: Record<Color, string> = {
   blue: 'text-blue-600',
@@ -17,9 +20,15 @@ const colorMap: Record<Color, string> = {
   purple: 'text-purple-600',
   gray: 'text-gray-700',
 }
-export default function StatCard({ label, value, color = 'blue', icon, trend, trendUp }: StatCardProps) {
+export default function StatCard({ label, value, color = 'blue', icon, trend, trendUp, draggable }: StatCardProps) {
+  const [isDragging, setIsDragging] = useState(false)
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
+    <div
+      className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 ${draggable ? (isDragging ? 'cursor-grabbing ring-2 ring-blue-400 shadow-xl scale-[1.02] opacity-90' : 'cursor-grab') : ''} transition-all duration-150`}
+      draggable={draggable}
+      onDragStart={draggable ? e => { e.dataTransfer.effectAllowed = 'move'; setIsDragging(true) } : undefined}
+      onDragEnd={draggable ? () => setIsDragging(false) : undefined}
+    >
       <div className="flex items-start justify-between">
         <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
         {icon && <span className="text-xl">{icon}</span>}

@@ -16,6 +16,7 @@ import {
   Search,
   X,
   Map,
+  HelpCircle,
 } from 'lucide-react'
 import { Btn } from '@/components/ui'
 import type { GraphLayoutType } from '@/lib/ontology/types'
@@ -53,16 +54,18 @@ export interface GraphToolbarProps {
   onToggleMap?: () => void
 }
 
-const LAYOUT_OPTIONS: { value: GraphLayoutType; label: string }[] = [
-  { value: 'force', label: 'Force' },
-  { value: 'cluster', label: 'Cluster' },
-  { value: 'galaxy', label: 'Galaxy' },
-  { value: 'circular', label: 'Circular' },
-  { value: 'hierarchical', label: 'Hierarchical' },
-  { value: 'radial', label: 'Radial' },
-  { value: 'geo', label: 'Geo' },
-  { value: 'time', label: 'Time' },
+const LAYOUT_OPTIONS: { value: GraphLayoutType; label: string; title: string }[] = [
+  { value: 'force',       label: 'Force',       title: '물리 기반 자동 배치' },
+  { value: 'cluster',     label: 'Cluster',     title: '시군별 군집화' },
+  { value: 'galaxy',      label: 'Galaxy',      title: '넓은 군집 배치' },
+  { value: 'circular',    label: 'Circular',    title: '원형 배치' },
+  { value: 'hierarchical',label: 'Hierarchical',title: '계층 트리 배치' },
+  { value: 'radial',      label: 'Radial',      title: '방사형 배치' },
+  { value: 'geo',         label: 'Geo',         title: '실제 지리좌표 배치' },
+  { value: 'time',        label: 'Time',        title: '시간축 배치' },
 ]
+
+const LAYOUT_HELP = LAYOUT_OPTIONS
 
 export default function GraphToolbar({
   layout,
@@ -97,8 +100,10 @@ export default function GraphToolbar({
 }: GraphToolbarProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const helpRef = useRef<HTMLDivElement>(null)
 
   const suggestions = useMemo(() => {
     const q = searchTerm.trim().toLowerCase()
@@ -116,6 +121,9 @@ export default function GraphToolbar({
     function handleClickOutside(e: MouseEvent) {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setIsOpen(false)
+      }
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
+        setShowHelp(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -206,10 +214,11 @@ export default function GraphToolbar({
           value={layout}
           onChange={e => onLayoutChange(e.target.value as GraphLayoutType)}
           className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900"
-          aria-label="그래프 레이아웃"
+          aria-label="그래프 레이아웃 선택"
+          title="레이아웃 방식을 선택합니다"
         >
           {LAYOUT_OPTIONS.map(o => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+            <option key={o.value} value={o.value} title={o.title}>{o.label}</option>
           ))}
         </select>
 
@@ -218,6 +227,7 @@ export default function GraphToolbar({
           <button
             key={rel}
             onClick={() => onToggleRel(rel)}
+            title={`관계 "${rel}" ${activeRels.has(rel) ? '숨기기' : '표시'}`}
             className={`text-[11px] px-2 py-0.5 rounded-full border transition-colors ${
               activeRels.has(rel)
                 ? 'text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
@@ -241,10 +251,12 @@ export default function GraphToolbar({
               onChange={e => onYearChange?.(Number(e.target.value))}
               className="w-24 accent-indigo-600"
               aria-label="연도 필터"
+              title={`연도 필터: ${yearFilter ?? years[years.length - 1]}년`}
             />
             <button
               type="button"
               onClick={() => onYearChange?.(null)}
+              title="전체 연도 표시"
               className={`text-[11px] px-2 py-0.5 rounded-full border ${
                 yearFilter === null
                   ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
@@ -277,23 +289,23 @@ export default function GraphToolbar({
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <Btn onClick={onZoomIn} variant="secondary" size="sm" title="확대">
+        <Btn onClick={onZoomIn} variant="secondary" size="sm" title="줌 인 (+)">
           <ZoomIn className="w-3.5 h-3.5" />
         </Btn>
-        <Btn onClick={onZoomOut} variant="secondary" size="sm" title="축소">
+        <Btn onClick={onZoomOut} variant="secondary" size="sm" title="줌 아웃 (-)">
           <ZoomOut className="w-3.5 h-3.5" />
         </Btn>
-        <Btn onClick={onFit} variant="secondary" size="sm" title="전체 노드 보기">
+        <Btn onClick={onFit} variant="secondary" size="sm" title="화면 맞춤">
           <Move className="w-3.5 h-3.5" /> 전체 보기
         </Btn>
-        <Btn onClick={onTogglePhysics} variant="secondary" size="sm" title={paused ? '물리 시뮬레이션 재개' : '물리 시뮬레이션 일시정지'}>
+        <Btn onClick={onTogglePhysics} variant="secondary" size="sm" title="물리 시뮬레이션 켜기/끄기">
           {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
           {paused ? '재개' : '정지'}
         </Btn>
-        <Btn onClick={onResetZoom} variant="secondary" size="sm" title="초기 위치">
+        <Btn onClick={onResetZoom} variant="secondary" size="sm" title="초기 위치로 복귀">
           <RotateCcw className="w-3.5 h-3.5" /> 초기 위치
         </Btn>
-        <Btn onClick={onReheat} variant="secondary" size="sm" title="시뮬레이션 재가열">
+        <Btn onClick={onReheat} variant="secondary" size="sm" title="물리 기반 자동 배치 (Force Layout)">
           <RefreshCw className="w-3.5 h-3.5" /> 레이아웃
         </Btn>
         <Btn onClick={onToggleFullscreen} variant="secondary" size="sm" title="전체화면">
@@ -307,9 +319,41 @@ export default function GraphToolbar({
         >
           <Map className="w-3.5 h-3.5" /> 지도
         </Btn>
-        <Btn onClick={onExportPng} loading={exporting} variant="secondary" size="sm" title="PNG 저장">
+        <Btn onClick={onExportPng} loading={exporting} variant="secondary" size="sm" title="PNG 내보내기">
           <Camera className="w-3.5 h-3.5" /> PNG
         </Btn>
+
+        {/* Help button */}
+        <div ref={helpRef} className="relative">
+          <button
+            type="button"
+            title="도움말"
+            onClick={() => setShowHelp(v => !v)}
+            className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-xs font-bold"
+            aria-label="그래프 도움말"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+          </button>
+
+          {showHelp && (
+            <div className="absolute right-0 top-9 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 min-w-[280px]">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-200 mb-2">레이아웃 종류</p>
+              <ul className="space-y-1 mb-3">
+                {LAYOUT_HELP.map(o => (
+                  <li key={o.value} className="flex gap-2 text-xs text-gray-600 dark:text-gray-300">
+                    <span className="font-medium text-gray-700 dark:text-gray-200 w-20 flex-shrink-0">{o.label}</span>
+                    <span>{o.title}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="border-t border-gray-100 dark:border-gray-700 pt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="font-medium text-gray-700 dark:text-gray-200">Physics:</span> 시뮬레이션 활성화 시 노드가 서로 밀고 당기며 자동 배치됩니다
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
