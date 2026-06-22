@@ -120,7 +120,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
                 max={100}
                 value={top}
                 onChange={e => setTop(Number(e.target.value))}
-                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
+                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
               />
             </label>
           </div>
@@ -177,7 +177,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
                 max={100}
                 value={top}
                 onChange={e => setTop(Number(e.target.value))}
-                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm"
+                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
               />
             </label>
           </div>

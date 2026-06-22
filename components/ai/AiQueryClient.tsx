@@ -1155,7 +1155,7 @@ export default function AiQueryClient() {
               value={sidebarSearch}
               onChange={e => setSidebarSearch(e.target.value)}
               placeholder="대화 검색..."
-              className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
             />
             {sidebarSearch && (
               <button

@@ -226,7 +226,7 @@ export default function NodeListTab({
             onFocus={() => setShowSearchDropdown(true)}
             onKeyDown={onSearchKeyDown}
             placeholder="레이블·타입·ID 검색... (Enter로 첫 결과 선택)"
-            className="w-full pl-9 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-9 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
           />
           {nodeSearch && (
             <Btn

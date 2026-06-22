@@ -980,7 +980,7 @@ export default function ReportClient({ role }: Props) {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="지표명, 설명, 영역 검색"
-                  className="w-full md:w-64 pl-9 pr-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="w-full md:w-64 pl-9 pr-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
                 />
               </div>
             </div>
