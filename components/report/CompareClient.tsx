@@ -110,11 +110,11 @@ export default function CompareClient() {
               <th className="px-3 py-2.5 text-left text-xs text-gray-500 dark:text-gray-400 font-medium w-8">#</th>
               <th className="px-3 py-2.5 text-left text-xs text-gray-700 dark:text-gray-300 font-semibold min-w-[120px]">기관명</th>
               <th className="px-3 py-2.5 text-center text-xs text-gray-500 dark:text-gray-400 font-medium">등록<br/>건수</th>
-              <th className="px-3 py-2.5 text-center text-xs text-blue-600 font-semibold">개방률</th>
-              <th className="px-3 py-2.5 text-center text-xs text-purple-600 font-semibold">AI-Ready</th>
-              <th className="px-3 py-2.5 text-center text-xs text-teal-600 font-semibold">품질통과율</th>
-              <th className="px-3 py-2.5 text-center text-xs text-indigo-600 font-semibold">분석<br/>실적</th>
-              <th className="px-3 py-2.5 text-center text-xs text-green-600 font-semibold">가명·합성<br/>실적</th>
+              <th className="px-3 py-2.5 text-center text-xs text-blue-600 dark:text-blue-400 font-semibold">개방률</th>
+              <th className="px-3 py-2.5 text-center text-xs text-purple-600 dark:text-purple-400 font-semibold">AI-Ready</th>
+              <th className="px-3 py-2.5 text-center text-xs text-teal-600 dark:text-teal-400 font-semibold">품질통과율</th>
+              <th className="px-3 py-2.5 text-center text-xs text-indigo-600 dark:text-indigo-400 font-semibold">분석<br/>실적</th>
+              <th className="px-3 py-2.5 text-center text-xs text-green-600 dark:text-green-400 font-semibold">가명·합성<br/>실적</th>
               <th className="px-3 py-2.5 text-center text-xs text-gray-500 dark:text-gray-400 font-medium">목표<br/>달성</th>
             </tr>
           </thead>
@@ -137,7 +137,7 @@ export default function CompareClient() {
                   <HeatCell value={r.analysis} goal={GOALS.analysis} unit="건" />
                   <HeatCell value={r.synthetic} goal={GOALS.synthetic} unit="건" />
                   <td className="px-3 py-2.5 text-center">
-                    <span className={`text-sm font-bold ${achieved >= 4 ? 'text-green-700' : achieved >= 2 ? 'text-amber-600' : 'text-red-600'}`}>
+                    <span className={`text-sm font-bold ${achieved >= 4 ? 'text-green-700 dark:text-green-300' : achieved >= 2 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
                       {achieved}/5
                     </span>
                   </td>

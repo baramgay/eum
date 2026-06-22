@@ -31,7 +31,7 @@ export default function DataUsageWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300">데이터 활용 현황</h3>
-          <Link href="/catalog" className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition-colors">바로가기 →</Link>
+          <Link href="/catalog" className="text-xs text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors">바로가기 →</Link>
         </div>
         <div className="flex gap-1">
           {(['month', 'q', 'year'] as const).map(p => (

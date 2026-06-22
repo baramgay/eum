@@ -161,7 +161,7 @@ export default function AuditLogViewer() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="이메일·리소스 ID 검색"
-            className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ export default function AuditLogViewer() {
           <select
             value={action}
             onChange={e => setAction(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           >
             <option value="">모든 동작</option>
             {ACTIONS.map(a => (
@@ -179,7 +179,7 @@ export default function AuditLogViewer() {
           <select
             value={resourceType}
             onChange={e => setResourceType(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           >
             <option value="">모든 리소스</option>
             {RESOURCE_TYPES.map(t => (
@@ -192,14 +192,14 @@ export default function AuditLogViewer() {
             type="date"
             value={from}
             onChange={e => setFrom(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
           <span className="text-gray-400 dark:text-gray-300">~</span>
           <input
             type="date"
             value={to}
             onChange={e => setTo(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
         {isFiltered && (

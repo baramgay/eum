@@ -264,7 +264,7 @@ function AnalysisTab() {
             placeholder="분석명, 목적, 결과 요약 검색..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="w-full pl-9 pr-9 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+            className="w-full pl-9 pr-9 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
           {query && (
             <button
@@ -305,7 +305,7 @@ function AnalysisTab() {
             <Card key={r.record_id} padding="sm" hover className="flex items-start gap-3">
               <div className={`mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${r.policy_applied ? 'bg-green-100' : 'bg-gray-100 dark:bg-gray-800'}`}>
                 {r.policy_applied
-                  ? <CheckCircle className="w-4 h-4 text-green-600" />
+                  ? <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
                   : <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />}
               </div>
               <div className="flex-1 min-w-0">
@@ -561,7 +561,7 @@ function SyntheticTab() {
               placeholder="데이터명, 데이터셋 ID 검색..."
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className="w-full pl-9 pr-9 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none"
+              className="w-full pl-9 pr-9 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
             />
             {query && (
               <button
@@ -617,7 +617,7 @@ function SyntheticTab() {
           {filtered.map(c => (
             <Card key={c.case_id} padding="sm" hover className="flex items-start gap-3">
               <div className="mt-0.5 w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                <FlaskConical className="w-4 h-4 text-blue-600" />
+                <FlaskConical className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">

@@ -87,8 +87,8 @@ const STATUS_BADGE: Record<StatusKey, 'green' | 'amber' | 'gray'> = {
   na:   'gray',
 }
 const STATUS_ICON: Record<StatusKey, React.ReactNode> = {
-  ok:   <CheckCircle className="w-3.5 h-3.5 text-green-600" />,
-  warn: <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" />,
+  ok:   <CheckCircle className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />,
+  warn: <AlertTriangle className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-400" />,
   na:   <MinusCircle className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />,
 }
 const STATUS_LABEL: Record<StatusKey, string> = { ok: '충족', warn: '미흡', na: 'N/A' }
@@ -540,7 +540,7 @@ export default function ReportClient({ role }: Props) {
             <div className="flex items-center gap-2">
               {saving && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
               {!saving && saveStatus === 'saved' && (
-                <span className="text-xs text-green-600 flex items-center gap-1">
+                <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                   <CheckCircle className="w-3.5 h-3.5" /> 저장됨
                 </span>
               )}
@@ -874,7 +874,7 @@ export default function ReportClient({ role }: Props) {
           {goalItems.length > 0 && (
             <Card className="p-0 overflow-hidden">
               <div className="px-5 py-3 flex items-center gap-2 border-b bg-gray-50 dark:bg-gray-950">
-                <Target className="w-4 h-4 text-blue-600" />
+                <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">목표 대비 현황</span>
                 <span className="text-xs text-gray-400 dark:text-gray-300 ml-1">실적 관리 페이지에서 목표를 수정할 수 있습니다</span>
               </div>
@@ -932,7 +932,7 @@ export default function ReportClient({ role }: Props) {
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.ind.name} · {item.ind.desc}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      <span className="text-xs font-bold text-amber-700">+{item.pts}점 기여</span>
+                      <span className="text-xs font-bold text-amber-700 dark:text-amber-300">+{item.pts}점 기여</span>
                       <span className={`text-xs px-1.5 py-0.5 rounded-full ${DIFFICULTY_BADGE[item.difficulty]}`}>
                         {item.difficulty}
                       </span>
@@ -941,7 +941,7 @@ export default function ReportClient({ role }: Props) {
                 ))}
               </div>
               {actionItems.length > 6 && (
-                <div className="px-5 py-2 text-xs text-amber-600 text-right border-t border-amber-200">
+                <div className="px-5 py-2 text-xs text-amber-600 dark:text-amber-400 text-right border-t border-amber-200">
                   + {actionItems.length - 6}개 항목은 아래 영역별 상세에서 확인
                 </div>
               )}

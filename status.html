@@ -575,6 +575,97 @@ Playwright axe 접근성 스캔 4 viewport 통과</span></div>
   </ul>
 </div></section>
 
+<!-- 다크모드 잔여 개선 인계 -->
+<section><div class="wrap">
+  <div class="sec-no">DARK MODE HANDOFF · 2026-06-22</div>
+  <h2>다크모드 잔여 개선 — 다음 세션 인계 <span class="badge b-progress">진행 예정</span></h2>
+
+  <div class="note">
+    <b>완료·푸시됨</b> — 전체 컴포넌트 다크모드 <b>배경</b>(<code>bg-*-50 / bg-*-100</code>) 일괄 적용.
+    HEAD 커밋 <code>187feff2</code> "fix: 전체 컴포넌트 다크모드 일괄 적용 (30개+ 파일)". 워킹트리 clean.
+    배경·테두리·텍스트·ring에 <code>dark:*</code> 변형 부여, 단색 채움(<code>bg-*-500</code> 진행바·점)은 의도적으로 제외.
+  </div>
+  <div class="note warn">
+    <b>사용자 지시</b> — 아래 <b>4건 모두 병렬로 진행</b>.
+  </div>
+
+  <table>
+    <thead><tr><th style="width:7%">순위</th><th style="width:30%">항목</th><th>내용 · 근거</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge b-warn">1</span></td>
+        <td><b>색상 텍스트 dark 변형 보강</b></td>
+        <td>지난 감사가 <b>배경</b>만 grep해 <b>색상 텍스트</b>가 비어 있음.
+          <code>text-{red,blue,green,indigo,emerald,amber,purple}-{600,700,800}</code> 중 같은 줄에 <code>dark:text-*</code> 없는 곳에 <code>dark:text-*-400</code>(진한 톤 <code>-300</code>) 부여.<br>
+          <b>직접 확인 누락:</b> <code>components/ontology/tabs/OverviewTab.tsx</code> 124행(<code>text-indigo-700</code>)·213행(<code>text-blue-600</code>/<code>text-red-600</code>);
+          <code>components/admin/AdminClient.tsx</code> 325·372·390·403·431·483·487행.<br>
+          ⚠ 같은 파일에 정상 줄 혼재(AdminClient 524·582는 <code>dark:text-red-400</code> 적용됨) → "전부 누락"이 아니라 <b>줄 단위 혼재</b>, 줄별 점검 필요.
+          활성 탭 표시 <code>border-blue-600 text-blue-600</code>(AdminClient 431)는 의도된 액센트 — 톤만 조정. <code>hover:text-*</code>는 후순위.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-progress">2</span></td>
+        <td><b>Tailwind 밖 색상 (canvas / inline hex)</b></td>
+        <td><code>dark:</code> 클래스가 닿지 못하는 canvas·SVG·인라인 hex 점검.<br>
+          <b>이미 대응됨(재작업 불필요):</b> <code>components/ontology/OntologyGraph.tsx</code> — <code>useTheme</code>+<code>isDark</code> 분기로 393~694행 fillStyle/strokeStyle 전부 테마 대응 확인.<br>
+          <b>미검증(점검 대상):</b> <code>WordNetworkGraph.tsx</code> · <code>MiniMap.tsx</code> · <code>KakaoOntologyMap.tsx</code> · <code>ScenarioSelector.tsx</code> · <code>NodeProfile.tsx</code> (모두 components/ontology/).</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-proto">3</span></td>
+        <td><b>브라우저 시각 검증</b></td>
+        <td>지금까지 확인은 전부 grep(정적) — "클래스 존재"까지만 증명. 다크 토글(<code>document.documentElement.classList.add('dark')</code>) 후 주요 페이지 띄워 대비·가독성 확인. 1·2순위 누락도 함께 드러남.</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-proto">4</span></td>
+        <td><b>반복 dark 문자열 → 공용 상수/Badge 추출</b> (별건)</td>
+        <td><code>bg-*-900/20 dark:...</code> 조합이 수십 파일 복붙 → 새 컴포넌트마다 누락 재발. 색상 토큰 일원화로 드리프트 구조적 차단. 범위 넓고 회귀 위험 → 1~3순위와 분리.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid2">
+    <div>
+      <h3 style="font-size:15px;margin-bottom:6px">색상 컨벤션</h3>
+      <table>
+        <thead><tr><th>라이트</th><th>다크</th></tr></thead>
+        <tbody>
+          <tr><td><code>bg-*-50</code></td><td><code>dark:bg-*-900/20</code></td></tr>
+          <tr><td><code>bg-*-100</code></td><td><code>dark:bg-*-900/30</code></td></tr>
+          <tr><td><code>border-*-200</code></td><td><code>dark:border-*-800</code></td></tr>
+          <tr><td><code>text-*-600</code></td><td><code>dark:text-*-400</code></td></tr>
+          <tr><td><code>text-*-700</code></td><td><code>dark:text-*-300</code></td></tr>
+          <tr><td><code>text-*-800</code></td><td><code>dark:text-*-200</code></td></tr>
+          <tr><td><code>ring-*-200</code></td><td><code>dark:ring-*-800</code></td></tr>
+          <tr><td>hover</td><td><code>/40</code> opacity</td></tr>
+          <tr><td><code>bg-*-500</code> 단색</td><td>변형 없음(의도)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="font-size:15px;margin-bottom:6px">검증 grep</h3>
+      <div class="note" style="font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap"># 1순위 — dark 없는 색상 텍스트
+grep -rn "text-\(red\|blue\|green\|indigo\|emerald\|amber\|purple\)-\(600\|700\|800\)" components/ | grep -v "dark:"
+
+# 배경(완료분) 재확인
+grep -rnE "bg-(green|red|blue|amber|yellow|purple|orange|indigo|emerald|cyan)-(50|100)[^d]" components/ | grep -v "dark:"</div>
+      <h3 style="font-size:15px;margin:12px 0 6px">절대 유지 — 보안·표기</h3>
+      <ul class="clean" style="font-size:13px">
+        <li><code>DEV_BYPASS</code>는 <code>NEXT_PUBLIC_</code> 금지(서버 전용)</li>
+        <li><code>scripts/reset_test_passwords.mjs</code> 키 하드코딩 금지 → <code>process.env.SUPABASE_SERVICE_KEY</code></li>
+        <li><code>test_accounts.txt</code> 커밋 금지(.gitignore)</li>
+        <li>특정 상용 플랫폼명 직접 언급 금지 → "온톨로지 방식 통합 데이터 플랫폼"</li>
+        <li>한자·일본어 금지(텍스트·파일명·코드·주석)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>작업 절차</b> — agents 시스템 경유(dev 도메인 lead-dev → frontend).
+    <code>python C:\업무\agents\scripts\update_status.py lead-dev working "..."</code> →
+    <code>frontend working "..."</code> → 작업 → <code>frontend done</code> → <code>lead-dev done</code>.
+    VFF 유지: 첫 문장=결론·산문 우선·완료 전 검증·직접 본 것만 단정.
+  </div>
+</div></section>
+
 <!-- 다음 단계 -->
 <section style="border-bottom:none"><div class="wrap">
   <div class="sec-no">NEXT</div>

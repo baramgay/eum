@@ -120,7 +120,7 @@ export default function CollectLogsPanel({
       align: 'right',
       sortable: true,
       sortValue: log => log.rows_new,
-      render: log => <span className="text-xs text-green-600 tabular-nums">+{log.rows_new}</span>,
+      render: log => <span className="text-xs text-green-600 dark:text-green-400 tabular-nums">+{log.rows_new}</span>,
     },
     {
       key: 'rows_deleted',
@@ -137,7 +137,7 @@ export default function CollectLogsPanel({
         log.error_msg ? (
           <button
             onClick={() => setExpandedLogId(expandedLogId === log.log_id ? null : log.log_id)}
-            className="text-red-600 hover:underline flex items-center gap-0.5 text-xs"
+            className="text-red-600 dark:text-red-400 hover:underline flex items-center gap-0.5 text-xs"
           >
             {expandedLogId === log.log_id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             보기
@@ -184,7 +184,7 @@ export default function CollectLogsPanel({
           <select
             value={sourceFilter}
             onChange={e => setSourceFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm"
+            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           >
             <option value="all">전체 소스</option>
             {sources.map(s => (
@@ -194,7 +194,7 @@ export default function CollectLogsPanel({
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm"
+            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           >
             <option value="all">전체 상태</option>
             <option value="running">실행 중</option>

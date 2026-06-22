@@ -208,7 +208,7 @@ export default function CollectSourceForm({
             error={errors.title}
             aria-describedby={errors.title ? 'title-error' : undefined}
             onChange={() => clearError('title')}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
           <FormError id="title-error" message={errors.title} />
         </div>
@@ -223,7 +223,7 @@ export default function CollectSourceForm({
             error={errors.url}
             aria-describedby={errors.url ? 'url-error' : undefined}
             onChange={() => clearError('url')}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
           <FormError id="url-error" message={errors.url} />
         </div>
@@ -233,13 +233,13 @@ export default function CollectSourceForm({
             id="description"
             name="description"
             defaultValue={defaultValues.description}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
         <div>
           <Label htmlFor="method" className="text-xs text-gray-600 dark:text-gray-400 mb-1">HTTP 메서드</Label>
           <select id="method" name="method" value={method} onChange={e => setMethod(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md text-sm">
+            className="w-full px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500">
             <option value="GET">GET</option>
             <option value="POST">POST</option>
           </select>
@@ -247,7 +247,7 @@ export default function CollectSourceForm({
         <div>
           <Label htmlFor="resp_format" className="text-xs text-gray-600 dark:text-gray-400 mb-1">응답 형식</Label>
           <select id="resp_format" name="resp_format" value={respFormat} onChange={e => setRespFormat(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md text-sm">
+            className="w-full px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500">
             <option value="json">JSON</option>
             <option value="csv">CSV</option>
             <option value="xml">XML</option>
@@ -257,7 +257,7 @@ export default function CollectSourceForm({
         <div>
           <Label htmlFor="auth_type" className="text-xs text-gray-600 dark:text-gray-400 mb-1">인증 방식</Label>
           <select id="auth_type" name="auth_type" value={authType} onChange={e => setAuthType(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md text-sm">
+            className="w-full px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500">
             <option value="none">인증 없음</option>
             <option value="api_key">API 키 (헤더)</option>
             <option value="bearer">Bearer 토큰</option>
@@ -272,7 +272,7 @@ export default function CollectSourceForm({
                 id="auth_key"
                 name="auth_key"
                 defaultValue={defaultValues.auth_key}
-                className="px-3 py-2 border rounded-md"
+                className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
               />
             </div>
             <div className="md:col-span-2">
@@ -285,7 +285,7 @@ export default function CollectSourceForm({
                 error={errors.auth_value}
                 aria-describedby={errors.auth_value ? 'auth_value-error' : undefined}
                 onChange={() => clearError('auth_value')}
-                className="px-3 py-2 border rounded-md"
+                className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
               />
               <FormError id="auth_value-error" message={errors.auth_value} />
             </div>
@@ -302,7 +302,7 @@ export default function CollectSourceForm({
               error={errors.auth_value}
               aria-describedby={errors.auth_value ? 'auth_value-error' : undefined}
               onChange={() => clearError('auth_value')}
-              className="px-3 py-2 border rounded-md"
+              className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
             />
             <FormError id="auth_value-error" message={errors.auth_value} />
           </div>
@@ -326,7 +326,7 @@ export default function CollectSourceForm({
               error={errors.json_path}
               aria-describedby={errors.json_path ? 'json_path-error' : undefined}
               onChange={() => clearError('json_path')}
-              className="px-3 py-2 border rounded-md"
+              className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
             />
             <FormError id="json_path-error" message={errors.json_path} />
           </div>
@@ -362,7 +362,7 @@ export default function CollectSourceForm({
         <div className="flex items-center gap-2 mb-3">
           <label htmlFor="pagination_type" className="text-xs font-semibold text-gray-700 dark:text-gray-300">페이지네이션</label>
           <select id="pagination_type" name="pagination_type" value={paginationType} onChange={e => setPaginationType(e.target.value)}
-            className="px-2 py-1 border rounded text-xs">
+            className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500">
             <option value="none">없음 (단일 요청)</option>
             <option value="page">페이지 번호 (공공데이터포털 기본)</option>
             <option value="offset">오프셋 (offset + limit)</option>
@@ -377,24 +377,24 @@ export default function CollectSourceForm({
               </label>
               <input id="pagination_page_param" name="pagination_page_param"
                 defaultValue={defaultValues.pagination_page_param}
-                className="w-full px-2 py-1 border rounded text-xs" />
+                className="w-full px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
             </div>
             <div>
               <label htmlFor="pagination_size_param" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">크기 파라미터</label>
               <input id="pagination_size_param" name="pagination_size_param"
                 defaultValue={defaultValues.pagination_size_param}
-                className="w-full px-2 py-1 border rounded text-xs" />
+                className="w-full px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
             </div>
             <div>
               <label htmlFor="pagination_size" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">페이지당 행 수</label>
               <input id="pagination_size" name="pagination_size" type="number" defaultValue={defaultValues.pagination_size} min={1} max={5000}
-                className="w-full px-2 py-1 border rounded text-xs" />
+                className="w-full px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
             </div>
             {paginationType === 'page' && (
               <div>
                 <label htmlFor="pagination_total_path" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">전체 건수 경로</label>
                 <input id="pagination_total_path" name="pagination_total_path" defaultValue={defaultValues.pagination_total_path}
-                  className="w-full px-2 py-1 border rounded text-xs" />
+                  className="w-full px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
               </div>
             )}
           </div>
@@ -418,7 +418,7 @@ export default function CollectSourceForm({
             id="theme"
             name="theme"
             defaultValue={defaultValues.theme}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
         <div>
@@ -427,7 +427,7 @@ export default function CollectSourceForm({
             id="keywords"
             name="keywords"
             defaultValue={defaultValues.keywords}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
         <div>
@@ -436,7 +436,7 @@ export default function CollectSourceForm({
             id="license"
             name="license"
             defaultValue={defaultValues.license}
-            className="px-3 py-2 border rounded-md"
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
       </div>

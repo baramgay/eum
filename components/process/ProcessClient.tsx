@@ -505,7 +505,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                   required
                   placeholder="예: 청년인구 정제"
-                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 />
               </div>
               <div>
@@ -514,7 +514,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                   id="proc-source-kind"
                   value={form.source_kind}
                   onChange={e => setForm(f => ({ ...f, source_kind: e.target.value }))}
-                  className="w-full border rounded px-3 py-2 text-sm"
+                  className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 >
                   <option value="upload">업로드 (table_name)</option>
                   <option value="catalog">카탈로그 (dataset_id)</option>
@@ -530,7 +530,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                       id="source-pipeline-select"
                       value={form.source_dataset_id}
                       onChange={e => setForm(f => ({ ...f, source_dataset_id: e.target.value }))}
-                      className="w-full border rounded px-3 py-2 text-sm"
+                      className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                       required
                     >
                       <option value="">파이프라인 선택...</option>
@@ -562,7 +562,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                       onChange={e => setForm(f => ({ ...f, source_dataset_id: e.target.value }))}
                       required
                       placeholder="예: sub_gyeongnam_a1b2c3d4"
-                      className="w-full border rounded px-3 py-2 text-sm"
+                      className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                     />
                   </>
                 )}
@@ -574,7 +574,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   placeholder="선택 입력"
-                  className="w-full border rounded px-3 py-2 text-sm"
+                  className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 />
               </div>
             </div>
@@ -596,7 +596,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="파이프라인명, 설명, 소스 식별자 검색"
-                className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
               />
             </div>
             <div className="flex gap-2">
@@ -665,7 +665,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
               {runResult.result.error_rows > 0 && (
                 <button
                   type="button"
-                  className="text-red-500 ml-1 underline underline-offset-2 hover:text-red-700"
+                  className="text-red-500 ml-1 underline underline-offset-2 hover:text-red-700 dark:hover:text-red-300"
                   onClick={() => setShowErrorDialog(true)}
                 >
                   오류 {runResult.result.error_rows}건
@@ -685,7 +685,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
           </div>
           <button
             onClick={() => setRunResult(null)}
-            className="text-green-500 hover:text-green-700 ml-4 text-xs shrink-0"
+            className="text-green-500 hover:text-green-700 dark:hover:text-green-300 ml-4 text-xs shrink-0"
           >
             닫기
           </button>
@@ -697,7 +697,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
         <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="font-medium text-blue-800 dark:text-blue-200">배치 실행 결과</span>
-            <button onClick={() => setBatchResults(null)} className="text-blue-500 text-xs hover:text-blue-700">닫기</button>
+            <button onClick={() => setBatchResults(null)} className="text-blue-500 text-xs hover:text-blue-700 dark:hover:text-blue-300">닫기</button>
           </div>
           <div className="space-y-1">
             {batchResults.map(r => {
@@ -991,7 +991,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.rowIndex + 1}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.ruleIndex + 1}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>
-                      <td className="border border-gray-200 px-3 py-1.5 text-red-600">{err.message}</td>
+                      <td className="border border-gray-200 px-3 py-1.5 text-red-600 dark:text-red-400">{err.message}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1031,7 +1031,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{(err.rowIndex ?? i) + 1}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{typeof err.ruleIndex === 'number' ? err.ruleIndex + 1 : '—'}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>
-                      <td className="border border-gray-200 px-3 py-1.5 text-red-600">{err.message ?? JSON.stringify(err)}</td>
+                      <td className="border border-gray-200 px-3 py-1.5 text-red-600 dark:text-red-400">{err.message ?? JSON.stringify(err)}</td>
                     </tr>
                   ))}
                 </tbody>

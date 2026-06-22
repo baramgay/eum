@@ -197,7 +197,7 @@ export default function Header({ userEmail, role }: HeaderProps) {
                         {unreadCount > 0 && (
                           <button
                             onClick={markAllRead}
-                            className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1"
                           >
                             <CheckCheck className="w-3 h-3" />
                             모두 읽음

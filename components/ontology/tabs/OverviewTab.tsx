@@ -121,7 +121,7 @@ export default function OverviewTab({
                 <li key={a.key}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-sm font-medium text-indigo-700">{a.name}</span>
+                      <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">{a.name}</span>
                       <span className="text-gray-400 dark:text-gray-300 text-xs ml-2">{a.key}</span>
                     </div>
                     <Btn
@@ -210,7 +210,7 @@ export default function OverviewTab({
                     <td className="px-3 py-1.5 text-center font-medium text-gray-500 dark:text-gray-400">{r.rank}</td>
                     <td className="px-3 py-1.5 font-medium text-gray-800 dark:text-gray-200">{r.sigun}</td>
                     <td className="px-3 py-1.5 text-right text-gray-600 dark:text-gray-400">{r.youth_pop.toLocaleString()}</td>
-                    <td className={`px-3 py-1.5 text-right font-medium ${r.net_migration >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                    <td className={`px-3 py-1.5 text-right font-medium ${r.net_migration >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
                       {r.net_migration >= 0 ? '+' : ''}{r.net_migration.toLocaleString()}
                     </td>
                     <td className="px-3 py-1.5 text-right text-gray-600 dark:text-gray-400">{r.employees.toLocaleString()}</td>

@@ -1459,7 +1459,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                   <button
                     key={it.id}
                     onClick={() => { setShowCatalogPicker(false); loadCatalogById(it.id, it.title) }}
-                    className="w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-blue-50 transition-colors"
+                    className="w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-colors"
                   >
                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{it.title}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-300 mt-0.5">{it.id}{it.theme ? ` · ${it.theme}` : ''}</p>
@@ -1500,7 +1500,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               </div>
               <button
                 onClick={() => setShowPreview(v => !v)}
-                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
               >
                 {showPreview ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                 데이터 미리보기
@@ -1835,7 +1835,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                             ))}
                           </div>
                           {sel.length > 0 && (
-                            <p className="text-xs text-blue-600 mt-1">선택됨: {sel.join(', ')}</p>
+                            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">선택됨: {sel.join(', ')}</p>
                           )}
 
                           {/* 레벨 선택: 범주형 변수가 선택된 경우 */}
@@ -2024,7 +2024,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <label htmlFor="ar-title" className="block text-xs font-medium text-gray-600 mb-1">분석명 *</label>
               <input
                 id="ar-title"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 value={registerForm.title}
                 onChange={e => setRegisterForm(p => ({ ...p, title: e.target.value }))}
               />
@@ -2034,7 +2034,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <input
                 id="ar-performed-at"
                 type="date"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 value={registerForm.performed_at}
                 onChange={e => setRegisterForm(p => ({ ...p, performed_at: e.target.value }))}
               />
@@ -2043,7 +2043,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <label htmlFor="ar-purpose" className="block text-xs font-medium text-gray-600 mb-1">분석 목적</label>
               <input
                 id="ar-purpose"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 placeholder="예: 정책 수립을 위한 데이터 분석"
                 value={registerForm.purpose}
                 onChange={e => setRegisterForm(p => ({ ...p, purpose: e.target.value }))}
@@ -2054,7 +2054,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <textarea
                 id="ar-summary"
                 rows={2}
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 value={registerForm.result_summary}
                 onChange={e => setRegisterForm(p => ({ ...p, result_summary: e.target.value }))}
               />

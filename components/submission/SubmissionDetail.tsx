@@ -155,7 +155,7 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
               onClick={() => setActiveTab(tab)}
               className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -321,7 +321,7 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
                         onChange={e => setComment(e.target.value)}
                         rows={3}
                         placeholder="컨설팅 의견을 입력하세요..."
-                        className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                       />
                       <button
                         onClick={addComment}

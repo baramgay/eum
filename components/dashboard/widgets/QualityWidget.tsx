@@ -60,7 +60,7 @@ export default function QualityWidget({ qualityDims, qualityAvg }: QualityWidget
               <ul className="inline list-none ml-1">
                 {qualityAvg.topIssues.map((issue, i, arr) => (
                   <li key={issue} className="inline">
-                    <span className="text-red-600">{issue}</span>
+                    <span className="text-red-600 dark:text-red-400">{issue}</span>
                     {i < arr.length - 1 && <span className="text-gray-300 dark:text-gray-200 mx-1">·</span>}
                   </li>
                 ))}

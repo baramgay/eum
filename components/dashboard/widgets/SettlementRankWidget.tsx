@@ -59,7 +59,7 @@ export default function SettlementRankWidget({ settlement }: SettlementRankWidge
       sortable: true,
       sortValue: r => r.youth_pop_change_rate,
       render: r => (
-        <span className={`text-sm font-medium ${r.youth_pop_change_rate >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+        <span className={`text-sm font-medium ${r.youth_pop_change_rate >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
           {r.youth_pop_change_rate >= 0 ? '+' : ''}{r.youth_pop_change_rate.toFixed(1)}%
         </span>
       ),
@@ -96,7 +96,7 @@ export default function SettlementRankWidget({ settlement }: SettlementRankWidge
               }}
             />
           </div>
-          <span className={`text-xs font-semibold w-10 text-right ${r.settlement_score >= 0 ? 'text-blue-700' : 'text-red-600'}`}>
+          <span className={`text-xs font-semibold w-10 text-right ${r.settlement_score >= 0 ? 'text-blue-700 dark:text-blue-300' : 'text-red-600 dark:text-red-400'}`}>
             {r.settlement_score >= 0 ? '+' : ''}{r.settlement_score.toFixed(2)}
           </span>
         </div>

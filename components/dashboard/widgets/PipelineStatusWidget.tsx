@@ -15,7 +15,7 @@ export default function PipelineStatusWidget({ pipeline }: PipelineStatusWidgetP
     <Card>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">오늘의 파이프라인 현황</h3>
-        <Link href="/pipeline" className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition-colors">바로가기 →</Link>
+        <Link href="/pipeline" className="text-xs text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors">바로가기 →</Link>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <StatCard

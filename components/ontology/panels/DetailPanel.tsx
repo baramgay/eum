@@ -137,7 +137,7 @@ export default function DetailPanel({
         <div className="flex items-center gap-1.5">
           <p className="text-xs text-gray-400 dark:text-gray-300 font-mono break-all">{node.obj_id}</p>
           <Btn onClick={() => onCopyId(node.obj_id)} variant="ghost" size="sm" className="!p-0.5 h-auto" title="ID 복사">
-            {copiedId ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
+            {copiedId ? <Check className="w-3 h-3 text-green-600 dark:text-green-400" /> : <Copy className="w-3 h-3" />}
           </Btn>
         </div>
         <Btn onClick={onClose} variant="ghost" size="sm" className="!p-1 h-auto flex-shrink-0" title="패널 닫기">

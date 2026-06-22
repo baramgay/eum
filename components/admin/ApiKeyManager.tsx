@@ -106,7 +106,7 @@ export default function ApiKeyManager() {
       {newKey && (
         <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
           <div className="flex items-start gap-2 mb-2">
-            <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+            <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
             <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
               API 키가 발급되었습니다. 지금 복사하세요 — 다시 표시되지 않습니다.
             </p>
@@ -120,7 +120,7 @@ export default function ApiKeyManager() {
             </Btn>
           </div>
           <button
-            className="mt-2 text-xs text-amber-600 hover:text-amber-800"
+            className="mt-2 text-xs text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200"
             onClick={() => setNewKey(null)}
           >
             닫기
@@ -171,7 +171,7 @@ export default function ApiKeyManager() {
       {loading ? (
         <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
       ) : error ? (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       ) : keys.length === 0 ? (
         <p className="text-sm text-gray-500 text-center py-8">발급된 API 키가 없습니다.</p>
       ) : (

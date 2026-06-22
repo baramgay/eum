@@ -96,7 +96,7 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
     <Card className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
-          <FolderOpen className="w-4 h-4 text-indigo-600" />
+          <FolderOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           워크스페이스
         </h3>
         <Badge variant="gray" size="sm">{(workspaces ?? []).length}개</Badge>
@@ -154,7 +154,7 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
                     autoFocus
                   />
                   <Btn onClick={() => handleRename(ws.id)} variant="ghost" size="sm" className="!p-1 h-auto">
-                    <Check className="w-3.5 h-3.5 text-green-600" />
+                    <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                   </Btn>
                   <Btn onClick={cancelEdit} variant="ghost" size="sm" className="!p-1 h-auto">
                     <X className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />

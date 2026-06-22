@@ -56,7 +56,7 @@ export default function RecentAnalysisWidget({ recentRuns }: RecentAnalysisWidge
               placeholder="데이터셋, 분석명 검색..."
               value={runQuery}
               onChange={e => setRunQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-300 focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
             />
           </div>
           <div className="flex flex-wrap gap-1.5">

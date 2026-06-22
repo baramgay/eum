@@ -692,7 +692,7 @@ export default function ManualClient({ role }: { role: string }) {
             {UPDATE_LOG.map(log => (
               <div key={log.date} className="flex gap-6">
                 <div className="flex-shrink-0 w-24">
-                  <span className="text-sm font-semibold text-blue-600">{log.date}</span>
+                  <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">{log.date}</span>
                 </div>
                 <ul className="flex-1 space-y-2 border-l border-gray-100 pl-6">
                   {log.items.map((item, i) => (
@@ -772,7 +772,7 @@ export default function ManualClient({ role }: { role: string }) {
               {/* 섹션 헤더 */}
               <div className="flex items-center gap-4 px-8 py-6 border-b border-gray-100">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-100 dark:ring-blue-800 flex items-center justify-center flex-shrink-0">
-                  <ActiveIcon className="w-5 h-5 text-blue-600" />
+                  <ActiveIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{active.title}</h2>

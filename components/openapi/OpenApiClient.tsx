@@ -357,7 +357,7 @@ export default function OpenApiClient() {
             onClick={() => setTab(t)}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
               tab === t
-                ? 'border-blue-600 text-blue-600'
+                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
                 : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
@@ -402,7 +402,7 @@ export default function OpenApiClient() {
                 value={keyQuery}
                 onChange={e => setKeyQuery(e.target.value)}
                 placeholder="키 이름, 설명, 접두사 검색"
-                className="w-full border rounded-lg pl-9 pr-8 py-2 text-sm"
+                className="w-full border rounded-lg pl-9 pr-8 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
               />
               {keyQuery && (
                 <button
@@ -430,7 +430,7 @@ export default function OpenApiClient() {
                       onChange={e => setKeyName(e.target.value)}
                       required
                       placeholder="예: 행정안전부 연계"
-                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      className="w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                     />
                   </div>
                   <div>
@@ -440,7 +440,7 @@ export default function OpenApiClient() {
                       value={keyDesc}
                       onChange={e => setKeyDesc(e.target.value)}
                       placeholder="용도 설명"
-                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      className="w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                     />
                   </div>
                 </div>
@@ -507,7 +507,7 @@ export default function OpenApiClient() {
                     variant="secondary"
                     loading={rotatingKeyId === k.key_id}
                     onClick={() => rotateKey(k)}
-                    className="text-blue-600 hover:text-blue-700"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                   >
                     <RefreshCw className="w-3 h-3" /> 재발급
                   </Btn>
@@ -537,7 +537,7 @@ export default function OpenApiClient() {
                 value={whQuery}
                 onChange={e => setWhQuery(e.target.value)}
                 placeholder="URL, 설명, 이벤트 검색"
-                className="w-full border rounded-lg pl-9 pr-8 py-2 text-sm"
+                className="w-full border rounded-lg pl-9 pr-8 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
               />
               {whQuery && (
                 <button
@@ -566,7 +566,7 @@ export default function OpenApiClient() {
                       required
                       type="url"
                       placeholder="https://your-server.com/webhook"
-                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      className="w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                     />
                   </div>
                   <div>
@@ -576,7 +576,7 @@ export default function OpenApiClient() {
                       value={whDesc}
                       onChange={e => setWhDesc(e.target.value)}
                       placeholder="웹훅 용도"
-                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      className="w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                     />
                   </div>
                 </div>
@@ -587,7 +587,7 @@ export default function OpenApiClient() {
                     value={whSecret}
                     onChange={e => setWhSecret(e.target.value)}
                     placeholder="whsec_xxxxxxxx"
-                    className="w-full border rounded-lg px-3 py-2 text-sm font-mono"
+                    className="w-full border rounded-lg px-3 py-2 text-sm font-mono bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                   />
                 </div>
                 <div>

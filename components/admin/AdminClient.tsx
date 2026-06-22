@@ -309,7 +309,7 @@ export default function AdminClient({ initialTenants }: Props) {
             loading={isActing}
             disabled={isActing}
             onClick={() => toggleOnboarded(t)}
-            className={t.onboarded ? '!text-green-700 hover:!bg-green-100' : '!text-gray-500 hover:!bg-gray-100'}
+            className={t.onboarded ? '!text-green-700 dark:!text-green-300 hover:!bg-green-100' : '!text-gray-500 hover:!bg-gray-100'}
           >
             {isActing ? '처리 중...' : (t.onboarded ? '입주 중' : '미입주')}
           </Btn>
@@ -322,7 +322,7 @@ export default function AdminClient({ initialTenants }: Props) {
       render: t => (
         <div className="text-xs text-gray-500 dark:text-gray-400 max-w-xs">
           {t.reject_reason ? (
-            <span className="text-red-600 flex items-start gap-1">
+            <span className="text-red-600 dark:text-red-400 flex items-start gap-1">
               <AlertCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
               {t.reject_reason}
             </span>
@@ -341,7 +341,7 @@ export default function AdminClient({ initialTenants }: Props) {
       render: t => (
         <a
           href={`/portal?tenant_id=${encodeURIComponent(t.tenant_id)}`}
-          className="inline-flex items-center gap-0.5 text-xs text-blue-600 hover:text-blue-800 hover:underline"
+          className="inline-flex items-center gap-0.5 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline"
           title="해당 기관 데이터셋 보기"
         >
           <ExternalLink className="w-3 h-3" />
@@ -369,7 +369,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   if (memo === null) return
                   void updateStatus(t, 'approved', memo || undefined)
                 }}
-                className="!text-green-700 hover:!bg-green-50"
+                className="!text-green-700 dark:!text-green-300 hover:!bg-green-50"
                 title="승인"
               >
                 <CheckCircle className="w-3 h-3" />
@@ -387,7 +387,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   if (!reason) return
                   void updateStatus(t, 'rejected', reason)
                 }}
-                className="!text-red-700 hover:!bg-red-50"
+                className="!text-red-700 dark:!text-red-300 hover:!bg-red-50"
                 title="반려"
               >
                 <XCircle className="w-3 h-3" />
@@ -400,7 +400,7 @@ export default function AdminClient({ initialTenants }: Props) {
               loading={isActing}
               disabled={isActing}
               onClick={() => deleteTenant(t.tenant_id, t.name)}
-              className="!text-red-600 hover:!bg-red-50"
+              className="!text-red-600 dark:!text-red-400 hover:!bg-red-50"
               title="삭제"
               aria-label="삭제"
             >
@@ -428,7 +428,7 @@ export default function AdminClient({ initialTenants }: Props) {
               onClick={() => setActiveTab(tab)}
               className={`flex items-center gap-2 pb-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -467,7 +467,7 @@ export default function AdminClient({ initialTenants }: Props) {
                 id="admin-bulk-type"
                 value={bulkType}
                 onChange={e => setBulkType(e.target.value as typeof bulkType)}
-                className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
               >
                 <option value="users">사용자 일괄 등록</option>
                 <option value="tenants">기관 일괄 등록</option>
@@ -484,7 +484,7 @@ export default function AdminClient({ initialTenants }: Props) {
                 성공 {bulkResult.ok}건 / 실패 {bulkResult.fail}건
               </p>
               {bulkResult.errors.length > 0 && (
-                <ul className="mt-1 text-xs text-red-600 list-disc list-inside">
+                <ul className="mt-1 text-xs text-red-600 dark:text-red-400 list-disc list-inside">
                   {bulkResult.errors.map((err, i) => <li key={i}>{err}</li>)}
                 </ul>
               )}
@@ -530,7 +530,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   required value={form.tenant_id}
                   onChange={e => setForm(p => ({ ...p, tenant_id: e.target.value }))}
                   placeholder="예: gni_hadong"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 />
                 <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">영문·숫자·언더스코어만 권장합니다.</p>
               </div>
@@ -541,7 +541,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   required value={form.name}
                   onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                   placeholder="예: 하동군청"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 />
               </div>
               <div>
@@ -550,7 +550,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   id="admin-gov-type"
                   value={form.gov_type}
                   onChange={e => setForm(p => ({ ...p, gov_type: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 >
                   <option value="">선택</option>
                   <option value="시청">시청</option>
@@ -566,7 +566,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   value={form.sgg_cd}
                   onChange={e => setForm(p => ({ ...p, sgg_cd: e.target.value }))}
                   placeholder="예: 48850"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 />
               </div>
               <div className="md:col-span-2">
@@ -599,7 +599,7 @@ export default function AdminClient({ initialTenants }: Props) {
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1) }}
               placeholder="기관명·코드·시군코드 검색"
-              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -607,7 +607,7 @@ export default function AdminClient({ initialTenants }: Props) {
             <select
               value={statusFilter}
               onChange={e => { setStatusFilter(e.target.value as typeof statusFilter); setPage(1) }}
-              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
             >
               <option value="all">모든 상태</option>
               <option value="pending">승인 대기</option>
@@ -617,7 +617,7 @@ export default function AdminClient({ initialTenants }: Props) {
             <select
               value={govFilter}
               onChange={e => { setGovFilter(e.target.value); setPage(1) }}
-              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
             >
               {GOV_TYPES.map(g => <option key={g} value={g}>{g}</option>)}
             </select>

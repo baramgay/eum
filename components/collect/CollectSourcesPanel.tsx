@@ -129,7 +129,7 @@ export default function CollectSourcesPanel({
     {
       key: 'url',
       label: 'URL',
-      render: s => <span className="text-xs text-blue-600 font-mono" title={s.url}>{truncateUrl(s.url)}</span>,
+      render: s => <span className="text-xs text-blue-600 dark:text-blue-400 font-mono" title={s.url}>{truncateUrl(s.url)}</span>,
     },
     {
       key: 'resp_format',
@@ -246,13 +246,13 @@ export default function CollectSourcesPanel({
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="제목, URL, 주제, 키워드 검색"
-              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
             />
           </div>
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm"
+            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
           >
             <option value="all">전체 상태</option>
             <option value="idle">대기</option>

@@ -279,7 +279,7 @@ export default function FacilityMap({ facilities }: Props) {
           <div className="w-px h-4 bg-gray-200 mx-1" />
           <button
             onClick={() => setShowFilters(v => !v)}
-            className={`transition-colors ${showFilters ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`transition-colors ${showFilters ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 hover:text-gray-600'}`}
             aria-pressed={showFilters}
           >
             <SlidersHorizontal className="w-4 h-4" />
@@ -559,7 +559,7 @@ export default function FacilityMap({ facilities }: Props) {
         <button
           onClick={handleLocate}
           disabled={locating}
-          className="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow border border-gray-100 text-gray-500 hover:text-blue-600 hover:border-blue-200 active:scale-95 transition-all disabled:opacity-60"
+          className="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow border border-gray-100 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 active:scale-95 transition-all disabled:opacity-60"
           title="현재 위치로 이동"
         >
           <LocateFixed className={`w-4 h-4 ${locating ? 'animate-spin' : ''}`} />
@@ -754,7 +754,7 @@ export default function FacilityMap({ facilities }: Props) {
                     <Building2 className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-xs font-medium text-gray-700">홈페이지</p>
-                      <a href={detail.homepage} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline break-all">
+                      <a href={detail.homepage} target="_blank" rel="noreferrer" className="text-sm text-blue-600 dark:text-blue-400 hover:underline break-all">
                         {detail.homepage.replace(/^https?:\/\//, '')}
                       </a>
                     </div>
@@ -888,7 +888,7 @@ export default function FacilityMap({ facilities }: Props) {
                         onClick={() => toggleCompare(f)}
                         className={`shrink-0 p-1.5 rounded-full border transition-all ${
                           compareSet.has(f.facility_id)
-                            ? 'bg-blue-50 border-blue-200 text-blue-600'
+                            ? 'bg-blue-50 border-blue-200 text-blue-600 dark:text-blue-400'
                             : 'border-gray-200 text-gray-400 hover:text-gray-600'
                         }`}
                       >

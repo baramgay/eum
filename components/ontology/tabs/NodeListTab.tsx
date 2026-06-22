@@ -431,7 +431,7 @@ export default function NodeListTab({
                             className="!p-1 h-auto"
                             title="ID 복사"
                           >
-                            {copiedId ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copiedId ? <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                           </Btn>
                         </div>
                       </td>

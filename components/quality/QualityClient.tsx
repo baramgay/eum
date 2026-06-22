@@ -510,7 +510,7 @@ export default function QualityClient() {
                 <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{sig.label}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{AREA_META[sig.name].desc}</p>
                 <p className={`text-xs font-medium mt-2 ${
-                  sig.status === 'pass' ? 'text-green-600' :
+                  sig.status === 'pass' ? 'text-green-600 dark:text-green-400' :
                   sig.status === 'fail' ? 'text-red-600' : 'text-gray-400 dark:text-gray-300'
                 }`}>
                   {sig.status === 'none' ? '미측정' : sig.violations === 0 ? '이상 없음' : `${sig.violations.toLocaleString()}건 위반`}
@@ -596,7 +596,7 @@ export default function QualityClient() {
               onClick={() => setActiveTab(tab.key as TabKey)}
               className={`flex items-center gap-1.5 pb-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.key
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -830,7 +830,7 @@ export default function QualityClient() {
                             <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1.5">{issue.rule}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-mono">{issue.table} · {truncateId(issue.datasetId)}</p>
                           </div>
-                          <span className="text-lg font-bold text-red-600">{issue.violations.toLocaleString()}</span>
+                          <span className="text-lg font-bold text-red-600 dark:text-red-400">{issue.violations.toLocaleString()}</span>
                         </div>
                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-3 bg-gray-50 dark:bg-gray-950 p-2 rounded-lg">{issue.recommendation}</p>
                       </Card>
@@ -886,7 +886,7 @@ export default function QualityClient() {
                   id="quality-dataset"
                   value={selectedDataset}
                   onChange={e => setSelectedDataset(e.target.value)}
-                  className="px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
                 >
                   {results.map(r => (
                     <option key={r.dataset_id} value={r.dataset_id}>{r.table} ({truncateId(r.dataset_id)})</option>
@@ -899,14 +899,14 @@ export default function QualityClient() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Card className="text-center">
                       <p className="text-xs text-gray-500 dark:text-gray-400">현재 오류율</p>
-                      <p className={`text-2xl font-bold mt-1 ${compare.current.passed ? 'text-green-600' : 'text-red-600'}`}>
+                      <p className={`text-2xl font-bold mt-1 ${compare.current.passed ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {compare.current.error_rate.toFixed(4)}%
                       </p>
                       <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">{formatDate(compare.current.ran_at)}</p>
                     </Card>
                     <Card className="text-center">
                       <p className="text-xs text-gray-500 dark:text-gray-400">이전 대비 오류율</p>
-                      <p className={`text-2xl font-bold mt-1 flex items-center justify-center gap-1 ${compare.improved ? 'text-green-600' : 'text-red-600'}`}>
+                      <p className={`text-2xl font-bold mt-1 flex items-center justify-center gap-1 ${compare.improved ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {compare.improved ? <TrendingDown className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />}
                         {compare.deltaRate > 0 ? '+' : ''}{compare.deltaRate.toFixed(4)}%
                       </p>
@@ -914,7 +914,7 @@ export default function QualityClient() {
                     </Card>
                     <Card className="text-center">
                       <p className="text-xs text-gray-500 dark:text-gray-400">오류 건수 변화</p>
-                      <p className={`text-2xl font-bold mt-1 ${compare.deltaErrors <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <p className={`text-2xl font-bold mt-1 ${compare.deltaErrors <= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {compare.deltaErrors > 0 ? '+' : ''}{compare.deltaErrors.toLocaleString()}건
                       </p>
                       <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">현재 {compare.current.errors.toLocaleString()}건</p>

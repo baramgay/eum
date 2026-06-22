@@ -178,7 +178,7 @@ export default function LineageWidget() {
           데이터 계보
         </h3>
         <div className="flex items-center gap-3">
-          <Link href="/ontology" className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition-colors">바로가기 →</Link>
+          <Link href="/ontology" className="text-xs text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors">바로가기 →</Link>
           {TYPE_ORDER.map(t => (
             <span key={t} className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
               <span

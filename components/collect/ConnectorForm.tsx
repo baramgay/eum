@@ -53,7 +53,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
   }
 
   const inputClass =
-    'w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+    'w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500'
   const labelClass = 'block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1'
 
   return (
@@ -64,7 +64,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
           id="connector-type"
           value={type}
           onChange={e => handleTypeChange(e.target.value as ConnectorType)}
-          className="px-2 py-1 border rounded text-xs"
+          className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
         >
           <option value="none">사용 안 함</option>
           <option value="postgres">PostgreSQL</option>
@@ -281,7 +281,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
             {testing ? '테스트 중...' : '연결 테스트'}
           </Btn>
           {testMessage && (
-            <span className={`text-xs ${testMessage.includes('성공') ? 'text-green-600' : 'text-red-600'}`}>
+            <span className={`text-xs ${testMessage.includes('성공') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {testMessage}
             </span>
           )}

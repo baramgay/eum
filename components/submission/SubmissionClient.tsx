@@ -302,13 +302,13 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                 <label htmlFor="submission-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">제목 <span className="text-red-500">*</span></label>
                 <input id="submission-title" name="title" required placeholder="데이터셋 제목"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
               </div>
               <div>
                 <label htmlFor="submission-theme" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">주제 <span className="text-red-500">*</span></label>
                 <input id="submission-theme" name="theme" required placeholder="예: 인구통계"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
               </div>
               <div>
                 <label htmlFor="submission-format" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">포맷</label>
@@ -323,14 +323,14 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                 <label htmlFor="submission-license" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">라이선스 <span className="text-red-500">*</span></label>
                 <input id="submission-license" name="license" required placeholder="공공누리 1유형" defaultValue="공공누리 1유형"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
               </div>
             </div>
             <div>
               <label htmlFor="submission-description" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">설명 <span className="text-red-500">*</span></label>
               <textarea id="submission-description" name="description" required rows={3} placeholder="데이터셋 설명 (20자 이상)"
                 onChange={refreshChecks}
-                className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">최소 20자 이상 입력해 주세요.</p>
             </div>
             <div>
@@ -358,10 +358,10 @@ export default function SubmissionClient({ role, tenantId }: Props) {
               >
                 <p className="text-gray-500 dark:text-gray-300 text-sm">
                   {filePreview
-                    ? <span className="text-blue-600 font-medium flex items-center justify-center gap-1">
+                    ? <span className="text-blue-600 dark:text-blue-400 font-medium flex items-center justify-center gap-1">
                         <FileSpreadsheet className="w-4 h-4" /> {filePreview.fileName} · {filePreview.rowCount.toLocaleString()}행
                       </span>
-                    : <><span className="text-blue-600 font-medium">CSV 파일을 클릭하거나 드래그</span>하여 올려주세요</>
+                    : <><span className="text-blue-600 dark:text-blue-400 font-medium">CSV 파일을 클릭하거나 드래그</span>하여 올려주세요</>
                   }
                 </p>
               </button>
@@ -502,7 +502,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="데이터셋 제목 검색"
-                className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
               />
               {search && (
                 <button

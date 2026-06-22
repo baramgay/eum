@@ -314,7 +314,7 @@ export default function EditTab() {
                       <td className="px-3 py-2">
                         <div className="flex justify-end gap-1">
                           <button onClick={saveNode} disabled={savingNode} aria-label="저장"
-                            className="p-1 text-green-600 hover:text-green-800 disabled:opacity-40">
+                            className="p-1 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 disabled:opacity-40">
                             {savingNode ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                           </button>
                           <button onClick={cancelEditNode} aria-label="취소"

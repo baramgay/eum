@@ -49,7 +49,7 @@ export default function CollectRunsPanel({ sources, logs, runningId, sseProgress
         {/* 진행 중 */}
         <div className="bg-white dark:bg-gray-900 rounded-lg border p-4 shadow-sm">
           <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-1.5">
-            <RotateCw className="w-4 h-4 text-blue-600 animate-spin" />
+            <RotateCw className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" />
             진행 중인 수집
           </h3>
           {runningLogs.length === 0 && !runningId ? (

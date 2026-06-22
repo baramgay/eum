@@ -243,7 +243,7 @@ function SqlQueryPanel() {
             </div>
             <div className="flex items-center gap-2">
               <Btn onClick={copySql} variant="secondary" size="sm" className="text-xs">
-                {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                 {copied ? '복사됨' : '복사'}
               </Btn>
               <Btn
@@ -516,7 +516,7 @@ function Sources({ sources }: { sources?: SourceItem[] }) {
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 hover:text-blue-600"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400"
               >
                 <Badge variant="gray" size="sm">{s.source}</Badge>
                 <span className="font-medium">{s.title}</span>
@@ -581,7 +581,7 @@ function ResultCard({
         )}
         {onRetry && (
           <div className="px-4 py-2 bg-gray-50 dark:bg-gray-950 border-t flex items-center gap-2">
-            <Btn onClick={onRetry} variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+            <Btn onClick={onRetry} variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200">
               <RotateCcw className="w-3.5 h-3.5" /> 다시 시도
             </Btn>
           </div>
@@ -670,7 +670,7 @@ function ResultCard({
             className="text-xs"
             title="결과 복사"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? '복사됨' : '복사'}
           </Btn>
         </div>
@@ -1272,7 +1272,7 @@ export default function AiQueryClient() {
               size="sm"
               title="대화 링크 복사"
             >
-              {copiedShare ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Share2 className="w-3.5 h-3.5" />}
+              {copiedShare ? <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" /> : <Share2 className="w-3.5 h-3.5" />}
               {copiedShare ? '복사됨' : '공유'}
             </Btn>
             <div className="relative" ref={exportBtnRef}>
@@ -1383,7 +1383,7 @@ export default function AiQueryClient() {
 
           {error && messages.length === 0 && (
             <Card className="!p-4 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-red-800 dark:text-red-200">질의 처리 중 오류가 발생했습니다</p>
                 <p className="text-sm text-red-700 dark:text-red-300 mt-0.5">{error}</p>

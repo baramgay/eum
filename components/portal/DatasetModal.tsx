@@ -611,13 +611,13 @@ export default function DatasetModal({ item, onClose }: Props) {
                         }`}
                       >
                         {c.pass
-                          ? <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          ? <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
                           : <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                         }
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{c.name}</p>
                           {!c.pass && c.detail && (
-                            <p className="text-xs text-red-600 mt-0.5">{c.detail}</p>
+                            <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">{c.detail}</p>
                           )}
                           {c.pass && c.detail && (
                             <p className="text-xs text-gray-400 dark:text-gray-300 mt-0.5">{c.detail}</p>

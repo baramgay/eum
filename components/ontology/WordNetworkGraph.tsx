@@ -13,6 +13,7 @@ import {
   forceCollide,
 } from 'd3-force'
 import type { WordNetworkNode, WordNetworkEdge } from '@/app/api/ontology/text-analysis/route'
+import { useTheme } from '@/components/theme/ThemeProvider'
 
 interface SimNode extends WordNetworkNode {
   x?: number; y?: number; vx?: number; vy?: number; fx?: number | null; fy?: number | null
@@ -50,6 +51,8 @@ export default function WordNetworkGraph({ nodes, edges, height = 440 }: Props) 
   const [hovered, setHovered] = useState<SimNode | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const simRef = useRef<any | null>(null)
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   const render = useCallback(() => {
     const svgEl = svgRef.current
@@ -133,11 +136,11 @@ export default function WordNetworkGraph({ nodes, edges, height = 440 }: Props) 
       .attr('dominant-baseline', 'central')
       .attr('font-size', d => Math.max(8, nodeRadius(d.freq, maxFreq) * 0.75))
       .attr('font-weight', d => d.freq > maxFreq * 0.5 ? '600' : '400')
-      .attr('fill', '#1e293b')
+      .attr('fill', isDark ? '#e5e7eb' : '#1e293b')
       .attr('pointer-events', 'none')
       .clone(true) // shadow for readability
       .lower()
-      .attr('stroke', '#fff')
+      .attr('stroke', isDark ? '#111827' : '#fff')
       .attr('stroke-width', 2.5)
       .attr('stroke-linejoin', 'round')
 
@@ -170,7 +173,7 @@ export default function WordNetworkGraph({ nodes, edges, height = 440 }: Props) 
     })
 
     return () => sim.stop()
-  }, [nodes, edges, height])
+  }, [nodes, edges, height, isDark])
 
   useEffect(() => {
     const cleanup = render()
