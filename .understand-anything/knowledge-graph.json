@@ -53,8 +53,8 @@
       "tags": [
         "component",
         "api-handler",
-        "관리자",
-        "멀티테넌트"
+        "admin",
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -66,9 +66,8 @@
       "summary": "감사 로그를 페이지네이션·필터링·검색과 함께 테이블로 표시하는 관리자용 뷰어 컴포넌트이다.",
       "tags": [
         "component",
-        "관리자",
-        "감사로그",
-        "데이터-조회"
+        "admin",
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -84,8 +83,7 @@
       "summary": "감사 로그 목록을 API에서 조회하여 필터·페이지네이션과 함께 렌더링하는 메인 React 컴포넌트이다.",
       "tags": [
         "component",
-        "감사로그",
-        "페이지네이션"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -97,9 +95,9 @@
       "summary": "테넌트 통계 요약 정보(상태별 카운트, 최근 가입 등)를 카드 형태로 표시하는 대시보드 위젯 컴포넌트이다.",
       "tags": [
         "component",
-        "통계",
-        "멀티테넌트",
-        "대시보드"
+        "statistics",
+        "misc",
+        "dashboard"
       ],
       "complexity": "moderate"
     },
@@ -115,8 +113,8 @@
       "summary": "테넌트 목록을 받아 상태·정부형태별 집계와 최근 가입 목록을 StatCard로 시각화하는 컴포넌트이다.",
       "tags": [
         "component",
-        "통계",
-        "멀티테넌트"
+        "statistics",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -128,9 +126,9 @@
       "summary": "테넌트 내 사용자 목록 조회, 초대, 역할 변경, 비밀번호 재설정 등 사용자 관리 기능을 제공하는 관리자 컴포넌트이다.",
       "tags": [
         "component",
-        "관리자",
-        "사용자-관리",
-        "인증"
+        "admin",
+        "misc",
+        "auth"
       ],
       "complexity": "complex"
     },
@@ -146,8 +144,8 @@
       "summary": "사용자 목록 로드, 초대 폼, 역할/비밀번호 변경 모달을 통합 관리하는 메인 관리자 사용자 관리 컴포넌트이다.",
       "tags": [
         "component",
-        "사용자-관리",
-        "인증"
+        "misc",
+        "auth"
       ],
       "complexity": "complex"
     },
@@ -160,8 +158,7 @@
       "tags": [
         "component",
         "ai",
-        "자연어-쿼리",
-        "데이터-시각화"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -178,7 +175,7 @@
       "tags": [
         "component",
         "ai",
-        "자연어-쿼리"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -194,7 +191,7 @@
       "summary": "단일 AI 쿼리 결과를 테이블, 차트, 소스 배지와 함께 카드 형태로 렌더링하는 서브 컴포넌트이다.",
       "tags": [
         "component",
-        "데이터-시각화",
+        "misc",
         "ai"
       ],
       "complexity": "complex"
@@ -212,7 +209,7 @@
       "tags": [
         "component",
         "sql",
-        "데이터-조회"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -225,7 +222,7 @@
       "tags": [
         "component",
         "ai",
-        "요약"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -242,7 +239,7 @@
       "tags": [
         "component",
         "ai",
-        "요약"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -254,8 +251,7 @@
       "summary": "공공데이터 변수 선택, 통계 분석(교차분석·회귀·상관 등) 실행, 결과 차트·테이블 렌더링을 통합하는 대규모 분석 클라이언트 컴포넌트이다.",
       "tags": [
         "component",
-        "통계-분석",
-        "데이터-시각화",
+        "misc",
         "api-handler"
       ],
       "complexity": "complex"
@@ -272,8 +268,7 @@
       "summary": "데이터셋·변수 선택부터 분석 유형 지정, API 호출, 결과 렌더링, 이력 저장까지 전체 분석 워크플로를 관리하는 메인 컴포넌트이다.",
       "tags": [
         "component",
-        "통계-분석",
-        "데이터-시각화"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -289,8 +284,8 @@
       "summary": "분석 결과 차트(막대, 산점도, 히트맵 등)를 동적으로 렌더링하는 복합 차트 컴포넌트이다.",
       "tags": [
         "component",
-        "데이터-시각화",
-        "차트"
+        "misc",
+        "chart"
       ],
       "complexity": "complex"
     },
@@ -302,9 +297,8 @@
       "summary": "위젯 기반 드래그 앤 드롭 대시보드 레이아웃을 관리하며, Supabase Realtime으로 데이터를 실시간 동기화하는 메인 대시보드 컴포넌트이다.",
       "tags": [
         "component",
-        "대시보드",
-        "실시간",
-        "드래그앤드롭"
+        "dashboard",
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -320,8 +314,8 @@
       "summary": "Realtime 구독을 통해 대시보드 데이터를 갱신하고 위젯 레이아웃·가시성을 관리하는 메인 대시보드 컴포넌트이다.",
       "tags": [
         "component",
-        "대시보드",
-        "실시간"
+        "dashboard",
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -333,9 +327,9 @@
       "summary": "localStorage 기반으로 분석 즐겨찾기를 저장·불러오기·삭제하고 분석 페이지로 빠르게 이동할 수 있는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "대시보드",
-        "즐겨찾기",
-        "위젯"
+        "dashboard",
+        "misc",
+        "widget"
       ],
       "complexity": "moderate"
     },
@@ -351,8 +345,8 @@
       "summary": "저장된 분석 즐겨찾기 목록을 렌더링하고 삭제·이동 기능을 제공하는 대시보드 위젯 컴포넌트이다.",
       "tags": [
         "component",
-        "즐겨찾기",
-        "위젯"
+        "misc",
+        "widget"
       ],
       "complexity": "moderate"
     },
@@ -364,9 +358,9 @@
       "summary": "데이터 수집 추이(월별 건수)를 Recharts 영역 차트로 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "차트",
-        "대시보드"
+        "widget",
+        "chart",
+        "dashboard"
       ],
       "complexity": "simple"
     },
@@ -378,9 +372,9 @@
       "summary": "기간별 데이터 사용량을 API로 조회하여 막대 차트로 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "차트",
-        "대시보드"
+        "widget",
+        "chart",
+        "dashboard"
       ],
       "complexity": "moderate"
     },
@@ -392,8 +386,8 @@
       "summary": "데이터 계보 그래프를 SVG로 직접 렌더링하며, 노드 타입별 색상·경로·레이아웃을 계산하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "데이터-계보",
+        "widget",
+        "misc",
         "svg"
       ],
       "complexity": "complex"
@@ -410,7 +404,7 @@
       "summary": "lineage/graph API를 호출하여 노드·엣지를 SVG로 시각화하는 대시보드 위젯 메인 컴포넌트이다.",
       "tags": [
         "component",
-        "데이터-계보",
+        "misc",
         "svg"
       ],
       "complexity": "complex"
@@ -423,9 +417,9 @@
       "summary": "인구 이동 데이터를 연도별 막대 차트로 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "차트",
-        "인구"
+        "widget",
+        "chart",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -437,9 +431,9 @@
       "summary": "pipeline API를 호출하여 최근 파이프라인 실행 상태와 처리 행 수를 카드로 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "파이프라인",
-        "대시보드"
+        "widget",
+        "pipeline",
+        "dashboard"
       ],
       "complexity": "moderate"
     },
@@ -455,8 +449,8 @@
       "summary": "API에서 파이프라인 상세 목록을 받아 상태 배지와 함께 렌더링하는 위젯 컴포넌트이다.",
       "tags": [
         "component",
-        "파이프라인",
-        "위젯"
+        "pipeline",
+        "widget"
       ],
       "complexity": "moderate"
     },
@@ -468,9 +462,9 @@
       "summary": "파이프라인 전체 상태 요약을 StatCard 세 개로 간략하게 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "파이프라인",
-        "대시보드"
+        "widget",
+        "pipeline",
+        "dashboard"
       ],
       "complexity": "simple"
     },
@@ -482,9 +476,9 @@
       "summary": "인구 추이 데이터를 연도별 라인 차트로 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "인구",
-        "차트"
+        "widget",
+        "misc",
+        "chart"
       ],
       "complexity": "simple"
     },
@@ -496,9 +490,9 @@
       "summary": "quality-signal API를 호출하여 데이터셋별 품질 등급을 신호등 스타일 배지로 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "데이터-품질",
-        "대시보드"
+        "widget",
+        "misc",
+        "dashboard"
       ],
       "complexity": "moderate"
     },
@@ -514,8 +508,8 @@
       "summary": "API에서 품질 신호 데이터를 가져와 데이터셋별 등급을 색상 배지로 렌더링하는 위젯 컴포넌트이다.",
       "tags": [
         "component",
-        "데이터-품질",
-        "위젯"
+        "misc",
+        "widget"
       ],
       "complexity": "moderate"
     },
@@ -527,9 +521,9 @@
       "summary": "데이터 품질 차원별 점수를 레이더 차트와 등급 배지로 시각화하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "데이터-품질",
-        "차트"
+        "widget",
+        "misc",
+        "chart"
       ],
       "complexity": "simple"
     },
@@ -541,9 +535,9 @@
       "summary": "최근 분석 실행 이력을 분석 유형 배지, 날짜, 결과 링크와 함께 목록으로 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "분석",
-        "이력"
+        "widget",
+        "analytics",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -559,8 +553,8 @@
       "summary": "최근 분석 실행 목록을 받아 분석 유형·소요시간·날짜를 카드 형태로 렌더링하는 위젯 컴포넌트이다.",
       "tags": [
         "component",
-        "분석",
-        "위젯"
+        "analytics",
+        "widget"
       ],
       "complexity": "moderate"
     },
@@ -572,9 +566,9 @@
       "summary": "DashboardClient의 ScoreGauge 컴포넌트를 재사용하여 종합 품질 점수와 영역별 점수를 게이지로 표시하는 경량 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "품질",
-        "게이지"
+        "widget",
+        "quality",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -586,9 +580,9 @@
       "summary": "데이터 제출 요청 현황을 상태별 StatCard로 집계 표시하는 대시보드 위젯이다.",
       "tags": [
         "component",
-        "위젯",
-        "데이터-제출",
-        "대시보드"
+        "widget",
+        "misc",
+        "dashboard"
       ],
       "complexity": "simple"
     },
@@ -602,7 +596,7 @@
         "component",
         "openapi",
         "api-schema",
-        "데이터-탐색"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -631,9 +625,9 @@
       "summary": "데이터 수집·합성·목표·정성 분석 파이프라인을 탭 기반으로 관리하고 시각화하는 파이프라인 클라이언트 컴포넌트이다.",
       "tags": [
         "component",
-        "파이프라인",
-        "데이터-관리",
-        "탭-UI"
+        "pipeline",
+        "misc",
+        "ui"
       ],
       "complexity": "complex"
     },
@@ -649,8 +643,8 @@
       "summary": "분석·합성·목표·정성 4개 탭을 탭 인터페이스로 통합 관리하는 파이프라인 메인 컴포넌트이다.",
       "tags": [
         "component",
-        "파이프라인",
-        "탭-UI"
+        "pipeline",
+        "ui"
       ],
       "complexity": "complex"
     },
@@ -666,8 +660,8 @@
       "summary": "분석 파이프라인 목록과 실행 상태를 관리하며 PipelineFlow 시각화를 포함하는 탭 컴포넌트이다.",
       "tags": [
         "component",
-        "파이프라인",
-        "분석"
+        "pipeline",
+        "analytics"
       ],
       "complexity": "complex"
     },
@@ -683,8 +677,8 @@
       "summary": "합성데이터 파이프라인 생성·실행·모니터링 기능을 제공하는 탭 컴포넌트이다.",
       "tags": [
         "component",
-        "파이프라인",
-        "합성데이터"
+        "pipeline",
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -696,9 +690,8 @@
       "summary": "지표를 목표치와 비교하는 히트맵 셀 방식의 비교 보고서 컴포넌트로, 데이터 없이 독립적으로 렌더링된다.",
       "tags": [
         "component",
-        "보고서",
-        "비교",
-        "히트맵"
+        "report",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -714,8 +707,8 @@
       "summary": "지표·목표·단위를 받아 히트셀 기반 비교 표를 렌더링하는 보고서 비교 컴포넌트이다.",
       "tags": [
         "component",
-        "보고서",
-        "비교"
+        "report",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -727,8 +720,8 @@
       "summary": "AI 보조 보고서 편집기로, 블록 기반 콘텐츠 편집·지표 연동·이력 관리·마크다운 내보내기 기능을 통합한 대규모 보고서 클라이언트이다.",
       "tags": [
         "component",
-        "보고서",
-        "편집기",
+        "report",
+        "misc",
         "ai"
       ],
       "complexity": "complex"
@@ -745,8 +738,8 @@
       "summary": "보고서 블록 생성·편집·AI 보완·Supabase 저장·마크다운 내보내기를 통합 관리하는 메인 보고서 편집 컴포넌트이다.",
       "tags": [
         "component",
-        "보고서",
-        "편집기"
+        "report",
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -758,9 +751,8 @@
       "summary": "데이터 제출 요청 목록 관리, 새 제출 생성, 상태 필터링, 상세 뷰어 연동을 제공하는 데이터 제출 클라이언트 컴포넌트이다.",
       "tags": [
         "component",
-        "데이터-제출",
-        "api-handler",
-        "목록-관리"
+        "misc",
+        "api-handler"
       ],
       "complexity": "complex"
     },
@@ -776,8 +768,7 @@
       "summary": "제출 목록 조회, 필터링, 신규 제출 폼, SubmissionDetail 모달 연동을 통합 관리하는 메인 제출 컴포넌트이다.",
       "tags": [
         "component",
-        "데이터-제출",
-        "목록-관리"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -789,9 +780,7 @@
       "summary": "개별 데이터 제출 요청의 상세 정보를 표시하고 승인·반려 결정을 처리하는 상세 뷰어 컴포넌트이다.",
       "tags": [
         "component",
-        "데이터-제출",
-        "승인-흐름",
-        "상세-뷰"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -807,8 +796,7 @@
       "summary": "제출 ID를 받아 상세 내용을 조회하고 역할 기반 승인·반려 액션을 렌더링하는 상세 뷰어 컴포넌트이다.",
       "tags": [
         "component",
-        "데이터-제출",
-        "승인-흐름"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -821,8 +809,7 @@
       "tags": [
         "component",
         "ui",
-        "배지",
-        "공통"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -839,7 +826,7 @@
       "tags": [
         "component",
         "ui",
-        "배지"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -852,8 +839,7 @@
       "tags": [
         "component",
         "ui",
-        "버튼",
-        "공통"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -870,7 +856,7 @@
       "tags": [
         "component",
         "ui",
-        "버튼"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -883,8 +869,7 @@
       "tags": [
         "component",
         "ui",
-        "카드",
-        "공통"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -901,7 +886,7 @@
       "tags": [
         "component",
         "ui",
-        "카드"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -914,8 +899,7 @@
       "tags": [
         "component",
         "ui",
-        "빈-상태",
-        "공통"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -932,7 +916,7 @@
       "tags": [
         "component",
         "ui",
-        "빈-상태"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -945,8 +929,7 @@
       "tags": [
         "component",
         "ui",
-        "페이지-헤더",
-        "공통"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -963,7 +946,7 @@
       "tags": [
         "component",
         "ui",
-        "페이지-헤더"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -976,8 +959,7 @@
       "tags": [
         "component",
         "ui",
-        "로딩",
-        "공통"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -994,7 +976,7 @@
       "tags": [
         "component",
         "ui",
-        "로딩"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -1007,8 +989,8 @@
       "tags": [
         "component",
         "ui",
-        "통계",
-        "공통"
+        "statistics",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -1025,7 +1007,7 @@
       "tags": [
         "component",
         "ui",
-        "통계"
+        "statistics"
       ],
       "complexity": "simple"
     },
@@ -1037,9 +1019,8 @@
       "summary": "색상 이름을 키로 Tailwind CSS 클래스 조합(배경·텍스트·테두리)을 매핑하고, 노트·배지용 tint 헬퍼 함수를 제공하는 디자인 토큰 모듈이다.",
       "tags": [
         "utility",
-        "디자인-토큰",
-        "색상",
-        "공통"
+        "misc",
+        "color"
       ],
       "complexity": "moderate",
       "languageNotes": "TINT 객체가 Tailwind 클래스 문자열을 동적으로 매핑하므로, PurgeCSS 설정에서 safelist 처리가 필요할 수 있다."
@@ -1056,8 +1037,8 @@
       "summary": "색상 이름을 받아 노트/알림용 Tailwind 클래스 문자열을 반환하는 헬퍼 함수이다.",
       "tags": [
         "utility",
-        "색상",
-        "디자인-토큰"
+        "color",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -1073,8 +1054,8 @@
       "summary": "색상 이름을 받아 배지용 Tailwind 클래스 문자열을 반환하는 헬퍼 함수이다.",
       "tags": [
         "utility",
-        "색상",
-        "배지"
+        "color",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -2736,7 +2717,7 @@
       "tags": [
         "test",
         "ai",
-        "단위-테스트",
+        "unit-test",
         "provider"
       ],
       "complexity": "moderate"
@@ -2749,8 +2730,8 @@
       "summary": "공공데이터포털 어댑터의 XML/JSON 파싱, 응답 정규화, 데이터 수집 함수 등을 망라하는 단위 테스트 파일입니다.",
       "tags": [
         "test",
-        "단위-테스트",
-        "공공데이터",
+        "unit-test",
+        "misc",
         "collector"
       ],
       "complexity": "moderate"
@@ -2763,8 +2744,8 @@
       "summary": "데이터 품질 평가 라이브러리(evaluation.ts)의 핵심 지표 계산, AI 준비도 체크리스트, 합성 데이터 보너스 등의 로직을 검증하는 단위 테스트입니다.",
       "tags": [
         "test",
-        "단위-테스트",
-        "품질-평가",
+        "unit-test",
+        "misc",
         "ai-ready"
       ],
       "complexity": "moderate"
@@ -2777,8 +2758,8 @@
       "summary": "알림 생성 함수(createNotification)의 동작을 검증하는 단위 테스트 파일입니다.",
       "tags": [
         "test",
-        "단위-테스트",
-        "알림",
+        "unit-test",
+        "notification",
         "notifications"
       ],
       "complexity": "simple"
@@ -2792,8 +2773,8 @@
       "tags": [
         "entry-point",
         "admin",
-        "서버-컴포넌트",
-        "모니터링"
+        "server-component",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -2808,9 +2789,9 @@
       ],
       "summary": "인증을 확인하고 MonitoringClient 컴포넌트를 반환하는 Next.js 서버 페이지 컴포넌트입니다.",
       "tags": [
-        "서버-컴포넌트",
+        "server-component",
         "admin",
-        "인증"
+        "auth"
       ],
       "complexity": "simple"
     },
@@ -2823,8 +2804,8 @@
       "tags": [
         "entry-point",
         "admin",
-        "서버-컴포넌트",
-        "멀티테넌트"
+        "server-component",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -2839,9 +2820,9 @@
       ],
       "summary": "인증 확인 후 전체 테넌트 목록을 Supabase에서 조회하여 AdminClient에 props로 전달하는 서버 페이지입니다.",
       "tags": [
-        "서버-컴포넌트",
+        "server-component",
         "admin",
-        "멀티테넌트"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -2854,8 +2835,8 @@
       "tags": [
         "entry-point",
         "ai",
-        "서버-컴포넌트",
-        "쿼리"
+        "server-component",
+        "query"
       ],
       "complexity": "simple"
     },
@@ -2870,9 +2851,9 @@
       ],
       "summary": "Supabase 인증 후 AiQueryClient를 반환하는 Next.js 서버 페이지 컴포넌트입니다.",
       "tags": [
-        "서버-컴포넌트",
+        "server-component",
         "ai",
-        "인증"
+        "auth"
       ],
       "complexity": "simple"
     },
@@ -2884,8 +2865,8 @@
       "summary": "데이터 통계 페이지의 서버 컴포넌트로, 인증 확인 후 AnalyticsClient를 렌더링합니다.",
       "tags": [
         "entry-point",
-        "통계",
-        "서버-컴포넌트",
+        "statistics",
+        "server-component",
         "analytics"
       ],
       "complexity": "simple"
@@ -2901,9 +2882,9 @@
       ],
       "summary": "Supabase 인증 후 AnalyticsClient를 반환하는 Next.js 서버 페이지 컴포넌트입니다.",
       "tags": [
-        "서버-컴포넌트",
-        "통계",
-        "인증"
+        "server-component",
+        "statistics",
+        "auth"
       ],
       "complexity": "simple"
     },
@@ -2917,7 +2898,7 @@
         "api-handler",
         "audit",
         "admin",
-        "페이지네이션"
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -2934,8 +2915,7 @@
       "tags": [
         "api-handler",
         "audit",
-        "필터링",
-        "페이지네이션"
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -2948,8 +2928,7 @@
       "tags": [
         "api-handler",
         "ai",
-        "예시-생성",
-        "카탈로그"
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -2964,9 +2943,9 @@
       ],
       "summary": "카탈로그 행 데이터에서 테마·지역 조합으로 중복 없는 AI 질의 예시 문장 목록을 생성합니다.",
       "tags": [
-        "유틸리티",
+        "utility",
         "ai",
-        "예시-생성"
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -2983,7 +2962,7 @@
       "tags": [
         "api-handler",
         "ai",
-        "카탈로그"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -2995,9 +2974,9 @@
       "summary": "테이블 또는 컬럼 지정 데이터에 대해 Python 기반 분석 스크립트를 실행하는 POST API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "데이터-분석",
+        "misc",
         "python",
-        "통계"
+        "statistics"
       ],
       "complexity": "moderate"
     },
@@ -3013,7 +2992,7 @@
       "summary": "요청 유형(table/column)에 따라 runAnalyzePy를 호출해 분석 결과를 반환하는 POST 핸들러입니다.",
       "tags": [
         "api-handler",
-        "데이터-분석",
+        "misc",
         "python"
       ],
       "complexity": "moderate"
@@ -3026,8 +3005,7 @@
       "summary": "업로드된 파일을 임시 디렉토리에 저장하고 Python 분석 스크립트를 실행한 뒤 결과를 반환하는 POST API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "파일-업로드",
-        "데이터-분석",
+        "misc",
         "python"
       ],
       "complexity": "moderate"
@@ -3044,8 +3022,7 @@
       "summary": "multipart 파일을 임시 경로에 저장하고 runAnalyzePy를 호출한 뒤 임시 파일을 삭제하는 POST 핸들러입니다.",
       "tags": [
         "api-handler",
-        "파일-업로드",
-        "임시-파일"
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3058,7 +3035,7 @@
       "tags": [
         "api-handler",
         "audit",
-        "페이지네이션"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -3070,9 +3047,8 @@
       "summary": "특정 카탈로그 데이터셋의 AI 준비도 체크리스트를 계산해 반환하는 GET API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "카탈로그",
-        "ai-ready",
-        "품질-평가"
+        "misc",
+        "ai-ready"
       ],
       "complexity": "simple"
     },
@@ -3084,9 +3060,8 @@
       "summary": "카탈로그 데이터셋 단건 조회(GET)와 메타데이터 수정(PATCH)을 처리하며, 품질 계약 유효성 검사를 포함합니다.",
       "tags": [
         "api-handler",
-        "카탈로그",
-        "crud",
-        "품질-계약"
+        "misc",
+        "crud"
       ],
       "complexity": "moderate"
     },
@@ -3102,8 +3077,7 @@
       "summary": "dataset_id로 카탈로그 단건을 조회해 반환하는 GET 핸들러입니다.",
       "tags": [
         "api-handler",
-        "카탈로그",
-        "조회"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -3119,9 +3093,7 @@
       "summary": "카탈로그 메타데이터를 수정하며 품질 계약 유효성과 허용 필드를 검증하는 PATCH 핸들러입니다.",
       "tags": [
         "api-handler",
-        "카탈로그",
-        "수정",
-        "검증"
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3133,8 +3105,7 @@
       "summary": "카탈로그 데이터셋 구독 상태 조회(GET), 구독 추가(POST), 구독 해제(DELETE)를 처리하는 RESTful API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "카탈로그",
-        "구독",
+        "misc",
         "crud"
       ],
       "complexity": "moderate"
@@ -3148,8 +3119,7 @@
       "tags": [
         "api-handler",
         "ai",
-        "메타데이터",
-        "카탈로그"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -3166,7 +3136,7 @@
       "tags": [
         "api-handler",
         "ai",
-        "메타데이터-생성"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -3178,9 +3148,9 @@
       "summary": "청년·이주 인구 통계 및 제출 현황 데이터를 집계하여 차트용 데이터를 반환하는 GET API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "차트",
-        "통계",
-        "데이터-집계"
+        "chart",
+        "statistics",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3196,8 +3166,8 @@
       "summary": "gold_youth_population과 submissions 테이블에서 데이터를 조회하고 시군별·연도별로 집계하는 GET 핸들러입니다.",
       "tags": [
         "api-handler",
-        "통계",
-        "데이터-집계"
+        "statistics",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3210,7 +3180,7 @@
       "tags": [
         "api-handler",
         "ai",
-        "채팅",
+        "misc",
         "chatbot"
       ],
       "complexity": "simple"
@@ -3223,8 +3193,8 @@
       "summary": "수집 작업(collection_job)의 스케줄 타입, 활성화 여부, 다음 실행 시각 등을 수정하는 PATCH API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "스케줄링",
+        "collect",
+        "misc",
         "job"
       ],
       "complexity": "moderate"
@@ -3237,9 +3207,8 @@
       "summary": "특정 수집 소스의 수집 로그 목록을 조회하며 테넌트 소유권을 검증하는 GET API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "로그",
-        "멀티테넌트"
+        "collect",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -3251,9 +3220,9 @@
       "summary": "수집 소스의 최근 성공 로그를 기반으로 데이터 미리보기와 스키마 정보를 반환하는 GET API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "미리보기",
-        "스키마"
+        "collect",
+        "misc",
+        "schema"
       ],
       "complexity": "moderate"
     },
@@ -3265,9 +3234,9 @@
       "summary": "수집 소스 단건 조회(GET), 설정 수정(PATCH), 삭제(DELETE)를 처리하며 인증 값 암호화를 포함하는 RESTful API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
+        "collect",
         "crud",
-        "암호화"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -3283,8 +3252,8 @@
       "summary": "수집 소스와 최근 로그를 조회해 테넌트 권한을 확인 후 반환하는 GET 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "조회"
+        "collect",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3300,9 +3269,8 @@
       "summary": "수집 소스 설정을 수정하며 인증 값 암호화 및 스케줄 재계산을 처리하는 PATCH 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "암호화",
-        "스케줄링"
+        "collect",
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -3314,8 +3282,8 @@
       "summary": "수집 작업을 즉시 실행하며 SSE 스트리밍과 일반 응답을 모두 지원하고, 완료 시 알림을 발송하는 POST API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "스트리밍",
+        "collect",
+        "misc",
         "sse"
       ],
       "complexity": "complex"
@@ -3332,9 +3300,9 @@
       "summary": "수집 작업을 즉시 실행하고 SSE 또는 JSON으로 진행 상황을 전달하며 완료 후 createNotification을 호출하는 POST 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
+        "collect",
         "sse",
-        "알림"
+        "notification"
       ],
       "complexity": "complex"
     },
@@ -3346,9 +3314,9 @@
       "summary": "수집 작업을 실행하면서 진행 상황을 Server-Sent Events(SSE)로 실시간 스트리밍하는 GET API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
+        "collect",
         "sse",
-        "스트리밍"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -3365,8 +3333,8 @@
       "tags": [
         "api-handler",
         "sse",
-        "수집",
-        "실시간"
+        "collect",
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -3378,9 +3346,8 @@
       "summary": "전체 수집 로그를 페이지네이션으로 조회하며 소스·테넌트·상태별 필터링을 지원하는 GET API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "로그",
-        "필터링"
+        "collect",
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -3392,8 +3359,8 @@
       "summary": "특정 수집 로그 ID로 미리보기 데이터를 조회하는 GET API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "미리보기"
+        "collect",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3405,9 +3372,9 @@
       "summary": "수집 소스 목록 조회(GET)와 새 수집 소스·작업 생성(POST)을 처리하며 인증 값 암호화를 포함하는 RESTful API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
+        "collect",
         "crud",
-        "암호화"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -3423,8 +3390,8 @@
       "summary": "수집 소스 목록과 각 소스의 작업 상태를 조합해 반환하는 GET 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "목록-조회"
+        "collect",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3440,9 +3407,8 @@
       "summary": "새 수집 소스를 생성하고 연관 수집 작업(job)도 함께 삽입하는 POST 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "생성",
-        "멀티테넌트"
+        "collect",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3454,9 +3420,9 @@
       "summary": "수집 소스 설정을 임시로 테스트해 샘플 데이터와 컬럼 정보를 반환하는 POST API 핸들러입니다.",
       "tags": [
         "api-handler",
-        "수집",
-        "테스트",
-        "미리보기"
+        "collect",
+        "test",
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -3469,8 +3435,8 @@
       "tags": [
         "api-handler",
         "cron",
-        "모니터링",
-        "알림"
+        "misc",
+        "notification"
       ],
       "complexity": "complex"
     },
@@ -3486,8 +3452,8 @@
       "summary": "1시간 이내의 API·수집·파이프라인 오류 데이터를 집계하고 임계값 초과 시 sendEmail을 호출하는 크론 GET 핸들러입니다.",
       "tags": [
         "cron",
-        "모니터링",
-        "알림",
+        "misc",
+        "notification",
         "telemetry"
       ],
       "complexity": "complex"
@@ -4714,7 +4680,7 @@
       "tags": [
         "hook",
         "search",
-        "localStorage",
+        "localstorage",
         "utility"
       ],
       "complexity": "simple"
@@ -4732,7 +4698,7 @@
       "tags": [
         "hook",
         "search-history",
-        "localStorage"
+        "localstorage"
       ],
       "complexity": "simple"
     },
@@ -8806,7 +8772,7 @@
         "entry-point",
         "api-handler",
         "component",
-        "서버-컴포넌트"
+        "server-component"
       ],
       "complexity": "simple"
     },
@@ -8818,9 +8784,9 @@
       "summary": "공공시설 지도 탐색을 위한 메인 클라이언트 컴포넌트로, 레이어 전환(마커/히트맵/클러스터), 필터링, 시설 상세 패널, 비교 기능 등 전체 UI 상태를 관리한다.",
       "tags": [
         "component",
-        "지도",
-        "상태관리",
-        "클라이언트-컴포넌트"
+        "map",
+        "misc",
+        "client-component"
       ],
       "complexity": "complex"
     },
@@ -8832,9 +8798,9 @@
       "summary": "Kakao Maps API를 동적으로 로드하고 마커·히트맵·클러스터 레이어를 직접 조작하는 저수준 지도 렌더링 컴포넌트로, forwardRef를 통해 setCenter·resetView 등 명령형 API를 노출한다.",
       "tags": [
         "component",
-        "지도",
+        "map",
         "kakao-maps",
-        "저수준"
+        "misc"
       ],
       "complexity": "complex",
       "languageNotes": "useImperativeHandle + forwardRef 패턴으로 부모가 지도 인스턴스에 직접 명령을 내릴 수 있도록 설계되었으며, 카카오 Maps SDK를 lazy load하여 SSR 환경에서 발생하는 window 미정의 문제를 회피한다."
@@ -8848,8 +8814,8 @@
       "tags": [
         "component",
         "utility",
-        "지도",
-        "시각화"
+        "map",
+        "visualization"
       ],
       "complexity": "simple"
     },
@@ -8861,8 +8827,8 @@
       "summary": "getPinSvg로 생성한 SVG를 URL-encoded data URI로 변환하여 Kakao Maps 마커 이미지 URL로 사용 가능하게 하는 단순 유틸리티.",
       "tags": [
         "utility",
-        "지도",
-        "마커"
+        "map",
+        "marker"
       ],
       "complexity": "simple"
     },
@@ -8875,8 +8841,7 @@
       "tags": [
         "utility",
         "gis",
-        "클러스터링",
-        "공간분석",
+        "misc",
         "tested"
       ],
       "complexity": "complex"
@@ -8890,8 +8855,8 @@
       "tags": [
         "utility",
         "gis",
-        "히트맵",
-        "시각화",
+        "misc",
+        "visualization",
         "tested"
       ],
       "complexity": "complex"
@@ -8907,7 +8872,7 @@
       ],
       "summary": "Supabase에서 공공시설 데이터를 조회하고 인증 여부를 확인한 후 FacilityMap 컴포넌트를 렌더링하는 서버 컴포넌트.",
       "tags": [
-        "서버-컴포넌트",
+        "server-component",
         "entry-point",
         "api-handler"
       ],
@@ -8925,8 +8890,8 @@
       "summary": "지도 레이어 모드·필터·검색·반경·비교·드릴다운 등 모든 UI 상태를 관리하며 MapInner를 조율하는 최상위 클라이언트 컴포넌트.",
       "tags": [
         "component",
-        "상태관리",
-        "클라이언트-컴포넌트"
+        "misc",
+        "client-component"
       ],
       "complexity": "complex"
     },
@@ -8959,8 +8924,7 @@
       "tags": [
         "component",
         "kakao-maps",
-        "저수준",
-        "이벤트"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -8977,7 +8941,7 @@
       "tags": [
         "utility",
         "kakao-maps",
-        "비동기"
+        "misc"
       ],
       "complexity": "moderate"
     },
@@ -8994,7 +8958,7 @@
       "tags": [
         "utility",
         "svg",
-        "마커"
+        "marker"
       ],
       "complexity": "moderate"
     },
@@ -9010,7 +8974,7 @@
       "summary": "SVG 핀을 URL-encoded data URI로 변환하여 Kakao Maps Marker 이미지 src에 직접 사용 가능한 문자열을 반환한다.",
       "tags": [
         "utility",
-        "마커",
+        "marker",
         "svg"
       ],
       "complexity": "simple"
@@ -9028,7 +8992,7 @@
       "tags": [
         "clustering",
         "gis",
-        "알고리즘"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -9045,7 +9009,7 @@
       "tags": [
         "clustering",
         "gis",
-        "알고리즘"
+        "misc"
       ],
       "complexity": "complex"
     },
@@ -9061,7 +9025,7 @@
       "summary": "Andrew's monotone chain 알고리즘으로 포인트 집합의 convex hull을 계산하여 클러스터 폴리곤 시각화에 사용한다.",
       "tags": [
         "gis",
-        "알고리즘",
+        "misc",
         "geometry"
       ],
       "complexity": "moderate"
@@ -9079,7 +9043,7 @@
       "tags": [
         "utility",
         "clustering",
-        "통계"
+        "statistics"
       ],
       "complexity": "simple"
     },
@@ -9094,9 +9058,8 @@
       ],
       "summary": "지리 좌표 포인트를 균등 격자로 집계하여 히트맵 격자 셀 배열을 반환한다.",
       "tags": [
-        "히트맵",
-        "gis",
-        "알고리즘"
+        "misc",
+        "gis"
       ],
       "complexity": "moderate"
     },
@@ -9111,9 +9074,8 @@
       ],
       "summary": "Gaussian 커널 밀도 추정으로 각 격자 셀의 가중치 합산 값을 계산하는 히트맵 알고리즘.",
       "tags": [
-        "히트맵",
-        "gis",
-        "커널밀도"
+        "misc",
+        "gis"
       ],
       "complexity": "complex"
     },
@@ -9128,9 +9090,9 @@
       ],
       "summary": "히트맵 강도 값(0~1)과 팔레트 이름을 받아 RGBA 색상 문자열을 반환하는 색상 매핑 함수.",
       "tags": [
-        "시각화",
-        "히트맵",
-        "색상"
+        "visualization",
+        "misc",
+        "color"
       ],
       "complexity": "simple"
     },
@@ -13543,8 +13505,7 @@
       "summary": "Supabase에서 테넌트별 제출 현황을 조회하여 공공데이터 개방계획 마크다운 초안을 생성한다.",
       "tags": [
         "planning",
-        "공공데이터",
-        "마크다운-생성"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -13560,8 +13521,7 @@
       "summary": "보류 상태 제출물의 품질 요약을 파싱하여 개선과제 중심의 품질개선계획 마크다운 초안을 생성한다.",
       "tags": [
         "planning",
-        "품질진단",
-        "마크다운-생성"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -13595,7 +13555,7 @@
       "tags": [
         "audit",
         "submission",
-        "감사로그"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -13612,7 +13572,7 @@
       "tags": [
         "email",
         "submission",
-        "알림"
+        "notification"
       ],
       "complexity": "simple"
     },
@@ -13628,7 +13588,7 @@
       "summary": "제출물의 상태(승인/반려/검토)와 결정 의견, 결정 일시를 submissions 테이블에 업데이트한다.",
       "tags": [
         "submission",
-        "결정",
+        "misc",
         "supabase"
       ],
       "complexity": "simple"
@@ -13662,8 +13622,7 @@
       "summary": "데이터셋의 최근 2개 품질 이력을 비교하여 오류 수/오류율 변화량과 개선 여부를 반환한다.",
       "tags": [
         "quality",
-        "품질비교",
-        "이력"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -13679,7 +13638,7 @@
       "summary": "haversineKm을 이용해 두 GeoPoint 간 거리를 미터 단위로 반환하는 래퍼 함수이다.",
       "tags": [
         "gis",
-        "거리계산",
+        "misc",
         "haversine"
       ],
       "complexity": "simple"
@@ -13697,7 +13656,7 @@
       "tags": [
         "heatmap",
         "gis",
-        "셀크기"
+        "misc"
       ],
       "complexity": "simple"
     },
@@ -13724,7 +13683,7 @@
         "migration",
         "supabase",
         "database",
-        "평가편람"
+        "misc"
       ],
       "complexity": "simple"
     }
@@ -24352,7 +24311,7 @@
     {
       "source": "service:docker-compose.yml:app",
       "target": "service:Dockerfile",
-      "type": "deploys",
+      "type": "related",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25166,7 +25125,7 @@
     {
       "source": "service:Dockerfile",
       "target": "file:package.json",
-      "type": "deploys",
+      "type": "related",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25180,7 +25139,7 @@
     {
       "source": "table:supabase/migrations/002_rpc.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25194,7 +25153,7 @@
     {
       "source": "table:supabase/migrations/003_quality_rpc.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25208,7 +25167,7 @@
     {
       "source": "table:supabase/migrations/004_fix_rls_jwt_claims.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25222,7 +25181,7 @@
     {
       "source": "table:supabase/migrations/005_seed_gold_data.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25236,7 +25195,7 @@
     {
       "source": "table:supabase/migrations/007_fix_migration_calc.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25250,7 +25209,7 @@
     {
       "source": "table:supabase/migrations/008_gold_business.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25264,7 +25223,7 @@
     {
       "source": "table:supabase/migrations/009_real_facilities.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25278,7 +25237,7 @@
     {
       "source": "table:supabase/migrations/013_access_logs_response_ms.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25292,7 +25251,7 @@
     {
       "source": "table:supabase/migrations/014_search.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25306,7 +25265,7 @@
     {
       "source": "table:supabase/migrations/018_collection_pagination.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25320,7 +25279,7 @@
     {
       "source": "table:supabase/migrations/020_tenant_status.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25334,7 +25293,7 @@
     {
       "source": "table:supabase/migrations/021_admin_enhancements.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25348,7 +25307,7 @@
     {
       "source": "table:supabase/migrations/025_ontology_schema_upgrade.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25362,7 +25321,7 @@
     {
       "source": "table:supabase/migrations/026_collection_connector_config.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25376,7 +25335,7 @@
     {
       "source": "table:supabase/migrations/027_embeddings.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25390,7 +25349,7 @@
     {
       "source": "table:supabase/migrations/030_ontology_workspace.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25404,7 +25363,7 @@
     {
       "source": "table:supabase/migrations/031_nl_to_sql.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25418,7 +25377,7 @@
     {
       "source": "table:supabase/migrations/032_quality_duplicate_rpc.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25432,7 +25391,7 @@
     {
       "source": "table:supabase/migrations/035_catalog_fts.sql",
       "target": "table:supabase/migrations/001_initial.sql",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25474,14 +25433,14 @@
     {
       "source": "file:kimi.html",
       "target": "document:README.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.5
     },
     {
       "source": "file:status.html",
       "target": "document:README.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.5
     },
@@ -25495,21 +25454,21 @@
     {
       "source": "file:.superpowers/brainstorm/158831-1781786731/content/approach.html",
       "target": "document:docs/superpowers/plans/2026-06-12-platform-quality-upgrade.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.5
     },
     {
       "source": "file:.superpowers/brainstorm/158831-1781786731/content/mockup-01-scenario-selector.html",
       "target": "document:docs/superpowers/plans/2026-06-12-platform-quality-upgrade.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.5
     },
     {
       "source": "file:.superpowers/brainstorm/158831-1781786731/content/scenarios.html",
       "target": "document:docs/superpowers/plans/2026-06-12-platform-quality-upgrade.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.5
     },
@@ -25537,119 +25496,119 @@
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/air_quality.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/business.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/commercial_area.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/cultural_facility.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/fire_safety.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/housing_stock.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/public_facility.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/public_hospital.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/public_transport.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/school_population.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/sports_facility.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/tourism.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/traffic_accidents.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/water_quality.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/welfare_facility.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "config:data/samples/youth_population.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:scripts/load-samples-to-catalog.mjs",
       "target": "file:app/api/catalog/route.ts",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.6
     },
@@ -25663,7 +25622,7 @@
     {
       "source": "file:__tests__/e2e/login.spec.ts",
       "target": "file:__tests__/e2e/global-setup.ts",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.6
     },
@@ -25677,14 +25636,14 @@
     {
       "source": "file:__tests__/e2e/smoke.spec.ts",
       "target": "file:__tests__/e2e/global-setup.ts",
-      "type": "depends-on",
+      "type": "depends_on",
       "direction": "forward",
       "weight": 0.6
     },
     {
       "source": "file:__tests__/lib/map-samples.test.ts",
       "target": "file:app/api/catalog/[id]/download/route.ts",
-      "type": "tests",
+      "type": "tested_by",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25726,14 +25685,14 @@
     {
       "source": "file:lib/geo-cluster.ts",
       "target": "config:data/geo/sigun_centroids.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "file:lib/heatmap.ts",
       "target": "config:data/geo/sigun_centroids.json",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.6
     },
@@ -25754,28 +25713,28 @@
     {
       "source": "document:docs/user-guide/agency-submission.md",
       "target": "document:docs/specs/2026-06-08-공급자워크플로우-design.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "document:docs/user-guide/center-review.md",
       "target": "document:docs/specs/2026-06-08-공급자워크플로우-design.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.7
     },
     {
       "source": "document:docs/user-guide/agency-submission.md",
       "target": "document:README.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.6
     },
     {
       "source": "document:docs/user-guide/center-review.md",
       "target": "document:README.md",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.6
     },
@@ -25803,7 +25762,7 @@
     {
       "source": "file:next-env.d.ts",
       "target": "file:next.config.js",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.7
     },
@@ -25838,7 +25797,7 @@
     {
       "source": "file:run.vbs",
       "target": "config:package.json",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.5
     },
@@ -25852,7 +25811,7 @@
     {
       "source": "file:scripts/create_test_users.py",
       "target": "file:lib/supabase/client.ts",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.6
     },
@@ -25880,28 +25839,28 @@
     {
       "source": "file:scripts/e2e-seed.mjs",
       "target": "file:__tests__/e2e/global-setup.ts",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.6
     },
     {
       "source": "file:scripts/inspect-routes.mjs",
       "target": "file:next.config.js",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.6
     },
     {
       "source": "file:scripts/inspect-routes.mjs",
       "target": "file:app/api/catalog/route.ts",
-      "type": "references",
+      "type": "related",
       "direction": "forward",
       "weight": 0.5
     },
     {
       "source": "file:scripts/quality_report.py",
       "target": "file:lib/supabase/client.ts",
-      "type": "uses",
+      "type": "reads_from",
       "direction": "forward",
       "weight": 0.6
     },
