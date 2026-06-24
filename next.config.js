@@ -47,10 +47,16 @@ function securityHeaders() {
   ]
 }
 
+// 번들 크기 분석: ANALYZE=true npx @next/bundle-analyzer 설치 후
+// const withBundleAnalyzer = require('@next/bundle-analyzer')({ enabled: process.env.ANALYZE === 'true' })
+// module.exports = withBundleAnalyzer(config)
+
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
-  eslint: { ignoreDuringBuilds: true },
+  // eslint.ignoreDuringBuilds를 true로 설정하면 CI 빌드 중 ESLint 오류가 무시됩니다.
+  // 린트 문제를 숨기지 않도록 기본값(false)을 유지합니다.
+  eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
   webpack: (config) => {
     // .node 네이티브 바이너리 파일을 externals로 처리 (안전망)

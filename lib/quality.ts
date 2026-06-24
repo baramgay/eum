@@ -398,7 +398,12 @@ function makeRecommendation(area: QualityArea, rule: string, violations: number,
   }
 }
 
-export function buildNIASignals(results: QualityResult[]): Array<{
+export function buildNIASignals(
+  results: QualityResult[],
+  /** 준비성(readiness) 점수: collection_logs 기반으로 외부에서 측정해 주입한다.
+   *  100 = 7일 이내 수집, 75 = 14일 이내, 50 = 30일 이내, -1 = 미측정 */
+  readinessScore = -1,
+): Array<{
   characteristic: NIACharacteristic
   score: number
   violations: number
@@ -422,6 +427,10 @@ export function buildNIASignals(results: QualityResult[]): Array<{
   ]
 
   return ALL_TRAITS.map(c => {
+    // 준비성은 규칙 기반 집계 대신 collection_logs 기반 점수를 사용한다
+    if (c === 'readiness') {
+      return { characteristic: c, score: readinessScore, violations: 0, checked: 0 }
+    }
     const v = agg[c]
     if (!v) return { characteristic: c, score: -1, violations: 0, checked: 0 }
     const score = v.checked > 0 ? Math.max(0, (1 - v.violations / v.checked) * 100) : 100
