@@ -1,0 +1,21 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 71,
+  "edgesRestored": 108,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "71개 orphan 노드 전체 복구 완료 (이전 경고 71개 → 0개)",
+    "migration SQL orphans (19개): 001_initial.sql에 depends-on, supabase config.toml에 configures 연결",
+    "data/samples JSON orphans (16개): scripts/load-samples-to-catalog.mjs의 uses 엣지로 연결",
+    "scripts/* orphans (8개): supabase client, e2e-setup, package.json 등 적절한 앵커에 연결",
+    "e2e spec orphans (3개): global-setup, helpers/auth 참조 복구",
+    ".superpowers/brainstorm 파일들 (6개): 관련 plan document에 references 엣지 추가",
+    "app/loading.tsx, app/not-found.tsx: app/layout.tsx에 contains 엣지 연결",
+    "lib/connectors/index.ts: barrel 파일로 types/client/api.ts에 imports 엣지 추가",
+    "document orphans (4개): workflow design 및 migration plan에 related/references 연결",
+    "config orphans (.mcp.json, postcss.config.js 등): 적절한 설정 앵커에 연결",
+    "최종 상태: 901 노드, 1738 엣지, orphan 0개"
+  ]
+}

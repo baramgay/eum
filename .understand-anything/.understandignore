@@ -1,0 +1,61 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Syntax: same as .gitignore (globs, # comments, ! negation, trailing / for dirs)
+# Lines below are suggestions — uncomment to activate.
+# Use ! prefix to force-include something excluded by defaults.
+#
+# Built-in defaults (always excluded unless negated):
+#   node_modules/, .git/, dist/, build/, obj/, *.lock, *.min.js, etc.
+#
+
+# --- From .gitignore (uncomment to exclude) ---
+
+# .env.local
+# .env*.local
+# .env
+# *.tsbuildinfo
+# data/**
+# !data/samples/
+# !data/samples/*.json
+# !data/geo/
+# !data/geo/*.json
+# *.pyc
+# .pytest_cache/
+# .worktrees/
+# .claude/
+# !.claude/CLAUDE.md
+# .agents/
+# !.agents/skills/eum-platform/
+# !.agents/skills/eum-platform-backend/
+# !.agents/skills/eum-platform-quality/
+# !.agents/skills/eum-platform-frontend/
+# skills-lock.json
+# test_accounts.txt
+# supabase/.temp/
+# eum_dev.log
+# .vercel
+# .superpowers/
+
+# --- Detected directories (uncomment to exclude) ---
+
+# docs/
+# scripts/
+# __tests__/
+
+# --- Test file patterns (uncomment to exclude) ---
+
+# JS / TS
+# *.test.*
+# *.spec.*
+# *.snap
+# C# / .NET
+# **/*Tests.cs
+# **/*Test.cs
+# **/*Fixture.cs
+# **/*.Tests.csproj
+# Java / Kotlin
+# **/src/test/**
+# **/*Test.java
+# **/*IT.java
+# **/*Spec.kt
+# Go
+# **/*_test.go

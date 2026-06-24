@@ -5,7 +5,7 @@ import type { AggFunc, Rule, Row, ProcessError, WhenCondition } from '@/lib/proc
 import { validateRules } from '@/lib/processor'
 import Modal from '@/components/ui/Modal'
 import PreviewPanel from './PreviewPanel'
-import { Btn, Badge } from '@/components/ui'
+import { Btn, Badge, Input, Select, Textarea } from '@/components/ui'
 import {
   Settings2, Type, Calendar, Filter, Eraser, Trash2,
   ArrowUp, ArrowDown, Plus, Eye, Save, X, AlertCircle,
@@ -77,16 +77,16 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
     case 'select':
       return (
         <div className="flex flex-col gap-1 text-xs">
-          <select
-            className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          <Select
+            className="border rounded px-2 py-1 bg-white"
             value={rule.mode}
             onChange={e => onChange({ ...rule, mode: e.target.value as 'include' | 'exclude' })}
           >
             <option value="include">포함</option>
             <option value="exclude">제외</option>
-          </select>
-          <input
-            className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          </Select>
+          <Input
+            className="border rounded px-2 py-1 bg-white"
             placeholder="컬럼명 (쉼표 구분)"
             value={rule.columns.join(',')}
             onChange={e => onChange({ ...rule, columns: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
@@ -96,67 +96,67 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
     case 'rename':
       return (
         <div className="flex gap-1 text-xs">
-          <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="기존 컬럼명" value={rule.from}
+          <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="기존 컬럼명" value={rule.from}
             onChange={e => onChange({ ...rule, from: e.target.value })} />
           <span className="self-center">→</span>
-          <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="새 컬럼명" value={rule.to}
+          <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="새 컬럼명" value={rule.to}
             onChange={e => onChange({ ...rule, to: e.target.value })} />
         </div>
       )
     case 'cast':
       return (
         <div className="flex gap-1 text-xs">
-          <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="컬럼명" value={rule.column}
+          <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="컬럼명" value={rule.column}
             onChange={e => onChange({ ...rule, column: e.target.value })} />
-          <select className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" value={rule.to}
+          <Select className="border rounded px-2 py-1 bg-white" value={rule.to}
             onChange={e => onChange({ ...rule, to: e.target.value as 'number' | 'string' | 'date' })}>
             <option value="number">숫자</option>
             <option value="string">문자</option>
             <option value="date">날짜</option>
-          </select>
+          </Select>
         </div>
       )
     case 'nullfill':
       return (
         <div className="flex gap-1 text-xs">
-          <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="컬럼명" value={rule.column}
+          <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="컬럼명" value={rule.column}
             onChange={e => onChange({ ...rule, column: e.target.value })} />
-          <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="채울 값" value={String(rule.value ?? '')}
+          <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="채울 값" value={String(rule.value ?? '')}
             onChange={e => onChange({ ...rule, value: e.target.value })} />
         </div>
       )
     case 'nulldrop':
       return (
-        <input className="border rounded px-2 py-1 text-xs w-full bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="컬럼명 (쉼표 구분)"
+        <Input className="border rounded px-2 py-1 text-xs w-full bg-white" placeholder="컬럼명 (쉼표 구분)"
           value={rule.columns.join(',')}
           onChange={e => onChange({ ...rule, columns: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
       )
     case 'filter':
       return (
         <div className="flex gap-1 text-xs">
-          <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="컬럼명" value={rule.column}
+          <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="컬럼명" value={rule.column}
             onChange={e => onChange({ ...rule, column: e.target.value })} />
-          <select className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" value={rule.op}
+          <Select className="border rounded px-2 py-1 bg-white" value={rule.op}
             onChange={e => onChange({ ...rule, op: e.target.value as Rule extends { type: 'filter' } ? Rule['op'] : never })}>
             {(['>', '<', '>=', '<=', '==', '!=', 'contains', 'startsWith', 'endsWith'] as const).map(op => (
               <option key={op} value={op}>{op}</option>
             ))}
-          </select>
-          <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="비교값" value={String(rule.value ?? '')}
+          </Select>
+          <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="비교값" value={String(rule.value ?? '')}
             onChange={e => onChange({ ...rule, value: e.target.value })} />
         </div>
       )
     case 'normalize':
       return (
         <div className="flex gap-1 text-xs">
-          <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="컬럼명" value={rule.column}
+          <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="컬럼명" value={rule.column}
             onChange={e => onChange({ ...rule, column: e.target.value })} />
-          <select className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" value={rule.fn}
+          <Select className="border rounded px-2 py-1 bg-white" value={rule.fn}
             onChange={e => onChange({ ...rule, fn: e.target.value as 'trim' | 'upper' | 'lower' })}>
             <option value="trim">trim</option>
             <option value="upper">대문자</option>
             <option value="lower">소문자</option>
-          </select>
+          </Select>
         </div>
       )
     case 'derive': {
@@ -164,9 +164,9 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
       return (
         <div className="flex flex-col gap-1 text-xs">
           <div className="flex gap-1">
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="소스 컬럼" value={rule.source}
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="소스 컬럼" value={rule.source}
               onChange={e => onChange({ ...rule, source: e.target.value })} />
-            <select className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            <Select className="border rounded px-2 py-1 bg-white"
               value={rule.expr}
               onChange={e => onChange({ ...rule, expr: e.target.value as typeof rule.expr, format: undefined })}>
               <optgroup label="날짜">
@@ -178,12 +178,12 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
                 <option value="hour">시간</option>
                 <option value="dateformat">날짜 형식 변환</option>
               </optgroup>
-            </select>
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="대상 컬럼명" value={rule.target}
+            </Select>
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="대상 컬럼명" value={rule.target}
               onChange={e => onChange({ ...rule, target: e.target.value })} />
           </div>
           {needsFormat && (
-            <input className="border rounded px-2 py-1 w-full bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="형식 예: YYYY-MM-DD"
+            <Input className="border rounded px-2 py-1 w-full bg-white" placeholder="형식 예: YYYY-MM-DD"
               value={(rule as { format?: string }).format ?? ''}
               onChange={e => onChange({ ...rule, format: e.target.value } as Rule)} />
           )}
@@ -193,7 +193,7 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
     case 'dedup':
       return (
         <div className="flex flex-col gap-1 text-xs">
-          <input className="border rounded px-2 py-1 w-full bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          <Input className="border rounded px-2 py-1 w-full bg-white"
             placeholder="기준 키 컬럼 (쉼표 구분, 비우면 전체 행 기준)"
             value={rule.keys.join(',')}
             onChange={e => onChange({ ...rule, keys: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
@@ -205,17 +205,17 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
       return (
         <div className="flex flex-col gap-1 text-xs">
           <div className="flex gap-1">
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="대상 컬럼"
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="대상 컬럼"
               value={rule.column}
               onChange={e => onChange({ ...rule, column: e.target.value })} />
-            <select className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            <Select className="border rounded px-2 py-1 bg-white"
               value={rule.fallback ?? 'keep'}
               onChange={e => onChange({ ...rule, fallback: e.target.value as 'keep' | 'null' })}>
               <option value="keep">미일치 → 원본 유지</option>
               <option value="null">미일치 → NULL</option>
-            </select>
+            </Select>
           </div>
-          <textarea className="border rounded px-2 py-1 w-full font-mono bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" rows={4}
+          <Textarea className="border rounded px-2 py-1 w-full font-mono bg-white" rows={4}
             placeholder={"코드:치환값 (줄바꿈으로 구분)\n예)\n36110:창원시\n36120:진주시"}
             value={mapStr}
             onChange={e => {
@@ -233,14 +233,14 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
       return (
         <div className="flex flex-col gap-1 text-xs">
           <div className="flex gap-1">
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="결과 컬럼명"
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="결과 컬럼명"
               value={rule.target}
               onChange={e => onChange({ ...rule, target: e.target.value })} />
-            <input className="border rounded px-2 py-1 w-20 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="구분자"
+            <Input className="border rounded px-2 py-1 w-20 bg-white" placeholder="구분자"
               value={rule.separator}
               onChange={e => onChange({ ...rule, separator: e.target.value })} />
           </div>
-          <input className="border rounded px-2 py-1 w-full bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          <Input className="border rounded px-2 py-1 w-full bg-white"
             placeholder="합칠 컬럼들 (쉼표 구분)"
             value={rule.sources.join(',')}
             onChange={e => onChange({ ...rule, sources: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
@@ -250,14 +250,14 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
       return (
         <div className="flex flex-col gap-1 text-xs">
           <div className="flex gap-1">
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="분리할 컬럼"
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="분리할 컬럼"
               value={rule.column}
               onChange={e => onChange({ ...rule, column: e.target.value })} />
-            <input className="border rounded px-2 py-1 w-20 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="구분자"
+            <Input className="border rounded px-2 py-1 w-20 bg-white" placeholder="구분자"
               value={rule.separator}
               onChange={e => onChange({ ...rule, separator: e.target.value })} />
           </div>
-          <input className="border rounded px-2 py-1 w-full bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          <Input className="border rounded px-2 py-1 w-full bg-white"
             placeholder="결과 컬럼명들 (쉼표 구분)"
             value={rule.targets.join(',')}
             onChange={e => onChange({ ...rule, targets: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
@@ -266,20 +266,20 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
     case 'aggregate':
       return (
         <div className="flex flex-col gap-1 text-xs">
-          <input className="border rounded px-2 py-1 w-full bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          <Input className="border rounded px-2 py-1 w-full bg-white"
             placeholder="그룹 기준 컬럼 (쉼표 구분)"
             value={rule.groupBy.join(',')}
             onChange={e => onChange({ ...rule, groupBy: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
           <div className="flex gap-1">
-            <select className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            <Select className="border rounded px-2 py-1 bg-white"
               value={rule.agg}
               onChange={e => onChange({ ...rule, agg: e.target.value as AggFunc })}>
               {AGG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="집계할 컬럼"
+            </Select>
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="집계할 컬럼"
               value={rule.column}
               onChange={e => onChange({ ...rule, column: e.target.value })} />
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="결과 컬럼명 (비우면 자동)"
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="결과 컬럼명 (비우면 자동)"
               value={rule.target ?? ''}
               onChange={e => onChange({ ...rule, target: e.target.value })} />
           </div>
@@ -292,18 +292,18 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
             서버 실행 시 처리됩니다 (미리보기에서는 걸러집니다)
           </div>
           <div className="flex gap-1">
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="조인할 데이터셋 ID"
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="조인할 데이터셋 ID"
               value={rule.datasetId}
               onChange={e => onChange({ ...rule, datasetId: e.target.value })} />
-            <select className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            <Select className="border rounded px-2 py-1 bg-white"
               value={rule.how}
               onChange={e => onChange({ ...rule, how: e.target.value as 'left' | 'inner' | 'right' })}>
               <option value="left">LEFT JOIN</option>
               <option value="inner">INNER JOIN</option>
               <option value="right">RIGHT JOIN</option>
-            </select>
+            </Select>
           </div>
-          <input className="border rounded px-2 py-1 w-full bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="조인 키 컬럼"
+          <Input className="border rounded px-2 py-1 w-full bg-white" placeholder="조인 키 컬럼"
             value={rule.on}
             onChange={e => onChange({ ...rule, on: e.target.value })} />
         </div>
@@ -312,22 +312,22 @@ function RuleForm({ rule, onChange }: { rule: Rule; onChange: (r: Rule) => void 
       return (
         <div className="flex flex-col gap-1 text-xs">
           <div className="flex gap-1">
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="인덱스 컬럼"
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="인덱스 컬럼"
               value={rule.index}
               onChange={e => onChange({ ...rule, index: e.target.value })} />
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="피벗 컬럼 (새 헤더)"
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="피벗 컬럼 (새 헤더)"
               value={rule.columns}
               onChange={e => onChange({ ...rule, columns: e.target.value })} />
           </div>
           <div className="flex gap-1">
-            <input className="border rounded px-2 py-1 flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" placeholder="값 컬럼"
+            <Input className="border rounded px-2 py-1 flex-1 bg-white" placeholder="값 컬럼"
               value={rule.values}
               onChange={e => onChange({ ...rule, values: e.target.value })} />
-            <select className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            <Select className="border rounded px-2 py-1 bg-white"
               value={rule.agg}
               onChange={e => onChange({ ...rule, agg: e.target.value as AggFunc })}>
               {AGG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+            </Select>
           </div>
         </div>
       )
@@ -463,8 +463,8 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
                     )}
                   </summary>
                   <div className="mt-2 flex flex-wrap gap-1.5 items-center text-xs">
-                    <input
-                      className="border rounded px-2 py-1 w-28 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                    <Input
+                      className="border rounded px-2 py-1 w-28 bg-white"
                       placeholder="컬럼명"
                       value={(rule as Rule & { when?: WhenCondition }).when?.column ?? ''}
                       onChange={e => {
@@ -473,8 +473,8 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
                         updateRule(i, e.target.value ? { ...rule, when: next } as Rule : { ...rule, when: undefined } as Rule)
                       }}
                     />
-                    <select
-                      className="border rounded px-2 py-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                    <Select
+                      className="border rounded px-2 py-1 bg-white"
                       value={(rule as Rule & { when?: WhenCondition }).when?.op ?? '=='}
                       onChange={e => {
                         const cur = (rule as Rule & { when?: WhenCondition }).when
@@ -488,9 +488,9 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
                       <option value="<">{'<'}</option>
                       <option value=">=">{'>='}</option>
                       <option value="<=">{'<='}</option>
-                    </select>
-                    <input
-                      className="border rounded px-2 py-1 w-28 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                    </Select>
+                    <Input
+                      className="border rounded px-2 py-1 w-28 bg-white"
                       placeholder="값"
                       value={String((rule as Rule & { when?: WhenCondition }).when?.value ?? '')}
                       onChange={e => {
@@ -515,15 +515,15 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
           })}
 
           <div className="flex gap-2 items-center pt-2 border-t">
-            <select
-              className="border rounded px-2 py-1 text-sm flex-1 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            <Select
+              className="border rounded px-2 py-1 text-sm flex-1 bg-white"
               value={addType}
               onChange={e => setAddType(e.target.value as RuleType)}
             >
               {RULE_TYPES.map(t => (
                 <option key={t.value} value={t.value}>{t.label}</option>
               ))}
-            </select>
+            </Select>
             <Btn onClick={addRule} size="sm"><Plus className="w-3.5 h-3.5" /> 규칙 추가</Btn>
           </div>
         </div>

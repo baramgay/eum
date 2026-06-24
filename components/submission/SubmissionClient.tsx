@@ -14,6 +14,9 @@ import Badge from '@/components/ui/Badge'
 import Btn from '@/components/ui/Btn'
 import EmptyState from '@/components/ui/EmptyState'
 import Skeleton from '@/components/ui/Skeleton'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import Textarea from '@/components/ui/Textarea'
 
 interface Submission {
   submission_id: string; title: string; status: string; tenant_id: string
@@ -300,37 +303,37 @@ export default function SubmissionClient({ role, tenantId }: Props) {
             <div className="grid md:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="submission-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">제목 <span className="text-red-500">*</span></label>
-                <input id="submission-title" name="title" required placeholder="데이터셋 제목"
+                <Input id="submission-title" name="title" required placeholder="데이터셋 제목"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
+                  className="px-3 py-2 rounded-lg bg-white" />
               </div>
               <div>
                 <label htmlFor="submission-theme" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">주제 <span className="text-red-500">*</span></label>
-                <input id="submission-theme" name="theme" required placeholder="예: 인구통계"
+                <Input id="submission-theme" name="theme" required placeholder="예: 인구통계"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
+                  className="px-3 py-2 rounded-lg bg-white" />
               </div>
               <div>
                 <label htmlFor="submission-format" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">포맷</label>
-                <select id="submission-format" name="format"
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900">
+                <Select id="submission-format" name="format"
+                  className="px-3 py-2 rounded-lg bg-white">
                   <option value="CSV">CSV</option>
                   <option value="JSON">JSON</option>
                   <option value="XLSX">XLSX</option>
-                </select>
+                </Select>
               </div>
               <div>
                 <label htmlFor="submission-license" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">라이선스 <span className="text-red-500">*</span></label>
-                <input id="submission-license" name="license" required placeholder="공공누리 1유형" defaultValue="공공누리 1유형"
+                <Input id="submission-license" name="license" required placeholder="공공누리 1유형" defaultValue="공공누리 1유형"
                   onChange={refreshChecks}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
+                  className="px-3 py-2 rounded-lg bg-white" />
               </div>
             </div>
             <div>
               <label htmlFor="submission-description" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">설명 <span className="text-red-500">*</span></label>
-              <textarea id="submission-description" name="description" required rows={3} placeholder="데이터셋 설명 (20자 이상)"
+              <Textarea id="submission-description" name="description" required rows={3} placeholder="데이터셋 설명 (20자 이상)"
                 onChange={refreshChecks}
-                className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500" />
+                className="px-3 py-2 rounded-lg bg-white" />
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">최소 20자 이상 입력해 주세요.</p>
             </div>
             <div>
@@ -498,11 +501,11 @@ export default function SubmissionClient({ role, tenantId }: Props) {
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-              <input
+              <Input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="데이터셋 제목 검색"
-                className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="pl-9 pr-3 py-2 rounded-lg bg-white"
               />
               {search && (
                 <button
@@ -514,15 +517,15 @@ export default function SubmissionClient({ role, tenantId }: Props) {
               )}
             </div>
             <div className="flex gap-2">
-              <select
+              <Select
                 value={sort}
                 onChange={e => setSort(e.target.value as Sort)}
-                className="px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-900"
+                className="px-3 py-2 rounded-lg bg-white"
               >
                 {SORT_OPTIONS.map(o => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-1.5">

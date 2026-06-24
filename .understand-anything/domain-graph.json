@@ -1,0 +1,1550 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "eum-platform",
+    "languages": ["TypeScript"],
+    "frameworks": ["Next.js", "Supabase", "Recharts", "Leaflet", "D3"],
+    "description": "경남빅데이터센터 공공데이터 개방 허브. 데이터 수집·가공·품질진단·온톨로지 관리·통계 분석·AI 자연어 질의·공개 포털 API까지 공공데이터 전 생애주기를 멀티테넌트로 지원하는 통합 플랫폼.",
+    "analyzedAt": "2026-06-25T00:00:00Z",
+    "gitCommitHash": "bd406dec"
+  },
+  "nodes": [
+    {
+      "id": "domain:data-collection",
+      "type": "domain",
+      "name": "데이터 수집",
+      "summary": "공공데이터포털(data.go.kr), SFTP, PostgreSQL, 외부 API 등 다양한 소스에서 공공데이터를 주기적으로 수집한다. AES-256 암호화, CSV/JSON/XML 파싱, 페이지네이션, 변경분 감지를 지원하며 SSE 스트리밍으로 실시간 진행 상황을 제공한다.",
+      "tags": ["수집", "cron", "connector", "SSE", "공공데이터"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["CollectionSource", "CollectionJob", "CollectionLog", "Connector"],
+        "businessRules": [
+          "인증 값은 AES-256으로 암호화 저장",
+          "수집 작업마다 타임아웃 및 다음 실행 시각 갱신",
+          "수집 실패 시 임계치 초과 이메일 알림 발송",
+          "테넌트 소유권 검증 필수"
+        ],
+        "crossDomainInteractions": [
+          "수집 완료 데이터 → 데이터 가공 파이프라인으로 전달",
+          "수집 로그 → 데이터 계보(Lineage) 기록",
+          "품질 도메인의 Cron 품질 진단 트리거와 연동"
+        ]
+      }
+    },
+    {
+      "id": "domain:data-processing",
+      "type": "domain",
+      "name": "데이터 가공",
+      "summary": "수집된 원시 데이터에 변환 규칙(null 대체, 타입 캐스팅, 파생 컬럼, JOIN)을 적용해 카탈로그 테이블로 저장한다. 규칙 편집·미리보기·배치 등록·실행 이력 관리가 포함되며 데이터 계보를 자동으로 기록한다.",
+      "tags": ["pipeline", "transformation", "processor", "lineage"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["ProcessPipeline", "TransformRule", "PipelineRun", "DataLineage"],
+        "businessRules": [
+          "SQL 구문 검증 및 화이트리스트 검사 필수",
+          "중복 파이프라인 등록 방지",
+          "파생 테이블 생성 시 카탈로그 자동 등록",
+          "계보(lineage) 레코드 자동 기록"
+        ],
+        "crossDomainInteractions": [
+          "수집 소스 데이터를 입력으로 받아 가공",
+          "가공 결과를 공개 포털 카탈로그에 등록",
+          "품질 진단 도메인에 가공 테이블 제공",
+          "온톨로지 도메인의 데이터 계보 그래프와 연동"
+        ]
+      }
+    },
+    {
+      "id": "domain:data-quality",
+      "type": "domain",
+      "name": "데이터 품질",
+      "summary": "NIA AI 데이터 품질관리 가이드라인 v4.0의 9대 품질 특성 기반으로 데이터셋 품질을 진단하고 계약 규칙을 관리한다. Cron 스케줄 자동 진단, 1-Cycle 체크리스트, 품질 신호 대시보드 위젯을 포함한다.",
+      "tags": ["품질", "NIA", "quality-contract", "cron", "진단"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["QualityDiagnostic", "QualityContract", "NIACharacteristic", "OneCycleCheckpoint"],
+        "businessRules": [
+          "NIA 9대 특성(완전성·정확성·일관성·유효성·유일성·적시성·접근성·준거성·효율성) 기반 점수화",
+          "품질 계약 규칙(null·범위·허용값·중복) Supabase 쿼리로 실행",
+          "Cron 주기 진단 실패 시 알림 생성",
+          "대시보드 품질 신호 위젯에 등급·위반 집계 제공"
+        ],
+        "crossDomainInteractions": [
+          "가공 파이프라인 결과 테이블 품질 진단",
+          "카탈로그 AI 준비도 체크리스트와 연동",
+          "보고서 도메인의 품질 평가 지표 공급",
+          "대시보드 QualitySignalWidget·QualityWidget에 신호 제공"
+        ]
+      }
+    },
+    {
+      "id": "domain:ontology-management",
+      "type": "domain",
+      "name": "온톨로지 관리",
+      "summary": "경남 공공데이터 개념 간 관계를 그래프(노드·엣지)로 모델링하고 D3 Canvas 기반으로 시각화한다. 청년유출·서비스격차·산업집적·환경위험 등 시나리오별 데모 그래프, 중심성·커뮤니티 탐지·최단 경로 등 그래프 알고리즘, 워크스페이스 스냅샷 관리 기능을 제공한다.",
+      "tags": ["ontology", "graph", "D3", "canvas", "lineage"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["OntologyNode", "OntologyEdge", "OntologyWorkspace", "OntologyScenario"],
+        "businessRules": [
+          "onto_objects/onto_links 테이블에 upsert 방식 저장",
+          "center 역할만 노드·엣지 생성·수정·삭제 가능",
+          "워크스페이스 공유는 토큰 기반 공개 URL",
+          "시나리오별 시드 데이터로 데모 그래프 생성"
+        ],
+        "crossDomainInteractions": [
+          "카탈로그 데이터셋을 온톨로지 노드로 연결",
+          "데이터 계보 그래프를 온톨로지 계보 패널에 표시",
+          "AI 질의 도메인에 온톨로지 컨텍스트 제공",
+          "대시보드 LineageWidget에 계보 SVG 공급"
+        ]
+      }
+    },
+    {
+      "id": "domain:statistical-analysis",
+      "type": "domain",
+      "name": "통계 분석",
+      "summary": "17종 통계 분석(교차분석·회귀·상관·군집 등)을 Python 엔진으로 실행하고 Recharts로 결과를 시각화한다. 파일 업로드 분석, 카탈로그 테이블 직접 분석, 즐겨찾기 기반 분석 이력 관리를 지원한다.",
+      "tags": ["analytics", "Python", "통계", "시각화", "Recharts"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["AnalysisRun", "AnalysisResult", "AnalysisType", "AnalysisFavorite"],
+        "businessRules": [
+          "17종 통계 유형 선택 후 Python 스크립트 실행",
+          "테이블 지정 또는 파일 업로드 두 가지 입력 경로",
+          "분석 실행 삭제는 개별 레코드 DELETE",
+          "즐겨찾기는 localStorage에 영속"
+        ],
+        "crossDomainInteractions": [
+          "가공 파이프라인 결과 테이블을 분석 입력으로 사용",
+          "분석 결과를 대시보드 RecentAnalysisWidget에 노출",
+          "보고서 도메인의 분석 지표 공급"
+        ]
+      }
+    },
+    {
+      "id": "domain:open-portal",
+      "type": "domain",
+      "name": "공개 포털",
+      "summary": "공공데이터 카탈로그를 외부 사용자에게 공개하고 FTS 검색·테마 필터·구독·API 키 발급·DCAT 메타데이터 내보내기를 제공한다. v1 공개 API 엔드포인트로 JSON/CSV 형식 데이터 다운로드를 지원한다.",
+      "tags": ["portal", "catalog", "openapi", "DCAT", "구독"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["CatalogDataset", "ApiKey", "Subscription", "DcatCatalog", "Webhook"],
+        "businessRules": [
+          "API 키는 해시 저장, 플레인텍스트 미보관",
+          "API 키 사용 시 범위(scope) 검사 필수",
+          "DCAT JSON-LD 형식으로 카탈로그 공개",
+          "구독 상태 조회·추가·해제 RESTful 처리"
+        ],
+        "crossDomainInteractions": [
+          "가공·수집 도메인의 카탈로그 테이블을 포털에 노출",
+          "품질 도메인의 AI 준비도 체크리스트를 카탈로그 상세에 표시",
+          "AI 질의 도메인에 카탈로그 화이트리스트 제공",
+          "인증 도메인의 API 키 검증 로직 사용"
+        ]
+      }
+    },
+    {
+      "id": "domain:auth-authorization",
+      "type": "domain",
+      "name": "인증·권한",
+      "summary": "Supabase 기반 멀티테넌트 인증과 기관(tenant)/센터(center) 역할 기반 접근 제어를 구현한다. API 키 해시 발급, Row-Level Security, 감사 로그, 속도 제한, 비밀번호 복잡도 검사를 포함한다.",
+      "tags": ["auth", "multi-tenant", "RLS", "audit", "rate-limit"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["Tenant", "User", "Role", "ApiKey", "AuditLog", "RateLimiter"],
+        "businessRules": [
+          "center 역할만 관리자 API 접근 허용",
+          "슬라이딩 윈도우 속도 제한 적용",
+          "모든 관리 작업에 감사 로그 기록",
+          "비밀번호 복잡도 Zod 검사 필수"
+        ],
+        "crossDomainInteractions": [
+          "모든 도메인 API 진입점에서 인증 세션 검증",
+          "공개 포털 API 키 발급·검증",
+          "온톨로지 노드·엣지 CRUD에 center 역할 검사",
+          "테넌트별 데이터 격리(RLS) 전 도메인 적용"
+        ]
+      }
+    },
+    {
+      "id": "domain:dashboard",
+      "type": "domain",
+      "name": "대시보드",
+      "summary": "드래그 앤 드롭 위젯 기반 대시보드로 수집 추이·품질 신호·파이프라인 상태·분석 이력·데이터 계보 등 KPI를 Supabase Realtime으로 실시간 동기화한다.",
+      "tags": ["dashboard", "widget", "realtime", "KPI", "Recharts"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["DashboardWidget", "KpiMetric", "OverviewData", "LineageGraph"],
+        "businessRules": [
+          "위젯 레이아웃 드래그 앤 드롭으로 재배치",
+          "Supabase Realtime으로 실시간 데이터 동기화",
+          "/api/overview에서 파이프라인·품질·개방·평가 지표 병렬 조회",
+          "품질 신호 위젯은 등급·주요 위반 규칙 집계 표시"
+        ],
+        "crossDomainInteractions": [
+          "품질 도메인 점수·신호 표시",
+          "수집 추이 위젯에 수집 도메인 월별 건수 표시",
+          "파이프라인 상태 위젯에 가공 도메인 실행 현황 표시",
+          "온톨로지 계보 위젯에 계보 그래프 SVG 표시"
+        ]
+      }
+    },
+    {
+      "id": "domain:ai-query",
+      "type": "domain",
+      "name": "AI 질의",
+      "summary": "사용자의 자연어 질문을 NL-to-SQL 엔진으로 변환하거나 벡터 임베딩 유사도 검색으로 컨텍스트를 검색하고, LLM 멀티턴 도구 호출 루프를 통해 공공데이터 질의 응답을 제공한다. 온톨로지 추천 및 대화 컨텍스트 상속을 지원한다.",
+      "tags": ["AI", "NL-to-SQL", "vector-search", "LLM", "chatbot"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["NlQuery", "ChatMessage", "SqlWhitelist", "EmbeddingContext", "AiTool"],
+        "businessRules": [
+          "민감어 필터링 후 LLM 전달",
+          "SQL 화이트리스트 검증으로 삽입 공격 방지",
+          "슬라이딩 윈도우 속도 제한 적용",
+          "쿼리 로그 자동 기록"
+        ],
+        "crossDomainInteractions": [
+          "카탈로그 화이트리스트 기반 동적 도구 생성",
+          "온톨로지 그래프를 컨텍스트로 활용한 추천",
+          "카탈로그 메타데이터 AI 자동 제안(suggest-meta)",
+          "보고서 편집기에 AI 보조 기능 제공"
+        ]
+      }
+    },
+    {
+      "id": "domain:report-evaluation",
+      "type": "domain",
+      "name": "보고서·평가",
+      "summary": "AI 보조 블록 기반 보고서 편집기, 멀티테넌트 비교 평가 히트맵, jsPDF 기반 서버사이드 PDF 내보내기, 데이터 개방 계획 자동 생성 기능을 제공한다. NIA 기준 평가 지표와 정성 평가 항목을 통합한다.",
+      "tags": ["report", "evaluation", "PDF", "planning", "비교"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["EvaluationReport", "EvaluationIndicator", "QualitativeInput", "ReportBlock"],
+        "businessRules": [
+          "Pretendard 폰트 사용 PDF 서버사이드 생성",
+          "멀티테넌트 비교 시 테넌트별 카탈로그·품질·분석·합성 건수 집계",
+          "정성 평가 GET/PUT API로 항목 관리",
+          "데이터 개방 계획서 텍스트 초안 자동 생성"
+        ],
+        "crossDomainInteractions": [
+          "품질 도메인 점수를 평가 지표로 수신",
+          "통계 분석 실행 건수를 평가 지표로 집계",
+          "AI 질의로 보고서 내용 보조 생성",
+          "인증 도메인으로 테넌트 정보 조회"
+        ]
+      }
+    },
+    {
+      "id": "domain:spatial-data",
+      "type": "domain",
+      "name": "공간 데이터",
+      "summary": "경남 공공시설 위치 데이터를 Kakao Maps와 Leaflet으로 시각화하고 마커·히트맵·클러스터 레이어 전환, 시설 필터링, 시설 상세 패널 비교 기능을 제공한다. Haversine 거리·DBSCAN·K-means 지오 클러스터링이 포함된다.",
+      "tags": ["GIS", "Kakao-Maps", "Leaflet", "heatmap", "cluster"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["Facility", "MapLayer", "GeoCluster", "HeatmapGrid", "FacilityType"],
+        "businessRules": [
+          "Kakao Maps SDK 동적 로드",
+          "레이어 전환: 마커/히트맵/클러스터",
+          "DBSCAN·K-means 클러스터링으로 밀집 지역 탐지",
+          "시설 유형별 색상·SVG 핀 아이콘 구분"
+        ],
+        "crossDomainInteractions": [
+          "카탈로그 공공시설 데이터셋을 지도 레이어로 렌더링",
+          "온톨로지 노드의 지리 좌표를 KakaoOntologyMap에 표시",
+          "대시보드 MigrationChartWidget·PopulationTrendWidget에 공간 집계 데이터 제공"
+        ]
+      }
+    },
+    {
+      "id": "flow:data-collection-source-setup",
+      "type": "flow",
+      "name": "수집 소스 등록",
+      "summary": "운영자가 공공데이터포털·SFTP·PostgreSQL·외부 API 수집 소스를 등록하고 연결을 테스트한다.",
+      "tags": ["수집", "소스등록", "connector"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/collect",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:data-collection-scheduled-run",
+      "type": "flow",
+      "name": "스케줄 수집 실행",
+      "summary": "Cron 엔드포인트가 활성화된 수집 작업을 병렬로 실행하고 로그를 저장한 뒤 다음 실행 시각을 갱신한다.",
+      "tags": ["cron", "수집", "스케줄", "병렬"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "GET /api/cron/collect",
+        "entryType": "cron"
+      }
+    },
+    {
+      "id": "flow:data-collection-manual-run",
+      "type": "flow",
+      "name": "수동 수집 실행",
+      "summary": "운영자가 특정 소스에 대해 즉시 수집을 실행하고 SSE 스트리밍으로 진행 상황을 실시간으로 확인한다.",
+      "tags": ["수집", "SSE", "수동실행"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/collect/{id}/run",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:data-processing-rule-setup",
+      "type": "flow",
+      "name": "가공 규칙 편집",
+      "summary": "운영자가 파이프라인 변환 규칙을 생성·편집하고 미리보기로 결과를 확인한 뒤 저장한다.",
+      "tags": ["pipeline", "규칙", "미리보기"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /process (RuleEditor UI)",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:data-processing-pipeline-run",
+      "type": "flow",
+      "name": "파이프라인 실행",
+      "summary": "저장된 변환 규칙을 수집 소스 데이터에 적용하고 파생 테이블을 생성하여 카탈로그에 등록하며 데이터 계보를 기록한다.",
+      "tags": ["pipeline", "transformation", "lineage", "카탈로그"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "PATCH /api/process/{id}",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:data-processing-batch-register",
+      "type": "flow",
+      "name": "파이프라인 일괄 등록",
+      "summary": "여러 처리 파이프라인을 한 번에 등록하며 SQL 구문 검증과 중복 확인을 수행한다.",
+      "tags": ["batch", "pipeline", "등록"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "POST /api/process/batch",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:data-quality-contract-setup",
+      "type": "flow",
+      "name": "품질 계약 설정",
+      "summary": "데이터셋별 품질 계약 규칙(null·범위·허용값·중복)을 편집하고 NIA 특성에 매핑한다.",
+      "tags": ["품질", "계약", "NIA"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "PATCH /api/catalog/{id} (품질계약 포함)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:data-quality-diagnostic-run",
+      "type": "flow",
+      "name": "품질 진단 실행",
+      "summary": "품질 계약 규칙을 Supabase 쿼리로 실행하여 NIA 9대 특성 점수를 산출하고 결과를 저장하며 이상 시 알림을 발송한다.",
+      "tags": ["품질", "진단", "NIA", "cron"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/quality 또는 GET /api/cron/quality",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:data-quality-onecycle-checklist",
+      "type": "flow",
+      "name": "1-Cycle 체크리스트 점검",
+      "summary": "샘플→초기→중간→보완→최종 5단계 NIA 1-Cycle 자가점검 체크리스트를 데이터셋별로 수행하고 결과를 저장한다.",
+      "tags": ["품질", "체크리스트", "NIA", "1-Cycle"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /quality (OneCycleChecklist UI)",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:ontology-graph-crud",
+      "type": "flow",
+      "name": "온톨로지 노드·엣지 관리",
+      "summary": "center 역할 사용자가 온톨로지 노드와 엣지를 추가·편집·삭제하고 upsert 방식으로 Supabase에 저장한다.",
+      "tags": ["ontology", "CRUD", "center-role"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/ontology/nodes 및 /edges",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:ontology-graph-analysis",
+      "type": "flow",
+      "name": "그래프 분석 실행",
+      "summary": "온톨로지 그래프에 중심성·커뮤니티 탐지·최단 경로·이상치 탐지 알고리즘을 적용하고 결과를 시각적 오버레이로 표시한다.",
+      "tags": ["graph-algorithm", "centrality", "community", "D3"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/ontology/analytics",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:ontology-workspace-management",
+      "type": "flow",
+      "name": "워크스페이스 관리",
+      "summary": "온톨로지 탐색 상태를 스냅샷으로 저장·불러오기하고 공유 토큰으로 외부에 공개할 수 있다.",
+      "tags": ["workspace", "snapshot", "sharing"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "GET/POST /api/ontology/workspace",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:ontology-scenario-demo",
+      "type": "flow",
+      "name": "시나리오 데모 그래프 탐색",
+      "summary": "청년유출·서비스격차·산업집적·환경위험 등 사전 정의 시나리오 데모 그래프를 로드하여 탐색한다.",
+      "tags": ["scenario", "demo", "ontology"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "GET /api/ontology/demo-graph/{scenario}",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:analytics-run",
+      "type": "flow",
+      "name": "통계 분석 실행",
+      "summary": "변수와 분석 유형을 선택하고 Python 엔진으로 분석을 실행하며 Recharts 차트와 테이블로 결과를 렌더링한다.",
+      "tags": ["통계", "Python", "Recharts"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/analyze",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:analytics-file-upload",
+      "type": "flow",
+      "name": "파일 업로드 분석",
+      "summary": "사용자가 파일을 업로드하고 Python 분석 스크립트를 실행하여 결과를 받는다.",
+      "tags": ["파일업로드", "Python", "통계"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/analyze/upload",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:analytics-favorites",
+      "type": "flow",
+      "name": "분석 즐겨찾기 관리",
+      "summary": "자주 사용하는 분석 설정을 localStorage에 즐겨찾기로 저장하고 대시보드 위젯에서 빠르게 접근한다.",
+      "tags": ["즐겨찾기", "localStorage", "dashboard"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "GET / (대시보드 AnalysisFavoritesWidget)",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "flow:portal-catalog-browse",
+      "type": "flow",
+      "name": "카탈로그 검색·탐색",
+      "summary": "외부 사용자가 공공데이터 카탈로그를 FTS 검색·테마 필터·AI Ready 필터로 탐색하고 데이터셋 상세를 조회한다.",
+      "tags": ["catalog", "FTS", "portal", "AI-Ready"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /portal",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:portal-api-key-management",
+      "type": "flow",
+      "name": "API 키 발급·관리",
+      "summary": "사용자가 공개 API 접근을 위한 API 키를 발급받고 관리하며, 관리자는 전체 API 키를 관리한다.",
+      "tags": ["API-key", "security", "openapi"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/openapi/keys",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:portal-dataset-subscription",
+      "type": "flow",
+      "name": "데이터셋 구독",
+      "summary": "사용자가 카탈로그 데이터셋을 구독하고 업데이트 알림을 받는다.",
+      "tags": ["구독", "catalog", "notification"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "POST /api/catalog/{id}/subscribe",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:portal-public-api-access",
+      "type": "flow",
+      "name": "공개 API 데이터 접근",
+      "summary": "외부 클라이언트가 API 키를 사용해 공개 데이터셋 목록·메타데이터·데이터를 JSON 또는 CSV로 조회한다.",
+      "tags": ["v1-api", "API-key", "JSON", "CSV"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /api/v1/datasets",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:auth-tenant-management",
+      "type": "flow",
+      "name": "테넌트 관리",
+      "summary": "관리자가 테넌트를 생성·삭제·상태 변경하고 CSV 일괄 업로드로 테넌트를 등록한다.",
+      "tags": ["tenant", "admin", "multi-tenant"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/tenants",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:auth-user-role-management",
+      "type": "flow",
+      "name": "사용자·역할 관리",
+      "summary": "관리자가 테넌트 내 사용자를 초대하고 역할을 변경하며 비밀번호를 재설정한다.",
+      "tags": ["user", "role", "admin", "auth"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "POST /api/admin/users",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:auth-audit-monitoring",
+      "type": "flow",
+      "name": "감사 로그 모니터링",
+      "summary": "관리자가 플랫폼 전반의 감사 로그를 페이지네이션·필터링으로 조회하고 이상 행위를 감지한다.",
+      "tags": ["audit", "monitoring", "admin"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "GET /api/admin/audit-logs",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:dashboard-realtime-kpi",
+      "type": "flow",
+      "name": "실시간 KPI 대시보드",
+      "summary": "Supabase Realtime으로 수집·품질·파이프라인·분석 지표를 실시간 동기화하여 위젯 대시보드에 표시한다.",
+      "tags": ["realtime", "KPI", "Supabase", "위젯"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET / (DashboardClient)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:dashboard-overview-load",
+      "type": "flow",
+      "name": "개요 데이터 로드",
+      "summary": "/api/overview에서 파이프라인·품질·개방·평가 지표를 병렬 조회하여 대시보드 초기 상태를 구성한다.",
+      "tags": ["overview", "parallel", "dashboard"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "GET /api/overview",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:ai-nl-query",
+      "type": "flow",
+      "name": "자연어 질의",
+      "summary": "사용자가 한국어 질문을 입력하면 NL-to-SQL 엔진이 SQL을 생성·검증·실행하고 결과를 테이블·차트로 표시한다.",
+      "tags": ["NL-to-SQL", "AI", "SQL", "공공데이터"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/nl-to-sql",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:ai-chat-assistant",
+      "type": "flow",
+      "name": "AI 채팅 질의",
+      "summary": "LLM 멀티턴 도구 호출 루프로 사용자 질문에 답변하며 민감어 필터링·벡터 검색·온톨로지 추천을 통합한다.",
+      "tags": ["LLM", "chat", "vector-search", "ontology"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "POST /api/ai/chat",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:ai-meta-suggestion",
+      "type": "flow",
+      "name": "AI 메타데이터 자동 제안",
+      "summary": "카탈로그 데이터셋의 샘플 데이터를 AI에 전달하여 제목·설명·키워드 메타데이터를 자동 생성한다.",
+      "tags": ["AI", "metadata", "catalog", "자동생성"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "POST /api/catalog/{id}/suggest-meta",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:report-evaluation-generate",
+      "type": "flow",
+      "name": "평가 보고서 생성",
+      "summary": "AI 보조 블록 편집기에서 보고서를 작성하고 평가 지표를 연동하여 마크다운 또는 PDF로 내보낸다.",
+      "tags": ["report", "evaluation", "PDF", "AI"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /report (ReportClient)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:report-comparison",
+      "type": "flow",
+      "name": "멀티테넌트 비교 평가",
+      "summary": "테넌트별 카탈로그·품질·분석·합성 건수를 히트맵으로 비교하는 보고서를 생성한다.",
+      "tags": ["비교", "multi-tenant", "evaluation", "heatmap"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /api/evaluation/compare",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:report-plan-generate",
+      "type": "flow",
+      "name": "데이터 개방 계획 자동 생성",
+      "summary": "제출 이력을 분석하여 데이터 개방 계획서와 품질 개선 계획서 텍스트 초안을 자동 생성한다.",
+      "tags": ["planning", "AI", "개방계획"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "GET /api/plan",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:spatial-map-explore",
+      "type": "flow",
+      "name": "공공시설 지도 탐색",
+      "summary": "Kakao Maps에서 공공시설을 마커·히트맵·클러스터 레이어로 탐색하고 필터링 및 시설 상세를 조회한다.",
+      "tags": ["map", "Kakao-Maps", "facility", "layer"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /map (FacilityMap)",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "flow:spatial-geo-cluster",
+      "type": "flow",
+      "name": "지오 클러스터링 분석",
+      "summary": "DBSCAN·K-means 알고리즘으로 공공시설 위치 데이터를 클러스터링하여 밀집 지역을 탐지한다.",
+      "tags": ["DBSCAN", "K-means", "clustering", "GIS"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "GET /map (GeoCluster 내부 연산)",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:data-collection-source-setup:register-source-form",
+      "type": "step",
+      "name": "수집 소스 폼 입력",
+      "summary": "운영자가 API·SFTP·Postgres 커넥터 타입을 선택하고 URL·인증·스케줄 설정을 입력한다.",
+      "tags": ["form", "connector", "UI"],
+      "complexity": "simple",
+      "filePath": "components/collect/CollectSourceForm.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-source-setup:test-connection",
+      "type": "step",
+      "name": "연결 테스트",
+      "summary": "입력된 커넥터 설정으로 /api/collect/test를 호출하여 실제 연결 가능 여부와 샘플 데이터를 확인한다.",
+      "tags": ["connector", "test", "API"],
+      "complexity": "simple",
+      "filePath": "app/api/collect/test/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-source-setup:encrypt-and-save",
+      "type": "step",
+      "name": "인증 값 암호화 저장",
+      "summary": "AES-256으로 인증 값을 암호화하고 수집 소스와 작업 레코드를 Supabase에 저장한다.",
+      "tags": ["암호화", "AES-256", "Supabase"],
+      "complexity": "moderate",
+      "filePath": "app/api/collect/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-source-setup:schedule-config",
+      "type": "step",
+      "name": "스케줄 설정",
+      "summary": "수집 작업의 스케줄 타입과 다음 실행 시각을 설정한다.",
+      "tags": ["schedule", "cron", "job"],
+      "complexity": "simple",
+      "filePath": "app/api/collect/[id]/job/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-scheduled-run:cron-trigger",
+      "type": "step",
+      "name": "Cron 트리거",
+      "summary": "Cron 엔드포인트가 활성화된 수집 작업 목록을 조회하고 병렬 실행 루프를 시작한다.",
+      "tags": ["cron", "trigger", "병렬"],
+      "complexity": "simple",
+      "filePath": "app/api/cron/collect/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-scheduled-run:collect-execute",
+      "type": "step",
+      "name": "수집 엔진 실행",
+      "summary": "lib/collector.ts가 CSV/JSON/XML 파싱, 페이지네이션, 변경분 감지를 수행하여 데이터를 가져온다.",
+      "tags": ["collector", "parsing", "페이지네이션"],
+      "complexity": "complex",
+      "filePath": "lib/collector.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-scheduled-run:log-and-notify",
+      "type": "step",
+      "name": "로그 저장·알림 발송",
+      "summary": "수집 결과 로그를 저장하고 실패 임계치 초과 시 이메일 알림을 발송하며 다음 실행 시각을 갱신한다.",
+      "tags": ["log", "notification", "이메일"],
+      "complexity": "moderate",
+      "filePath": "app/api/cron/alerts/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-manual-run:sse-stream",
+      "type": "step",
+      "name": "SSE 스트리밍 시작",
+      "summary": "/api/collect/{id}/stream을 GET 요청하여 수집 진행 상황을 Server-Sent Events로 실시간 수신한다.",
+      "tags": ["SSE", "streaming", "realtime"],
+      "complexity": "moderate",
+      "filePath": "app/api/collect/[id]/stream/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-manual-run:run-and-complete",
+      "type": "step",
+      "name": "수집 실행 완료",
+      "summary": "수집이 완료되면 결과를 반환하고 알림을 발송한다.",
+      "tags": ["완료", "notification"],
+      "complexity": "simple",
+      "filePath": "app/api/collect/[id]/run/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-collection-manual-run:preview-result",
+      "type": "step",
+      "name": "수집 결과 미리보기",
+      "summary": "최근 성공 로그를 기반으로 수집 데이터 미리보기와 스키마를 조회한다.",
+      "tags": ["미리보기", "schema", "log"],
+      "complexity": "simple",
+      "filePath": "app/api/collect/[id]/preview/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-processing-rule-setup:create-rule",
+      "type": "step",
+      "name": "규칙 생성",
+      "summary": "규칙 유형(null 대체·타입 캐스팅·파생 컬럼·JOIN)과 대상 컬럼을 선택하여 변환 규칙을 생성한다.",
+      "tags": ["rule", "transformation", "UI"],
+      "complexity": "simple",
+      "filePath": "components/process/RuleEditor.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-processing-rule-setup:validate-sql",
+      "type": "step",
+      "name": "SQL 유효성 검사",
+      "summary": "파생 컬럼·JOIN 규칙의 SQL 구문 검증 및 화이트리스트 검사를 수행한다.",
+      "tags": ["SQL", "validation", "security"],
+      "complexity": "moderate",
+      "filePath": "lib/processor.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-processing-rule-setup:preview-result",
+      "type": "step",
+      "name": "미리보기 확인",
+      "summary": "/api/process/{id}/preview를 호출하여 규칙 적용 결과를 테이블로 미리보기한다.",
+      "tags": ["미리보기", "preview", "pipeline"],
+      "complexity": "simple",
+      "filePath": "components/process/PreviewPanel.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-processing-pipeline-run:fetch-source",
+      "type": "step",
+      "name": "수집 소스 데이터 조회",
+      "summary": "파이프라인 대상 테이블에서 처리할 원시 데이터를 조회한다.",
+      "tags": ["data-fetch", "source", "pipeline"],
+      "complexity": "simple",
+      "filePath": "lib/processor.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-processing-pipeline-run:apply-rules",
+      "type": "step",
+      "name": "변환 규칙 적용",
+      "summary": "등록된 변환 규칙을 순서대로 적용하여 데이터를 변환하고 파생 테이블을 생성한다.",
+      "tags": ["transformation", "rules", "processor"],
+      "complexity": "complex",
+      "filePath": "lib/processor.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-processing-pipeline-run:register-catalog",
+      "type": "step",
+      "name": "카탈로그 등록",
+      "summary": "가공된 파생 테이블을 공개 카탈로그에 메타데이터와 함께 등록한다.",
+      "tags": ["catalog", "registration", "metadata"],
+      "complexity": "moderate",
+      "filePath": "lib/processor.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-processing-pipeline-run:record-lineage",
+      "type": "step",
+      "name": "데이터 계보 기록",
+      "summary": "수집 소스→파이프라인→카탈로그 계보를 data_lineage 테이블에 기록한다.",
+      "tags": ["lineage", "data-pipeline", "Supabase"],
+      "complexity": "simple",
+      "filePath": "app/api/lineage/graph/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-quality-contract-setup:define-rules",
+      "type": "step",
+      "name": "품질 계약 규칙 정의",
+      "summary": "데이터셋에 null·범위·허용값·중복 체크 규칙을 NIA 특성에 매핑하여 정의한다.",
+      "tags": ["quality-contract", "NIA", "rules"],
+      "complexity": "moderate",
+      "filePath": "components/quality/QualityContractEditor.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-quality-contract-setup:save-contract",
+      "type": "step",
+      "name": "계약 저장",
+      "summary": "품질 계약 규칙 유효성 검사 후 카탈로그 메타데이터와 함께 저장한다.",
+      "tags": ["storage", "catalog", "validation"],
+      "complexity": "simple",
+      "filePath": "app/api/catalog/[id]/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-quality-diagnostic-run:execute-rules",
+      "type": "step",
+      "name": "품질 규칙 실행",
+      "summary": "품질 계약 규칙을 Supabase 쿼리로 변환하여 실행하고 위반 건수를 집계한다.",
+      "tags": ["quality", "execution", "Supabase"],
+      "complexity": "complex",
+      "filePath": "lib/quality.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-quality-diagnostic-run:score-nia",
+      "type": "step",
+      "name": "NIA 9대 특성 점수 산출",
+      "summary": "lib/quality-nia.ts 기준으로 9대 특성별 점수를 산출하고 신호(Green/Yellow/Red)를 결정한다.",
+      "tags": ["NIA", "scoring", "signal"],
+      "complexity": "moderate",
+      "filePath": "lib/quality-nia.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-quality-diagnostic-run:save-result",
+      "type": "step",
+      "name": "진단 결과 저장·알림",
+      "summary": "진단 결과를 Supabase에 저장하고 이상 탐지 시 알림을 생성한다.",
+      "tags": ["storage", "notification", "Supabase"],
+      "complexity": "simple",
+      "filePath": "app/api/quality/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-quality-onecycle-checklist:select-stage",
+      "type": "step",
+      "name": "점검 단계 선택",
+      "summary": "샘플·초기·중간·보완·최종 5단계 중 현재 단계를 선택한다.",
+      "tags": ["1-Cycle", "stage", "checklist"],
+      "complexity": "simple",
+      "filePath": "components/quality/OneCycleChecklist.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-quality-onecycle-checklist:check-items",
+      "type": "step",
+      "name": "체크 항목 점검",
+      "summary": "해당 단계의 NIA 품질 점검 항목을 하나씩 확인하며 체크 상태를 서버에 저장한다.",
+      "tags": ["checklist", "NIA", "storage"],
+      "complexity": "simple",
+      "filePath": "components/quality/OneCycleChecklist.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:data-quality-onecycle-checklist:view-lifecycle",
+      "type": "step",
+      "name": "데이터 생애주기 타임라인 조회",
+      "summary": "수집·정제·가공·검증 단계별 활동과 NIA 특성 연관 관계를 타임라인으로 확인한다.",
+      "tags": ["lifecycle", "timeline", "NIA"],
+      "complexity": "simple",
+      "filePath": "components/quality/DataLifecycleTimeline.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-graph-crud:add-node",
+      "type": "step",
+      "name": "노드 추가",
+      "summary": "center 역할 사용자가 온톨로지 노드 이름·타입·속성을 입력하고 onto_objects에 upsert 저장한다.",
+      "tags": ["node", "CRUD", "onto_objects"],
+      "complexity": "simple",
+      "filePath": "app/api/ontology/nodes/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-graph-crud:add-edge",
+      "type": "step",
+      "name": "엣지 추가",
+      "summary": "소스·타겟 노드와 관계 타입을 선택하여 onto_links에 upsert 저장한다.",
+      "tags": ["edge", "CRUD", "onto_links"],
+      "complexity": "simple",
+      "filePath": "app/api/ontology/edges/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-graph-crud:render-graph",
+      "type": "step",
+      "name": "그래프 렌더링",
+      "summary": "D3 force simulation과 Canvas2D를 결합하여 노드·엣지를 고성능으로 렌더링한다.",
+      "tags": ["D3", "Canvas2D", "visualization"],
+      "complexity": "complex",
+      "filePath": "components/ontology/OntologyGraph.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-graph-crud:delete-node-or-edge",
+      "type": "step",
+      "name": "노드·엣지 삭제",
+      "summary": "center 역할 검증 후 onto_objects 또는 onto_links에서 해당 레코드를 삭제한다.",
+      "tags": ["delete", "center-role", "CRUD"],
+      "complexity": "simple",
+      "filePath": "components/ontology/tabs/EditTab.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-graph-analysis:run-algorithms",
+      "type": "step",
+      "name": "알고리즘 실행",
+      "summary": "Brandes 매개 중심성·Louvain 커뮤니티·Dijkstra 최단 경로·코사인 유사도·이상치 탐지를 실행한다.",
+      "tags": ["algorithm", "centrality", "Louvain", "Dijkstra"],
+      "complexity": "complex",
+      "filePath": "lib/ontology/graph-algorithms.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-graph-analysis:encode-visual",
+      "type": "step",
+      "name": "시각 인코딩 적용",
+      "summary": "분석 결과 유형에 따라 노드 색상·반경·엣지 두께를 오버레이 인코딩하여 그래프에 표시한다.",
+      "tags": ["visual-encoding", "overlay", "D3"],
+      "complexity": "moderate",
+      "filePath": "lib/ontology/visual-encoders.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-graph-analysis:text-analysis",
+      "type": "step",
+      "name": "텍스트 분석",
+      "summary": "노드 속성에 TF-IDF 기반 단어 빈도·관계 패턴 추출을 적용하고 단어 클라우드·네트워크로 표시한다.",
+      "tags": ["TF-IDF", "text-analysis", "word-cloud"],
+      "complexity": "moderate",
+      "filePath": "app/api/ontology/text-analysis/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-workspace-management:save-snapshot",
+      "type": "step",
+      "name": "스냅샷 저장",
+      "summary": "현재 그래프 뷰·필터·선택 상태를 직렬화하여 워크스페이스 스냅샷으로 Supabase에 저장한다.",
+      "tags": ["snapshot", "workspace", "serialization"],
+      "complexity": "simple",
+      "filePath": "lib/ontology/workspace.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-workspace-management:load-snapshot",
+      "type": "step",
+      "name": "스냅샷 불러오기",
+      "summary": "저장된 워크스페이스 스냅샷을 파싱하여 그래프 상태를 복원한다.",
+      "tags": ["snapshot", "restore", "workspace"],
+      "complexity": "simple",
+      "filePath": "components/ontology/tabs/WorkspaceTab.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-workspace-management:share-workspace",
+      "type": "step",
+      "name": "워크스페이스 공유",
+      "summary": "공유 토큰을 생성하여 공개 URL을 통해 워크스페이스를 외부에 공유한다.",
+      "tags": ["sharing", "token", "public-url"],
+      "complexity": "simple",
+      "filePath": "app/api/ontology/workspace/share/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-scenario-demo:select-scenario",
+      "type": "step",
+      "name": "시나리오 선택",
+      "summary": "청년유출·서비스격차·산업집적·환경위험 중 하나를 선택하거나 자유 탐색 모드로 진입한다.",
+      "tags": ["scenario", "selector", "demo"],
+      "complexity": "simple",
+      "filePath": "components/ontology/ScenarioSelector.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ontology-scenario-demo:load-demo-graph",
+      "type": "step",
+      "name": "데모 그래프 로드",
+      "summary": "선택된 시나리오의 공공데이터 기반 온톨로지 노드·엣지를 팩토리 모듈로 생성하여 반환한다.",
+      "tags": ["demo", "factory", "graph"],
+      "complexity": "moderate",
+      "filePath": "lib/ontology/demo-graph.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:analytics-run:select-variables",
+      "type": "step",
+      "name": "변수 선택",
+      "summary": "카탈로그 테이블에서 분석 대상 변수와 분석 유형을 선택한다.",
+      "tags": ["variable", "selection", "analytics"],
+      "complexity": "simple",
+      "filePath": "components/analytics/AnalyticsClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:analytics-run:python-execute",
+      "type": "step",
+      "name": "Python 분석 실행",
+      "summary": "선택된 분석 유형에 해당하는 Python 스크립트를 서버에서 실행하고 결과를 수신한다.",
+      "tags": ["Python", "script", "execution"],
+      "complexity": "complex",
+      "filePath": "app/api/analyze/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:analytics-run:render-chart",
+      "type": "step",
+      "name": "결과 차트 렌더링",
+      "summary": "분석 결과를 Recharts 차트와 테이블로 렌더링하여 사용자에게 표시한다.",
+      "tags": ["Recharts", "chart", "visualization"],
+      "complexity": "moderate",
+      "filePath": "components/analytics/AnalyticsClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:portal-catalog-browse:search",
+      "type": "step",
+      "name": "카탈로그 검색",
+      "summary": "키워드 FTS, 테마 필터, AI Ready 필터로 카탈로그 데이터셋을 검색한다.",
+      "tags": ["FTS", "filter", "catalog"],
+      "complexity": "simple",
+      "filePath": "components/portal/PortalClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:portal-catalog-browse:view-dataset-detail",
+      "type": "step",
+      "name": "데이터셋 상세 조회",
+      "summary": "데이터 미리보기·메타데이터·AI 준비도 체크리스트·API 예제를 탭 기반 모달에서 조회한다.",
+      "tags": ["detail", "preview", "AI-Ready"],
+      "complexity": "moderate",
+      "filePath": "components/portal/DatasetModal.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:portal-catalog-browse:view-column-stats",
+      "type": "step",
+      "name": "컬럼 통계 조회",
+      "summary": "데이터셋 컬럼별 통계(분포·히스토그램)를 조회하여 시각화한다.",
+      "tags": ["statistics", "histogram", "column"],
+      "complexity": "simple",
+      "filePath": "components/portal/DatasetStats.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:portal-api-key-management:create-key",
+      "type": "step",
+      "name": "API 키 생성",
+      "summary": "사용자 또는 관리자가 API 키를 생성하며 키는 해시로 저장하고 감사 로그를 기록한다.",
+      "tags": ["API-key", "hash", "audit"],
+      "complexity": "simple",
+      "filePath": "app/api/openapi/keys/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:portal-api-key-management:revoke-key",
+      "type": "step",
+      "name": "API 키 폐기",
+      "summary": "소유권 확인 후 API 키를 비활성화(소프트 삭제)하고 감사 로그를 기록한다.",
+      "tags": ["revoke", "soft-delete", "audit"],
+      "complexity": "simple",
+      "filePath": "app/api/openapi/keys/[id]/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:portal-public-api-access:authenticate-key",
+      "type": "step",
+      "name": "API 키 인증",
+      "summary": "요청 헤더에서 API 키를 추출하여 해시 검증하고 범위(scope)를 확인한다.",
+      "tags": ["auth", "scope", "validation"],
+      "complexity": "simple",
+      "filePath": "lib/openapi.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:portal-public-api-access:return-data",
+      "type": "step",
+      "name": "데이터 반환",
+      "summary": "인증된 요청에 JSON 또는 CSV 형식으로 데이터셋 데이터를 반환하고 접근 로그를 기록한다.",
+      "tags": ["JSON", "CSV", "access-log"],
+      "complexity": "simple",
+      "filePath": "app/api/v1/datasets/[id]/data/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:auth-tenant-management:create-tenant",
+      "type": "step",
+      "name": "테넌트 생성",
+      "summary": "관리자가 테넌트 정보를 입력하거나 CSV 일괄 업로드로 여러 테넌트를 생성한다.",
+      "tags": ["tenant", "create", "CSV"],
+      "complexity": "simple",
+      "filePath": "components/admin/AdminClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:auth-tenant-management:change-status",
+      "type": "step",
+      "name": "상태 변경",
+      "summary": "테넌트를 활성화·비활성화·삭제하고 변경 사항을 감사 로그에 기록한다.",
+      "tags": ["status", "audit", "tenant"],
+      "complexity": "simple",
+      "filePath": "app/api/tenants/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:auth-user-role-management:invite-user",
+      "type": "step",
+      "name": "사용자 초대",
+      "summary": "관리자가 이메일로 사용자를 초대하고 비밀번호 복잡도 검사 후 Supabase Admin API로 생성한다.",
+      "tags": ["invite", "user", "auth"],
+      "complexity": "moderate",
+      "filePath": "app/api/admin/users/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:auth-user-role-management:change-role",
+      "type": "step",
+      "name": "역할 변경",
+      "summary": "Zod 입력 검사 후 Supabase Admin API로 사용자 역할(tenant/center)을 변경한다.",
+      "tags": ["role", "Supabase", "admin"],
+      "complexity": "simple",
+      "filePath": "app/api/admin/users/[id]/role/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:auth-audit-monitoring:query-logs",
+      "type": "step",
+      "name": "감사 로그 조회",
+      "summary": "audit_logs 테이블을 페이지네이션·필터·검색으로 조회한다.",
+      "tags": ["audit", "pagination", "filter"],
+      "complexity": "simple",
+      "filePath": "app/api/admin/audit-logs/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:auth-audit-monitoring:view-logs",
+      "type": "step",
+      "name": "감사 로그 뷰어",
+      "summary": "AuditLogViewer 컴포넌트가 로그를 테이블로 표시하고 필터링·페이지네이션을 제공한다.",
+      "tags": ["UI", "audit", "table"],
+      "complexity": "simple",
+      "filePath": "components/admin/AuditLogViewer.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:dashboard-realtime-kpi:load-widgets",
+      "type": "step",
+      "name": "위젯 초기화",
+      "summary": "DashboardClient가 위젯 레이아웃을 로드하고 각 위젯을 초기화한다.",
+      "tags": ["widget", "initialization", "layout"],
+      "complexity": "simple",
+      "filePath": "components/dashboard/DashboardClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:dashboard-realtime-kpi:realtime-sync",
+      "type": "step",
+      "name": "Supabase Realtime 동기화",
+      "summary": "Supabase Realtime 채널을 구독하여 데이터 변경 이벤트를 수신하고 위젯 상태를 갱신한다.",
+      "tags": ["Supabase", "realtime", "subscription"],
+      "complexity": "moderate",
+      "filePath": "components/dashboard/DashboardClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:dashboard-realtime-kpi:drag-layout",
+      "type": "step",
+      "name": "위젯 레이아웃 편집",
+      "summary": "드래그 앤 드롭으로 위젯 위치를 재배치하고 레이아웃 설정을 저장한다.",
+      "tags": ["drag-and-drop", "layout", "widget"],
+      "complexity": "simple",
+      "filePath": "components/dashboard/DashboardClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:dashboard-overview-load:fetch-parallel",
+      "type": "step",
+      "name": "병렬 지표 조회",
+      "summary": "/api/overview에서 파이프라인·품질·개방·평가 지표를 병렬로 조회한다.",
+      "tags": ["parallel", "API", "metrics"],
+      "complexity": "simple",
+      "filePath": "app/api/overview/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:dashboard-overview-load:render-kpi",
+      "type": "step",
+      "name": "KPI 카드 렌더링",
+      "summary": "조회된 지표를 StatCard와 차트 위젯으로 렌더링하여 대시보드 개요를 구성한다.",
+      "tags": ["KPI", "StatCard", "rendering"],
+      "complexity": "simple",
+      "filePath": "components/ui/StatCard.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ai-nl-query:parse-question",
+      "type": "step",
+      "name": "자연어 파싱",
+      "summary": "사용자 질문에서 시군·의도·TopN·필터 조건을 파싱하고 대화 컨텍스트를 상속한다.",
+      "tags": ["parsing", "NL", "context"],
+      "complexity": "moderate",
+      "filePath": "lib/nlquery.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ai-nl-query:generate-sql",
+      "type": "step",
+      "name": "SQL 생성·검증",
+      "summary": "카탈로그 화이트리스트 기반 SQL SELECT를 생성하고 삽입 공격 방지 검사를 수행한다.",
+      "tags": ["SQL", "whitelist", "validation"],
+      "complexity": "complex",
+      "filePath": "lib/ai/nl-to-sql.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ai-nl-query:execute-and-summarize",
+      "type": "step",
+      "name": "쿼리 실행·요약",
+      "summary": "검증된 SQL을 실행하고 결과를 한국어 문장으로 요약하여 테이블·차트와 함께 반환한다.",
+      "tags": ["execution", "summary", "Korean"],
+      "complexity": "moderate",
+      "filePath": "lib/nlquery/summarize.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ai-chat-assistant:filter-and-retrieve",
+      "type": "step",
+      "name": "민감어 필터링·컨텍스트 검색",
+      "summary": "사용자 메시지에서 민감어를 필터링하고 벡터 임베딩 유사도·키워드 ILIKE 이중 검색으로 컨텍스트를 수집한다.",
+      "tags": ["filter", "vector-search", "ILIKE"],
+      "complexity": "moderate",
+      "filePath": "lib/ai/retriever.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ai-chat-assistant:build-tools",
+      "type": "step",
+      "name": "동적 도구 생성",
+      "summary": "Supabase 카탈로그를 기반으로 LLM이 사용할 데이터셋 조회 도구 배열을 동적으로 생성한다.",
+      "tags": ["tools", "dynamic", "LLM"],
+      "complexity": "moderate",
+      "filePath": "lib/ai/tools.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:ai-chat-assistant:llm-tool-loop",
+      "type": "step",
+      "name": "LLM 멀티턴 루프",
+      "summary": "LLM에 시스템 프롬프트·컨텍스트·도구를 전달하여 멀티턴 도구 호출 루프로 최종 응답을 생성한다.",
+      "tags": ["LLM", "tool-calling", "multi-turn"],
+      "complexity": "complex",
+      "filePath": "app/api/ai/chat/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:report-evaluation-generate:edit-blocks",
+      "type": "step",
+      "name": "블록 편집",
+      "summary": "AI 보조 블록 기반 편집기에서 텍스트·차트·지표 블록을 편집하고 이력을 관리한다.",
+      "tags": ["block-editor", "AI", "history"],
+      "complexity": "moderate",
+      "filePath": "components/report/ReportClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:report-evaluation-generate:link-metrics",
+      "type": "step",
+      "name": "평가 지표 연동",
+      "summary": "/api/evaluation에서 종합 평가 지표를 조회하여 보고서 블록에 자동 연동한다.",
+      "tags": ["evaluation", "metrics", "API"],
+      "complexity": "simple",
+      "filePath": "app/api/evaluation/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:report-evaluation-generate:export-pdf",
+      "type": "step",
+      "name": "PDF 내보내기",
+      "summary": "jsPDF와 Pretendard 폰트로 평가 지표 기반 PDF 보고서를 서버사이드 생성하여 다운로드한다.",
+      "tags": ["PDF", "jsPDF", "Pretendard"],
+      "complexity": "moderate",
+      "filePath": "app/api/report/pdf/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:report-comparison:aggregate-tenants",
+      "type": "step",
+      "name": "테넌트별 지표 집계",
+      "summary": "멀티테넌트 비교를 위해 테넌트별 카탈로그·품질·분석·합성 건수를 집계한다.",
+      "tags": ["multi-tenant", "aggregation", "evaluation"],
+      "complexity": "moderate",
+      "filePath": "app/api/evaluation/compare/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:report-comparison:render-heatmap",
+      "type": "step",
+      "name": "히트맵 렌더링",
+      "summary": "집계 데이터를 목표치와 비교하는 히트맵 셀 방식으로 시각화한다.",
+      "tags": ["heatmap", "comparison", "visualization"],
+      "complexity": "simple",
+      "filePath": "components/report/CompareClient.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:report-plan-generate:analyze-history",
+      "type": "step",
+      "name": "제출 이력 분석",
+      "summary": "이전 데이터 제출 이력을 분석하여 개방 현황과 품질 수준을 파악한다.",
+      "tags": ["history", "submission", "analysis"],
+      "complexity": "simple",
+      "filePath": "lib/planning.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:report-plan-generate:generate-plan-text",
+      "type": "step",
+      "name": "계획서 텍스트 생성",
+      "summary": "분석 결과를 바탕으로 데이터 개방 계획서와 품질 개선 계획서 텍스트 초안을 자동 생성한다.",
+      "tags": ["text-generation", "plan", "AI"],
+      "complexity": "moderate",
+      "filePath": "app/api/plan/route.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:spatial-map-explore:load-facilities",
+      "type": "step",
+      "name": "시설 데이터 로드",
+      "summary": "카탈로그에서 공공시설 위치 데이터를 조회하여 지도 레이어에 준비한다.",
+      "tags": ["facility", "data-load", "catalog"],
+      "complexity": "simple",
+      "filePath": "components/map/FacilityMap.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:spatial-map-explore:render-layer",
+      "type": "step",
+      "name": "지도 레이어 렌더링",
+      "summary": "Kakao Maps SDK로 마커·히트맵·클러스터 레이어를 렌더링하고 레이어 전환을 지원한다.",
+      "tags": ["Kakao-Maps", "layer", "rendering"],
+      "complexity": "complex",
+      "filePath": "components/map/MapInner.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:spatial-map-explore:filter-and-detail",
+      "type": "step",
+      "name": "필터링·상세 조회",
+      "summary": "시설 유형·지역 필터를 적용하고 선택된 시설의 상세 패널을 표시한다.",
+      "tags": ["filter", "detail", "facility"],
+      "complexity": "simple",
+      "filePath": "components/map/FacilityMap.tsx",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:spatial-geo-cluster:compute-clusters",
+      "type": "step",
+      "name": "클러스터 계산",
+      "summary": "Haversine 거리 기반 DBSCAN 또는 K-means로 시설 위치 클러스터를 계산한다.",
+      "tags": ["DBSCAN", "K-means", "Haversine"],
+      "complexity": "complex",
+      "filePath": "lib/geo-cluster.ts",
+      "lineRange": [0, 0]
+    },
+    {
+      "id": "step:spatial-geo-cluster:render-heatmap",
+      "type": "step",
+      "name": "히트맵 그리드 생성",
+      "summary": "격자 셀 생성·커널 밀도 계산·색상 팔레트 매핑으로 히트맵 레이어 데이터를 생성한다.",
+      "tags": ["heatmap", "kernel-density", "grid"],
+      "complexity": "moderate",
+      "filePath": "lib/heatmap.ts",
+      "lineRange": [0, 0]
+    }
+  ],
+  "edges": [
+    { "source": "domain:data-collection", "target": "flow:data-collection-source-setup", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-collection", "target": "flow:data-collection-scheduled-run", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-collection", "target": "flow:data-collection-manual-run", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-processing", "target": "flow:data-processing-rule-setup", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-processing", "target": "flow:data-processing-pipeline-run", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-processing", "target": "flow:data-processing-batch-register", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-quality", "target": "flow:data-quality-contract-setup", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-quality", "target": "flow:data-quality-diagnostic-run", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-quality", "target": "flow:data-quality-onecycle-checklist", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:ontology-management", "target": "flow:ontology-graph-crud", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:ontology-management", "target": "flow:ontology-graph-analysis", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:ontology-management", "target": "flow:ontology-workspace-management", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:ontology-management", "target": "flow:ontology-scenario-demo", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:statistical-analysis", "target": "flow:analytics-run", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:statistical-analysis", "target": "flow:analytics-file-upload", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:statistical-analysis", "target": "flow:analytics-favorites", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:open-portal", "target": "flow:portal-catalog-browse", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:open-portal", "target": "flow:portal-api-key-management", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:open-portal", "target": "flow:portal-dataset-subscription", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:open-portal", "target": "flow:portal-public-api-access", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:auth-authorization", "target": "flow:auth-tenant-management", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:auth-authorization", "target": "flow:auth-user-role-management", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:auth-authorization", "target": "flow:auth-audit-monitoring", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:dashboard", "target": "flow:dashboard-realtime-kpi", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:dashboard", "target": "flow:dashboard-overview-load", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:ai-query", "target": "flow:ai-nl-query", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:ai-query", "target": "flow:ai-chat-assistant", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:ai-query", "target": "flow:ai-meta-suggestion", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:report-evaluation", "target": "flow:report-evaluation-generate", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:report-evaluation", "target": "flow:report-comparison", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:report-evaluation", "target": "flow:report-plan-generate", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:spatial-data", "target": "flow:spatial-map-explore", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:spatial-data", "target": "flow:spatial-geo-cluster", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:data-collection-source-setup", "target": "step:data-collection-source-setup:register-source-form", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:data-collection-source-setup", "target": "step:data-collection-source-setup:test-connection", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:data-collection-source-setup", "target": "step:data-collection-source-setup:encrypt-and-save", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:data-collection-source-setup", "target": "step:data-collection-source-setup:schedule-config", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:data-collection-scheduled-run", "target": "step:data-collection-scheduled-run:cron-trigger", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:data-collection-scheduled-run", "target": "step:data-collection-scheduled-run:collect-execute", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:data-collection-scheduled-run", "target": "step:data-collection-scheduled-run:log-and-notify", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:data-collection-manual-run", "target": "step:data-collection-manual-run:sse-stream", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:data-collection-manual-run", "target": "step:data-collection-manual-run:run-and-complete", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:data-collection-manual-run", "target": "step:data-collection-manual-run:preview-result", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:data-processing-rule-setup", "target": "step:data-processing-rule-setup:create-rule", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:data-processing-rule-setup", "target": "step:data-processing-rule-setup:validate-sql", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:data-processing-rule-setup", "target": "step:data-processing-rule-setup:preview-result", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:data-processing-pipeline-run", "target": "step:data-processing-pipeline-run:fetch-source", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:data-processing-pipeline-run", "target": "step:data-processing-pipeline-run:apply-rules", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:data-processing-pipeline-run", "target": "step:data-processing-pipeline-run:register-catalog", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:data-processing-pipeline-run", "target": "step:data-processing-pipeline-run:record-lineage", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:data-quality-contract-setup", "target": "step:data-quality-contract-setup:define-rules", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:data-quality-contract-setup", "target": "step:data-quality-contract-setup:save-contract", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:data-quality-diagnostic-run", "target": "step:data-quality-diagnostic-run:execute-rules", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:data-quality-diagnostic-run", "target": "step:data-quality-diagnostic-run:score-nia", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:data-quality-diagnostic-run", "target": "step:data-quality-diagnostic-run:save-result", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:data-quality-onecycle-checklist", "target": "step:data-quality-onecycle-checklist:select-stage", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:data-quality-onecycle-checklist", "target": "step:data-quality-onecycle-checklist:check-items", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:data-quality-onecycle-checklist", "target": "step:data-quality-onecycle-checklist:view-lifecycle", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:ontology-graph-crud", "target": "step:ontology-graph-crud:add-node", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:ontology-graph-crud", "target": "step:ontology-graph-crud:add-edge", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:ontology-graph-crud", "target": "step:ontology-graph-crud:render-graph", "type": "flow_step", "direction": "forward", "weight": 0.8 },
+    { "source": "flow:ontology-graph-crud", "target": "step:ontology-graph-crud:delete-node-or-edge", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:ontology-graph-analysis", "target": "step:ontology-graph-analysis:run-algorithms", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:ontology-graph-analysis", "target": "step:ontology-graph-analysis:encode-visual", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:ontology-graph-analysis", "target": "step:ontology-graph-analysis:text-analysis", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:ontology-workspace-management", "target": "step:ontology-workspace-management:save-snapshot", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:ontology-workspace-management", "target": "step:ontology-workspace-management:load-snapshot", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:ontology-workspace-management", "target": "step:ontology-workspace-management:share-workspace", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:ontology-scenario-demo", "target": "step:ontology-scenario-demo:select-scenario", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:ontology-scenario-demo", "target": "step:ontology-scenario-demo:load-demo-graph", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:analytics-run", "target": "step:analytics-run:select-variables", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:analytics-run", "target": "step:analytics-run:python-execute", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:analytics-run", "target": "step:analytics-run:render-chart", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:portal-catalog-browse", "target": "step:portal-catalog-browse:search", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:portal-catalog-browse", "target": "step:portal-catalog-browse:view-dataset-detail", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:portal-catalog-browse", "target": "step:portal-catalog-browse:view-column-stats", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:portal-api-key-management", "target": "step:portal-api-key-management:create-key", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:portal-api-key-management", "target": "step:portal-api-key-management:revoke-key", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:portal-public-api-access", "target": "step:portal-public-api-access:authenticate-key", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:portal-public-api-access", "target": "step:portal-public-api-access:return-data", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:auth-tenant-management", "target": "step:auth-tenant-management:create-tenant", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:auth-tenant-management", "target": "step:auth-tenant-management:change-status", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:auth-user-role-management", "target": "step:auth-user-role-management:invite-user", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:auth-user-role-management", "target": "step:auth-user-role-management:change-role", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:auth-audit-monitoring", "target": "step:auth-audit-monitoring:query-logs", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:auth-audit-monitoring", "target": "step:auth-audit-monitoring:view-logs", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:dashboard-realtime-kpi", "target": "step:dashboard-realtime-kpi:load-widgets", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:dashboard-realtime-kpi", "target": "step:dashboard-realtime-kpi:realtime-sync", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:dashboard-realtime-kpi", "target": "step:dashboard-realtime-kpi:drag-layout", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:dashboard-overview-load", "target": "step:dashboard-overview-load:fetch-parallel", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:dashboard-overview-load", "target": "step:dashboard-overview-load:render-kpi", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:ai-nl-query", "target": "step:ai-nl-query:parse-question", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:ai-nl-query", "target": "step:ai-nl-query:generate-sql", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:ai-nl-query", "target": "step:ai-nl-query:execute-and-summarize", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:ai-chat-assistant", "target": "step:ai-chat-assistant:filter-and-retrieve", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:ai-chat-assistant", "target": "step:ai-chat-assistant:build-tools", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:ai-chat-assistant", "target": "step:ai-chat-assistant:llm-tool-loop", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:report-evaluation-generate", "target": "step:report-evaluation-generate:edit-blocks", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:report-evaluation-generate", "target": "step:report-evaluation-generate:link-metrics", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:report-evaluation-generate", "target": "step:report-evaluation-generate:export-pdf", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:report-comparison", "target": "step:report-comparison:aggregate-tenants", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:report-comparison", "target": "step:report-comparison:render-heatmap", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:report-plan-generate", "target": "step:report-plan-generate:analyze-history", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:report-plan-generate", "target": "step:report-plan-generate:generate-plan-text", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:spatial-map-explore", "target": "step:spatial-map-explore:load-facilities", "type": "flow_step", "direction": "forward", "weight": 0.3 },
+    { "source": "flow:spatial-map-explore", "target": "step:spatial-map-explore:render-layer", "type": "flow_step", "direction": "forward", "weight": 0.7 },
+    { "source": "flow:spatial-map-explore", "target": "step:spatial-map-explore:filter-and-detail", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:spatial-geo-cluster", "target": "step:spatial-geo-cluster:compute-clusters", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:spatial-geo-cluster", "target": "step:spatial-geo-cluster:render-heatmap", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:data-collection", "target": "domain:data-processing", "type": "cross_domain", "direction": "forward", "description": "수집된 원시 데이터가 가공 파이프라인의 입력으로 전달됨", "weight": 0.9 },
+    { "source": "domain:data-processing", "target": "domain:open-portal", "type": "cross_domain", "direction": "forward", "description": "가공 파이프라인의 파생 테이블이 공개 포털 카탈로그에 등록됨", "weight": 0.8 },
+    { "source": "domain:data-processing", "target": "domain:data-quality", "type": "cross_domain", "direction": "forward", "description": "가공 결과 테이블에 품질 진단을 실행하여 NIA 점수 산출", "weight": 0.8 },
+    { "source": "domain:data-processing", "target": "domain:ontology-management", "type": "cross_domain", "direction": "forward", "description": "데이터 계보(수집→파이프라인→카탈로그)가 온톨로지 계보 패널에 공급됨", "weight": 0.6 },
+    { "source": "domain:data-quality", "target": "domain:dashboard", "type": "cross_domain", "direction": "forward", "description": "NIA 품질 신호·점수가 대시보드 QualitySignalWidget에 표시됨", "weight": 0.7 },
+    { "source": "domain:data-quality", "target": "domain:report-evaluation", "type": "cross_domain", "direction": "forward", "description": "품질 평가 지표가 보고서·평가 도메인의 종합 평가에 포함됨", "weight": 0.7 },
+    { "source": "domain:data-quality", "target": "domain:open-portal", "type": "cross_domain", "direction": "forward", "description": "AI 준비도 체크리스트를 카탈로그 데이터셋 상세에 제공", "weight": 0.5 },
+    { "source": "domain:ontology-management", "target": "domain:ai-query", "type": "cross_domain", "direction": "forward", "description": "온톨로지 그래프가 AI 채팅 컨텍스트 및 추천 소스로 활용됨", "weight": 0.7 },
+    { "source": "domain:ontology-management", "target": "domain:dashboard", "type": "cross_domain", "direction": "forward", "description": "데이터 계보 그래프 SVG가 대시보드 LineageWidget에 렌더링됨", "weight": 0.5 },
+    { "source": "domain:open-portal", "target": "domain:ai-query", "type": "cross_domain", "direction": "forward", "description": "카탈로그 화이트리스트가 NL-to-SQL 동적 도구 생성에 사용됨", "weight": 0.7 },
+    { "source": "domain:auth-authorization", "target": "domain:open-portal", "type": "cross_domain", "direction": "forward", "description": "API 키 해시 검증 및 범위 검사를 공개 포털 API가 사용", "weight": 0.8 },
+    { "source": "domain:auth-authorization", "target": "domain:ontology-management", "type": "cross_domain", "direction": "forward", "description": "center 역할 검사로 온톨로지 노드·엣지 편집 권한 제어", "weight": 0.6 },
+    { "source": "domain:statistical-analysis", "target": "domain:dashboard", "type": "cross_domain", "direction": "forward", "description": "분석 실행 이력이 대시보드 RecentAnalysisWidget에 노출됨", "weight": 0.5 },
+    { "source": "domain:statistical-analysis", "target": "domain:report-evaluation", "type": "cross_domain", "direction": "forward", "description": "분석 건수가 보고서 도메인의 멀티테넌트 비교 평가 지표에 포함됨", "weight": 0.6 },
+    { "source": "domain:ai-query", "target": "domain:report-evaluation", "type": "cross_domain", "direction": "forward", "description": "AI 보조 기능으로 보고서 블록 내용 생성 지원", "weight": 0.5 },
+    { "source": "domain:spatial-data", "target": "domain:open-portal", "type": "cross_domain", "direction": "forward", "description": "공공시설 공간 데이터를 카탈로그 데이터셋으로 연동", "weight": 0.5 },
+    { "source": "domain:spatial-data", "target": "domain:ontology-management", "type": "cross_domain", "direction": "forward", "description": "온톨로지 노드의 지리 좌표가 KakaoOntologyMap 위에 표시됨", "weight": 0.4 },
+    { "source": "domain:data-collection", "target": "domain:dashboard", "type": "cross_domain", "direction": "forward", "description": "수집 추이 월별 건수가 대시보드 CollectionTrendWidget에 표시됨", "weight": 0.5 }
+  ],
+  "layers": [],
+  "tour": []
+}

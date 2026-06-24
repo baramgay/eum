@@ -1,0 +1,9 @@
+tmp/
+intermediate/batch-*.json
+intermediate/batches.json
+intermediate/fingerprint-input.json
+intermediate/scan-result.json
+intermediate/tour.json
+intermediate/architecture.json
+intermediate/assembled-graph.json
+intermediate/review-output.json
