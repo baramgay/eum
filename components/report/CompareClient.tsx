@@ -118,7 +118,7 @@ export default function CompareClient() {
               <th className="px-3 py-2.5 text-center text-xs text-gray-500 dark:text-gray-400 font-medium">목표<br/>달성</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {sorted.map((r, i) => {
               const achieved =
                 (r.open_pct >= GOALS.open ? 1 : 0) +

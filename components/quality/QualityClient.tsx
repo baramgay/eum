@@ -1213,7 +1213,7 @@ export default function QualityClient() {
           {activeTab === 'gap' && (
             <div className="space-y-4">
               <Card className="flex flex-wrap items-center gap-3">
-                <Filter className="w-4 h-4 text-gray-400" />
+                <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 <label className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택</label>
                 <select
                   value={selectedDataset}
@@ -1258,7 +1258,7 @@ export default function QualityClient() {
               {!selectedDataset ? (
                 <Card>
                   <EmptyState
-                    icon={<AlertCircle className="w-6 h-6 text-gray-400" />}
+                    icon={<AlertCircle className="w-6 h-6 text-gray-400 dark:text-gray-300" />}
                     title="데이터셋을 선택하세요"
                     description="갭 분석을 실행할 데이터셋을 위에서 선택하세요"
                   />
@@ -1344,7 +1344,7 @@ export default function QualityClient() {
               {/* 데이터셋 선택 */}
               <Card>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Filter className="w-4 h-4 text-gray-400" />
+                  <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   <label className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택</label>
                   <select
                     value={selectedDataset}
@@ -1375,7 +1375,7 @@ export default function QualityClient() {
               ) : !selectedDataset ? (
                 <Card>
                   <EmptyState
-                    icon={<FileEdit className="w-6 h-6 text-gray-400" />}
+                    icon={<FileEdit className="w-6 h-6 text-gray-400 dark:text-gray-300" />}
                     title="데이터셋을 선택하세요"
                     description="품질 계약을 편집할 데이터셋을 위에서 선택하세요"
                   />

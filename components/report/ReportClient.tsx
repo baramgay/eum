@@ -671,7 +671,7 @@ export default function ReportClient({ role }: Props) {
 
       {/* center 전용 모드 탭 */}
       {isCenter && (
-        <div className="flex gap-1 border-b pb-0 print:hidden">
+        <div className="flex gap-1 border-b dark:border-gray-700 pb-0 print:hidden">
           {(['report', 'compare'] as const).map(mode => (
             <button
               key={mode}
@@ -878,7 +878,7 @@ export default function ReportClient({ role }: Props) {
                 <span className="font-semibold text-gray-800 dark:text-gray-200 text-sm">목표 대비 현황</span>
                 <span className="text-xs text-gray-400 dark:text-gray-300 ml-1">실적 관리 페이지에서 목표를 수정할 수 있습니다</span>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-y md:divide-y-0 divide-gray-100">
+              <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-y md:divide-y-0 divide-gray-100 dark:divide-gray-700">
                 {goalItems.map(item => {
                   const pct = item.goal > 0 ? Math.min(item.current / item.goal * 100, 100) : 0
                   const met = item.current >= item.goal
@@ -886,7 +886,7 @@ export default function ReportClient({ role }: Props) {
                     <div key={item.label} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors">
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{item.label}</p>
                       <div className="flex items-baseline gap-1 mb-1.5">
-                        <span className={`text-base font-bold ${met ? 'text-green-700' : 'text-gray-800 dark:text-gray-200'}`}>
+                        <span className={`text-base font-bold ${met ? 'text-green-700 dark:text-green-400' : 'text-gray-800 dark:text-gray-200'}`}>
                           {item.fmt(item.current)}
                         </span>
                         <span className="text-xs text-gray-400 dark:text-gray-300">/ 목표 {item.fmt(item.goal)}</span>
@@ -941,7 +941,7 @@ export default function ReportClient({ role }: Props) {
                 ))}
               </div>
               {actionItems.length > 6 && (
-                <div className="px-5 py-2 text-xs text-amber-600 dark:text-amber-400 text-right border-t border-amber-200">
+                <div className="px-5 py-2 text-xs text-amber-600 dark:text-amber-400 text-right border-t border-amber-200 dark:border-amber-800">
                   + {actionItems.length - 6}개 항목은 아래 영역별 상세에서 확인
                 </div>
               )}
@@ -1003,7 +1003,7 @@ export default function ReportClient({ role }: Props) {
 
           {/* 영역별 인디케이터 */}
           {filteredAreas.length > 0 ? filteredAreas.map(area => (
-            <div key={area.name} className="bg-white dark:bg-gray-900 rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div key={area.name} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div
                 className="px-5 py-3 flex items-center justify-between border-b"
                 style={{ backgroundColor: area.color + '15' }}
@@ -1036,7 +1036,7 @@ export default function ReportClient({ role }: Props) {
                       <th className="px-4 py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">설명</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {area.indicators.map(ind => (
                       <tr key={ind.name} className="hover:bg-gray-50 dark:hover:bg-gray-950">
                         <td className="px-4 py-2 text-gray-800 dark:text-gray-200">{ind.name}</td>

@@ -93,7 +93,7 @@ export default function OneCycleChecklist({ datasetId }: OneCycleChecklistProps)
               <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold
                 ${phaseDone ? 'bg-emerald-500 text-white' :
                   activePhase === cp.phase ? 'bg-white/30 text-white' :
-                                            'bg-gray-200 dark:bg-gray-700 text-gray-500'}`}>
+                                            'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
                 {phaseDone ? '✓' : idx + 1}
               </span>
               {cp.label}
@@ -112,7 +112,7 @@ export default function OneCycleChecklist({ datasetId }: OneCycleChecklistProps)
       </div>
 
       {/* 현재 단계 상세 */}
-      <div className="border rounded-xl overflow-hidden">
+      <div className="border dark:border-gray-700 rounded-xl overflow-hidden">
         <div className="px-4 py-3 text-white"
           style={{ backgroundColor: PHASE_COLORS[activePhase] }}>
           <div className="flex items-center justify-between">

@@ -14,6 +14,9 @@ import Badge from '@/components/ui/Badge'
 import Btn from '@/components/ui/Btn'
 import EmptyState from '@/components/ui/EmptyState'
 import Skeleton from '@/components/ui/Skeleton'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import Textarea from '@/components/ui/Textarea'
 
 // ────── 타입 ──────
 interface AnalysisRecord {
@@ -181,9 +184,9 @@ function AnalysisTab() {
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="pl-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석명 *</label>
-              <input
+              <Input
                 id="pl-title"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-purple-300 py-2"
                 placeholder="예: 경남 청년인구 이동패턴 분석"
                 value={form.title}
                 onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
@@ -191,19 +194,19 @@ function AnalysisTab() {
             </div>
             <div>
               <label htmlFor="pl-performed-at" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">수행일 *</label>
-              <input
+              <Input
                 id="pl-performed-at"
                 type="date"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-purple-300 py-2"
                 value={form.performed_at}
                 onChange={e => setForm(p => ({ ...p, performed_at: e.target.value }))}
               />
             </div>
             <div>
               <label htmlFor="pl-purpose" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석 목적</label>
-              <input
+              <Input
                 id="pl-purpose"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-purple-300 py-2"
                 placeholder="정책활용 / 서비스개선 / 사회문제해결"
                 value={form.purpose}
                 onChange={e => setForm(p => ({ ...p, purpose: e.target.value }))}
@@ -211,9 +214,9 @@ function AnalysisTab() {
             </div>
             <div>
               <label htmlFor="pl-datasets" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">활용 데이터셋 (쉼표 구분)</label>
-              <input
+              <Input
                 id="pl-datasets"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-purple-300 py-2"
                 placeholder="주민등록인구통계, 청년지원사업현황"
                 value={form.datasets_used}
                 onChange={e => setForm(p => ({ ...p, datasets_used: e.target.value }))}
@@ -221,9 +224,9 @@ function AnalysisTab() {
             </div>
             <div className="md:col-span-2">
               <label htmlFor="pl-result-summary" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">결과 요약</label>
-              <textarea
+              <Textarea
                 id="pl-result-summary"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-purple-300 resize-none py-2"
                 rows={2}
                 placeholder="분석 결과 및 정책 제언 요약"
                 value={form.result_summary}
@@ -259,12 +262,12 @@ function AnalysisTab() {
       {!loading && !error && total > 0 && (
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-          <input
+          <Input
             type="text"
             placeholder="분석명, 목적, 결과 요약 검색..."
             value={query}
             onChange={e => setQuery(e.target.value)}
-            className="w-full pl-9 pr-9 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="pl-9 pr-9 py-2 rounded-lg focus:ring-purple-300"
           />
           {query && (
             <button
@@ -484,31 +487,31 @@ function SyntheticTab() {
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="pl-case-type" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">유형 *</label>
-              <select
+              <Select
                 id="pl-case-type"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-blue-300 py-2"
                 value={form.case_type}
                 onChange={e => setForm(p => ({ ...p, case_type: e.target.value as 'synthetic' | 'anonymized' }))}
               >
                 <option value="synthetic">합성데이터 개방</option>
                 <option value="anonymized">가명정보 제공</option>
-              </select>
+              </Select>
             </div>
             <div>
               <label htmlFor="pl-opened-at" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">개방·제공일 *</label>
-              <input
+              <Input
                 id="pl-opened-at"
                 type="date"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-blue-300 py-2"
                 value={form.opened_at}
                 onChange={e => setForm(p => ({ ...p, opened_at: e.target.value }))}
               />
             </div>
             <div className="md:col-span-2">
               <label htmlFor="pl-syn-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">데이터명 *</label>
-              <input
+              <Input
                 id="pl-syn-title"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-blue-300 py-2"
                 placeholder="예: 경남 복지서비스 이용 합성데이터"
                 value={form.title}
                 onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
@@ -516,9 +519,9 @@ function SyntheticTab() {
             </div>
             <div>
               <label htmlFor="pl-dataset-id" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">연관 데이터셋 ID</label>
-              <input
+              <Input
                 id="pl-dataset-id"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-blue-300 py-2"
                 placeholder="catalog 데이터셋 ID"
                 value={form.dataset_id}
                 onChange={e => setForm(p => ({ ...p, dataset_id: e.target.value }))}
@@ -526,10 +529,10 @@ function SyntheticTab() {
             </div>
             <div>
               <label htmlFor="pl-portal-url" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">공공데이터포털 URL</label>
-              <input
+              <Input
                 id="pl-portal-url"
                 type="url"
-                className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                className="rounded-lg focus:ring-blue-300 py-2"
                 placeholder="https://data.go.kr/..."
                 value={form.portal_url}
                 onChange={e => setForm(p => ({ ...p, portal_url: e.target.value }))}
@@ -556,12 +559,12 @@ function SyntheticTab() {
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-            <input
+            <Input
               type="text"
               placeholder="데이터명, 데이터셋 ID 검색..."
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className="w-full pl-9 pr-9 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+              className="pl-9 pr-9 py-2 rounded-lg focus:ring-blue-300"
             />
             {query && (
               <button
@@ -744,12 +747,12 @@ function TargetsTab() {
                 <p className="text-xs text-gray-400 dark:text-gray-300">{f.desc}</p>
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0">
-                <input
+                <Input
                   type="number"
                   min={0}
                   max={f.unit === '%' ? 100 : 100}
                   step={f.unit === '%' ? 5 : 1}
-                  className="w-20 px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-right focus:ring-2 focus:ring-amber-300 focus:outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                  className="w-20 py-1.5 text-right rounded-lg focus:ring-amber-300"
                   value={targets[f.key]}
                   onChange={e => setTargets(p => ({ ...p, [f.key]: Number(e.target.value) }))}
                 />
@@ -906,8 +909,8 @@ function QualitativeTab() {
                     </button>
                   ))}
                 </div>
-                <textarea
-                  className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-300 focus:outline-none resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                <Textarea
+                  className="rounded-lg focus:ring-indigo-300 resize-none py-2"
                   rows={3}
                   placeholder="실적 내용, 증빙 자료, 이행 현황 등을 간략히 기재하세요"
                   value={draft.note}

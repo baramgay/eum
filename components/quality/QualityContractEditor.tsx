@@ -437,7 +437,7 @@ export default function QualityContractEditor({
       )}
 
       {/* NIA 체크 타입 안내 */}
-      <div className="border rounded-xl p-3 bg-gray-50 dark:bg-gray-800 space-y-2">
+      <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-3 bg-gray-50 dark:bg-gray-800 space-y-2">
         <div className="text-xs font-medium text-gray-600 dark:text-gray-400">체크 유형별 NIA 특성 연계</div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
           {(Object.keys(CHECK_TYPE_META) as ContractCheck['type'][]).map(t => (
