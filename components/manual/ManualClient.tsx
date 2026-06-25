@@ -608,7 +608,7 @@ function renderBlock(block: Block, idx: number) {
         <div key={idx} className="flex items-center gap-2 my-4 flex-wrap">
           {block.items.map((item, i) => (
             <span key={i} className="flex items-center gap-2">
-              <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-full text-xs font-medium ring-1 ring-gray-200">
+              <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-full text-xs font-medium ring-1 ring-gray-200 dark:ring-gray-700">
                 {item}
               </span>
               {i < block.items.length - 1 && (
@@ -624,8 +624,8 @@ function renderBlock(block: Block, idx: number) {
           {block.items.map((f, i) => {
             const Icon = ICON_MAP[f.icon] ?? BookOpen
             return (
-              <div key={i} className="flex items-start gap-3 bg-gray-50 dark:bg-gray-950 rounded-xl p-3.5 ring-1 ring-gray-200/70">
-                <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 ring-1 ring-gray-200 flex items-center justify-center flex-shrink-0">
+              <div key={i} className="flex items-start gap-3 bg-gray-50 dark:bg-gray-950 rounded-xl p-3.5 ring-1 ring-gray-200/70 dark:ring-gray-700/70">
+                <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 ring-1 ring-gray-200 dark:ring-gray-700 flex items-center justify-center flex-shrink-0">
                   <Icon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                 </div>
                 <div>
@@ -642,7 +642,7 @@ function renderBlock(block: Block, idx: number) {
       return (
         <div key={idx} className="space-y-2.5 my-4">
           {block.items.map((r, i) => (
-            <div key={i} className="flex items-center gap-3 p-3.5 bg-gray-50 dark:bg-gray-950 rounded-xl ring-1 ring-gray-200/70">
+            <div key={i} className="flex items-center gap-3 p-3.5 bg-gray-50 dark:bg-gray-950 rounded-xl ring-1 ring-gray-200/70 dark:ring-gray-700/70">
               <span className={`text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 ring-1 ${r.color}`}>
                 {r.badge}
               </span>
@@ -686,7 +686,7 @@ export default function ManualClient({ role }: { role: string }) {
 
       {showLog ? (
         /* ─── 업데이트 이력 ─── */
-        <div className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm p-8">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm p-8">
           <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6">업데이트 이력</h2>
           <div className="space-y-8">
             {UPDATE_LOG.map(log => (
@@ -694,7 +694,7 @@ export default function ManualClient({ role }: { role: string }) {
                 <div className="flex-shrink-0 w-24">
                   <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">{log.date}</span>
                 </div>
-                <ul className="flex-1 space-y-2 border-l border-gray-100 pl-6">
+                <ul className="flex-1 space-y-2 border-l border-gray-100 dark:border-gray-700 pl-6">
                   {log.items.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <span className="w-1 h-1 rounded-full bg-gray-400 dark:bg-gray-500 mt-2.5 flex-shrink-0" />
@@ -711,8 +711,8 @@ export default function ManualClient({ role }: { role: string }) {
         <div className="flex gap-6 items-start">
           {/* 사이드바 */}
           <aside className="w-56 flex-shrink-0 sticky top-6">
-            <nav className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
-              <div className="px-4 py-3 border-b border-gray-100">
+            <nav className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider">메뉴</p>
               </div>
               {visibleSections.map(s => {
@@ -724,7 +724,7 @@ export default function ManualClient({ role }: { role: string }) {
                     onClick={() => setActiveId(s.id)}
                     className={`
                       w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-all
-                      border-b border-gray-50 last:border-b-0
+                      border-b border-gray-50 dark:border-gray-800 last:border-b-0
                       ${isActive
                         ? 'bg-blue-600 text-white'
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950 hover:text-gray-900 dark:hover:text-gray-100'}
@@ -745,7 +745,7 @@ export default function ManualClient({ role }: { role: string }) {
             </nav>
 
             {/* 바로가기 */}
-            <div className="mt-4 bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm p-4">
+            <div className="mt-4 bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm p-4">
               <p className="text-xs font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-3">바로가기</p>
               <div className="space-y-1">
                 {[
@@ -768,9 +768,9 @@ export default function ManualClient({ role }: { role: string }) {
 
           {/* 본문 */}
           <main className="flex-1 min-w-0">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm">
               {/* 섹션 헤더 */}
-              <div className="flex items-center gap-4 px-8 py-6 border-b border-gray-100">
+              <div className="flex items-center gap-4 px-8 py-6 border-b border-gray-100 dark:border-gray-700">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-100 dark:ring-blue-800 flex items-center justify-center flex-shrink-0">
                   <ActiveIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
@@ -791,7 +791,7 @@ export default function ManualClient({ role }: { role: string }) {
             </div>
 
             {/* 하단 네비게이션 */}
-            <div className="mt-4 flex items-center justify-between bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 shadow-sm px-6 py-3.5">
+            <div className="mt-4 flex items-center justify-between bg-white dark:bg-gray-900 rounded-2xl ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm px-6 py-3.5">
               <p className="text-xs text-gray-400 dark:text-gray-300">
                 마지막 업데이트: 2026-06-14 · 기능 추가 시 자동 갱신
               </p>

@@ -107,7 +107,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
               <Select
                 value={metric}
                 onChange={e => setMetric(e.target.value)}
-                className="px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
+                className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
               >
                 {METRICS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
               </Select>
@@ -120,7 +120,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
                 max={100}
                 value={top}
                 onChange={e => setTop(Number(e.target.value))}
-                className="w-20 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
+                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
               />
             </label>
           </div>
@@ -133,7 +133,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
               <Select
                 value={source}
                 onChange={e => setSource(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
               >
                 <option value="">선택</option>
                 {sggNodes.map(n => <option key={n.obj_id} value={n.obj_id}>{n.label}</option>)}
@@ -144,7 +144,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
               <Select
                 value={target}
                 onChange={e => setTarget(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
               >
                 <option value="">선택</option>
                 {sggNodes.map(n => <option key={n.obj_id} value={n.obj_id}>{n.label}</option>)}
@@ -160,7 +160,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
               <Select
                 value={nodeId}
                 onChange={e => setNodeId(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
               >
                 <option value="">선택</option>
                 {nodes
@@ -177,7 +177,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
                 max={100}
                 value={top}
                 onChange={e => setTop(Number(e.target.value))}
-                className="w-20 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
+                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
               />
             </label>
           </div>
@@ -360,7 +360,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
                     <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${col.bg}`} />
                     <span className={`text-xs font-semibold ${col.text}`}>클러스터 {c.communityId}</span>
                   </div>
-                  <span className="text-[11px] text-gray-500">{c.size}개 노드</span>
+                  <span className="text-[11px] text-gray-500 dark:text-gray-400">{c.size}개 노드</span>
                 </div>
                 <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mb-2">
                   <div className={`h-full rounded-full ${col.bg}`} style={{ width: `${pct}%` }} />
@@ -511,7 +511,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
                     <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mb-1">
                       <div className={`h-full rounded-full ${severity}`} style={{ width: `${pct}%` }} />
                     </div>
-                    <p className="text-[10px] text-gray-500">{r.reason}</p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400">{r.reason}</p>
                   </div>
                   <span className="text-xs font-semibold text-red-600 dark:text-red-400 tabular-nums flex-shrink-0 mt-0.5">
                     {r.zScore >= 0 ? '+' : ''}{Number(r.zScore).toFixed(2)}σ

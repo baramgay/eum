@@ -444,7 +444,7 @@ function LevelSelector({ variableName, levels, selected, onChange, min, max }: L
   const clearAll = () => onChange(variableName, [])
 
   return (
-    <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-950 rounded-lg border border-gray-100">
+    <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-950 rounded-lg border border-gray-100 dark:border-gray-700">
       <div className="flex items-center justify-between mb-2">
         <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex items-center gap-1">
           <Filter className="w-3.5 h-3.5" /> {variableName} 레벨 선택
@@ -521,7 +521,7 @@ function ResultTableView({ table }: { table: ResultTable }) {
           </thead>
           <tbody>
             {table.rows.map((row, ri) => (
-              <tr key={ri} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-950">
+              <tr key={ri} className="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-950">
                 {row.map((cell, ci) => {
                   const header = table.headers[ci] ?? ''
                   const isPHint = pHint.some(h => header.toLowerCase().includes(h.toLowerCase()))
@@ -690,7 +690,7 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
         const chartRef = { current: null as HTMLDivElement | null }
 
         return (
-          <div key={idx} className="bg-gray-50 dark:bg-gray-950 rounded-xl border border-gray-100 p-4">
+          <div key={idx} className="bg-gray-50 dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-700 p-4">
             <ChartToolbar chart={chart} chartRef={chartRef as unknown as React.RefObject<HTMLDivElement>} />
             <div ref={el => { chartRef.current = el }}>
               <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">{chart.title}</p>
@@ -1398,14 +1398,14 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
       {showCatalogPicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-lg mx-4 overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
               <p className="font-semibold text-gray-800 dark:text-gray-200">카탈로그 선택</p>
               <button onClick={() => setShowCatalogPicker(false)} className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-3 border-b">
-              <div className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-950">
+            <div className="p-3 border-b dark:border-gray-700">
+              <div className="flex items-center gap-2 px-3 py-2 border dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-950">
                 <Search className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                 <Input
                   type="text"
@@ -1462,7 +1462,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                   <button
                     key={it.id}
                     onClick={() => { setShowCatalogPicker(false); loadCatalogById(it.id, it.title) }}
-                    className="w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-colors"
+                    className="w-full text-left px-4 py-3 border-b border-gray-50 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-colors"
                   >
                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{it.title}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-300 mt-0.5">{it.id}{it.theme ? ` · ${it.theme}` : ''}</p>
@@ -1470,7 +1470,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                 ))
               })()}
             </div>
-            <div className="p-3 border-t bg-gray-50 dark:bg-gray-950">
+            <div className="p-3 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-950">
               <p className="text-xs text-gray-400 dark:text-gray-300">
                 {catalogItems.length > 0 ? `${catalogItems.length}개 데이터셋` : ''}
                 {' '} · 선택하면 즉시 분석 세션에 로드됩니다
@@ -1509,18 +1509,18 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                 데이터 미리보기
               </button>
               {showPreview && session.preview.length > 0 && (
-                <div className="mt-2 overflow-x-auto rounded border border-gray-100 max-h-40">
+                <div className="mt-2 overflow-x-auto rounded border border-gray-100 dark:border-gray-700 max-h-40">
                   <table className="text-xs">
                     <thead>
                       <tr className="bg-gray-50 dark:bg-gray-950">
                         {Object.keys(session.preview[0]).slice(0, 6).map(k => (
-                          <th key={k} className="px-2 py-1 text-left font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap border-b border-gray-100">{k}</th>
+                          <th key={k} className="px-2 py-1 text-left font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap border-b border-gray-100 dark:border-gray-700">{k}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {session.preview.slice(0, 5).map((row, i) => (
-                        <tr key={i} className="border-b border-gray-50">
+                        <tr key={i} className="border-b border-gray-50 dark:border-gray-700">
                           {Object.values(row).slice(0, 6).map((v, j) => (
                             <td key={j} className="px-2 py-1 text-gray-600 dark:text-gray-400 whitespace-nowrap">{String(v ?? '')}</td>
                           ))}
@@ -1825,7 +1825,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                               <button
                                 key={col.name}
                                 onClick={() => assignVariable(slot.key, col.name, slot.multi)}
-                                className={`w-full text-left px-3 py-2 text-sm border-b border-gray-100 last:border-0 flex items-center gap-2 transition-colors
+                                className={`w-full text-left px-3 py-2 text-sm border-b border-gray-100 dark:border-gray-700 last:border-0 flex items-center gap-2 transition-colors
                                   ${sel.includes(col.name)
                                     ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
                                     : 'hover:bg-gray-50 dark:hover:bg-gray-950 text-gray-700 dark:text-gray-300'}`}
@@ -1875,7 +1875,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                           <Select
                             value={optValues[opt.key] ?? opt.default}
                             onChange={e => setOptValues(prev => ({ ...prev, [opt.key]: e.target.value }))}
-                            className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+                            className="text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 bg-white"
                           >
                             {opt.choices.map(c => (
                               <option key={c.value} value={c.value}>{c.label}</option>
@@ -1963,7 +1963,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                           <ResultTableView key={i} table={t} />
                         ))}
                         {result.charts && result.charts.length > 0 && (
-                          <div className="mt-2 pt-4 border-t border-gray-100">
+                          <div className="mt-2 pt-4 border-t border-gray-100 dark:border-gray-700">
                             <ResultCharts charts={result.charts} />
                           </div>
                         )}
@@ -1974,7 +1974,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                             description="분석은 성공했으나 출력할 테이블이나 차트가 없습니다."
                           />
                         )}
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
                           <Btn
                             variant="secondary"
                             size="sm"
@@ -2020,11 +2020,11 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
         size="md"
       >
         <div className="p-6 space-y-4">
-          <h3 className="text-sm font-semibold text-gray-800">분석 실적 등록</h3>
-          <p className="text-xs text-gray-500">평가편람 분석·활용 ①-1 지표에 반영됩니다.</p>
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">분석 실적 등록</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400">평가편람 분석·활용 ①-1 지표에 반영됩니다.</p>
           <div className="space-y-3">
             <div>
-              <label htmlFor="ar-title" className="block text-xs font-medium text-gray-600 mb-1">분석명 *</label>
+              <label htmlFor="ar-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석명 *</label>
               <Input
                 id="ar-title"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white"
@@ -2033,7 +2033,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               />
             </div>
             <div>
-              <label htmlFor="ar-performed-at" className="block text-xs font-medium text-gray-600 mb-1">수행일 *</label>
+              <label htmlFor="ar-performed-at" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">수행일 *</label>
               <Input
                 id="ar-performed-at"
                 type="date"
@@ -2043,7 +2043,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               />
             </div>
             <div>
-              <label htmlFor="ar-purpose" className="block text-xs font-medium text-gray-600 mb-1">분석 목적</label>
+              <label htmlFor="ar-purpose" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석 목적</label>
               <Input
                 id="ar-purpose"
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white"
@@ -2053,7 +2053,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               />
             </div>
             <div>
-              <label htmlFor="ar-summary" className="block text-xs font-medium text-gray-600 mb-1">결과 요약</label>
+              <label htmlFor="ar-summary" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">결과 요약</label>
               <Textarea
                 id="ar-summary"
                 rows={2}
@@ -2062,7 +2062,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                 onChange={e => setRegisterForm(p => ({ ...p, result_summary: e.target.value }))}
               />
             </div>
-            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={registerForm.policy_applied}

@@ -98,7 +98,7 @@ function DatasetPreview({ datasetId }: { datasetId: string }) {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {rows.map((row, i) => (
               <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-950">
                 {cols.map(c => (
@@ -262,7 +262,7 @@ export default function DatasetModal({ item, onClose }: Props) {
             className={`p-1.5 rounded-md transition-colors ${
               subscribed
                 ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950'
-                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+                : 'text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
             }`}
           >
             {subLoading ? <Loader2 size={16} className="animate-spin" /> : subscribed ? <BellOff size={16} /> : <Bell size={16} />}
@@ -445,13 +445,13 @@ export default function DatasetModal({ item, onClose }: Props) {
                   ['다운로드 수', `${(item.download_count ?? 0).toLocaleString()}회`],
                   ['품질 요약', item.quality_summary || '—'],
                 ].map(([dt, dd]) => (
-                  <div key={dt} className="flex border-b border-gray-100 pb-2 last:border-0">
+                  <div key={dt} className="flex border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0">
                     <dt className="w-28 shrink-0 text-xs text-gray-400 dark:text-gray-300">{dt}</dt>
                     <dd className="text-sm text-gray-800 dark:text-gray-200 font-medium break-all">{dd}</dd>
                   </div>
                 ))}
                 {item.keywords && (
-                  <div className="flex border-b border-gray-100 pb-2 last:border-0">
+                  <div className="flex border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0">
                     <dt className="w-28 shrink-0 text-xs text-gray-400 dark:text-gray-300">키워드</dt>
                     <dd className="flex flex-wrap gap-1">
                       {item.keywords.split(',').map(k => k.trim()).filter(Boolean).map(k => (

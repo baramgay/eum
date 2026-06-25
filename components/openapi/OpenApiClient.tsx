@@ -350,7 +350,7 @@ export default function OpenApiClient() {
       )}
 
       {/* 탭 */}
-      <div className="flex gap-1 border-b">
+      <div className="flex gap-1 border-b dark:border-gray-700">
         {(['keys', 'webhooks', 'docs'] as const).map(t => (
           <button
             key={t}
@@ -493,7 +493,7 @@ export default function OpenApiClient() {
                     </Badge>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t">
+                <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t dark:border-gray-700">
                   <Btn
                     size="sm"
                     variant="secondary"

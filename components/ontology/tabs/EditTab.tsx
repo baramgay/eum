@@ -231,7 +231,7 @@ export default function EditTab() {
       {/* 노드 편집 */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-900">노드 ({nodes.length})</h2>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">노드 ({nodes.length})</h2>
           <div className="flex gap-2">
             <Input
               type="text"
@@ -244,7 +244,7 @@ export default function EditTab() {
               노드 추가
             </Btn>
             <button onClick={loadNodes} disabled={loadingNodes} aria-label="새로고침"
-              className="p-1.5 text-gray-500 hover:text-gray-800 disabled:opacity-40">
+              className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-40">
               <Loader2 size={16} className={loadingNodes ? 'animate-spin' : ''} />
             </button>
           </div>
@@ -277,20 +277,20 @@ export default function EditTab() {
           </div>
         )}
 
-        <div className="overflow-auto max-h-72 border border-gray-200 rounded-lg">
+        <div className="overflow-auto max-h-72 border border-gray-200 dark:border-gray-700 rounded-lg">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0">
               <tr>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">ID</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">Label</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">유형</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">Props</th>
-                <th className="px-3 py-2 text-right font-medium text-gray-600">작업</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400">ID</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400">Label</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400">유형</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400">Props</th>
+                <th className="px-3 py-2 text-right font-medium text-gray-600 dark:text-gray-400">작업</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {filteredNodes.length === 0 && (
-                <tr><td colSpan={5} className="px-3 py-6 text-center text-gray-400">
+                <tr><td colSpan={5} className="px-3 py-6 text-center text-gray-400 dark:text-gray-500">
                   {loadingNodes ? '로딩 중...' : '노드 없음'}
                 </td></tr>
               )}
@@ -298,7 +298,7 @@ export default function EditTab() {
                 <tr key={node.obj_id} className="hover:bg-gray-50 dark:hover:bg-gray-950">
                   {editingNodeId === node.obj_id && editingNode ? (
                     <>
-                      <td className="px-3 py-2 text-gray-500 font-mono text-xs">{node.obj_id}</td>
+                      <td className="px-3 py-2 text-gray-500 dark:text-gray-400 font-mono text-xs">{node.obj_id}</td>
                       <td className="px-3 py-2">
                         <Input value={editingNode.label} onChange={e => setEditingNode(n => n ? { ...n, label: e.target.value } : n)}
                           className="w-full h-7 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
@@ -318,7 +318,7 @@ export default function EditTab() {
                             {savingNode ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                           </button>
                           <button onClick={cancelEditNode} aria-label="취소"
-                            className="p-1 text-gray-500 hover:text-gray-700">
+                            className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
                             <X size={14} />
                           </button>
                         </div>
@@ -326,20 +326,20 @@ export default function EditTab() {
                     </>
                   ) : (
                     <>
-                      <td className="px-3 py-2 font-mono text-xs text-gray-500 max-w-[12rem] truncate">{node.obj_id}</td>
-                      <td className="px-3 py-2 font-medium text-gray-900">{node.label}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-gray-500 dark:text-gray-400 max-w-[12rem] truncate">{node.obj_id}</td>
+                      <td className="px-3 py-2 font-medium text-gray-900 dark:text-gray-100">{node.label}</td>
                       <td className="px-3 py-2"><Badge variant="gray">{node.obj_type}</Badge></td>
-                      <td className="px-3 py-2 font-mono text-xs text-gray-400 max-w-[14rem] truncate">{node.props}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-gray-400 dark:text-gray-500 max-w-[14rem] truncate">{node.props}</td>
                       <td className="px-3 py-2">
                         <div className="flex justify-end gap-1">
                           <button onClick={() => startEditNode(node)} aria-label="편집"
-                            className="p-1 text-gray-400 hover:text-gray-700">
+                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                             <Pencil size={14} />
                           </button>
                           <button onClick={() => deleteNode(node.obj_id)}
                             disabled={deletingNodeId === node.obj_id}
                             aria-label="삭제"
-                            className="p-1 text-gray-400 hover:text-red-500 disabled:opacity-40">
+                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 disabled:opacity-40">
                             {deletingNodeId === node.obj_id
                               ? <Loader2 size={14} className="animate-spin" />
                               : <Trash2 size={14} />}
@@ -358,7 +358,7 @@ export default function EditTab() {
       {/* 엣지 편집 */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-900">엣지 ({edges.length})</h2>
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">엣지 ({edges.length})</h2>
           <div className="flex gap-2">
             <Input
               type="text"
@@ -371,7 +371,7 @@ export default function EditTab() {
               엣지 추가
             </Btn>
             <button onClick={loadEdges} disabled={loadingEdges} aria-label="새로고침"
-              className="p-1.5 text-gray-500 hover:text-gray-800 disabled:opacity-40">
+              className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-40">
               <Loader2 size={16} className={loadingEdges ? 'animate-spin' : ''} />
             </button>
           </div>
@@ -383,27 +383,27 @@ export default function EditTab() {
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">새 엣지</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">src (출발 노드 ID)</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">src (출발 노드 ID)</label>
                 <Input type="text" placeholder="예: sigun:48121" value={addEdgeForm.src}
                   list="node-ids-src"
                   onChange={e => setAddEdgeForm(f => ({ ...f, src: e.target.value }))}
                   className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">rel (관계 유형)</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">rel (관계 유형)</label>
                 <Input type="text" placeholder="예: 포함, 인접, 청년이동" value={addEdgeForm.rel}
                   onChange={e => setAddEdgeForm(f => ({ ...f, rel: e.target.value }))}
                   className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">dst (도착 노드 ID)</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">dst (도착 노드 ID)</label>
                 <Input type="text" placeholder="예: sigun:48127" value={addEdgeForm.dst}
                   list="node-ids-dst"
                   onChange={e => setAddEdgeForm(f => ({ ...f, dst: e.target.value }))}
                   className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">가중치</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">가중치</label>
                 <Input type="number" min="0" step="0.1" placeholder="1" value={addEdgeForm.weight}
                   onChange={e => setAddEdgeForm(f => ({ ...f, weight: e.target.value }))}
                   className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
@@ -425,20 +425,20 @@ export default function EditTab() {
           </div>
         )}
 
-        <div className="overflow-auto max-h-72 border border-gray-200 rounded-lg">
+        <div className="overflow-auto max-h-72 border border-gray-200 dark:border-gray-700 rounded-lg">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0">
               <tr>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">src</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">rel</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">dst</th>
-                <th className="px-3 py-2 text-center font-medium text-gray-600">가중치</th>
-                <th className="px-3 py-2 text-right font-medium text-gray-600">삭제</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400">src</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400">rel</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400">dst</th>
+                <th className="px-3 py-2 text-center font-medium text-gray-600 dark:text-gray-400">가중치</th>
+                <th className="px-3 py-2 text-right font-medium text-gray-600 dark:text-gray-400">삭제</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {filteredEdges.length === 0 && (
-                <tr><td colSpan={5} className="px-3 py-6 text-center text-gray-400">
+                <tr><td colSpan={5} className="px-3 py-6 text-center text-gray-400 dark:text-gray-500">
                   {loadingEdges ? '로딩 중...' : '엣지 없음'}
                 </td></tr>
               )}
@@ -446,15 +446,15 @@ export default function EditTab() {
                 const key = edgeKey(edge)
                 return (
                   <tr key={key} className="hover:bg-gray-50 dark:hover:bg-gray-950">
-                    <td className="px-3 py-2 font-mono text-xs text-gray-600 max-w-[12rem] truncate">{edge.src}</td>
+                    <td className="px-3 py-2 font-mono text-xs text-gray-600 dark:text-gray-400 max-w-[12rem] truncate">{edge.src}</td>
                     <td className="px-3 py-2"><Badge variant="blue">{edge.rel}</Badge></td>
-                    <td className="px-3 py-2 font-mono text-xs text-gray-600 max-w-[12rem] truncate">{edge.dst}</td>
-                    <td className="px-3 py-2 text-center text-gray-700">{edge.weight}</td>
+                    <td className="px-3 py-2 font-mono text-xs text-gray-600 dark:text-gray-400 max-w-[12rem] truncate">{edge.dst}</td>
+                    <td className="px-3 py-2 text-center text-gray-700 dark:text-gray-300">{edge.weight}</td>
                     <td className="px-3 py-2 text-right">
                       <button onClick={() => deleteEdge(edge)}
                         disabled={deletingEdge === key}
                         aria-label="엣지 삭제"
-                        className="p-1 text-gray-400 hover:text-red-500 disabled:opacity-40">
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 disabled:opacity-40">
                         {deletingEdge === key
                           ? <Loader2 size={14} className="animate-spin" />
                           : <Trash2 size={14} />}

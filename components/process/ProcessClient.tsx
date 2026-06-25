@@ -753,7 +753,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                     if (e.target.checked) setSelectedIds(new Set(filteredPipelines.map(p => p.id)))
                     else setSelectedIds(new Set())
                   }}
-                  className="w-4 h-4 rounded border-gray-300"
+                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600"
                   aria-label="전체 선택"
                 />
                 전체 선택
@@ -787,7 +787,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                         else next.delete(p.id)
                         setSelectedIds(next)
                       }}
-                      className="mt-1 w-4 h-4 rounded border-gray-300 shrink-0"
+                      className="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 shrink-0"
                       aria-label={`${p.name} 선택`}
                     />
                   )}
@@ -866,7 +866,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                             <th className="pb-2 font-medium text-right">시작일시</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                           {runsMap[p.id].map(run => {
                             const lineage = lineageMap[run.id]
                             const showLineage = lineage !== undefined
@@ -969,28 +969,28 @@ export default function ProcessClient({ role, tenantId }: Props) {
         size="lg"
       >
         <div className="p-6 overflow-auto">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">
             오류 행 상세 ({runResult?.result.errors?.length ?? 0}건 표시 / 최대 100건)
           </h3>
           {!runResult?.result.errors?.length ? (
-            <p className="text-sm text-gray-500">오류 상세 정보가 없습니다.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">오류 상세 정보가 없습니다.</p>
           ) : (
             <div className="overflow-auto max-h-[60vh]">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="bg-gray-50 dark:bg-gray-900 text-left">
-                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">행 번호</th>
-                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">규칙 번호</th>
-                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">컬럼</th>
-                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">오류 내용</th>
+                    <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-400">행 번호</th>
+                    <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-400">규칙 번호</th>
+                    <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-400">컬럼</th>
+                    <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-400">오류 내용</th>
                   </tr>
                 </thead>
                 <tbody>
                   {runResult.result.errors.map((err, i) => (
                     <tr key={i} className="hover:bg-red-50 dark:hover:bg-red-900/20">
-                      <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.rowIndex + 1}</td>
-                      <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{err.ruleIndex + 1}</td>
-                      <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>
+                      <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300">{err.rowIndex + 1}</td>
+                      <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300">{err.ruleIndex + 1}</td>
+                      <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-500 dark:text-gray-400">{err.column ?? '—'}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-red-600 dark:text-red-400">{err.message}</td>
                     </tr>
                   ))}
@@ -1009,28 +1009,28 @@ export default function ProcessClient({ role, tenantId }: Props) {
         size="lg"
       >
         <div className="p-6 overflow-auto">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">
             오류 {selectedHistoryRun?.error_rows ?? 0}건 (최대 100건 표시)
           </h3>
           {!selectedHistoryRun?.error_log?.length ? (
-            <p className="text-sm text-gray-500">오류 상세 정보가 없습니다.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">오류 상세 정보가 없습니다.</p>
           ) : (
             <div className="overflow-auto max-h-[60vh]">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="bg-gray-50 dark:bg-gray-900 text-left">
-                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">행 번호</th>
-                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">규칙 번호</th>
-                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">컬럼</th>
-                    <th className="border border-gray-200 px-3 py-2 font-medium text-gray-600">오류 내용</th>
+                    <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-400">행 번호</th>
+                    <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-400">규칙 번호</th>
+                    <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-400">컬럼</th>
+                    <th className="border border-gray-200 dark:border-gray-700 px-3 py-2 font-medium text-gray-600 dark:text-gray-400">오류 내용</th>
                   </tr>
                 </thead>
                 <tbody>
                   {(selectedHistoryRun.error_log as ProcessError[]).map((err, i) => (
                     <tr key={i} className="hover:bg-red-50 dark:hover:bg-red-900/20">
-                      <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{(err.rowIndex ?? i) + 1}</td>
-                      <td className="border border-gray-200 px-3 py-1.5 text-gray-700">{typeof err.ruleIndex === 'number' ? err.ruleIndex + 1 : '—'}</td>
-                      <td className="border border-gray-200 px-3 py-1.5 text-gray-500">{err.column ?? '—'}</td>
+                      <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300">{(err.rowIndex ?? i) + 1}</td>
+                      <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300">{typeof err.ruleIndex === 'number' ? err.ruleIndex + 1 : '—'}</td>
+                      <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-500 dark:text-gray-400">{err.column ?? '—'}</td>
                       <td className="border border-gray-200 px-3 py-1.5 text-red-600 dark:text-red-400">{err.message ?? JSON.stringify(err)}</td>
                     </tr>
                   ))}

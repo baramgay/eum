@@ -130,7 +130,7 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
             <Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중...
           </div>
         ) : (workspaces ?? []).length === 0 ? (
-          <div className="text-center py-8 bg-gray-50 dark:bg-gray-950 rounded-xl border border-gray-100">
+          <div className="text-center py-8 bg-gray-50 dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-700">
             <FolderOpen className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-200" />
             <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">저장된 워크스페이스가 없습니다</p>
           </div>
@@ -138,7 +138,7 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
           (workspaces ?? []).map(ws => (
             <div
               key={ws.id}
-              className="flex items-center justify-between gap-2 p-3 border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors"
+              className="flex items-center justify-between gap-2 p-3 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors"
             >
               {editingId === ws.id ? (
                 <div className="flex items-center gap-2 flex-1 min-w-0">

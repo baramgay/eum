@@ -1556,7 +1556,7 @@ export default function OntologyGraph({
         )}
 
         {displayNodes.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+          <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
             온톨로지를 먼저 재구축하세요 (우측 상단 버튼)
           </div>
         )}
@@ -1564,7 +1564,7 @@ export default function OntologyGraph({
 
       {/* 키보드 접근 가능한 노드/범례 목록 */}
       {displayNodes.length > 0 && (
-        <details className="bg-white dark:bg-gray-900 border rounded-lg p-3 text-sm group">
+        <details className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-sm group">
           <summary className="cursor-pointer font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
             <span>그래프 범례 및 노드 목록</span>
             <span className="text-xs text-gray-400 dark:text-gray-300">(노드 {displayNodes.length}개)</span>
@@ -1633,24 +1633,24 @@ export default function OntologyGraph({
                 setSelected(null)
                 onSelectProp?.(null)
               }}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xs"
             >
               닫기
             </button>
           </div>
           {Object.keys(selectedProps).length > 0 ? (
             <table className="text-xs w-full">
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {Object.entries(selectedProps).map(([k, v]) => (
                   <tr key={k}>
-                    <td className="py-1 pr-4 text-gray-500 font-medium w-32">{k}</td>
-                    <td className="py-1 text-gray-800">{v}</td>
+                    <td className="py-1 pr-4 text-gray-500 dark:text-gray-400 font-medium w-32">{k}</td>
+                    <td className="py-1 text-gray-800 dark:text-gray-200">{v}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <p className="text-xs text-gray-400">속성 없음 (ID: {selected.obj_id})</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">속성 없음 (ID: {selected.obj_id})</p>
           )}
         </div>
       )}

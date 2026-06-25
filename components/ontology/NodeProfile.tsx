@@ -104,7 +104,7 @@ export default function NodeProfile({
       {/* Header */}
       <div className="flex items-start gap-3">
         <div
-          className="w-4 h-4 rounded-full ring-2 ring-gray-100 flex-shrink-0 mt-1"
+          className="w-4 h-4 rounded-full ring-2 ring-gray-100 dark:ring-gray-700 flex-shrink-0 mt-1"
           style={{ backgroundColor: meta.color }}
         />
         <div className="flex-1 min-w-0">
@@ -126,14 +126,14 @@ export default function NodeProfile({
 
       {/* Upstream / Downstream */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-gray-50 dark:bg-gray-950 rounded-xl p-3 border border-gray-100 text-center">
+        <div className="bg-gray-50 dark:bg-gray-950 rounded-xl p-3 border border-gray-100 dark:border-gray-700 text-center">
           <div className="flex items-center justify-center gap-1 mb-1">
             <ArrowUp className="w-3 h-3 text-blue-400" />
             <p className="text-xs text-gray-500 dark:text-gray-400">입력 (상위)</p>
           </div>
           <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{upstream.length}</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-950 rounded-xl p-3 border border-gray-100 text-center">
+        <div className="bg-gray-50 dark:bg-gray-950 rounded-xl p-3 border border-gray-100 dark:border-gray-700 text-center">
           <div className="flex items-center justify-center gap-1 mb-1">
             <ArrowDown className="w-3 h-3 text-emerald-400" />
             <p className="text-xs text-gray-500 dark:text-gray-400">출력 (하위)</p>
@@ -146,14 +146,14 @@ export default function NodeProfile({
       {schema.length > 0 && (
         <div>
           <div className="flex items-center gap-1.5 mb-2">
-            <Columns className="w-3 h-3 text-gray-400" />
+            <Columns className="w-3 h-3 text-gray-400 dark:text-gray-500" />
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">컬럼 ({schema.length})</p>
           </div>
           <div className="flex flex-wrap gap-1">
             {schema.slice(0, 12).map(col => (
               <span key={col} className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded font-mono text-gray-600 dark:text-gray-300">{col}</span>
             ))}
-            {schema.length > 12 && <span className="text-[10px] text-gray-400">+{schema.length - 12}</span>}
+            {schema.length > 12 && <span className="text-[10px] text-gray-400 dark:text-gray-500">+{schema.length - 12}</span>}
           </div>
         </div>
       )}
@@ -165,7 +165,7 @@ export default function NodeProfile({
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">속성</p>
             <Badge variant="gray" size="sm">{propEntries.length}개</Badge>
           </div>
-          <div className="space-y-1.5 bg-gray-50 dark:bg-gray-950 rounded-xl p-3 border border-gray-100">
+          <div className="space-y-1.5 bg-gray-50 dark:bg-gray-950 rounded-xl p-3 border border-gray-100 dark:border-gray-700">
             {propEntries.map(([k, v]) => (
               <div key={k} className="flex justify-between text-xs gap-3">
                 <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">{k}</span>
@@ -213,7 +213,7 @@ export default function NodeProfile({
               <button
                 key={f}
                 onClick={() => setDsFilter(f)}
-                className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${dsFilter === f ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 text-gray-500 hover:border-blue-300'}`}
+                className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${dsFilter === f ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-blue-300'}`}
               >
                 {f === 'all' ? '전체' : f === 'ai-ready' ? 'AI Ready' : '공개'}
               </button>
@@ -223,7 +223,7 @@ export default function NodeProfile({
               <button
                 key={s}
                 onClick={() => setDsSort(s)}
-                className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${dsSort === s ? 'bg-gray-700 text-white border-gray-700 dark:bg-gray-200 dark:text-gray-900 dark:border-gray-200' : 'border-gray-200 text-gray-500 hover:border-gray-400'}`}
+                className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${dsSort === s ? 'bg-gray-700 text-white border-gray-700 dark:bg-gray-200 dark:text-gray-900 dark:border-gray-200' : 'border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400'}`}
               >
                 {s === 'name' ? '이름' : s === 'rows' ? '행수' : '날짜'}
               </button>
@@ -236,7 +236,7 @@ export default function NodeProfile({
             <div className="h-12 w-full bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse" />
           </div>
         ) : filteredDatasets.length === 0 ? (
-          <div className="text-center py-5 bg-gray-50 dark:bg-gray-950 rounded-xl border border-gray-100">
+          <div className="text-center py-5 bg-gray-50 dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-700">
             <Database className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-200" />
             <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">매칭된 데이터셋이 없습니다</p>
             <p className="text-[10px] text-gray-400 dark:text-gray-300 mt-0.5">AI 질의로 더 넓은 데이터를 찾아보세요.</p>
@@ -247,7 +247,7 @@ export default function NodeProfile({
               <li key={ds.dataset_id}>
                 <button
                   onClick={() => onDatasetClick?.(ds)}
-                  className="w-full flex items-center justify-between p-2 border rounded-md hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors text-left"
+                  className="w-full flex items-center justify-between p-2 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors text-left"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-1 flex-wrap">

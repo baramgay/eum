@@ -1318,7 +1318,7 @@ export default function AiQueryClient() {
 
         {/* 상단 요약 KPI — 대화형 모드에서만 표시 */}
         {aiMode === 'chat' && conversations.length > 0 && (
-          <div className="px-4 py-3 border-b bg-gray-50/50 grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="px-4 py-3 border-b bg-gray-50/50 dark:bg-gray-800/50 grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard label="총 대화" value={stats.totalConversations} color="blue" icon={<MessageSquare className="w-5 h-5" />} />
             <StatCard label="현재 질문" value={stats.questions} color="purple" icon={<HelpCircle className="w-5 h-5" />} />
             <StatCard label="결과 수" value={stats.results} color="green" icon={<BarChart2 className="w-5 h-5" />} />

@@ -24,10 +24,10 @@ import { getHeatmapColor } from '@/lib/heatmap'
 const MapInner = dynamic(() => import('./MapInner'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full bg-gray-100">
+    <div className="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-gray-400">지도 로딩 중...</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">지도 로딩 중...</p>
       </div>
     </div>
   ),
@@ -473,16 +473,16 @@ export default function FacilityMap({ facilities }: Props) {
       <div className="absolute bottom-16 right-3 z-10">
         <button
           onClick={() => setShowLegend(v => !v)}
-          className="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs text-gray-600 shadow border border-gray-200/80 hover:bg-white transition-all"
+          className="flex items-center gap-1.5 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 shadow border border-gray-200/80 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-900 transition-all"
         >
           <span className="font-medium">범례</span>
           <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showLegend ? 'rotate-180' : ''}`} />
         </button>
         {showLegend && (
-          <div className="absolute bottom-full right-0 mb-2 bg-white/96 backdrop-blur-md rounded-xl shadow-lg border border-gray-100 p-3 min-w-[170px]">
+          <div className="absolute bottom-full right-0 mb-2 bg-white/96 dark:bg-gray-900/96 backdrop-blur-md rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-3 min-w-[170px]">
             {layerMode === 'heatmap' ? (
               <div className="space-y-2">
-                <p className="text-[11px] font-semibold text-gray-500">
+                <p className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">
                   {heatmapMode === 'grid' ? '격자 집계' : 'Gaussian 커널 밀도'} · {heatmapValueMode === 'count' ? '시설 개수' : '수용인원'}
                 </p>
                 <div
@@ -491,11 +491,11 @@ export default function FacilityMap({ facilities }: Props) {
                     background: `linear-gradient(90deg, ${getHeatmapColor(0, heatmapPalette)}, ${getHeatmapColor(0.5, heatmapPalette)}, ${getHeatmapColor(1, heatmapPalette)})`,
                   }}
                 />
-                <div className="flex justify-between text-[10px] text-gray-400">
+                <div className="flex justify-between text-[10px] text-gray-400 dark:text-gray-500">
                   <span>낮음</span>
                   <span>높음</span>
                 </div>
-                <div className="border-t pt-2 space-y-1 text-[11px] text-gray-600">
+                <div className="border-t dark:border-gray-700 pt-2 space-y-1 text-[11px] text-gray-600 dark:text-gray-400">
                   <div className="flex justify-between">
                     <span>총 시설</span>
                     <span className="font-medium">{filtered.length}개소</span>
@@ -511,15 +511,15 @@ export default function FacilityMap({ facilities }: Props) {
                 {FTYPES.map(ft => (
                   <div key={ft} className="flex items-center gap-2.5 py-1">
                     <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: FTYPE_COLOR[ft] }} />
-                    <span className="text-xs text-gray-700 flex-1">{ft}</span>
-                    <span className="text-xs text-gray-400 font-medium">{facilities.filter(f => f.ftype === ft).length}</span>
+                    <span className="text-xs text-gray-700 dark:text-gray-300 flex-1">{ft}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">{facilities.filter(f => f.ftype === ft).length}</span>
                   </div>
                 ))}
-                <div className="border-t mt-2 pt-2">
+                <div className="border-t dark:border-gray-700 mt-2 pt-2">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-2.5 h-2.5 rounded-full shrink-0 bg-gray-400" />
-                    <span className="text-xs text-gray-500 flex-1">전체</span>
-                    <span className="text-xs text-gray-600 font-medium">{facilities.length}</span>
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0 bg-gray-400 dark:bg-gray-600" />
+                    <span className="text-xs text-gray-500 dark:text-gray-400 flex-1">전체</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">{facilities.length}</span>
                   </div>
                 </div>
               </>
@@ -542,15 +542,15 @@ export default function FacilityMap({ facilities }: Props) {
         <div className="flex-1" />
 
         {/* 카운트 배지 */}
-        <div className="bg-white/90 backdrop-blur-sm text-gray-700 text-xs px-3 py-2 rounded-full shadow border border-gray-100 font-semibold">
+        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-xs px-3 py-2 rounded-full shadow border border-gray-100 dark:border-gray-700 font-semibold">
           {filtered.length}
-          <span className="font-normal text-gray-400 ml-0.5">개소</span>
+          <span className="font-normal text-gray-400 dark:text-gray-500 ml-0.5">개소</span>
         </div>
 
         {/* 지도 초기화 버튼 */}
         <button
           onClick={handleResetView}
-          className="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow border border-gray-100 text-gray-500 hover:text-gray-700 hover:border-gray-300 active:scale-95 transition-all"
+          className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2.5 rounded-full shadow border border-gray-100 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600 active:scale-95 transition-all"
           title="지도 초기화"
         >
           <RotateCcw className="w-4 h-4" />
@@ -560,7 +560,7 @@ export default function FacilityMap({ facilities }: Props) {
         <button
           onClick={handleLocate}
           disabled={locating}
-          className="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow border border-gray-100 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 active:scale-95 transition-all disabled:opacity-60"
+          className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2.5 rounded-full shadow border border-gray-100 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 active:scale-95 transition-all disabled:opacity-60"
           title="현재 위치로 이동"
         >
           <LocateFixed className={`w-4 h-4 ${locating ? 'animate-spin' : ''}`} />
@@ -572,33 +572,33 @@ export default function FacilityMap({ facilities }: Props) {
         <div
           role="dialog"
           aria-label="시설 목록 패널"
-          className="absolute inset-x-0 bottom-0 z-20 bg-white/97 backdrop-blur-lg rounded-t-2xl shadow-2xl border-t border-gray-100 md:top-0 md:right-0 md:left-auto md:w-80 md:rounded-none md:rounded-l-2xl md:border-t-0 md:border-l"
+          className="absolute inset-x-0 bottom-0 z-20 bg-white/97 dark:bg-gray-900/97 backdrop-blur-lg rounded-t-2xl shadow-2xl border-t border-gray-100 dark:border-gray-700 md:top-0 md:right-0 md:left-auto md:w-80 md:rounded-none md:rounded-l-2xl md:border-t-0 md:border-l"
           style={{ maxHeight: '52%', overflowY: 'auto' }}
         >
           {/* 패널 헤더 */}
-          <div className="sticky top-0 bg-white/97 backdrop-blur-lg border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+          <div className="sticky top-0 bg-white/97 dark:bg-gray-900/97 backdrop-blur-lg border-b border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-gray-800 text-sm">시설 목록</span>
-              <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full font-medium">
+              <span className="font-semibold text-gray-800 dark:text-gray-100 text-sm">시설 목록</span>
+              <span className="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs px-2 py-0.5 rounded-full font-medium">
                 {filtered.length}개소
               </span>
             </div>
             <button
               onClick={() => setShowList(false)}
-              className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* 드래그 핸들 (상단) */}
-          <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 bg-gray-300 rounded-full md:hidden" />
+          <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 bg-gray-300 dark:bg-gray-600 rounded-full md:hidden" />
 
           {/* 목록 아이템 */}
           <div className="divide-y divide-gray-50">
             {filtered.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-sm text-gray-400">검색 결과가 없습니다</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">검색 결과가 없습니다</p>
                 {search && (
                   <button
                     onClick={() => setSearch('')}
@@ -612,7 +612,7 @@ export default function FacilityMap({ facilities }: Props) {
               <div
                 key={f.facility_id}
                 ref={(el) => { listItemRefs.current[f.facility_id] = el }}
-                className="px-4 py-3 flex items-center gap-3 hover:bg-gray-50/80 transition-colors"
+                className="px-4 py-3 flex items-center gap-3 hover:bg-gray-50/80 dark:hover:bg-gray-800/80 transition-colors"
               >
                 <button
                   onClick={() => handleSelectFacility(f, true)}
@@ -625,8 +625,8 @@ export default function FacilityMap({ facilities }: Props) {
                     {FTYPE_ICON[f.ftype]('w-4.5 h-4.5')}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{f.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{f.name}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                       <span className="font-medium" style={{ color: FTYPE_COLOR[f.ftype] }}>{f.ftype}</span>
                       <span className="mx-1">·</span>
                       <span>{f.sigun}</span>
@@ -640,7 +640,7 @@ export default function FacilityMap({ facilities }: Props) {
                   className={`shrink-0 p-1.5 rounded-full border transition-all ${
                     compareSet.has(f.facility_id)
                       ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400'
-                      : 'border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                   title={compareSet.has(f.facility_id) ? '비교 목록에서 제거' : '비교에 추가'}
                 >
@@ -667,9 +667,9 @@ export default function FacilityMap({ facilities }: Props) {
           <div
             role="dialog"
             aria-label="시설 상세 정보"
-            className="absolute inset-x-0 bottom-0 z-30 md:top-0 md:right-0 md:left-auto md:w-96 md:h-full md:rounded-none md:rounded-l-2xl bg-white/98 backdrop-blur-xl shadow-2xl border-t md:border-t-0 md:border-l border-gray-100 rounded-t-2xl flex flex-col max-h-[75vh] md:max-h-none"
+            className="absolute inset-x-0 bottom-0 z-30 md:top-0 md:right-0 md:left-auto md:w-96 md:h-full md:rounded-none md:rounded-l-2xl bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl shadow-2xl border-t md:border-t-0 md:border-l border-gray-100 dark:border-gray-700 rounded-t-2xl flex flex-col max-h-[75vh] md:max-h-none"
           >
-            <div className="sticky top-0 bg-white/98 backdrop-blur-xl border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+            <div className="sticky top-0 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl border-b border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
@@ -678,8 +678,8 @@ export default function FacilityMap({ facilities }: Props) {
                   {FTYPE_ICON[selectedFacility.ftype]('w-5 h-5')}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 truncate">{selectedFacility.name}</p>
-                  <p className="text-xs text-gray-400 truncate">{selectedFacility.sigun} · {selectedFacility.ftype}</p>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{selectedFacility.name}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{selectedFacility.sigun} · {selectedFacility.ftype}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -696,7 +696,7 @@ export default function FacilityMap({ facilities }: Props) {
                 </button>
                 <button
                   onClick={() => setSelectedFacility(null)}
-                  className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -705,12 +705,12 @@ export default function FacilityMap({ facilities }: Props) {
 
             <div className="overflow-y-auto flex-1 p-4 space-y-4">
               {/* 이미지 */}
-              <div className="w-full aspect-video rounded-xl bg-gray-100 border border-gray-100 flex items-center justify-center overflow-hidden">
+              <div className="w-full aspect-video rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden">
                 {detail.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={detail.image} alt={selectedFacility.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="flex flex-col items-center gap-2 text-gray-300">
+                  <div className="flex flex-col items-center gap-2 text-gray-300 dark:text-gray-600">
                     <ImageOff className="w-10 h-10" />
                     <span className="text-xs">대표 이미지 준비 중</span>
                   </div>
@@ -718,43 +718,43 @@ export default function FacilityMap({ facilities }: Props) {
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <div className="bg-gray-50 rounded-xl p-3">
-                  <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">수용인원</p>
-                  <p className="text-sm font-semibold text-gray-800 mt-0.5">{selectedFacility.capacity.toLocaleString()}명</p>
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">수용인원</p>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 mt-0.5">{selectedFacility.capacity.toLocaleString()}명</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-3">
-                  <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">시군</p>
-                  <p className="text-sm font-semibold text-gray-800 mt-0.5">{selectedFacility.sigun}</p>
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">시군</p>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 mt-0.5">{selectedFacility.sigun}</p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <MapPinned className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                  <MapPinned className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs font-medium text-gray-700">주소</p>
-                    <p className="text-sm text-gray-500">{detail.address}</p>
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300">주소</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{detail.address}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Phone className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                  <Phone className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs font-medium text-gray-700">연락처</p>
-                    <p className="text-sm text-gray-500">{detail.phone}</p>
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300">연락처</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{detail.phone}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Clock className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                  <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs font-medium text-gray-700">운영시간</p>
-                    <p className="text-sm text-gray-500">{detail.hours}</p>
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300">운영시간</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{detail.hours}</p>
                   </div>
                 </div>
                 {detail.homepage && (
                   <div className="flex items-start gap-3">
-                    <Building2 className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                    <Building2 className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
                     <div>
-                      <p className="text-xs font-medium text-gray-700">홈페이지</p>
+                      <p className="text-xs font-medium text-gray-700 dark:text-gray-300">홈페이지</p>
                       <a href={detail.homepage} target="_blank" rel="noreferrer" className="text-sm text-blue-600 dark:text-blue-400 hover:underline break-all">
                         {detail.homepage.replace(/^https?:\/\//, '')}
                       </a>
@@ -764,12 +764,12 @@ export default function FacilityMap({ facilities }: Props) {
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-gray-700 mb-2">시설 소개</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{detail.description}</p>
+                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">시설 소개</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{detail.description}</p>
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-gray-700 mb-2">제공 서비스</p>
+                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">제공 서비스</p>
                 <div className="flex flex-wrap gap-1.5">
                   {detail.services.map(s => (
                     <span key={s} className="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full">
@@ -785,16 +785,16 @@ export default function FacilityMap({ facilities }: Props) {
 
       {/* ── 비교 패널 ── */}
       {showCompare && comparedFacilities.length > 0 && (
-        <div className="absolute bottom-3 left-3 right-3 z-30 md:left-auto md:w-[480px] bg-white/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 p-4 max-h-[40vh] overflow-y-auto">
+        <div className="absolute bottom-3 left-3 right-3 z-30 md:left-auto md:w-[480px] bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-4 max-h-[40vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <ArrowRightLeft className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-semibold text-gray-800">시설 비교</span>
-              <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full font-medium">{comparedFacilities.length}개</span>
+              <ArrowRightLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">시설 비교</span>
+              <span className="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs px-2 py-0.5 rounded-full font-medium">{comparedFacilities.length}개</span>
             </div>
             <button
               onClick={() => { setCompareSet(new Set()); setShowCompare(false) }}
-              className="text-xs text-gray-400 hover:text-gray-600"
+              className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
             >
               초기화
             </button>
@@ -803,7 +803,7 @@ export default function FacilityMap({ facilities }: Props) {
             {comparedFacilities.map(f => {
               const d = getFacilityDetail(f)
               return (
-                <div key={f.facility_id} className="flex items-center gap-3 p-2 rounded-xl bg-gray-50">
+                <div key={f.facility_id} className="flex items-center gap-3 p-2 rounded-xl bg-gray-50 dark:bg-gray-800">
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                     style={{ backgroundColor: `${FTYPE_COLOR[f.ftype]}15`, color: FTYPE_COLOR[f.ftype] }}
@@ -811,14 +811,14 @@ export default function FacilityMap({ facilities }: Props) {
                     {FTYPE_ICON[f.ftype]('w-4.5 h-4.5')}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{f.name}</p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{f.name}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
                       {f.ftype} · 수용 {f.capacity.toLocaleString()}명 · {d.phone}
                     </p>
                   </div>
                   <button
                     onClick={() => toggleCompare(f)}
-                    className="p-1.5 hover:bg-white rounded-full text-gray-400 hover:text-red-500 transition-colors"
+                    className="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded-full text-gray-400 dark:text-gray-500 hover:text-red-500 transition-colors"
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
@@ -827,7 +827,7 @@ export default function FacilityMap({ facilities }: Props) {
             })}
           </div>
           {comparedFacilities.length >= 4 && (
-            <p className="text-[10px] text-gray-400 mt-2">최대 4개까지 비교할 수 있습니다.</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2">최대 4개까지 비교할 수 있습니다.</p>
           )}
         </div>
       )}
@@ -843,11 +843,11 @@ export default function FacilityMap({ facilities }: Props) {
             onClick={() => setDrilldown(null)}
             onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') setDrilldown(null) }}
           />
-          <div className="relative bg-white/98 backdrop-blur-xl rounded-t-2xl md:rounded-2xl shadow-2xl border border-gray-100 w-full md:w-[420px] max-h-[60vh] md:max-h-[70vh] overflow-hidden pointer-events-auto m-0 md:m-4">
-            <div className="sticky top-0 bg-white/98 backdrop-blur-xl border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+          <div className="relative bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl rounded-t-2xl md:rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 w-full md:w-[420px] max-h-[60vh] md:max-h-[70vh] overflow-hidden pointer-events-auto m-0 md:m-4">
+            <div className="sticky top-0 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl border-b border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-orange-500" />
-                <span className="text-sm font-semibold text-gray-800">
+                <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                   {drilldown.type === 'heatmap' ? '히트맵 영역 상세' : `클러스터 ${drilldown.cluster.id} 상세`}
                 </span>
                 <span className="bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 text-xs px-2 py-0.5 rounded-full font-medium">
@@ -856,18 +856,18 @@ export default function FacilityMap({ facilities }: Props) {
               </div>
               <button
                 onClick={() => setDrilldown(null)}
-                className="p-1 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="overflow-y-auto p-2" style={{ maxHeight: 'calc(60vh - 56px)' }}>
               {drilldown.list.length === 0 ? (
-                <div className="py-10 text-center text-sm text-gray-400">해당 영역에 시설이 없습니다</div>
+                <div className="py-10 text-center text-sm text-gray-400 dark:text-gray-500">해당 영역에 시설이 없습니다</div>
               ) : (
                 <div className="divide-y divide-gray-50">
                   {drilldown.list.map(f => (
-                    <div key={f.facility_id} className="px-2 py-2.5 flex items-center gap-3 hover:bg-gray-50 rounded-lg transition-colors">
+                    <div key={f.facility_id} className="px-2 py-2.5 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                       <button
                         onClick={() => { setSelectedFacility(f); setDrilldown(null) }}
                         className="flex items-center gap-3 flex-1 min-w-0 text-left"
@@ -879,8 +879,8 @@ export default function FacilityMap({ facilities }: Props) {
                           {FTYPE_ICON[f.ftype]('w-4.5 h-4.5')}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 truncate">{f.name}</p>
-                          <p className="text-xs text-gray-400 truncate">
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{f.name}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
                             {f.ftype} · {f.sigun} · 수용 {f.capacity.toLocaleString()}명
                           </p>
                         </div>
@@ -890,7 +890,7 @@ export default function FacilityMap({ facilities }: Props) {
                         className={`shrink-0 p-1.5 rounded-full border transition-all ${
                           compareSet.has(f.facility_id)
                             ? 'bg-blue-50 border-blue-200 text-blue-600 dark:text-blue-400'
-                            : 'border-gray-200 text-gray-400 hover:text-gray-600'
+                            : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                         }`}
                       >
                         {compareSet.has(f.facility_id) ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
@@ -920,7 +920,7 @@ export default function FacilityMap({ facilities }: Props) {
 
       {/* ── 히트맵 범례 ── */}
       {layerMode === 'heatmap' && (
-        <div className="absolute top-28 right-3 z-10 pointer-events-none hidden md:flex flex-col gap-1.5 bg-white/92 backdrop-blur-md text-gray-700 text-[11px] px-3 py-2 rounded-xl shadow border border-gray-100">
+        <div className="absolute top-28 right-3 z-10 pointer-events-none hidden md:flex flex-col gap-1.5 bg-white/92 dark:bg-gray-900/92 backdrop-blur-md text-gray-700 dark:text-gray-300 text-[11px] px-3 py-2 rounded-xl shadow border border-gray-100 dark:border-gray-700">
           <span className="font-semibold">
             {heatmapValueMode === 'count' ? '시설 밀도' : '수용인원 밀도'} · {heatmapPalette === 'default' ? '기본' : heatmapPalette === 'flame' ? '불꽃' : '바다'}
           </span>
@@ -934,7 +934,7 @@ export default function FacilityMap({ facilities }: Props) {
             />
             <span>높음</span>
           </div>
-          <span className="text-gray-400">
+          <span className="text-gray-400 dark:text-gray-500">
             {heatmapMode === 'grid'
               ? '셀 크기는 확대·축소 및 화면 크기에 따라 50m~10km 자동 조정'
               : '셀 크기에 따른 Gaussian 커널 밀도'}
