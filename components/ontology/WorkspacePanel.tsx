@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Save, FolderOpen, Trash2, Edit2, Check, X, Loader2 } from 'lucide-react'
-import { Card, Badge, Btn } from '@/components/ui'
+import { Card, Badge, Btn, Input } from '@/components/ui'
 import { useApi } from '@/lib/hooks/useApi'
 import type { WorkspaceSnapshot, OntologyWorkspace } from '@/lib/ontology/types'
 import {
@@ -104,11 +104,11 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
 
       {/* Save new */}
       <div className="flex gap-2">
-        <input
+        <Input
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="새 워크스페이스 이름"
-          className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+          className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
           onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
         />
         <Btn onClick={handleSave} loading={saving} disabled={!name.trim()} size="sm">
@@ -142,10 +142,10 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
             >
               {editingId === ws.id ? (
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <input
+                  <Input
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
-                    className="flex-1 min-w-0 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+                    className="flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded-md text-sm bg-white"
                     onKeyDown={e => {
                       if (e.key === 'Enter') handleRename(ws.id)
                       if (e.key === 'Escape') cancelEdit()

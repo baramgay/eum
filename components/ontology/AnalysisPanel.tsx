@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import { BarChart3, Network, Route, Fingerprint, AlertTriangle, Play, Download } from 'lucide-react'
-import { Card, Badge, Btn } from '@/components/ui'
+import { Card, Badge, Btn, Input, Select } from '@/components/ui'
 import { apiClient } from '@/lib/api/client'
 import type { OntologyNode, OntologyEdge } from '@/lib/ontology-utils'
 import type { AnalyticsPayload, AnalyticsResult } from '@/lib/ontology/types'
@@ -104,23 +104,23 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
           <div className="flex flex-col sm:flex-row gap-3">
             <label className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
               Metric
-              <select
+              <Select
                 value={metric}
                 onChange={e => setMetric(e.target.value)}
-                className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
+                className="px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
               >
                 {METRICS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-              </select>
+              </Select>
             </label>
             <label className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
               Top
-              <input
+              <Input
                 type="number"
                 min={1}
                 max={100}
                 value={top}
                 onChange={e => setTop(Number(e.target.value))}
-                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-20 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
               />
             </label>
           </div>
@@ -130,25 +130,25 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
           <div className="flex flex-col sm:flex-row gap-3">
             <label className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 flex-1">
               출발
-              <select
+              <Select
                 value={source}
                 onChange={e => setSource(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
               >
                 <option value="">선택</option>
                 {sggNodes.map(n => <option key={n.obj_id} value={n.obj_id}>{n.label}</option>)}
-              </select>
+              </Select>
             </label>
             <label className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 flex-1">
               도착
-              <select
+              <Select
                 value={target}
                 onChange={e => setTarget(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
               >
                 <option value="">선택</option>
                 {sggNodes.map(n => <option key={n.obj_id} value={n.obj_id}>{n.label}</option>)}
-              </select>
+              </Select>
             </label>
           </div>
         )}
@@ -157,27 +157,27 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
           <div className="flex flex-col sm:flex-row gap-3">
             <label className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2 flex-1">
               기준 노드
-              <select
+              <Select
                 value={nodeId}
                 onChange={e => setNodeId(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
               >
                 <option value="">선택</option>
                 {nodes
                   .slice()
                   .sort((a, b) => a.label.localeCompare(b.label, 'ko'))
                   .map(n => <option key={n.obj_id} value={n.obj_id}>{n.label} ({n.obj_type})</option>)}
-              </select>
+              </Select>
             </label>
             <label className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
               Top
-              <input
+              <Input
                 type="number"
                 min={1}
                 max={100}
                 value={top}
                 onChange={e => setTop(Number(e.target.value))}
-                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-20 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white"
               />
             </label>
           </div>

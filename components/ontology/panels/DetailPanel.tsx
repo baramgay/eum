@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Card, Btn } from '@/components/ui'
+import { Card, Btn, Input, Textarea } from '@/components/ui'
 import { Check, Copy, X, Info, GitMerge, Link2, Pencil, Loader2, Trash2 } from 'lucide-react'
 import NodeProfile from '../NodeProfile'
 import toast from 'react-hot-toast'
@@ -249,28 +249,28 @@ export default function DetailPanel({
           <p className="text-[10px] font-mono text-gray-400 dark:text-gray-500 break-all">{node.obj_id}</p>
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">이름 (Label)</label>
-            <input
+            <Input
               value={editLabel}
               onChange={e => setEditLabel(e.target.value)}
-              className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-9 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">유형 (Type)</label>
-            <input
+            <Input
               value={editObjType}
               onChange={e => setEditObjType(e.target.value)}
-              className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-9 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">속성 (Props)</label>
-            <textarea
+            <Textarea
               value={editProps}
               onChange={e => setEditProps(e.target.value)}
               rows={4}
               placeholder="key=value;key2=value2"
-              className="w-full px-3 py-2 text-xs font-mono bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-2 text-xs font-mono bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
           <div className="flex gap-2 pt-1">

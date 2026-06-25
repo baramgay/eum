@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Copy, Check, Key, Trash2, Plus, Loader2, AlertCircle } from 'lucide-react'
-import { Card, Btn, Badge } from '@/components/ui'
+import { Card, Btn, Badge, Input } from '@/components/ui'
 import Modal from '@/components/ui/Modal'
 import toast from 'react-hot-toast'
 
@@ -136,25 +136,25 @@ export default function ApiKeyManager() {
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 기관 ID (선택)
               </label>
-              <input
+              <Input
                 type="text"
                 value={form.tenant_id}
                 onChange={e => setForm(f => ({ ...f, tenant_id: e.target.value }))}
                 placeholder="tenant_id 입력 (비워두면 전체)"
-                className="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 유효 기간 (일)
               </label>
-              <input
+              <Input
                 type="number"
                 value={form.expires_days}
                 onChange={e => setForm(f => ({ ...f, expires_days: e.target.value }))}
                 min={1}
                 max={3650}
-                className="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex gap-2 justify-end">

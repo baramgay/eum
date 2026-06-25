@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { Search, Calendar, CheckCircle, AlertCircle, Database, Play, ArrowRight, Pencil, Trash2, RefreshCw, X, Eye, Loader2 } from 'lucide-react'
-import { StatCard, Badge, EmptyState, Btn, Skeleton } from '@/components/ui'
+import { StatCard, Badge, EmptyState, Btn, Skeleton, Input, Select } from '@/components/ui'
 import Modal from '@/components/ui/Modal'
 import SortableTable from '@/components/common/SortableTable'
 import type { SourceWithJob } from './types'
@@ -242,24 +242,24 @@ export default function CollectSourcesPanel({
         <div className="flex flex-col sm:flex-row gap-2 flex-1 w-full sm:w-auto">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-            <input
+            <Input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="제목, URL, 주제, 키워드 검색"
-              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             />
           </div>
-          <select
+          <Select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="px-3 py-2 border rounded-md text-sm bg-white"
           >
             <option value="all">전체 상태</option>
             <option value="idle">대기</option>
             <option value="running">실행 중</option>
             <option value="success">성공</option>
             <option value="failed">실패</option>
-          </select>
+          </Select>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <span>{filteredSources.length} / {sources.length}개</span>

@@ -13,7 +13,7 @@ import {
   LayoutGrid,
   Pencil,
 } from 'lucide-react'
-import { PageHeader, Btn, Badge } from '@/components/ui'
+import { PageHeader, Btn, Badge, Select } from '@/components/ui'
 import type { GraphLayoutType, AnalyticsResult, OntologyGraphData } from '@/lib/ontology/types'
 import type { OntologyNode } from '@/lib/ontology-utils'
 import type { ScenarioKey } from '@/lib/ontology/demo-graph-meta'
@@ -252,10 +252,10 @@ export default function OntologyClient() {
       {/* 시군 필터 (Supabase 그래프 전용 — 데모 모드에서는 숨김) */}
       {activeTab !== '노드 목록' && !activeScenario && (
         <div className="flex items-center gap-2 flex-wrap">
-          <select
+          <Select
             value={sgg}
             onChange={e => setSgg(e.target.value)}
-            className="w-48 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900"
+            className="w-48 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
             aria-label="시군 선택"
           >
             <option value="">전체 시군</option>
@@ -264,7 +264,7 @@ export default function OntologyClient() {
                 {o.name}
               </option>
             ))}
-          </select>
+          </Select>
           <Btn onClick={() => loadGraph(sgg || undefined)} loading={loading} variant="secondary" size="sm">
             필터
           </Btn>

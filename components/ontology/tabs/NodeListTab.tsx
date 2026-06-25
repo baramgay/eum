@@ -13,7 +13,7 @@ import {
   Copy,
   Check,
 } from 'lucide-react'
-import { Card, StatCard, Badge, Btn, EmptyState, Skeleton } from '@/components/ui'
+import { Card, StatCard, Badge, Btn, EmptyState, Skeleton, Input, Select } from '@/components/ui'
 import DetailPanel from '../panels/DetailPanel'
 import type { OntologyGraphData } from '@/lib/ontology/types'
 import type { OntologyNode } from '@/lib/ontology-utils'
@@ -215,7 +215,7 @@ export default function NodeListTab({
       <div className="flex flex-col lg:flex-row gap-3">
         <div ref={searchWrapRef} className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-          <input
+          <Input
             ref={searchInputRef}
             value={nodeSearch}
             onChange={e => {
@@ -226,7 +226,7 @@ export default function NodeListTab({
             onFocus={() => setShowSearchDropdown(true)}
             onKeyDown={onSearchKeyDown}
             placeholder="레이블·타입·ID 검색... (Enter로 첫 결과 선택)"
-            className="w-full pl-9 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+            className="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
           />
           {nodeSearch && (
             <Btn
@@ -257,10 +257,10 @@ export default function NodeListTab({
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <ArrowUpDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-          <select
+          <Select
             value={nodeSort}
             onChange={e => setNodeSort(e.target.value as NodeSort)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900"
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
             aria-label="노드 정렬"
           >
             {SORT_OPTIONS.map(o => (
@@ -268,7 +268,7 @@ export default function NodeListTab({
                 {o.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">

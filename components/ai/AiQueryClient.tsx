@@ -23,6 +23,7 @@ import Btn from '@/components/ui/Btn'
 import Card from '@/components/ui/Card'
 import Skeleton from '@/components/ui/Skeleton'
 import StatCard from '@/components/ui/StatCard'
+import { Input, Select, Textarea } from '@/components/ui'
 
 interface QueryResult {
   intent: string | null
@@ -194,12 +195,12 @@ function SqlQueryPanel() {
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Database className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-          <input
+          <Input
             value={state.question}
             onChange={e => update({ question: e.target.value })}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && generate()}
             placeholder="예: datasets 테이블에서 최근 10개 항목 보여줘"
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white dark:bg-gray-900"
+            className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white"
             aria-label="자연어 질문 입력"
           />
         </div>
@@ -258,12 +259,12 @@ function SqlQueryPanel() {
               </Btn>
             </div>
           </div>
-          <textarea
+          <Textarea
             value={state.editedSql}
             onChange={e => update({ editedSql: e.target.value })}
             rows={Math.max(3, Math.min(state.editedSql.split('\n').length + 1, 10))}
             spellCheck={false}
-            className="w-full px-4 py-3 font-mono text-xs bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 resize-none focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-400"
+            className="w-full px-4 py-3 font-mono text-xs bg-white text-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-400"
             aria-label="SQL 편집기"
           />
         </Card>
@@ -635,13 +636,13 @@ function ResultCard({
           {numericCols.length > 0 && (
             <div className="flex items-center gap-2">
               {numericCols.length > 1 && (
-                <select
+                <Select
                   value={chartCol}
                   onChange={e => setChartCol(e.target.value)}
-                  className="text-xs border rounded px-2 py-1 text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900"
+                  className="text-xs border rounded px-2 py-1 text-gray-600 bg-white"
                 >
                   {numericCols.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                </Select>
               )}
               <div className="flex rounded border overflow-hidden">
                 <button
@@ -1150,12 +1151,12 @@ export default function AiQueryClient() {
           </Btn>
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
-            <input
+            <Input
               type="text"
               value={sidebarSearch}
               onChange={e => setSidebarSearch(e.target.value)}
               placeholder="대화 검색..."
-              className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+              className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             />
             {sidebarSearch && (
               <button
@@ -1442,12 +1443,12 @@ export default function AiQueryClient() {
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-              <input
+              <Input
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && ask(query)}
                 placeholder="예: 청년 정착잠재 순위 보여줘"
-                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
             <Btn

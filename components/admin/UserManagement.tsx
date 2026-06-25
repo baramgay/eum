@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Trash2, RefreshCw, UserCog, Building2, Filter, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Input, Select } from '@/components/ui'
 import Card from '@/components/ui/Card'
 import Btn from '@/components/ui/Btn'
 import EmptyState from '@/components/ui/EmptyState'
@@ -179,49 +180,49 @@ export default function UserManagement() {
           <form onSubmit={createUser} className="grid md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="user-email" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">이메일 *</label>
-              <input
+              <Input
                 id="user-email"
                 required type="email" value={form.email}
                 onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                 placeholder="user@example.com"
-                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
             <div>
               <label htmlFor="user-password" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">비밀번호 *</label>
-              <input
+              <Input
                 id="user-password"
                 required type="password" value={form.password}
                 onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                 placeholder="8자 이상"
-                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
             <div>
               <label htmlFor="user-role" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">역할 *</label>
-              <select
+              <Select
                 id="user-role"
                 value={form.role}
                 onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
-                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
                 <option value="admin">최고 관리자</option>
                 <option value="center">센터 관리자</option>
                 <option value="agency">기관</option>
                 <option value="viewer">열람자</option>
                 <option value="public">일반 공개</option>
-              </select>
+              </Select>
             </div>
             {form.role === 'agency' && (
               <div>
                 <label htmlFor="user-tenant" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">소속 기관</label>
                 <div className="relative">
                   <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-                  <select
+                  <Select
                     id="user-tenant"
                     value={form.tenant_id}
                     onChange={e => setForm(p => ({ ...p, tenant_id: e.target.value }))}
-                    className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                    className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
                     <option value="">기관 선택</option>
                     {tenants.map(t => (
@@ -229,7 +230,7 @@ export default function UserManagement() {
                         {t.name} ({t.tenant_id})
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
               </div>
             )}
@@ -254,10 +255,10 @@ export default function UserManagement() {
 
       <div className="flex items-center gap-2">
         <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-        <select
+        <Select
           value={roleFilter}
           onChange={e => setRoleFilter(e.target.value as typeof roleFilter)}
-          className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option value="all">모든 역할</option>
           <option value="admin">최고 관리자</option>
@@ -265,7 +266,7 @@ export default function UserManagement() {
           <option value="agency">기관</option>
           <option value="viewer">열람자</option>
           <option value="public">일반 공개</option>
-        </select>
+        </Select>
       </div>
 
       <Card className="overflow-hidden p-0">
@@ -312,31 +313,31 @@ export default function UserManagement() {
                       )}
                     </td>
                     <td className="px-4 py-2">
-                      <select
+                      <Select
                         value={editingRole[u.id] ?? u.role}
                         onChange={e => changeField(u.id, 'role', e.target.value)}
                         disabled={isBusy(u.id)}
-                        className="text-xs border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                        className="text-xs border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 bg-white"
                       >
                         <option value="admin">최고 관리자</option>
                         <option value="center">센터 관리자</option>
                         <option value="agency">기관</option>
                         <option value="viewer">열람자</option>
                         <option value="public">일반 공개</option>
-                      </select>
+                      </Select>
                     </td>
                     <td className="px-4 py-2">
-                      <select
+                      <Select
                         value={u.tenant_id ?? ''}
                         onChange={e => changeField(u.id, 'tenant_id', e.target.value || null)}
                         disabled={isBusy(u.id)}
-                        className="text-xs border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 max-w-[160px] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                        className="text-xs border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 max-w-[160px] bg-white"
                       >
                         <option value="">—</option>
                         {tenants.map(t => (
                           <option key={t.tenant_id} value={t.tenant_id}>{t.name}</option>
                         ))}
-                      </select>
+                      </Select>
                     </td>
                     <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">{fmtDate(u.last_sign_in_at)}</td>
                     <td className="px-4 py-2">

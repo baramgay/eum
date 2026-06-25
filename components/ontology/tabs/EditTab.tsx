@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Trash2, Pencil, Check, X, Loader2 } from 'lucide-react'
-import { Btn, Badge } from '@/components/ui'
+import { Btn, Badge, Input } from '@/components/ui'
 import toast from 'react-hot-toast'
 
 interface OntologyNode {
@@ -233,12 +233,12 @@ export default function EditTab() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-gray-900">노드 ({nodes.length})</h2>
           <div className="flex gap-2">
-            <input
+            <Input
               type="text"
               placeholder="검색..."
               value={nodeSearch}
               onChange={e => setNodeSearch(e.target.value)}
-              className="h-8 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+              className="h-8 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white"
             />
             <Btn size="sm" variant="primary" onClick={() => setShowAddNode(v => !v)} icon={<Plus size={14} />}>
               노드 추가
@@ -255,18 +255,18 @@ export default function EditTab() {
           <div className="mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 space-y-3">
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">새 노드</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input type="text" placeholder="obj_id (선택, 자동생성 가능)" value={addNodeForm.obj_id}
+              <Input type="text" placeholder="obj_id (선택, 자동생성 가능)" value={addNodeForm.obj_id}
                 onChange={e => setAddNodeForm(f => ({ ...f, obj_id: e.target.value }))}
-                className="h-9 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
-              <input type="text" placeholder="label *" value={addNodeForm.label}
+                className="h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
+              <Input type="text" placeholder="label *" value={addNodeForm.label}
                 onChange={e => setAddNodeForm(f => ({ ...f, label: e.target.value }))}
-                className="h-9 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
-              <input type="text" placeholder="유형(obj_type) *" value={addNodeForm.obj_type}
+                className="h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
+              <Input type="text" placeholder="유형(obj_type) *" value={addNodeForm.obj_type}
                 onChange={e => setAddNodeForm(f => ({ ...f, obj_type: e.target.value }))}
-                className="h-9 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
-              <input type="text" placeholder="props (key=val;key2=val2)" value={addNodeForm.props}
+                className="h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
+              <Input type="text" placeholder="props (key=val;key2=val2)" value={addNodeForm.props}
                 onChange={e => setAddNodeForm(f => ({ ...f, props: e.target.value }))}
-                className="h-9 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
+                className="h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
             </div>
             <div className="flex gap-2">
               <Btn size="sm" variant="primary" onClick={addNode} disabled={addingNode}>
@@ -300,16 +300,16 @@ export default function EditTab() {
                     <>
                       <td className="px-3 py-2 text-gray-500 font-mono text-xs">{node.obj_id}</td>
                       <td className="px-3 py-2">
-                        <input value={editingNode.label} onChange={e => setEditingNode(n => n ? { ...n, label: e.target.value } : n)}
-                          className="w-full h-7 px-2 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
+                        <Input value={editingNode.label} onChange={e => setEditingNode(n => n ? { ...n, label: e.target.value } : n)}
+                          className="w-full h-7 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
                       </td>
                       <td className="px-3 py-2">
-                        <input value={editingNode.obj_type} onChange={e => setEditingNode(n => n ? { ...n, obj_type: e.target.value } : n)}
-                          className="w-full h-7 px-2 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
+                        <Input value={editingNode.obj_type} onChange={e => setEditingNode(n => n ? { ...n, obj_type: e.target.value } : n)}
+                          className="w-full h-7 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
                       </td>
                       <td className="px-3 py-2">
-                        <input value={editingNode.props} onChange={e => setEditingNode(n => n ? { ...n, props: e.target.value } : n)}
-                          className="w-full h-7 px-2 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
+                        <Input value={editingNode.props} onChange={e => setEditingNode(n => n ? { ...n, props: e.target.value } : n)}
+                          className="w-full h-7 px-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
                       </td>
                       <td className="px-3 py-2">
                         <div className="flex justify-end gap-1">
@@ -360,12 +360,12 @@ export default function EditTab() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-gray-900">엣지 ({edges.length})</h2>
           <div className="flex gap-2">
-            <input
+            <Input
               type="text"
               placeholder="검색..."
               value={edgeSearch}
               onChange={e => setEdgeSearch(e.target.value)}
-              className="h-8 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+              className="h-8 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white"
             />
             <Btn size="sm" variant="primary" onClick={() => setShowAddEdge(v => !v)} icon={<Plus size={14} />}>
               엣지 추가
@@ -384,29 +384,29 @@ export default function EditTab() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-gray-500 mb-1">src (출발 노드 ID)</label>
-                <input type="text" placeholder="예: sigun:48121" value={addEdgeForm.src}
+                <Input type="text" placeholder="예: sigun:48121" value={addEdgeForm.src}
                   list="node-ids-src"
                   onChange={e => setAddEdgeForm(f => ({ ...f, src: e.target.value }))}
-                  className="w-full h-9 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
+                  className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">rel (관계 유형)</label>
-                <input type="text" placeholder="예: 포함, 인접, 청년이동" value={addEdgeForm.rel}
+                <Input type="text" placeholder="예: 포함, 인접, 청년이동" value={addEdgeForm.rel}
                   onChange={e => setAddEdgeForm(f => ({ ...f, rel: e.target.value }))}
-                  className="w-full h-9 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
+                  className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">dst (도착 노드 ID)</label>
-                <input type="text" placeholder="예: sigun:48127" value={addEdgeForm.dst}
+                <Input type="text" placeholder="예: sigun:48127" value={addEdgeForm.dst}
                   list="node-ids-dst"
                   onChange={e => setAddEdgeForm(f => ({ ...f, dst: e.target.value }))}
-                  className="w-full h-9 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
+                  className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1">가중치</label>
-                <input type="number" min="0" step="0.1" placeholder="1" value={addEdgeForm.weight}
+                <Input type="number" min="0" step="0.1" placeholder="1" value={addEdgeForm.weight}
                   onChange={e => setAddEdgeForm(f => ({ ...f, weight: e.target.value }))}
-                  className="w-full h-9 px-3 text-sm border border-gray-200 dark:border-gray-700 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500" />
+                  className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
               </div>
             </div>
             {/* datalist for autocomplete */}

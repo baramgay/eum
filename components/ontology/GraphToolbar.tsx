@@ -18,7 +18,7 @@ import {
   Map,
   HelpCircle,
 } from 'lucide-react'
-import { Btn } from '@/components/ui'
+import { Btn, Input, Select } from '@/components/ui'
 import type { GraphLayoutType } from '@/lib/ontology/types'
 import type { OntologyNode } from '@/lib/ontology-utils'
 
@@ -152,7 +152,7 @@ export default function GraphToolbar({
       <div className="flex items-center gap-2 flex-wrap">
         <div ref={wrapRef} className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
-          <input
+          <Input
             ref={inputRef}
             type="text"
             role="combobox"
@@ -162,7 +162,7 @@ export default function GraphToolbar({
             onKeyDown={handleKeyDown}
             placeholder="노드 검색..."
             disabled={nodes.length === 0}
-            className="w-40 pl-7 pr-7 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-300"
+            className="w-40 pl-7 pr-7 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white disabled:bg-gray-100 disabled:text-gray-400"
             aria-label="그래프 노드 검색"
             aria-expanded={isOpen}
             aria-controls={isOpen ? 'graph-toolbar-search-list' : undefined}
@@ -211,17 +211,17 @@ export default function GraphToolbar({
         <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
           <LayoutTemplate className="w-3.5 h-3.5" /> 레이아웃
         </span>
-        <select
+        <Select
           value={layout}
           onChange={e => onLayoutChange(e.target.value as GraphLayoutType)}
-          className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900"
+          className="text-xs px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
           aria-label="그래프 레이아웃 선택"
           title="레이아웃 방식을 선택합니다"
         >
           {LAYOUT_OPTIONS.map(o => (
             <option key={o.value} value={o.value} title={o.title}>{o.label}</option>
           ))}
-        </select>
+        </Select>
 
         <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 ml-2">관계 필터</span>
         {relTypes.map(rel => (
@@ -243,7 +243,7 @@ export default function GraphToolbar({
         {years.length > 0 && (
           <div className="flex items-center gap-2 ml-3">
             <span className="text-xs text-gray-500 dark:text-gray-400">연도</span>
-            <input
+            <Input
               type="range"
               min={years[0]}
               max={years[years.length - 1]}

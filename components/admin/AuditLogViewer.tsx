@@ -9,6 +9,7 @@ import Card from '@/components/ui/Card'
 import Btn from '@/components/ui/Btn'
 import EmptyState from '@/components/ui/EmptyState'
 import Skeleton from '@/components/ui/Skeleton'
+import { Input, Select } from '@/components/ui'
 
 interface AuditLog {
   id: number
@@ -157,49 +158,49 @@ export default function AuditLogViewer() {
       <div className="flex flex-col md:flex-row gap-3 md:items-center flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-          <input
+          <Input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="이메일·리소스 ID 검색"
-            className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           />
         </div>
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-          <select
+          <Select
             value={action}
             onChange={e => setAction(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             <option value="">모든 동작</option>
             {ACTIONS.map(a => (
               <option key={a} value={a}>{ACTION_LABELS[a].label}</option>
             ))}
-          </select>
-          <select
+          </Select>
+          <Select
             value={resourceType}
             onChange={e => setResourceType(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             <option value="">모든 리소스</option>
             {RESOURCE_TYPES.map(t => (
               <option key={t} value={t}>{t}</option>
             ))}
-          </select>
+          </Select>
         </div>
         <div className="flex items-center gap-2">
-          <input
+          <Input
             type="date"
             value={from}
             onChange={e => setFrom(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           />
           <span className="text-gray-400 dark:text-gray-300">~</span>
-          <input
+          <Input
             type="date"
             value={to}
             onChange={e => setTo(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           />
         </div>
         {isFiltered && (

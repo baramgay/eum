@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { RefreshCw, Filter, ChevronDown, ChevronUp, AlertCircle, Eye, ArrowRight } from 'lucide-react'
-import { Badge, EmptyState, Btn, Skeleton } from '@/components/ui'
+import { Badge, EmptyState, Btn, Skeleton, Select } from '@/components/ui'
 import Modal from '@/components/ui/Modal'
 import SortableTable from '@/components/common/SortableTable'
 import type { CollectLog, SourceWithJob } from './types'
@@ -181,26 +181,26 @@ export default function CollectLogsPanel({
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-2 justify-between">
         <div className="flex flex-col sm:flex-row gap-2">
-          <select
+          <Select
             value={sourceFilter}
             onChange={e => setSourceFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="px-3 py-2 border rounded-md text-sm bg-white"
           >
             <option value="all">전체 소스</option>
             {sources.map(s => (
               <option key={s.source_id} value={s.source_id}>{s.title}</option>
             ))}
-          </select>
-          <select
+          </Select>
+          <Select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+            className="px-3 py-2 border rounded-md text-sm bg-white"
           >
             <option value="all">전체 상태</option>
             <option value="running">실행 중</option>
             <option value="success">성공</option>
             <option value="failed">실패</option>
-          </select>
+          </Select>
           {isFiltered && (
             <Btn variant="ghost" size="sm" onClick={() => { setStatusFilter('all'); setSourceFilter('all') }}>
               <Filter className="w-3 h-3" />

@@ -363,12 +363,12 @@ export default function CollectSourceForm({
       <div className="border rounded-md p-3 bg-gray-50 dark:bg-gray-950">
         <div className="flex items-center gap-2 mb-3">
           <label htmlFor="pagination_type" className="text-xs font-semibold text-gray-700 dark:text-gray-300">페이지네이션</label>
-          <select id="pagination_type" name="pagination_type" value={paginationType} onChange={e => setPaginationType(e.target.value)}
-            className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500">
+          <Select id="pagination_type" name="pagination_type" value={paginationType} onChange={e => setPaginationType(e.target.value)}
+            className="px-2 py-1 border rounded text-xs bg-white">
             <option value="none">없음 (단일 요청)</option>
             <option value="page">페이지 번호 (공공데이터포털 기본)</option>
             <option value="offset">오프셋 (offset + limit)</option>
-          </select>
+          </Select>
         </div>
 
         {(paginationType === 'page' || paginationType === 'offset') && (

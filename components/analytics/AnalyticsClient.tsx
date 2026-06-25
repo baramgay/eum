@@ -19,6 +19,9 @@ import PageHeader from '@/components/ui/PageHeader'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Btn from '@/components/ui/Btn'
+import Input from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import Textarea from '@/components/ui/Textarea'
 import EmptyState from '@/components/ui/EmptyState'
 import Skeleton from '@/components/ui/Skeleton'
 import StatCard from '@/components/ui/StatCard'
@@ -1404,7 +1407,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
             <div className="p-3 border-b">
               <div className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-950">
                 <Search className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
-                <input
+                <Input
                   type="text"
                   value={catalogSearch}
                   onChange={e => setCatalogSearch(e.target.value)}
@@ -1538,7 +1541,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <div className="mb-3 space-y-2">
                 <div className="flex items-center gap-2 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-950">
                   <Search className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
-                  <input
+                  <Input
                     type="text"
                     value={varSearch}
                     onChange={e => setVarSearch(e.target.value)}
@@ -1869,15 +1872,15 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                       {selectedAnalysis.options.map(opt => (
                         <div key={opt.key}>
                           <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">{opt.label}</p>
-                          <select
+                          <Select
                             value={optValues[opt.key] ?? opt.default}
                             onChange={e => setOptValues(prev => ({ ...prev, [opt.key]: e.target.value }))}
-                            className="text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-900"
+                            className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
                           >
                             {opt.choices.map(c => (
                               <option key={c.value} value={c.value}>{c.label}</option>
                             ))}
-                          </select>
+                          </Select>
                           {opt.unit && <span className="text-xs text-gray-400 dark:text-gray-300 ml-1.5">{opt.unit}</span>}
                         </div>
                       ))}
@@ -2022,28 +2025,28 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
           <div className="space-y-3">
             <div>
               <label htmlFor="ar-title" className="block text-xs font-medium text-gray-600 mb-1">분석명 *</label>
-              <input
+              <Input
                 id="ar-title"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white"
                 value={registerForm.title}
                 onChange={e => setRegisterForm(p => ({ ...p, title: e.target.value }))}
               />
             </div>
             <div>
               <label htmlFor="ar-performed-at" className="block text-xs font-medium text-gray-600 mb-1">수행일 *</label>
-              <input
+              <Input
                 id="ar-performed-at"
                 type="date"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white"
                 value={registerForm.performed_at}
                 onChange={e => setRegisterForm(p => ({ ...p, performed_at: e.target.value }))}
               />
             </div>
             <div>
               <label htmlFor="ar-purpose" className="block text-xs font-medium text-gray-600 mb-1">분석 목적</label>
-              <input
+              <Input
                 id="ar-purpose"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white"
                 placeholder="예: 정책 수립을 위한 데이터 분석"
                 value={registerForm.purpose}
                 onChange={e => setRegisterForm(p => ({ ...p, purpose: e.target.value }))}
@@ -2051,10 +2054,10 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
             </div>
             <div>
               <label htmlFor="ar-summary" className="block text-xs font-medium text-gray-600 mb-1">결과 요약</label>
-              <textarea
+              <Textarea
                 id="ar-summary"
                 rows={2}
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none bg-white"
                 value={registerForm.result_summary}
                 onChange={e => setRegisterForm(p => ({ ...p, result_summary: e.target.value }))}
               />

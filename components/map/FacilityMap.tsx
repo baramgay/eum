@@ -9,6 +9,7 @@ import {
   ImageOff, Check, Plus, Minus, ArrowRightLeft, Navigation,
   Info, Layers, Users, BookOpen, Dumbbell, Music, RotateCcw,
 } from 'lucide-react'
+import { Input, Select } from '@/components/ui'
 import type { Facility, MapInnerRef, ClusterOptions } from './MapInner'
 import { FTYPE_META, DEFAULT_META } from './MapPin'
 import type { Cluster } from '@/lib/geo-cluster'
@@ -261,7 +262,7 @@ export default function FacilityMap({ facilities }: Props) {
         {/* 검색바 */}
         <div className="pointer-events-auto flex items-center gap-2 bg-white/96 backdrop-blur-md rounded-2xl shadow-md px-4 py-2.5 border border-white/60">
           <Search className="w-4 h-4 text-gray-400 shrink-0" />
-          <input
+          <Input
             ref={searchRef}
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -332,7 +333,7 @@ export default function FacilityMap({ facilities }: Props) {
               </div>
 
               <div className="flex items-center gap-1 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
-                <select
+                <Select
                   value={heatmapValueMode}
                   onChange={(e) => setHeatmapValueMode(e.target.value as HeatmapValueMode)}
                   className="text-xs font-medium text-gray-700 bg-transparent outline-none"
@@ -340,11 +341,11 @@ export default function FacilityMap({ facilities }: Props) {
                 >
                   <option value="count">시설 개수</option>
                   <option value="capacity">수용인원</option>
-                </select>
+                </Select>
               </div>
 
               <div className="flex items-center gap-1 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
-                <select
+                <Select
                   value={heatmapPalette}
                   onChange={(e) => setHeatmapPalette(e.target.value as HeatmapPalette)}
                   className="text-xs font-medium text-gray-700 bg-transparent outline-none"
@@ -353,14 +354,14 @@ export default function FacilityMap({ facilities }: Props) {
                   <option value="default">기본</option>
                   <option value="flame">불꽃</option>
                   <option value="ocean">바다</option>
-                </select>
+                </Select>
               </div>
             </div>
           )}
 
           {layerMode === 'cluster' && (
             <div className="pointer-events-auto flex items-center gap-1.5 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
-              <select
+              <Select
                 value={clusterOptions.algorithm}
                 onChange={(e) => setClusterOptions((o) => ({ ...o, algorithm: e.target.value as ClusterOptions['algorithm'] }))}
                 className="text-xs font-medium text-gray-700 bg-transparent outline-none"
@@ -368,10 +369,10 @@ export default function FacilityMap({ facilities }: Props) {
               >
                 <option value="dbscan">DBSCAN</option>
                 <option value="kmeans">K-Means</option>
-              </select>
+              </Select>
               {clusterOptions.algorithm === 'dbscan' ? (
                 <>
-                  <select
+                  <Select
                     value={clusterOptions.eps}
                     onChange={(e) => setClusterOptions((o) => ({ ...o, eps: Number(e.target.value) }))}
                     className="text-xs font-medium text-gray-700 bg-transparent outline-none"
@@ -380,8 +381,8 @@ export default function FacilityMap({ facilities }: Props) {
                     <option value={300}>300m</option>
                     <option value={500}>500m</option>
                     <option value={1000}>1km</option>
-                  </select>
-                  <select
+                  </Select>
+                  <Select
                     value={clusterOptions.minPts}
                     onChange={(e) => setClusterOptions((o) => ({ ...o, minPts: Number(e.target.value) }))}
                     className="text-xs font-medium text-gray-700 bg-transparent outline-none"
@@ -390,10 +391,10 @@ export default function FacilityMap({ facilities }: Props) {
                     {[2, 3, 5, 10].map((v) => (
                       <option key={v} value={v}>최소 {v}개</option>
                     ))}
-                  </select>
+                  </Select>
                 </>
               ) : (
-                <select
+                <Select
                   value={clusterOptions.k}
                   onChange={(e) => setClusterOptions((o) => ({ ...o, k: Number(e.target.value) }))}
                   className="text-xs font-medium text-gray-700 bg-transparent outline-none"
@@ -402,7 +403,7 @@ export default function FacilityMap({ facilities }: Props) {
                   {[2, 3, 4, 5, 6, 7, 8].map((v) => (
                     <option key={v} value={v}>k={v}</option>
                   ))}
-                </select>
+                </Select>
               )}
             </div>
           )}
@@ -410,7 +411,7 @@ export default function FacilityMap({ facilities }: Props) {
           {showFilters && (
             <div className="flex items-center gap-1.5 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
               <Navigation className="w-3.5 h-3.5 text-blue-500" />
-              <select
+              <Select
                 value={radiusKm}
                 onChange={e => setRadiusKm(Number(e.target.value))}
                 className="text-xs font-medium text-gray-700 bg-transparent outline-none"
@@ -419,7 +420,7 @@ export default function FacilityMap({ facilities }: Props) {
                 {RADIUS_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
-              </select>
+              </Select>
             </div>
           )}
         </div>

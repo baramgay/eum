@@ -1,7 +1,7 @@
 'use client'
 
 import { Calendar, Clock, CheckCircle2, XCircle, CheckCircle, AlertCircle } from 'lucide-react'
-import { StatCard, Badge, EmptyState, Btn, Skeleton } from '@/components/ui'
+import { StatCard, Badge, EmptyState, Btn, Skeleton, Select } from '@/components/ui'
 import type { SourceWithJob } from './types'
 
 interface Props {
@@ -106,17 +106,17 @@ export default function CollectSchedulesPanel({ sources, loading, updatingSource
                     </label>
                   </td>
                   <td className="px-4 py-2">
-                    <select
+                    <Select
                       value={src.job?.schedule_type ?? 'manual'}
                       onChange={e => handleScheduleChange(src.source_id, e.target.value)}
                       disabled={updatingSourceId === src.source_id}
-                      className="px-2 py-1 border rounded-md text-xs disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-300"
+                      className="px-2 py-1 border rounded-md text-xs disabled:bg-gray-100 disabled:text-gray-400"
                     >
                       <option value="manual">수동</option>
                       <option value="daily">매일 자정</option>
                       <option value="weekly">매주 월요일</option>
                       <option value="monthly">매월 1일</option>
-                    </select>
+                    </Select>
                   </td>
                   <td className="px-4 py-2">
                     <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">

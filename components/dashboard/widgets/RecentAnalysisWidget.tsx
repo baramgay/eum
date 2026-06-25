@@ -6,6 +6,7 @@ import { Search, BarChart3, ArrowRight } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Btn from '@/components/ui/Btn'
 import Badge from '@/components/ui/Badge'
+import { Input } from '@/components/ui'
 import EmptyState from '@/components/ui/EmptyState'
 import { ANALYSIS_TYPE_LABEL, timeAgo, type AnalysisRun } from '../DashboardClient'
 
@@ -51,12 +52,12 @@ export default function RecentAnalysisWidget({ recentRuns }: RecentAnalysisWidge
         <div className="flex flex-col sm:flex-row gap-3 mb-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-            <input
+            <Input
               type="text"
               placeholder="데이터셋, 분석명 검색..."
               value={runQuery}
               onChange={e => setRunQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-300 focus:outline-none bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+              className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-300 focus:outline-none bg-white"
             />
           </div>
           <div className="flex flex-wrap gap-1.5">

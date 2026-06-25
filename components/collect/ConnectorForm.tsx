@@ -58,17 +58,17 @@ export default function ConnectorForm({ value, onChange }: Props) {
     <div className="border rounded-md p-3 bg-gray-50 dark:bg-gray-950 space-y-3">
       <div className="flex items-center gap-2">
         <label htmlFor="connector-type" className="text-xs font-semibold text-gray-700 dark:text-gray-300">외부 시스템 커넥터</label>
-        <select
+        <Select
           id="connector-type"
           value={type}
           onChange={e => handleTypeChange(e.target.value as ConnectorType)}
-          className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+          className="px-2 py-1 border rounded text-xs bg-white"
         >
           <option value="none">사용 안 함</option>
           <option value="postgres">PostgreSQL</option>
           <option value="sftp">SFTP</option>
           <option value="api">HTTP API</option>
-        </select>
+        </Select>
       </div>
 
       {value?.type === 'postgres' && (

@@ -13,6 +13,7 @@ import ApiKeyManager from './ApiKeyManager'
 import PageHeader from '@/components/ui/PageHeader'
 import Btn from '@/components/ui/Btn'
 import Badge from '@/components/ui/Badge'
+import { Input, Select, Textarea } from '@/components/ui'
 import EmptyState from '@/components/ui/EmptyState'
 import Card from '@/components/ui/Card'
 import SortableTable from '@/components/common/SortableTable'
@@ -463,15 +464,15 @@ export default function AdminClient({ initialTenants }: Props) {
             </div>
             <div>
               <label htmlFor="admin-bulk-type" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">등록 유형</label>
-              <select
+              <Select
                 id="admin-bulk-type"
                 value={bulkType}
                 onChange={e => setBulkType(e.target.value as typeof bulkType)}
-                className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
                 <option value="users">사용자 일괄 등록</option>
                 <option value="tenants">기관 일괄 등록</option>
-              </select>
+              </Select>
             </div>
             <Btn onClick={runBulkUpload} loading={bulkLoading} disabled={!bulkFile || bulkLoading}>
               <Upload className="w-4 h-4" />
@@ -525,48 +526,48 @@ export default function AdminClient({ initialTenants }: Props) {
             <form onSubmit={createTenant} className="grid md:grid-cols-2 gap-3">
               <div>
                 <label htmlFor="admin-tenant-id" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">기관 코드 *</label>
-                <input
+                <Input
                   id="admin-tenant-id"
                   required value={form.tenant_id}
                   onChange={e => setForm(p => ({ ...p, tenant_id: e.target.value }))}
                   placeholder="예: gni_hadong"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 />
                 <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">영문·숫자·언더스코어만 권장합니다.</p>
               </div>
               <div>
                 <label htmlFor="admin-tenant-name" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">기관명 *</label>
-                <input
+                <Input
                   id="admin-tenant-name"
                   required value={form.name}
                   onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                   placeholder="예: 하동군청"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 />
               </div>
               <div>
                 <label htmlFor="admin-gov-type" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">유형</label>
-                <select
+                <Select
                   id="admin-gov-type"
                   value={form.gov_type}
                   onChange={e => setForm(p => ({ ...p, gov_type: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="">선택</option>
                   <option value="시청">시청</option>
                   <option value="군청">군청</option>
                   <option value="도청">도청</option>
                   <option value="기타">기타</option>
-                </select>
+                </Select>
               </div>
               <div>
                 <label htmlFor="admin-sgg-cd" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">시군 코드</label>
-                <input
+                <Input
                   id="admin-sgg-cd"
                   value={form.sgg_cd}
                   onChange={e => setForm(p => ({ ...p, sgg_cd: e.target.value }))}
                   placeholder="예: 48850"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 />
               </div>
               <div className="md:col-span-2">
@@ -595,32 +596,32 @@ export default function AdminClient({ initialTenants }: Props) {
         <div className="flex flex-col md:flex-row gap-3 md:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
-            <input
+            <Input
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1) }}
               placeholder="기관명·코드·시군코드 검색"
-              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-            <select
+            <Select
               value={statusFilter}
               onChange={e => { setStatusFilter(e.target.value as typeof statusFilter); setPage(1) }}
-              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               <option value="all">모든 상태</option>
               <option value="pending">승인 대기</option>
               <option value="approved">승인 완료</option>
               <option value="rejected">반려</option>
-            </select>
-            <select
+            </Select>
+            <Select
               value={govFilter}
               onChange={e => { setGovFilter(e.target.value); setPage(1) }}
-              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               {GOV_TYPES.map(g => <option key={g} value={g}>{g}</option>)}
-            </select>
+            </Select>
             <Btn
               variant="ghost"
               size="sm"
