@@ -47,10 +47,10 @@ export default function NodeKpiPanel({ node, scenarioKey, onClose }: NodeKpiPane
                 <span className={`text-sm font-semibold tabular-nums ${kpi.highlight ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}`}>
                   {kpi.value}
                 </span>
-                {kpi.unit && <span className="text-[11px] text-gray-400">{kpi.unit}</span>}
+                {kpi.unit && <span className="text-[11px] text-gray-400 dark:text-gray-300">{kpi.unit}</span>}
                 {kpi.trend === 'up' && <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />}
                 {kpi.trend === 'down' && <TrendingDown className="w-3.5 h-3.5 text-red-500" />}
-                {kpi.trend === 'neutral' && <Minus className="w-3.5 h-3.5 text-gray-400" />}
+                {kpi.trend === 'neutral' && <Minus className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />}
               </div>
             </div>
           ))}
@@ -69,7 +69,7 @@ export default function NodeKpiPanel({ node, scenarioKey, onClose }: NodeKpiPane
 
       {/* 노드 ID */}
       <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
-        <span className="text-[10px] text-gray-400 font-mono break-all">{node.obj_id}</span>
+        <span className="text-[10px] text-gray-400 dark:text-gray-300 font-mono break-all">{node.obj_id}</span>
       </div>
     </div>
   )

@@ -147,7 +147,7 @@ function StepCard({
       </ReducedMotionButton>
       {index < total - 1 && (
         <div className="hidden lg:flex absolute top-1/2 -right-3 -translate-y-1/2 z-10 items-center">
-          <ArrowRight className="w-4 h-4 text-gray-300" />
+          <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600" />
         </div>
       )}
     </div>
@@ -210,12 +210,12 @@ function StepDetail({ step, onClose }: { step: PipelineStep; onClose: () => void
                 label: '이름',
                 sortable: true,
                 sortValue: item => item.title,
-                render: item => <span className="font-medium text-gray-800">{item.title}</span>,
+                render: item => <span className="font-medium text-gray-800 dark:text-gray-100">{item.title}</span>,
               },
               {
                 key: 'detail',
                 label: '상세',
-                render: item => <span className="text-xs text-gray-500">{item.detail ?? '—'}</span>,
+                render: item => <span className="text-xs text-gray-500 dark:text-gray-400">{item.detail ?? '—'}</span>,
               },
             ]}
           />

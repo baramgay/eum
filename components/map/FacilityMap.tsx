@@ -277,7 +277,7 @@ export default function FacilityMap({ facilities }: Props) {
               <X className="w-3.5 h-3.5" />
             </button>
           )}
-          <div className="w-px h-4 bg-gray-200 mx-1" />
+          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
           <button
             onClick={() => setShowFilters(v => !v)}
             className={`transition-colors ${showFilters ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 hover:text-gray-600'}`}
@@ -299,7 +299,7 @@ export default function FacilityMap({ facilities }: Props) {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     active
                       ? 'bg-gray-800 text-white shadow-sm'
-                      : 'text-gray-500 hover:bg-gray-100'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                   aria-pressed={active}
                 >
@@ -323,7 +323,7 @@ export default function FacilityMap({ facilities }: Props) {
                       key={key}
                       onClick={() => setHeatmapMode(key as HeatmapMode)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                        active ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'
+                        active ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                     >
                       {label}
@@ -336,7 +336,7 @@ export default function FacilityMap({ facilities }: Props) {
                 <Select
                   value={heatmapValueMode}
                   onChange={(e) => setHeatmapValueMode(e.target.value as HeatmapValueMode)}
-                  className="text-xs font-medium text-gray-700 bg-transparent outline-none"
+                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
                   aria-label="히트맵 값 기준"
                 >
                   <option value="count">시설 개수</option>
@@ -348,7 +348,7 @@ export default function FacilityMap({ facilities }: Props) {
                 <Select
                   value={heatmapPalette}
                   onChange={(e) => setHeatmapPalette(e.target.value as HeatmapPalette)}
-                  className="text-xs font-medium text-gray-700 bg-transparent outline-none"
+                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
                   aria-label="히트맵 색상 팔레트"
                 >
                   <option value="default">기본</option>
@@ -364,7 +364,7 @@ export default function FacilityMap({ facilities }: Props) {
               <Select
                 value={clusterOptions.algorithm}
                 onChange={(e) => setClusterOptions((o) => ({ ...o, algorithm: e.target.value as ClusterOptions['algorithm'] }))}
-                className="text-xs font-medium text-gray-700 bg-transparent outline-none"
+                className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
                 aria-label="클러스터 알고리즘"
               >
                 <option value="dbscan">DBSCAN</option>
@@ -375,7 +375,7 @@ export default function FacilityMap({ facilities }: Props) {
                   <Select
                     value={clusterOptions.eps}
                     onChange={(e) => setClusterOptions((o) => ({ ...o, eps: Number(e.target.value) }))}
-                    className="text-xs font-medium text-gray-700 bg-transparent outline-none"
+                    className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
                     aria-label="클러스터 반경"
                   >
                     <option value={300}>300m</option>
@@ -385,7 +385,7 @@ export default function FacilityMap({ facilities }: Props) {
                   <Select
                     value={clusterOptions.minPts}
                     onChange={(e) => setClusterOptions((o) => ({ ...o, minPts: Number(e.target.value) }))}
-                    className="text-xs font-medium text-gray-700 bg-transparent outline-none"
+                    className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
                     aria-label="최소 점 수"
                   >
                     {[2, 3, 5, 10].map((v) => (
@@ -397,7 +397,7 @@ export default function FacilityMap({ facilities }: Props) {
                 <Select
                   value={clusterOptions.k}
                   onChange={(e) => setClusterOptions((o) => ({ ...o, k: Number(e.target.value) }))}
-                  className="text-xs font-medium text-gray-700 bg-transparent outline-none"
+                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
                   aria-label="클러스터 수"
                 >
                   {[2, 3, 4, 5, 6, 7, 8].map((v) => (
@@ -414,7 +414,7 @@ export default function FacilityMap({ facilities }: Props) {
               <Select
                 value={radiusKm}
                 onChange={e => setRadiusKm(Number(e.target.value))}
-                className="text-xs font-medium text-gray-700 bg-transparent outline-none"
+                className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
                 aria-label="반경 검색"
               >
                 {RADIUS_OPTIONS.map(opt => (
@@ -436,7 +436,7 @@ export default function FacilityMap({ facilities }: Props) {
             className={`flex-shrink-0 flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm border transition-all whitespace-nowrap ${
               allActive
                 ? 'bg-gray-800 text-white border-transparent shadow-gray-800/20'
-                : 'bg-white/90 text-gray-500 border-gray-200 backdrop-blur-sm'
+                : 'bg-white/90 dark:bg-gray-800/90 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 backdrop-blur-sm'
             }`}
           >
             전체
@@ -452,14 +452,14 @@ export default function FacilityMap({ facilities }: Props) {
                 className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm border transition-all whitespace-nowrap ${
                   active
                     ? 'text-white border-transparent'
-                    : 'bg-white/90 text-gray-500 border-gray-200 backdrop-blur-sm hover:border-gray-300'
+                    : 'bg-white/90 dark:bg-gray-800/90 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 backdrop-blur-sm hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
                 style={active ? { backgroundColor: color, boxShadow: `0 2px 8px ${color}40` } : {}}
               >
                 <span>{FTYPE_ICON[ft]()}</span>
                 <span>{ft}</span>
                 <span className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none ${
-                  active ? 'bg-white/20' : 'bg-gray-100 text-gray-400'
+                  active ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'
                 }`}>
                   {facilities.filter(f => f.ftype === ft).length}
                 </span>
@@ -595,7 +595,7 @@ export default function FacilityMap({ facilities }: Props) {
           <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 bg-gray-300 dark:bg-gray-600 rounded-full md:hidden" />
 
           {/* 목록 아이템 */}
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-800">
             {filtered.length === 0 ? (
               <div className="py-12 text-center">
                 <p className="text-sm text-gray-400 dark:text-gray-500">검색 결과가 없습니다</p>
@@ -688,7 +688,7 @@ export default function FacilityMap({ facilities }: Props) {
                   className={`p-2 rounded-full transition-colors ${
                     compareSet.has(selectedFacility.facility_id)
                       ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500'
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400'
                   }`}
                   title="비교에 추가"
                 >
@@ -865,7 +865,7 @@ export default function FacilityMap({ facilities }: Props) {
               {drilldown.list.length === 0 ? (
                 <div className="py-10 text-center text-sm text-gray-400 dark:text-gray-500">해당 영역에 시설이 없습니다</div>
               ) : (
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-gray-50 dark:divide-gray-800">
                   {drilldown.list.map(f => (
                     <div key={f.facility_id} className="px-2 py-2.5 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
                       <button
@@ -889,7 +889,7 @@ export default function FacilityMap({ facilities }: Props) {
                         onClick={() => toggleCompare(f)}
                         className={`shrink-0 p-1.5 rounded-full border transition-all ${
                           compareSet.has(f.facility_id)
-                            ? 'bg-blue-50 border-blue-200 text-blue-600 dark:text-blue-400'
+                            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400'
                             : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                         }`}
                       >

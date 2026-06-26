@@ -2027,7 +2027,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <label htmlFor="ar-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석명 *</label>
               <Input
                 id="ar-title"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900"
                 value={registerForm.title}
                 onChange={e => setRegisterForm(p => ({ ...p, title: e.target.value }))}
               />
@@ -2037,7 +2037,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <Input
                 id="ar-performed-at"
                 type="date"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900"
                 value={registerForm.performed_at}
                 onChange={e => setRegisterForm(p => ({ ...p, performed_at: e.target.value }))}
               />
@@ -2046,7 +2046,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <label htmlFor="ar-purpose" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">분석 목적</label>
               <Input
                 id="ar-purpose"
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none bg-white dark:bg-gray-900"
                 placeholder="예: 정책 수립을 위한 데이터 분석"
                 value={registerForm.purpose}
                 onChange={e => setRegisterForm(p => ({ ...p, purpose: e.target.value }))}
@@ -2057,7 +2057,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <Textarea
                 id="ar-summary"
                 rows={2}
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none bg-white"
+                className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none resize-none bg-white dark:bg-gray-900"
                 value={registerForm.result_summary}
                 onChange={e => setRegisterForm(p => ({ ...p, result_summary: e.target.value }))}
               />
