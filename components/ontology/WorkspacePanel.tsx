@@ -108,7 +108,7 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="새 워크스페이스 이름"
-          className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+          className="flex-1 min-w-0 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400"
           onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
         />
         <Btn onClick={handleSave} loading={saving} disabled={!name.trim()} size="sm">

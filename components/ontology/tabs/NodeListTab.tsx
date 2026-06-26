@@ -226,7 +226,7 @@ export default function NodeListTab({
             onFocus={() => setShowSearchDropdown(true)}
             onKeyDown={onSearchKeyDown}
             placeholder="레이블·타입·ID 검색... (Enter로 첫 결과 선택)"
-            className="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="w-full pl-9 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400"
           />
           {nodeSearch && (
             <Btn
@@ -260,7 +260,7 @@ export default function NodeListTab({
           <Select
             value={nodeSort}
             onChange={e => setNodeSort(e.target.value as NodeSort)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900 dark:text-gray-100"
             aria-label="노드 정렬"
           >
             {SORT_OPTIONS.map(o => (
