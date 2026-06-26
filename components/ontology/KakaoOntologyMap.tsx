@@ -45,7 +45,6 @@ const DEFAULT_ICON = '●'
 // ── SDK 로더 (MapInner.tsx 패턴 동일) ────────────────────────────────────────
 
 // window.kakao is declared globally in MapInner.tsx; we only need the local ambient declaration
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const kakao: any
 
 let kakaoLoadPromise: Promise<void> | null = null

@@ -49,7 +49,6 @@ export default function WordNetworkGraph({ nodes, edges, height = 440 }: Props) 
   const svgRef = useRef<SVGSVGElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState<SimNode | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const simRef = useRef<any | null>(null)
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
