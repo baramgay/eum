@@ -241,7 +241,7 @@ export default function CollectSourceForm({
         <div>
           <Label htmlFor="method" className="text-xs text-gray-600 dark:text-gray-400 mb-1">HTTP 메서드</Label>
           <Select id="method" name="method" value={method} onChange={e => setMethod(e.target.value)}
-            className="px-3 py-2 border rounded-md bg-white">
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100">
             <option value="GET">GET</option>
             <option value="POST">POST</option>
           </Select>
@@ -249,7 +249,7 @@ export default function CollectSourceForm({
         <div>
           <Label htmlFor="resp_format" className="text-xs text-gray-600 dark:text-gray-400 mb-1">응답 형식</Label>
           <Select id="resp_format" name="resp_format" value={respFormat} onChange={e => setRespFormat(e.target.value)}
-            className="px-3 py-2 border rounded-md bg-white">
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100">
             <option value="json">JSON</option>
             <option value="csv">CSV</option>
             <option value="xml">XML</option>
@@ -259,7 +259,7 @@ export default function CollectSourceForm({
         <div>
           <Label htmlFor="auth_type" className="text-xs text-gray-600 dark:text-gray-400 mb-1">인증 방식</Label>
           <Select id="auth_type" name="auth_type" value={authType} onChange={e => setAuthType(e.target.value)}
-            className="px-3 py-2 border rounded-md bg-white">
+            className="px-3 py-2 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100">
             <option value="none">인증 없음</option>
             <option value="api_key">API 키 (헤더)</option>
             <option value="bearer">Bearer 토큰</option>
@@ -348,7 +348,7 @@ export default function CollectSourceForm({
               }}
               placeholder='{"key": "value"}'
               error={errors.request_body}
-              className="px-3 py-2 border rounded-md font-mono bg-white"
+              className="px-3 py-2 border rounded-md font-mono bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100"
               aria-describedby={errors.request_body ? 'request_body-error' : undefined}
             />
             <FormError id="request_body-error" message={errors.request_body} />
@@ -364,7 +364,7 @@ export default function CollectSourceForm({
         <div className="flex items-center gap-2 mb-3">
           <label htmlFor="pagination_type" className="text-xs font-semibold text-gray-700 dark:text-gray-300">페이지네이션</label>
           <Select id="pagination_type" name="pagination_type" value={paginationType} onChange={e => setPaginationType(e.target.value)}
-            className="px-2 py-1 border rounded text-xs bg-white">
+            className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100">
             <option value="none">없음 (단일 요청)</option>
             <option value="page">페이지 번호 (공공데이터포털 기본)</option>
             <option value="offset">오프셋 (offset + limit)</option>
@@ -379,24 +379,24 @@ export default function CollectSourceForm({
               </label>
               <Input id="pagination_page_param" name="pagination_page_param"
                 defaultValue={defaultValues.pagination_page_param}
-                className="px-2 py-1 border rounded text-xs bg-white" />
+                className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100" />
             </div>
             <div>
               <label htmlFor="pagination_size_param" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">크기 파라미터</label>
               <Input id="pagination_size_param" name="pagination_size_param"
                 defaultValue={defaultValues.pagination_size_param}
-                className="px-2 py-1 border rounded text-xs bg-white" />
+                className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100" />
             </div>
             <div>
               <label htmlFor="pagination_size" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">페이지당 행 수</label>
               <Input id="pagination_size" name="pagination_size" type="number" defaultValue={defaultValues.pagination_size} min={1} max={5000}
-                className="px-2 py-1 border rounded text-xs bg-white" />
+                className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100" />
             </div>
             {paginationType === 'page' && (
               <div>
                 <label htmlFor="pagination_total_path" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">전체 건수 경로</label>
                 <Input id="pagination_total_path" name="pagination_total_path" defaultValue={defaultValues.pagination_total_path}
-                  className="px-2 py-1 border rounded text-xs bg-white" />
+                  className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100" />
               </div>
             )}
           </div>

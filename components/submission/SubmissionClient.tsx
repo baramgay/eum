@@ -305,18 +305,18 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                 <label htmlFor="submission-title" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">제목 <span className="text-red-500">*</span></label>
                 <Input id="submission-title" name="title" required placeholder="데이터셋 제목"
                   onChange={refreshChecks}
-                  className="px-3 py-2 rounded-lg bg-white" />
+                  className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900" />
               </div>
               <div>
                 <label htmlFor="submission-theme" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">주제 <span className="text-red-500">*</span></label>
                 <Input id="submission-theme" name="theme" required placeholder="예: 인구통계"
                   onChange={refreshChecks}
-                  className="px-3 py-2 rounded-lg bg-white" />
+                  className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900" />
               </div>
               <div>
                 <label htmlFor="submission-format" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">포맷</label>
                 <Select id="submission-format" name="format"
-                  className="px-3 py-2 rounded-lg bg-white">
+                  className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900">
                   <option value="CSV">CSV</option>
                   <option value="JSON">JSON</option>
                   <option value="XLSX">XLSX</option>
@@ -326,14 +326,14 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                 <label htmlFor="submission-license" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">라이선스 <span className="text-red-500">*</span></label>
                 <Input id="submission-license" name="license" required placeholder="공공누리 1유형" defaultValue="공공누리 1유형"
                   onChange={refreshChecks}
-                  className="px-3 py-2 rounded-lg bg-white" />
+                  className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900" />
               </div>
             </div>
             <div>
               <label htmlFor="submission-description" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">설명 <span className="text-red-500">*</span></label>
               <Textarea id="submission-description" name="description" required rows={3} placeholder="데이터셋 설명 (20자 이상)"
                 onChange={refreshChecks}
-                className="px-3 py-2 rounded-lg bg-white" />
+                className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900" />
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">최소 20자 이상 입력해 주세요.</p>
             </div>
             <div>
@@ -424,7 +424,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                           ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-100">
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                         {filePreview.rows.map((row, i) => (
                           <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-950">
                             {row.map((cell, j) => (
@@ -505,7 +505,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="데이터셋 제목 검색"
-                className="pl-9 pr-3 py-2 rounded-lg bg-white"
+                className="pl-9 pr-3 py-2 rounded-lg bg-white dark:bg-gray-900"
               />
               {search && (
                 <button
@@ -520,7 +520,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
               <Select
                 value={sort}
                 onChange={e => setSort(e.target.value as Sort)}
-                className="px-3 py-2 rounded-lg bg-white"
+                className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900"
               >
                 {SORT_OPTIONS.map(o => (
                   <option key={o.value} value={o.value}>{o.label}</option>
@@ -603,7 +603,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                   {role === 'center' && <th className="px-4 py-2.5 text-left text-gray-600 dark:text-gray-400 font-medium">코멘트</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filteredItems.map(item => (
                   <tr
                     key={item.submission_id}

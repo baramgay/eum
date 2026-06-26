@@ -406,18 +406,8 @@ export default function KakaoOntologyMap({
       {/* 로딩/오류 오버레이 */}
       {loadState !== 'ready' && (
         <div
-          style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            gap: 12,
-            background: 'rgba(248,250,252,0.92)',
-            color: '#475569',
-            fontFamily: "-apple-system,BlinkMacSystemFont,'Pretendard',sans-serif",
-            fontSize: 14,
-            pointerEvents: loadState === 'error' ? 'auto' : 'none',
-            textAlign: 'center', padding: 16,
-          }}
+          className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-600 dark:text-slate-400 bg-slate-50/92 dark:bg-slate-900/92 text-sm text-center p-4"
+          style={{ pointerEvents: loadState === 'error' ? 'auto' : 'none' }}
         >
           {loadState === 'loading' ? (
             <>
@@ -435,12 +425,12 @@ export default function KakaoOntologyMap({
             </>
           ) : (
             <>
-              <span style={{ fontWeight: 600, color: '#334155' }}>
+              <span className="font-semibold text-slate-700 dark:text-slate-300">
                 {!process.env.NEXT_PUBLIC_KAKAO_MAP_KEY
                   ? '카카오맵 API 키가 설정되지 않았습니다.'
                   : '지도를 불러올 수 없습니다.'}
               </span>
-              <span style={{ fontSize: 13, color: '#64748B', maxWidth: 320 }}>
+              <span className="text-xs text-slate-500 dark:text-slate-400 max-w-xs">
                 {!process.env.NEXT_PUBLIC_KAKAO_MAP_KEY
                   ? '.env.local에 NEXT_PUBLIC_KAKAO_MAP_KEY를 추가한 뒤 개발 서버를 재시작해 주세요.'
                   : '네트워크 또는 카카오맵 SDK 로딩 문제일 수 있습니다.'}

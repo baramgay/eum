@@ -184,7 +184,7 @@ export default function CollectLogsPanel({
           <Select
             value={sourceFilter}
             onChange={e => setSourceFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm bg-white"
+            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900"
           >
             <option value="all">전체 소스</option>
             {sources.map(s => (
@@ -194,7 +194,7 @@ export default function CollectLogsPanel({
           <Select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm bg-white"
+            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900"
           >
             <option value="all">전체 상태</option>
             <option value="running">실행 중</option>
@@ -287,10 +287,10 @@ export default function CollectLogsPanel({
               ))}
             </div>
           ) : !previewData || previewData.preview.length === 0 ? (
-            <p className="text-sm text-gray-500">{previewData?.message ?? '미리보기 데이터 없음'}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{previewData?.message ?? '미리보기 데이터 없음'}</p>
           ) : (
             <>
-              <p className="text-xs text-gray-400 mb-3">최대 20행 표시</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mb-3">최대 20행 표시</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border-collapse min-w-[600px]">
                   <thead>
@@ -307,7 +307,7 @@ export default function CollectLogsPanel({
                       <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                         {Object.values(row).map((val, j) => (
                           <td key={j} className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300 max-w-[200px] truncate" title={String(val ?? '')}>
-                            {val === null || val === undefined ? <span className="text-gray-300">null</span> : String(val)}
+                            {val === null || val === undefined ? <span className="text-gray-300 dark:text-gray-600">null</span> : String(val)}
                           </td>
                         ))}
                       </tr>

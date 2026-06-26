@@ -34,7 +34,7 @@ const TYPE_COLOR: Record<string, string> = {
 }
 
 function WordCloudView({ words }: { words: WordFrequency[] }) {
-  if (!words.length) return <p className="text-xs text-gray-400 text-center py-6">키워드가 없습니다.</p>
+  if (!words.length) return <p className="text-xs text-gray-400 dark:text-gray-300 text-center py-6">키워드가 없습니다.</p>
   const maxVal = Math.max(...words.map(w => w.value))
   return (
     <div className="flex flex-wrap gap-2 p-2">
@@ -54,14 +54,14 @@ function WordCloudView({ words }: { words: WordFrequency[] }) {
 }
 
 function TfidfView({ items }: { items: TextAnalysisResponse['tfidf'] }) {
-  if (!items?.length) return <p className="text-xs text-gray-400 text-center py-6">TF-IDF 결과가 없습니다.</p>
+  if (!items?.length) return <p className="text-xs text-gray-400 dark:text-gray-300 text-center py-6">TF-IDF 결과가 없습니다.</p>
   const top = items.slice(0, 30)
   const maxScore = Math.max(...top.map(i => i.score))
   return (
     <div className="space-y-1">
       {top.map((item, i) => (
         <div key={i} className="flex items-center gap-2">
-          <span className="text-[11px] text-gray-400 w-5 text-right tabular-nums">{i + 1}</span>
+          <span className="text-[11px] text-gray-400 dark:text-gray-300 w-5 text-right tabular-nums">{i + 1}</span>
           <span className="text-xs font-mono text-gray-800 dark:text-gray-200 w-24 truncate">{item.term}</span>
           <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
             <div
@@ -69,8 +69,8 @@ function TfidfView({ items }: { items: TextAnalysisResponse['tfidf'] }) {
               style={{ width: `${(item.score / maxScore) * 100}%` }}
             />
           </div>
-          <span className="text-[11px] text-gray-500 tabular-nums w-14 text-right">{item.score.toFixed(4)}</span>
-          <span className="text-[11px] text-gray-400 truncate max-w-[80px]">{item.label}</span>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400 tabular-nums w-14 text-right">{item.score.toFixed(4)}</span>
+          <span className="text-[11px] text-gray-400 dark:text-gray-300 truncate max-w-[80px]">{item.label}</span>
         </div>
       ))}
     </div>
@@ -78,7 +78,7 @@ function TfidfView({ items }: { items: TextAnalysisResponse['tfidf'] }) {
 }
 
 function RelationPatternView({ patterns, summary }: { patterns?: RelationPattern[]; summary?: string }) {
-  if (!patterns?.length) return <p className="text-xs text-gray-400 text-center py-6">관계 패턴이 없습니다.</p>
+  if (!patterns?.length) return <p className="text-xs text-gray-400 dark:text-gray-300 text-center py-6">관계 패턴이 없습니다.</p>
   return (
     <div className="space-y-3">
       {summary && (
@@ -92,17 +92,17 @@ function RelationPatternView({ patterns, summary }: { patterns?: RelationPattern
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">{p.rel}</span>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-gray-500">{p.count}건</span>
-              <span className="text-[11px] text-gray-400">평균 가중치 {p.avgWeight}</span>
+              <span className="text-[11px] text-gray-500 dark:text-gray-400">{p.count}건</span>
+              <span className="text-[11px] text-gray-400 dark:text-gray-300">평균 가중치 {p.avgWeight}</span>
             </div>
           </div>
           <div className="space-y-1">
             {p.examples.map((ex, j) => (
-              <div key={j} className="flex items-center gap-1.5 text-[11px] text-gray-500">
+              <div key={j} className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
                 <span className="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[80px]">{ex.src}</span>
-                <span className="text-gray-400">→</span>
+                <span className="text-gray-400 dark:text-gray-300">→</span>
                 <span className="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[80px]">{ex.dst}</span>
-                <span className="ml-auto text-gray-400">w={ex.weight}</span>
+                <span className="ml-auto text-gray-400 dark:text-gray-300">w={ex.weight}</span>
               </div>
             ))}
           </div>
@@ -221,7 +221,7 @@ export default function TextAnalysisPanel({ nodes, edges }: TextAnalysisPanelPro
       {/* Word Network Graph */}
       <Card className="p-2">
         {networkLoading && (
-          <div className="flex items-center justify-center py-16 gap-2 text-sm text-gray-400">
+          <div className="flex items-center justify-center py-16 gap-2 text-sm text-gray-400 dark:text-gray-300">
             <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
             네트워크 분석 중...
           </div>
@@ -233,7 +233,7 @@ export default function TextAnalysisPanel({ nodes, edges }: TextAnalysisPanelPro
           <WordNetworkGraph nodes={networkNodes} edges={networkEdges} height={460} />
         )}
         {!networkLoading && !networkError && networkNodes.length === 0 && (
-          <div className="py-10 text-center text-xs text-gray-400">분석할 키워드가 없습니다.</div>
+          <div className="py-10 text-center text-xs text-gray-400 dark:text-gray-300">분석할 키워드가 없습니다.</div>
         )}
       </Card>
 
@@ -260,7 +260,7 @@ export default function TextAnalysisPanel({ nodes, edges }: TextAnalysisPanelPro
 
           <Card>
             {detailLoading && (
-              <div className="flex items-center justify-center py-8 gap-2 text-sm text-gray-400">
+              <div className="flex items-center justify-center py-8 gap-2 text-sm text-gray-400 dark:text-gray-300">
                 <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                 분석 중...
               </div>
@@ -279,7 +279,7 @@ export default function TextAnalysisPanel({ nodes, edges }: TextAnalysisPanelPro
       )}
 
       {/* Stats footer */}
-      <div className="flex gap-4 text-[11px] text-gray-400">
+      <div className="flex gap-4 text-[11px] text-gray-400 dark:text-gray-300">
         <span>노드 {nodes.length}개</span>
         <span>엣지 {edges.length}개</span>
         <span>유형 {new Set(nodes.map(n => n.obj_type)).size}가지</span>

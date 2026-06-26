@@ -141,7 +141,7 @@ export default function ApiKeyManager() {
                 value={form.tenant_id}
                 onChange={e => setForm(f => ({ ...f, tenant_id: e.target.value }))}
                 placeholder="tenant_id 입력 (비워두면 전체)"
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
@@ -154,7 +154,7 @@ export default function ApiKeyManager() {
                 onChange={e => setForm(f => ({ ...f, expires_days: e.target.value }))}
                 min={1}
                 max={3650}
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex gap-2 justify-end">
@@ -169,11 +169,11 @@ export default function ApiKeyManager() {
 
       {/* 키 목록 */}
       {loading ? (
-        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-gray-400 dark:text-gray-300" /></div>
       ) : error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       ) : keys.length === 0 ? (
-        <p className="text-sm text-gray-500 text-center py-8">발급된 API 키가 없습니다.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">발급된 API 키가 없습니다.</p>
       ) : (
         <div className="space-y-2">
           {keys.map(k => (

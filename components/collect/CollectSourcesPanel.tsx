@@ -246,13 +246,13 @@ export default function CollectSourcesPanel({
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="제목, URL, 주제, 키워드 검색"
-              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
             />
           </div>
           <Select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm bg-white"
+            className="px-3 py-2 border rounded-md text-sm bg-white dark:bg-gray-900"
           >
             <option value="all">전체 상태</option>
             <option value="idle">대기</option>
@@ -336,20 +336,20 @@ export default function CollectSourcesPanel({
           size="xl"
         >
           {previewLoading ? (
-            <div className="flex items-center justify-center py-12 gap-2 text-gray-500">
+            <div className="flex items-center justify-center py-12 gap-2 text-gray-500 dark:text-gray-400">
               <Loader2 className="w-5 h-5 animate-spin" />
               <span>불러오는 중…</span>
             </div>
           ) : !previewData || previewData.preview.length === 0 ? (
-            <div className="py-12 text-center text-gray-400 text-sm">미리보기 데이터가 없습니다.</div>
+            <div className="py-12 text-center text-gray-400 dark:text-gray-300 text-sm">미리보기 데이터가 없습니다.</div>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center gap-4 text-xs text-gray-500">
-                <span>전체 수집 행: <strong className="text-gray-700">{previewData.rows_fetched.toLocaleString()}건</strong></span>
+              <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                <span>전체 수집 행: <strong className="text-gray-700 dark:text-gray-200">{previewData.rows_fetched.toLocaleString()}건</strong></span>
                 {previewData.finished_at && (
-                  <span>수집 일시: <strong className="text-gray-700">{new Date(previewData.finished_at).toLocaleString('ko-KR')}</strong></span>
+                  <span>수집 일시: <strong className="text-gray-700 dark:text-gray-200">{new Date(previewData.finished_at).toLocaleString('ko-KR')}</strong></span>
                 )}
-                <span className="text-gray-400">최대 20행 표시</span>
+                <span className="text-gray-400 dark:text-gray-300">최대 20행 표시</span>
               </div>
               <div className="overflow-auto max-h-[60vh] border rounded-md">
                 <table className="min-w-full text-xs">
@@ -367,7 +367,7 @@ export default function CollectSourcesPanel({
                       <tr key={i} className="border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50">
                         {Object.values(row).map((val, j) => (
                           <td key={j} className="px-3 py-1.5 text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[200px] overflow-hidden text-ellipsis">
-                            {val === null || val === undefined ? <span className="text-gray-300 italic">null</span> : String(val)}
+                            {val === null || val === undefined ? <span className="text-gray-300 dark:text-gray-600 italic">null</span> : String(val)}
                           </td>
                         ))}
                       </tr>

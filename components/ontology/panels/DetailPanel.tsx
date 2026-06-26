@@ -203,9 +203,9 @@ export default function DetailPanel({
                 {ancestors.slice(0, 8).map((a, i) => (
                   <li key={`${a.node.obj_id}-${i}`} className="flex items-center gap-2" style={{ paddingLeft: `${a.depth * 12}px` }}>
                     <span className="text-[10px] text-blue-400">←</span>
-                    <span className="text-[10px] text-gray-400 italic">{a.rel}</span>
+                    <span className="text-[10px] text-gray-400 dark:text-gray-300 italic">{a.rel}</span>
                     <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">{a.node.label}</span>
-                    <span className="text-[9px] text-gray-400">{a.node.obj_type}</span>
+                    <span className="text-[9px] text-gray-400 dark:text-gray-300">{a.node.obj_type}</span>
                   </li>
                 ))}
               </ul>
@@ -220,9 +220,9 @@ export default function DetailPanel({
                 {descendants.slice(0, 8).map((d, i) => (
                   <li key={`${d.node.obj_id}-${i}`} className="flex items-center gap-2" style={{ paddingLeft: `${d.depth * 12}px` }}>
                     <span className="text-[10px] text-emerald-400">→</span>
-                    <span className="text-[10px] text-gray-400 italic">{d.rel}</span>
+                    <span className="text-[10px] text-gray-400 dark:text-gray-300 italic">{d.rel}</span>
                     <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">{d.node.label}</span>
-                    <span className="text-[9px] text-gray-400">{d.node.obj_type}</span>
+                    <span className="text-[9px] text-gray-400 dark:text-gray-300">{d.node.obj_type}</span>
                   </li>
                 ))}
               </ul>
@@ -252,7 +252,7 @@ export default function DetailPanel({
             <Input
               value={editLabel}
               onChange={e => setEditLabel(e.target.value)}
-              className="w-full h-9 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -260,7 +260,7 @@ export default function DetailPanel({
             <Input
               value={editObjType}
               onChange={e => setEditObjType(e.target.value)}
-              className="w-full h-9 px-3 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -270,7 +270,7 @@ export default function DetailPanel({
               onChange={e => setEditProps(e.target.value)}
               rows={4}
               placeholder="key=value;key2=value2"
-              className="w-full px-3 py-2 text-xs font-mono bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-2 text-xs font-mono bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
           <div className="flex gap-2 pt-1">

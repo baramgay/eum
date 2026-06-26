@@ -162,7 +162,7 @@ export default function GraphToolbar({
             onKeyDown={handleKeyDown}
             placeholder="노드 검색..."
             disabled={nodes.length === 0}
-            className="w-40 pl-7 pr-7 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white disabled:bg-gray-100 disabled:text-gray-400"
+            className="w-40 pl-7 pr-7 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500"
             aria-label="그래프 노드 검색"
             aria-expanded={isOpen}
             aria-controls={isOpen ? 'graph-toolbar-search-list' : undefined}
@@ -214,7 +214,7 @@ export default function GraphToolbar({
         <Select
           value={layout}
           onChange={e => onLayoutChange(e.target.value as GraphLayoutType)}
-          className="text-xs px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+          className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900"
           aria-label="그래프 레이아웃 선택"
           title="레이아웃 방식을 선택합니다"
         >

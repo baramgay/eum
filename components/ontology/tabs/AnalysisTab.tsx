@@ -108,23 +108,23 @@ export default function AnalysisTab({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                 <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                   <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400">{graph.nodes.length}</div>
-                  <div className="text-[11px] text-gray-500 mt-0.5">노드</div>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">노드</div>
                 </div>
                 <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                   <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{graph.edges?.length ?? 0}</div>
-                  <div className="text-[11px] text-gray-500 mt-0.5">엣지</div>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">엣지</div>
                 </div>
                 <div className="text-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                   <div className="text-xl font-bold text-amber-600 dark:text-amber-400">
                     {new Set(graph.nodes.map(n => n.obj_type)).size}
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-0.5">노드 유형</div>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">노드 유형</div>
                 </div>
                 <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                   <div className="text-xl font-bold text-purple-600 dark:text-purple-400">
                     {new Set((graph.edges ?? []).map(e => e.rel)).size}
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-0.5">관계 유형</div>
+                  <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">관계 유형</div>
                 </div>
               </div>
               <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">노드 유형별 분포</div>
@@ -142,7 +142,7 @@ export default function AnalysisTab({
                           style={{ width: `${(count / graph.nodes.length) * 100}%` }}
                         />
                       </div>
-                      <span className="text-[11px] text-gray-500 w-6 text-right tabular-nums">{count}</span>
+                      <span className="text-[11px] text-gray-500 dark:text-gray-400 w-6 text-right tabular-nums">{count}</span>
                     </div>
                   ))}
               </div>

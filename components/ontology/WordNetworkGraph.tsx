@@ -218,18 +218,18 @@ export default function WordNetworkGraph({ nodes, edges, height = 440 }: Props) 
           <div className="flex items-center gap-1.5 mb-1">
             <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: TYPE_COLOR[hovered.type] }} />
             <span className="font-semibold text-gray-900 dark:text-gray-100">{hovered.text}</span>
-            <span className="text-gray-400 ml-auto">빈도 {hovered.freq}</span>
+            <span className="text-gray-400 dark:text-gray-300 ml-auto">빈도 {hovered.freq}</span>
           </div>
           {connectedWords.length > 0 && (
-            <div className="text-gray-500 leading-relaxed">
+            <div className="text-gray-500 dark:text-gray-400 leading-relaxed">
               연결: {connectedWords.slice(0, 6).join(' · ')}
-              {connectedWords.length > 6 && <span className="text-gray-400"> +{connectedWords.length - 6}</span>}
+              {connectedWords.length > 6 && <span className="text-gray-400 dark:text-gray-300"> +{connectedWords.length - 6}</span>}
             </div>
           )}
         </div>
       )}
 
-      <p className="mt-1.5 text-[10px] text-gray-400 text-right">드래그로 노드 이동 · 스크롤로 확대/축소</p>
+      <p className="mt-1.5 text-[10px] text-gray-400 dark:text-gray-300 text-right">드래그로 노드 이동 · 스크롤로 확대/축소</p>
     </div>
   )
 }

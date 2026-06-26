@@ -107,7 +107,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
               <Select
                 value={metric}
                 onChange={e => setMetric(e.target.value)}
-                className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
+                className="px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
               >
                 {METRICS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
               </Select>
@@ -120,7 +120,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
                 max={100}
                 value={top}
                 onChange={e => setTop(Number(e.target.value))}
-                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
+                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
               />
             </label>
           </div>
@@ -133,7 +133,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
               <Select
                 value={source}
                 onChange={e => setSource(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
               >
                 <option value="">선택</option>
                 {sggNodes.map(n => <option key={n.obj_id} value={n.obj_id}>{n.label}</option>)}
@@ -144,7 +144,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
               <Select
                 value={target}
                 onChange={e => setTarget(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
               >
                 <option value="">선택</option>
                 {sggNodes.map(n => <option key={n.obj_id} value={n.obj_id}>{n.label}</option>)}
@@ -160,7 +160,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
               <Select
                 value={nodeId}
                 onChange={e => setNodeId(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
+                className="flex-1 min-w-0 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
               >
                 <option value="">선택</option>
                 {nodes
@@ -177,7 +177,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
                 max={100}
                 value={top}
                 onChange={e => setTop(Number(e.target.value))}
-                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white"
+                className="w-20 px-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900"
               />
             </label>
           </div>
@@ -223,12 +223,12 @@ function BarRow({ label, subLabel, score, maxScore, rank, color = 'indigo' }: {
   return (
     <div className="flex items-center gap-2 py-1.5 border-b border-gray-50 dark:border-gray-800 last:border-0">
       {rank !== undefined && (
-        <span className="text-[11px] text-gray-400 w-5 text-right tabular-nums flex-shrink-0">{rank}</span>
+        <span className="text-[11px] text-gray-400 dark:text-gray-300 w-5 text-right tabular-nums flex-shrink-0">{rank}</span>
       )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-0.5">
           <span className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">{label}</span>
-          {subLabel && <span className="text-[10px] text-gray-400 flex-shrink-0">{subLabel}</span>}
+          {subLabel && <span className="text-[10px] text-gray-400 dark:text-gray-300 flex-shrink-0">{subLabel}</span>}
         </div>
         <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
           <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
@@ -302,11 +302,11 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{result.metric} 중심성</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">{METRIC_DESC[result.metric] ?? result.metric}</p>
+            <p className="text-[11px] text-gray-400 dark:text-gray-300 mt-0.5">{METRIC_DESC[result.metric] ?? result.metric}</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">상위 {result.results.length}개</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -338,13 +338,13 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">커뮤니티 탐지</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">
+            <p className="text-[11px] text-gray-400 dark:text-gray-300 mt-0.5">
               {result.communities.length}개 군집 · 평균 밀도 {avgDensity.toFixed(3)}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">노드 {total}개</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -366,8 +366,8 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
                   <div className={`h-full rounded-full ${col.bg}`} style={{ width: `${pct}%` }} />
                 </div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] text-gray-400">밀도 {Number(c.density).toFixed(3)}</span>
-                  <span className="text-[10px] text-gray-400">{(pct).toFixed(0)}% of max</span>
+                  <span className="text-[10px] text-gray-400 dark:text-gray-300">밀도 {Number(c.density).toFixed(3)}</span>
+                  <span className="text-[10px] text-gray-400 dark:text-gray-300">{(pct).toFixed(0)}% of max</span>
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {c.nodes.slice(0, 10).map(n => (
@@ -376,7 +376,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
                     </span>
                   ))}
                   {c.nodes.length > 10 && (
-                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] text-gray-400 bg-gray-50 dark:bg-gray-800">
+                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] text-gray-400 dark:text-gray-300 bg-gray-50 dark:bg-gray-800">
                       +{c.nodes.length - 10}
                     </span>
                   )}
@@ -393,7 +393,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
     if (!result.result) {
       return (
         <div className="text-center py-6">
-          <Route className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+          <Route className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
           <p className="text-sm text-gray-500 dark:text-gray-400">두 노드 사이에 경로가 없습니다.</p>
         </div>
       )
@@ -406,7 +406,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">{labels.length - 1}홉</Badge>
             <Badge variant="blue" size="sm">거리 {Number(distance).toFixed(3)}</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -415,19 +415,19 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
           {labels.map((label, i) => (
             <div key={i}>
               <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${i === 0 ? 'bg-indigo-500' : i === labels.length - 1 ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${i === 0 ? 'bg-indigo-500' : i === labels.length - 1 ? 'bg-emerald-500' : 'bg-gray-400 dark:bg-gray-500'}`} />
                 <span className={`text-xs font-medium px-2 py-1 rounded-lg ${
                   i === 0 ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
                   : i === labels.length - 1 ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
                   : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                 }`}>{label}</span>
-                {i === 0 && <span className="text-[10px] text-gray-400">출발</span>}
-                {i === labels.length - 1 && <span className="text-[10px] text-gray-400">도착</span>}
+                {i === 0 && <span className="text-[10px] text-gray-400 dark:text-gray-300">출발</span>}
+                {i === labels.length - 1 && <span className="text-[10px] text-gray-400 dark:text-gray-300">도착</span>}
               </div>
               {i < labels.length - 1 && pathEdges?.[i] && (
                 <div className="flex items-center gap-2 ml-1 my-0.5">
                   <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 ml-0.5" />
-                  <span className="text-[10px] text-gray-400 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] text-gray-400 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-1.5 py-0.5 rounded">
                     {pathEdges[i].rel} (w={pathEdges[i].weight})
                   </span>
                 </div>
@@ -448,11 +448,11 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
               유사 노드 — {nodeLabel(result.nodeId)}
             </p>
-            <p className="text-[11px] text-gray-400 mt-0.5">Jaccard 계수 기반</p>
+            <p className="text-[11px] text-gray-400 dark:text-gray-300 mt-0.5">Jaccard 계수 기반</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">{result.results.length}개</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -481,19 +481,19 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">이상탐지</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">Z-score ≥ 2.0 이상 노드</p>
+            <p className="text-[11px] text-gray-400 dark:text-gray-300 mt-0.5">Z-score ≥ 2.0 이상 노드</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">{result.results.length}개</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
         {result.results.length === 0 ? (
           <div className="text-center py-6">
-            <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-            <p className="text-xs text-gray-400">이상 노드가 감지되지 않았습니다.</p>
+            <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+            <p className="text-xs text-gray-400 dark:text-gray-300">이상 노드가 감지되지 않았습니다.</p>
           </div>
         ) : (
           <div className="max-h-72 overflow-y-auto space-y-2 px-1">
@@ -506,7 +506,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">{r.label}</span>
-                      <span className="text-[10px] text-gray-400 flex-shrink-0">{r.obj_type}</span>
+                      <span className="text-[10px] text-gray-400 dark:text-gray-300 flex-shrink-0">{r.obj_type}</span>
                     </div>
                     <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mb-1">
                       <div className={`h-full rounded-full ${severity}`} style={{ width: `${pct}%` }} />

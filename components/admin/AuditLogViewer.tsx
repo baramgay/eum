@@ -162,7 +162,7 @@ export default function AuditLogViewer() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="이메일·리소스 ID 검색"
-            className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -170,7 +170,7 @@ export default function AuditLogViewer() {
           <Select
             value={action}
             onChange={e => setAction(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
           >
             <option value="">모든 동작</option>
             {ACTIONS.map(a => (
@@ -180,7 +180,7 @@ export default function AuditLogViewer() {
           <Select
             value={resourceType}
             onChange={e => setResourceType(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
           >
             <option value="">모든 리소스</option>
             {RESOURCE_TYPES.map(t => (
@@ -233,7 +233,7 @@ export default function AuditLogViewer() {
                 <th className="px-4 py-2 text-left text-gray-600 dark:text-gray-400 font-medium">변경 요약</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {loading ? (
                 <SkeletonRows />
               ) : logs.length === 0 ? (
@@ -249,7 +249,7 @@ export default function AuditLogViewer() {
                 </tr>
               ) : (
                 logs.map(log => {
-                  const style = ACTION_LABELS[log.action] ?? { label: log.action, color: 'text-gray-700 bg-gray-100', icon: FileText }
+                  const style = ACTION_LABELS[log.action] ?? { label: log.action, color: 'text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800', icon: FileText }
                   const Icon = style.icon
                   return (
                     <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-950">

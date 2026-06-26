@@ -62,7 +62,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
           id="connector-type"
           value={type}
           onChange={e => handleTypeChange(e.target.value as ConnectorType)}
-          className="px-2 py-1 border rounded text-xs bg-white"
+          className="px-2 py-1 border rounded text-xs bg-white dark:bg-gray-900"
         >
           <option value="none">사용 안 함</option>
           <option value="postgres">PostgreSQL</option>
@@ -79,7 +79,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="pg-host"
               value={(value as Extract<ConnectorConfig, { type: 'postgres' }>).host}
               onChange={e => patch({ host: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
               placeholder="db.example.com"
             />
           </div>
@@ -90,7 +90,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               type="number"
               value={(value as Extract<ConnectorConfig, { type: 'postgres' }>).port}
               onChange={e => patch({ port: Number(e.target.value) })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             />
           </div>
           <div>
@@ -99,7 +99,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="pg-database"
               value={(value as Extract<ConnectorConfig, { type: 'postgres' }>).database}
               onChange={e => patch({ database: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             />
           </div>
           <div>
@@ -108,7 +108,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="pg-username"
               value={(value as Extract<ConnectorConfig, { type: 'postgres' }>).username}
               onChange={e => patch({ username: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             />
           </div>
           <div>
@@ -118,7 +118,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               type="password"
               value={(value as Extract<ConnectorConfig, { type: 'postgres' }>).password}
               onChange={e => patch({ password: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             />
           </div>
           <div className="flex items-center gap-2 h-full pt-5">
@@ -141,7 +141,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="sftp-host"
               value={(value as Extract<ConnectorConfig, { type: 'sftp' }>).host}
               onChange={e => patch({ host: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             />
           </div>
           <div>
@@ -151,7 +151,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               type="number"
               value={(value as Extract<ConnectorConfig, { type: 'sftp' }>).port}
               onChange={e => patch({ port: Number(e.target.value) })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             />
           </div>
           <div>
@@ -160,7 +160,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="sftp-username"
               value={(value as Extract<ConnectorConfig, { type: 'sftp' }>).username}
               onChange={e => patch({ username: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             />
           </div>
           <div>
@@ -169,7 +169,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="sftp-remotePath"
               value={(value as Extract<ConnectorConfig, { type: 'sftp' }>).remotePath}
               onChange={e => patch({ remotePath: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
               placeholder="/data/files"
             />
           </div>
@@ -180,7 +180,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               type="password"
               value={(value as Extract<ConnectorConfig, { type: 'sftp' }>).password ?? ''}
               onChange={e => patch({ password: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             />
           </div>
           <div className="md:col-span-2">
@@ -189,7 +189,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="sftp-privateKey"
               value={(value as Extract<ConnectorConfig, { type: 'sftp' }>).privateKey ?? ''}
               onChange={e => patch({ privateKey: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
               rows={3}
             />
           </div>
@@ -204,7 +204,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="api-url"
               value={(value as Extract<ConnectorConfig, { type: 'api' }>).url}
               onChange={e => patch({ url: e.target.value })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
               placeholder="https://api.example.com/data"
             />
           </div>
@@ -214,7 +214,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="api-method"
               value={(value as Extract<ConnectorConfig, { type: 'api' }>).method}
               onChange={e => patch({ method: e.target.value as 'GET' | 'POST' })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             >
               <option value="GET">GET</option>
               <option value="POST">POST</option>
@@ -226,7 +226,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
               id="api-authType"
               value={(value as Extract<ConnectorConfig, { type: 'api' }>).authType}
               onChange={e => patch({ authType: e.target.value as 'none' | 'bearer' | 'api_key' })}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
             >
               <option value="none">없음</option>
               <option value="bearer">Bearer</option>
@@ -240,7 +240,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
                 id="api-authKey"
                 value={(value as Extract<ConnectorConfig, { type: 'api' }>).authKey ?? ''}
                 onChange={e => patch({ authKey: e.target.value })}
-                className="bg-white"
+                className="bg-white dark:bg-gray-900"
               />
             </div>
           )}
@@ -252,7 +252,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
                 type="password"
                 value={(value as Extract<ConnectorConfig, { type: 'api' }>).authValue ?? ''}
                 onChange={e => patch({ authValue: e.target.value })}
-                className="bg-white"
+                className="bg-white dark:bg-gray-900"
               />
             </div>
           )}
@@ -266,7 +266,7 @@ export default function ConnectorForm({ value, onChange }: Props) {
                   patch({ headers: JSON.parse(e.target.value) })
                 } catch {}
               }}
-              className="bg-white"
+              className="bg-white dark:bg-gray-900"
               rows={2}
             />
           </div>

@@ -200,7 +200,7 @@ function SqlQueryPanel() {
             onChange={e => update({ question: e.target.value })}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && generate()}
             placeholder="예: datasets 테이블에서 최근 10개 항목 보여줘"
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white"
+            className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white dark:bg-gray-900"
             aria-label="자연어 질문 입력"
           />
         </div>
@@ -234,7 +234,7 @@ function SqlQueryPanel() {
         <Card className="!p-0 overflow-hidden">
           <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-950 border-b flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Code2 className="w-4 h-4 text-gray-500" />
+              <Code2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">생성된 SQL</span>
               {state.explanation && (
                 <span className="text-xs text-gray-400 dark:text-gray-300 truncate max-w-[280px]">
@@ -264,7 +264,7 @@ function SqlQueryPanel() {
             onChange={e => update({ editedSql: e.target.value })}
             rows={Math.max(3, Math.min(state.editedSql.split('\n').length + 1, 10))}
             spellCheck={false}
-            className="w-full px-4 py-3 font-mono text-xs bg-white text-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-400"
+            className="w-full px-4 py-3 font-mono text-xs bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 resize-none focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-400"
             aria-label="SQL 편집기"
           />
         </Card>
@@ -274,7 +274,7 @@ function SqlQueryPanel() {
       {state.phase === 'executed' && (
         <Card className="!p-0 overflow-hidden">
           <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-950 border-b flex items-center gap-2">
-            <Table2 className="w-4 h-4 text-gray-500" />
+            <Table2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">결과</span>
             <span className="text-xs text-gray-400 dark:text-gray-300">{state.rowCount}행</span>
           </div>
@@ -639,7 +639,7 @@ function ResultCard({
                 <Select
                   value={chartCol}
                   onChange={e => setChartCol(e.target.value)}
-                  className="text-xs border rounded px-2 py-1 text-gray-600 bg-white"
+                  className="text-xs border rounded px-2 py-1 text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900"
                 >
                   {numericCols.map(c => <option key={c} value={c}>{c}</option>)}
                 </Select>
@@ -1156,7 +1156,7 @@ export default function AiQueryClient() {
               value={sidebarSearch}
               onChange={e => setSidebarSearch(e.target.value)}
               placeholder="대화 검색..."
-              className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
             />
             {sidebarSearch && (
               <button
@@ -1448,7 +1448,7 @@ export default function AiQueryClient() {
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && ask(query)}
                 placeholder="예: 청년 정착잠재 순위 보여줘"
-                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
               />
             </div>
             <Btn
