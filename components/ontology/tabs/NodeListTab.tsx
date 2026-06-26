@@ -107,7 +107,7 @@ function TypeChip({
       {type}
       <span
         className={`text-[10px] px-1.5 py-0 rounded-full ${
-          active ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+          active ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
         }`}
       >
         {count}

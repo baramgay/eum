@@ -110,7 +110,7 @@ export default function CollectSchedulesPanel({ sources, loading, updatingSource
                       value={src.job?.schedule_type ?? 'manual'}
                       onChange={e => handleScheduleChange(src.source_id, e.target.value)}
                       disabled={updatingSourceId === src.source_id}
-                      className="px-2 py-1 border rounded-md text-xs disabled:bg-gray-100 disabled:text-gray-400"
+                      className="px-2 py-1 border rounded-md text-xs disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100"
                     >
                       <option value="manual">수동</option>
                       <option value="daily">매일 자정</option>

@@ -173,7 +173,7 @@ export default function OverviewTab({
                   {topNode && (
                     <div className="flex justify-between">
                       <dt className="text-gray-500 dark:text-gray-400">최다 연결 노드</dt>
-                      <dd className="font-medium text-right">{topNode.label} <span className="text-gray-400">({sortedByDeg[0][1]})</span></dd>
+                      <dd className="font-medium text-right">{topNode.label} <span className="text-gray-400 dark:text-gray-300">({sortedByDeg[0][1]})</span></dd>
                     </div>
                   )}
                 </>

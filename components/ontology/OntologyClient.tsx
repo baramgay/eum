@@ -255,7 +255,7 @@ export default function OntologyClient() {
           <Select
             value={sgg}
             onChange={e => setSgg(e.target.value)}
-            className="w-48 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            className="w-48 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-900"
             aria-label="시군 선택"
           >
             <option value="">전체 시군</option>

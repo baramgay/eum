@@ -538,7 +538,7 @@ export default function ReportClient({ role }: Props) {
           <div className="flex items-center justify-between print:hidden">
             <h2 className="text-base font-semibold text-gray-800 dark:text-gray-200">삽입된 분석 결과</h2>
             <div className="flex items-center gap-2">
-              {saving && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+              {saving && <Loader2 className="w-4 h-4 animate-spin text-gray-400 dark:text-gray-300" />}
               {!saving && saveStatus === 'saved' && (
                 <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                   <CheckCircle className="w-3.5 h-3.5" /> 저장됨

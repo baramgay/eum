@@ -69,7 +69,7 @@ export default function ScenarioSelector({ onSelect, onFreeExplore, loading }: S
               </div>
 
               <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
-                <span className="text-[11px] text-gray-400">노드 {s.nodeCount} · 엣지 {s.edgeCount}</span>
+                <span className="text-[11px] text-gray-400 dark:text-gray-500">노드 {s.nodeCount} · 엣지 {s.edgeCount}</span>
                 <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform">
                   시작하기 →
                 </span>

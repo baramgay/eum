@@ -430,7 +430,7 @@ export default function CollectClient({ role, tenantId }: Props) {
               <div className="flex items-center justify-between">
                 <p className="text-xs text-blue-600 dark:text-blue-400">{sseProgress.label}</p>
                 {sseProgress.total != null && (
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 dark:text-gray-300">
                     {Math.min(100, Math.round((sseProgress.fetched / sseProgress.total) * 100))}%
                   </p>
                 )}

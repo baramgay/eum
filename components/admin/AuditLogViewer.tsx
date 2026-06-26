@@ -193,14 +193,14 @@ export default function AuditLogViewer() {
             type="date"
             value={from}
             onChange={e => setFrom(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
           />
           <span className="text-gray-400 dark:text-gray-300">~</span>
           <Input
             type="date"
             value={to}
             onChange={e => setTo(e.target.value)}
-            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
           />
         </div>
         {isFiltered && (

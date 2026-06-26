@@ -198,7 +198,7 @@ export default function LineageWidget() {
       )}
 
       {isEmpty && (
-        <p className="text-sm text-gray-400 py-8 text-center">계보 데이터가 없습니다</p>
+        <p className="text-sm text-gray-400 dark:text-gray-300 py-8 text-center">계보 데이터가 없습니다</p>
       )}
 
       {!loading && !error && !isEmpty && (

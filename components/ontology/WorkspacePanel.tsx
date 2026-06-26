@@ -145,7 +145,7 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
                   <Input
                     value={editName}
                     onChange={e => setEditName(e.target.value)}
-                    className="flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded-md text-sm bg-white"
+                    className="flex-1 min-w-0 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-900 dark:text-gray-100"
                     onKeyDown={e => {
                       if (e.key === 'Enter') handleRename(ws.id)
                       if (e.key === 'Escape') cancelEdit()
