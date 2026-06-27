@@ -1,9 +1,36 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { answer } from '@/lib/nlquery'
+import type { QueryResult } from '@/lib/nlquery'
 import { normalizeContext } from '@/lib/nlquery/context'
 import type { ConversationTurn } from '@/lib/nlquery/context'
 import { unstable_cache } from 'next/cache'
+import { chatCompletionGateway } from '@/lib/ai/gateway'
+import { checkQuota, recordUsage } from '@/lib/ai/quotas'
+
+async function addExplanation(result: QueryResult, userId: string, supabase: Awaited<ReturnType<typeof createClient>>): Promise<QueryResult & { explanation?: string }> {
+  const quota = await checkQuota(userId, supabase)
+  if (!quota.allowed) return result
+
+  const tableText = [
+    result.columns.join(' | '),
+    ...result.rows.slice(0, 10).map((r) => result.columns.map((c) => String(r[c] ?? '')).join(' | ')),
+  ].join('\n')
+
+  const prompt = `다음은 데이터 질의 결과입니다. 주요 인사이트를 한국어로 2~3문장으로 간결하게 요약해 주세요.\n\n${tableText}`
+
+  try {
+    const { content } = await chatCompletionGateway({
+      messages: [{ role: 'user', content: prompt }],
+      userId,
+      maxTokens: 256,
+    })
+    await recordUsage(userId, supabase, { calls: 1 })
+    return { ...result, explanation: content }
+  } catch {
+    return result
+  }
+}
 
 // tenants는 사용자별 데이터가 아니므로 Service Role 클라이언트를 사용해
 // unstable_cache 콜백 내에서 Dynamic data source(cookies)에 접근하지 않는다.
@@ -20,6 +47,7 @@ const getCachedTenants = unstable_cache(
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const q = searchParams.get('q') ?? ''
+  const explain = searchParams.get('explain') === '1'
   if (!q.trim()) {
     return NextResponse.json({ error: 'q 파라미터가 필요합니다' }, { status: 400 })
   }
@@ -29,7 +57,11 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: '인증되지 않았습니다' }, { status: 401 })
   }
   const tenants = await getCachedTenants()
-  return NextResponse.json(await answer(supabase, q, [], { tenants }))
+  const result = await answer(supabase, q, [], { tenants })
+  if (explain && result.rows?.length > 0) {
+    return NextResponse.json(await addExplanation(result, user.id, supabase))
+  }
+  return NextResponse.json(result)
 }
 
 export async function POST(req: Request) {
@@ -39,7 +71,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '인증되지 않았습니다' }, { status: 401 })
   }
 
-  let body: { q?: string; context?: (string | ConversationTurn)[] } = {}
+  let body: { q?: string; context?: (string | ConversationTurn)[]; explain?: boolean } = {}
   try {
     body = await req.json()
   } catch {
@@ -53,5 +85,9 @@ export async function POST(req: Request) {
 
   const context = normalizeContext(body.context)
   const tenants = await getCachedTenants()
-  return NextResponse.json(await answer(supabase, q, context, { tenants }))
+  const result = await answer(supabase, q, context, { tenants })
+  if (body.explain && result.rows?.length > 0) {
+    return NextResponse.json(await addExplanation(result, user.id, supabase))
+  }
+  return NextResponse.json(result)
 }

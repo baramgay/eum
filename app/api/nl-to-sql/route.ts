@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { generateSql, validateSql, ensureLimit, buildWhitelist } from '@/lib/ai/nl-to-sql'
+import { generateSql, validateSqlAst, validateSql, ensureLimit, buildWhitelist } from '@/lib/ai/nl-to-sql'
 import { SlidingWindowRateLimiter } from '@/lib/rate-limit'
 
 const limiter = new SlidingWindowRateLimiter(60_000, 20)
@@ -44,6 +44,25 @@ async function logQuery(
   }
 }
 
+function runSelectSqlSafe(
+  supabase: Awaited<ReturnType<typeof createServiceClient>>,
+  sql: string,
+) {
+  return supabase.rpc('run_select_sql_safe', { p_sql: sql })
+}
+
+async function validateUserSql(sql: string, whitelist: { tables: string[]; columns: Record<string, string[]> }) {
+  const ast = validateSqlAst(sql, whitelist)
+  if (ast.ok) return ast
+
+  // AST 파싱 실패 시 정규식 폭포
+  if (ast.reason?.startsWith('AST 파싱 실패')) {
+    return validateSql(sql, whitelist)
+  }
+
+  return ast
+}
+
 export async function POST(req: NextRequest) {
   // 인증 확인
   const authClient = await createClient()
@@ -82,17 +101,17 @@ export async function POST(req: NextRequest) {
 
   const supabase = await createServiceClient()
 
-  // 사용자가 직접 편집한 SQL이 들어온 경우: 생성 단계 건너뜀
+  // 사용자가 직접 편집한 SQL이 들어온 경우: 생성 단계 걱뜀
   if (body.sql?.trim()) {
     const userSql = ensureLimit(body.sql.trim())
     const whitelist = await buildWhitelist(supabase)
-    const validation = validateSql(userSql, whitelist)
+    const validation = await validateUserSql(userSql, whitelist)
     if (!validation.ok) {
       await logQuery(supabase, { user_id: user.id, question, sql: userSql, success: false, error_msg: validation.reason })
       return NextResponse.json({ error: validation.reason ?? 'SQL 검증 실패' }, { status: 400 })
     }
 
-    const { data, error } = await supabase.rpc('run_select_sql', { p_sql: userSql })
+    const { data, error } = await runSelectSqlSafe(supabase, userSql)
     const rows: Record<string, unknown>[] = Array.isArray(data) ? data : []
     const columns = rows.length > 0 ? Object.keys(rows[0]) : []
 
@@ -119,18 +138,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(response)
   }
 
-  // NL → SQL 생성
-  const generated = await generateSql(supabase, question)
-  if (!generated) {
-    await logQuery(supabase, { user_id: user.id, question, sql: '', success: false, error_msg: 'SQL 생성 실패' })
+  // NL → SQL 생성 (자동 교정 포함)
+  const generated = await generateSql(supabase, question, {
+    execute: async (sql) => {
+      const { data, error } = await runSelectSqlSafe(supabase, sql)
+      return { data: data ?? undefined, error: error ? { message: error.message } : undefined }
+    },
+    maxRetries: 2,
+  })
+
+  if (!generated || !generated.sql) {
+    await logQuery(supabase, { user_id: user.id, question, sql: generated?.sql ?? '', success: false, error_msg: generated?.explanation ?? 'SQL 생성 실패' })
     return NextResponse.json(
-      { error: 'SQL을 생성할 수 없습니다. 질문을 구체적으로 입력해 주세요.' },
+      { error: generated?.explanation ?? 'SQL을 생성할 수 없습니다. 질문을 구체적으로 입력해 주세요.' },
       { status: 422 },
     )
   }
 
   // 생성된 SQL 실행
-  const { data, error } = await supabase.rpc('run_select_sql', { p_sql: generated.sql })
+  const { data, error } = await runSelectSqlSafe(supabase, generated.sql)
   const rows: Record<string, unknown>[] = Array.isArray(data) ? data : []
   const columns = rows.length > 0 ? Object.keys(rows[0]) : []
 

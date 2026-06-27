@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import dynamic from 'next/dynamic'
 import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import RealtimeProvider from '@/components/realtime/RealtimeProvider'
 import './globals.css'
+
+const GuideChatbot = dynamic(() => import('@/components/common/GuideChatbot'), { ssr: false })
 
 const pretendard = localFont({
   src: [
@@ -57,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div id="main-content" tabIndex={-1} className="outline-none">
               {children}
             </div>
+            <GuideChatbot />
           </RealtimeProvider>
           <Toaster
             position="bottom-right"

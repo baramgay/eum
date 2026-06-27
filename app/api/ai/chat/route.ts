@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { answer, type QueryResult } from '@/lib/nlquery'
 import { retrieveContext, type RetrievedSource } from '@/lib/ai/retriever'
+import { enrichSources } from '@/lib/ai/context-builder'
 import { buildSystemPrompt } from '@/lib/ai/prompts'
 import { scoreAction } from '@/lib/ontology/core'
-import { chatCompletion, type ChatMessage, type ToolCall } from '@/lib/ai/provider'
+import { chatCompletionGateway, type ChatMessage, type ToolCall } from '@/lib/ai/gateway'
+import { generateTraceId } from '@/lib/ai/tracing'
+import { checkQuota, recordUsage } from '@/lib/ai/quotas'
+import { sanitizeForLlm, sanitizeOutput } from '@/lib/ai/safety'
 import { buildDynamicTools } from '@/lib/ai/tools'
 import { generateSql } from '@/lib/ai/nl-to-sql'
 import { SlidingWindowRateLimiter } from '@/lib/rate-limit'
@@ -12,24 +16,17 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 const limiter = new SlidingWindowRateLimiter(60_000, 10)
 
-const SENSITIVE_PATTERNS = [
-  /\b(주민등록번호|주민번호|rrn|resident registration)\b/i,
-  /\b(신용카드|카드번호|계좌번호|cvv|cvc)\b/i,
-  /\b(비밀번호|password|passwd)\b/i,
-  /\b(api[_-]?key|secret[_-]?key|private[_-]?key|access[_-]?token)\b/i,
-  /\b(ssn|social security)\b/i,
-]
-
-function containsSensitive(text: string): boolean {
-  return SENSITIVE_PATTERNS.some((p) => p.test(text))
-}
-
 function safeJsonParse<T>(text: string): T | null {
   try {
     return JSON.parse(text) as T
   } catch {
     return null
   }
+}
+
+function buildTitle(text: string): string {
+  const trimmed = text.trim()
+  return trimmed.length > 22 ? trimmed.slice(0, 22) + '…' : trimmed
 }
 
 async function executeToolCall(
@@ -169,13 +166,98 @@ async function callLlm(
   messages: ChatMessage[],
   tools: unknown[],
   userId: string,
+  traceId: string,
 ): Promise<{ content: string; tool_calls?: ToolCall[]; model?: string }> {
-  return chatCompletion({
+  return chatCompletionGateway({
     messages,
     tools,
     tool_choice: 'auto',
     userId,
+    traceId,
   })
+}
+
+interface ChatBody {
+  messages?: ChatMessage[]
+  conversation_id?: string
+}
+
+async function loadConversationMessages(
+  supabase: SupabaseClient,
+  conversationId: string,
+  userId: string,
+): Promise<ChatMessage[]> {
+  const { data: conv } = await supabase
+    .from('conversations')
+    .select('id')
+    .eq('id', conversationId)
+    .eq('user_id', userId)
+    .single()
+
+  if (!conv) return []
+
+  const { data: rows } = await supabase
+    .from('conversation_messages')
+    .select('role,content,tool_calls')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true })
+
+  return (rows ?? []).map((r) => ({
+    role: r.role as ChatMessage['role'],
+    content: r.content ?? '',
+    tool_calls: r.tool_calls,
+  }))
+}
+
+async function upsertConversation(
+  supabase: SupabaseClient,
+  userId: string,
+  conversationId: string | undefined,
+  messages: ChatMessage[],
+): Promise<string | undefined> {
+  const firstUser = messages.find((m) => m.role === 'user')
+  const title = firstUser ? buildTitle(firstUser.content) : '새 대화'
+
+  if (conversationId) {
+    const { data: existing } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('id', conversationId)
+      .eq('user_id', userId)
+      .single()
+
+    if (existing) {
+      await supabase
+        .from('conversations')
+        .update({ title, updated_at: new Date().toISOString() })
+        .eq('id', conversationId)
+      return conversationId
+    }
+  }
+
+  const { data: created } = await supabase
+    .from('conversations')
+    .insert({ user_id: userId, title })
+    .select('id')
+    .single()
+
+  return created?.id ?? undefined
+}
+
+async function saveMessages(
+  supabase: SupabaseClient,
+  conversationId: string,
+  messages: ChatMessage[],
+): Promise<void> {
+  if (messages.length === 0) return
+  await supabase.from('conversation_messages').insert(
+    messages.map((m) => ({
+      conversation_id: conversationId,
+      role: m.role,
+      content: m.content,
+      tool_calls: m.tool_calls ?? null,
+    })),
+  )
 }
 
 export async function POST(req: NextRequest) {
@@ -201,39 +283,70 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let body: { messages?: ChatMessage[] } = {}
+  let body: ChatBody = {}
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'JSON 본문을 파싱할 수 없습니다' }, { status: 400 })
   }
 
-  const messages = (body.messages ?? []).filter(
+  const clientMessages = (body.messages ?? []).filter(
     (m): m is ChatMessage =>
-      !!m && (m.role === 'user' || m.role === 'assistant' || m.role === 'system'),
+      !!m && (m.role === 'user' || m.role === 'assistant' || m.role === 'system' || m.role === 'tool'),
   )
-  const lastUser = [...messages].reverse().find((m) => m.role === 'user')
+  const lastUser = [...clientMessages].reverse().find((m) => m.role === 'user')
   if (!lastUser) {
     return NextResponse.json({ error: '사용자 메시지가 필요합니다' }, { status: 400 })
   }
 
-  // 프롬프트 가드: 민감 키워드 차단
-  if (containsSensitive(lastUser.content)) {
+  // 안전 레이어: 민감정보 마스킹 + 프롬프트 인젝션 탐지
+  const { sanitized: sanitizedUserContent, injection } = sanitizeForLlm(lastUser.content)
+  if (injection) {
     return NextResponse.json(
-      { error: '민감한 정보가 포함된 질문은 처리할 수 없습니다.' },
+      { error: '부적절한 프롬프트가 감지되어 처리할 수 없습니다.' },
       { status: 400 },
     )
   }
 
   const supabase = await createServiceClient()
+
+  // LLM 사용량 할당량 확인
+  const quota = await checkQuota(user.id, supabase)
+  if (!quota.allowed) {
+    return NextResponse.json({ error: quota.reason }, { status: 429 })
+  }
+
+  const traceId = generateTraceId()
+
+  // 서버 측 대화 기록 로드 및 병합
+  let conversationId: string | null | undefined = body.conversation_id
+  const serverMessages = conversationId
+    ? await loadConversationMessages(supabase, conversationId, user.id)
+    : []
+
+  const conversationMessages = serverMessages.length > 0
+    ? [...serverMessages, { ...lastUser, content: sanitizedUserContent }]
+    : clientMessages.map((m) =>
+        m.role === 'user' && m === lastUser ? { ...m, content: sanitizedUserContent } : m,
+      )
+
+  conversationId = await upsertConversation(supabase, user.id, conversationId, conversationMessages)
+
   const [sources, tools] = await Promise.all([
-    retrieveContext(supabase, lastUser.content, 6),
+    retrieveContext(supabase, sanitizedUserContent, 6),
     buildDynamicTools(supabase),
   ])
-  const systemPrompt = buildSystemPrompt(sources)
+  const enrichedSources = await enrichSources(supabase, sources)
+  const systemPrompt = buildSystemPrompt(enrichedSources)
 
   try {
-    const first = await callLlm([{ role: 'system', content: systemPrompt }, ...messages], tools, user.id)
+    const first = await callLlm(
+      [{ role: 'system', content: systemPrompt }, ...conversationMessages],
+      tools,
+      user.id,
+      traceId,
+    )
+    await recordUsage(user.id, supabase, { calls: 1 })
     let assistantContent = first.content ?? ''
     let toolResult: QueryResult | undefined
 
@@ -254,21 +367,44 @@ export async function POST(req: NextRequest) {
       const second = await callLlm(
         [
           { role: 'system', content: systemPrompt },
-          ...messages,
+          ...conversationMessages,
           { role: 'assistant', content: assistantContent, tool_calls: first.tool_calls },
           ...toolMessages,
         ],
         tools,
         user.id,
+        traceId,
       )
+      await recordUsage(user.id, supabase, { calls: 1 })
       assistantContent = second.content ?? assistantContent
     }
 
+    const { sanitized: sanitizedOutput, toxic } = sanitizeOutput(assistantContent)
+    if (toxic) {
+      return NextResponse.json(
+        { error: '부적절한 응답이 생성되어 반환할 수 없습니다.' },
+        { status: 500 },
+      )
+    }
+
+    // 대화 메시지 저장
+    if (conversationId) {
+      await saveMessages(supabase, conversationId, [
+        { role: 'user', content: sanitizedUserContent },
+        { role: 'assistant', content: sanitizedOutput, tool_calls: first.tool_calls },
+      ])
+      await supabase
+        .from('conversations')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', conversationId)
+    }
+
     return NextResponse.json({
-      content: assistantContent,
+      content: sanitizedOutput,
       result: toolResult,
-      sources,
+      sources: enrichedSources,
       model: first.model,
+      conversation_id: conversationId,
     })
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 })

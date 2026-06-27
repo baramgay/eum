@@ -7,11 +7,8 @@ import type { OntologyNode } from '@/lib/ontology-utils'
 import type { RelatedDataset } from './useOntologyData'
 
 async function fetchRelatedDatasets(node: OntologyNode): Promise<RelatedDataset[]> {
-  const params = new URLSearchParams()
-  params.set('label', node.label)
-  params.set('type', node.obj_type)
-  const data = await apiClient<RelatedDataset[]>(`/api/ontology/datasets?${params}`)
-  return Array.isArray(data) ? data : []
+  const data = await apiClient<{ datasets: RelatedDataset[] }>(`/api/ontology/nodes/${encodeURIComponent(node.obj_id)}/datasets`)
+  return Array.isArray(data?.datasets) ? data.datasets : []
 }
 
 export function useRelatedDatasets(selectedNode: OntologyNode | null) {

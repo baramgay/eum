@@ -23,6 +23,7 @@ import PopulationTrendWidget from './widgets/PopulationTrendWidget'
 import SettlementRankWidget from './widgets/SettlementRankWidget'
 import DataUsageWidget from './widgets/DataUsageWidget'
 import LineageWidget from './widgets/LineageWidget'
+import GovernanceWidget from './widgets/GovernanceWidget'
 
 export interface AreaScore { name: string; score: number; color: string; weight: number }
 export interface CollectionTrendRow {
@@ -145,6 +146,27 @@ export function timeAgo(isoStr: string) {
   return `${Math.floor(h / 24)}일 전`
 }
 
+async function parseApiResponse<T>(res: Response): Promise<T> {
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!contentType.includes('application/json')) {
+    if (res.status === 401) {
+      return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'))
+    }
+    return Promise.reject(new Error(`서버에서 예상치 못한 응답을 받았습니다 (${res.status}).`))
+  }
+  const data = await res.json()
+  if (!res.ok) {
+    return Promise.reject(new Error(data?.error ?? `요청 실패 (${res.status})`))
+  }
+  return data as T
+}
+
+function safeJson<T>(res: Response, fallback: T): Promise<T> {
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!contentType.includes('application/json')) return Promise.resolve(fallback)
+  return res.json().catch(() => fallback)
+}
+
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <Card>
@@ -194,9 +216,9 @@ export default function DashboardClient() {
     setLoading(true)
     setError(null)
     Promise.all([
-      fetch('/api/overview').then(r => r.ok ? r.json() : r.json().then(e => Promise.reject(e))),
-      fetch('/api/charts').then(r => r.ok ? r.json() : r.json().then(e => Promise.reject(e))),
-      fetch('/api/settlement').then(r => r.ok ? r.json() : r.json().then(e => Promise.reject(e))),
+      fetch('/api/overview').then(parseApiResponse<Indicators>),
+      fetch('/api/charts').then(parseApiResponse<ChartData>),
+      fetch('/api/settlement').then(parseApiResponse<SettlementRow[]>),
     ]).then(([ov, ch, si]) => {
       setData(ov)
       setCharts(ch)
@@ -204,14 +226,19 @@ export default function DashboardClient() {
       setLoading(false)
     }).catch(err => {
       console.error('[Dashboard] 데이터 로드 오류:', err)
-      setError(err?.message ?? '데이터를 불러올 수 없습니다.')
+      const message = err?.message ?? '데이터를 불러올 수 없습니다.'
+      if (typeof window !== 'undefined' && message.includes('세션이 만료')) {
+        window.location.href = '/login'
+        return
+      }
+      setError(message)
       setLoading(false)
     })
   }, [])
 
   const refreshRecentRuns = useCallback(() => {
     fetch('/api/analytics/runs?limit=5')
-      .then(r => r.ok ? r.json() : [])
+      .then(r => r.ok ? safeJson<AnalysisRun[]>(r, []) : [])
       .then(d => setRecentRuns(Array.isArray(d) ? d : []))
       .catch(() => {})
   }, [])
@@ -247,7 +274,7 @@ export default function DashboardClient() {
 
   useEffect(() => {
     fetch('/api/quality')
-      .then(r => r.ok ? r.json() : [])
+      .then(r => r.ok ? safeJson<QualitySummary[]>(r, []) : [])
       .then((results: QualitySummary[]) => {
         if (!Array.isArray(results) || results.length === 0) return
         const dims: Record<string, { violations: number; hasRules: boolean }> = {
@@ -333,6 +360,8 @@ export default function DashboardClient() {
       {settlement.length > 0 && <SettlementRankWidget settlement={settlement} />}
 
       <DataUsageWidget />
+
+      <GovernanceWidget />
 
       <div className="col-span-full">
         <LineageWidget />

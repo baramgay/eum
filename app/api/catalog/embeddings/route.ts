@@ -4,7 +4,7 @@ import { getEmbedding } from '@/lib/ai/embeddings'
 
 export const runtime = 'nodejs'
 
-export async function POST(_req: NextRequest) {
+export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.user_metadata?.role !== 'center') {
@@ -20,46 +20,51 @@ export async function POST(_req: NextRequest) {
     )
   }
 
-  const { data: rows, error } = await supabase
+  let datasetIds: string[] = []
+  try {
+    const body = await req.json()
+    if (Array.isArray(body.datasetIds)) {
+      datasetIds = body.datasetIds.filter((id: unknown) => typeof id === 'string')
+    }
+  } catch {
+    // body가 없으면 전체 ai_ready 데이터셋 대상
+  }
+
+  let query = supabase
     .from('catalog')
-    .select('dataset_id,title,description,theme,keywords')
+    .select('dataset_id')
     .eq('ai_ready', true)
 
+  if (datasetIds.length > 0) {
+    query = query.in('dataset_id', datasetIds)
+  }
+
+  const { data: rows, error } = await query
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  let updated = 0
-  let failed = 0
-
+  const jobs: { id: string; dataset_id: string }[] = []
   for (const r of rows ?? []) {
-    const text = [r.title, r.theme, r.keywords, r.description].filter(Boolean).join(' ')
-    const vec = await getEmbedding(text)
-    if (!vec) {
-      failed++
+    const { data: upsert, error: upsertErr } = await supabase
+      .from('embedding_jobs')
+      .upsert(
+        { dataset_id: r.dataset_id, status: 'pending', attempts: 0, error: null },
+        { onConflict: 'dataset_id' },
+      )
+      .select('id,dataset_id')
+      .single()
+
+    if (upsertErr) {
+      // eslint-disable-next-line no-console
+      console.error('[embeddings] enqueue failed:', upsertErr.message)
       continue
     }
-
-    const { error: upErr } = await supabase
-      .from('catalog')
-      .update({
-        description_embedding: vec,
-        embedding_model: 'text-embedding-v3',
-      })
-      .eq('dataset_id', r.dataset_id)
-
-    if (upErr) {
-      // eslint-disable-next-line no-console
-      console.error('[embeddings] update failed:', upErr.message)
-      failed++
-    } else {
-      updated++
-    }
+    if (upsert) jobs.push(upsert)
   }
 
   return NextResponse.json({
-    total: rows?.length ?? 0,
-    updated,
-    failed,
+    jobIds: jobs.map((j) => j.id),
+    count: jobs.length,
   })
 }

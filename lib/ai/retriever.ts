@@ -6,6 +6,7 @@ export interface RetrievedSource {
   title: string
   snippet: string
   url?: string
+  details?: string
 }
 
 interface MatchCatalogRow {
@@ -18,15 +19,73 @@ interface MatchCatalogRow {
   similarity: number
 }
 
+interface SearchResult {
+  key: string
+  source: 'catalog' | 'ontology'
+  title: string
+  snippet: string
+  url?: string
+}
+
+const RRF_K = 60
+
+function makeCatalogSource(r: MatchCatalogRow | Record<string, unknown>): SearchResult {
+  const id = String(r.dataset_id ?? '')
+  return {
+    key: `catalog:${id}`,
+    source: 'catalog',
+    title: (r.title as string | null) ?? id,
+    snippet: [r.theme, r.keywords, r.description].filter(Boolean).join(' | '),
+    url: id ? `/catalog/${id}` : undefined,
+  }
+}
+
+function makeOntologySource(r: Record<string, unknown>): SearchResult {
+  const id = String(r.obj_id ?? '')
+  return {
+    key: `ontology:${id}`,
+    source: 'ontology',
+    title: (r.label as string | null) ?? id,
+    snippet: `유형=${r.obj_type}${r.props ? ` | ${r.props}` : ''}`,
+    url: id ? `/ontology?node=${encodeURIComponent(id)}` : undefined,
+  }
+}
+
+/**
+ * Reciprocal Rank Fusion: 여러 순위 리스트를 하나의 점수로 결합한다.
+ * score = Σ 1 / (k + rank), k = 60
+ */
+export function fuseRrf(lists: SearchResult[][], k = RRF_K): SearchResult[] {
+  const scored = new Map<string, { score: number; result: SearchResult }>()
+
+  for (const list of lists) {
+    list.forEach((item, idx) => {
+      const rank = idx + 1
+      const existing = scored.get(item.key)
+      const add = 1 / (k + rank)
+      if (existing) {
+        existing.score += add
+      } else {
+        scored.set(item.key, { score: add, result: item })
+      }
+    })
+  }
+
+  return Array.from(scored.values())
+    .sort((a, b) => b.score - a.score)
+    .map((x) => x.result)
+}
+
 /**
  * 사용자 질문과 관련된 카탈로그/온톨로지 컨텍스트를 검색한다.
  *
  * - catalog:
  *   1) pgvector 유사도 검색 (임베딩 API 사용 가능 시)
  *   2) 키워드 ILIKE 폭로 (항상 수행)
+ *   - 두 결과는 RRF(Reciprocal Rank Fusion)로 융합된다.
  * - onto_objects: label, obj_type, props
  *
- * 반환 항목은 source, title, snippet, url(선택) 을 포함한다.
+ * 반환 항목은 source, title, snippet, url(선택), details(선택) 을 포함한다.
  */
 export async function retrieveContext(
   supabase: SupabaseClient,
@@ -39,10 +98,8 @@ export async function retrieveContext(
   const terms = q.split(/\s+/).filter((t) => t.length > 1)
   if (terms.length === 0) return []
 
-  const sources: RetrievedSource[] = []
-  const seenDatasetIds = new Set<string>()
-
   // 1) pgvector 시맨틱 검색 (임베딩 API가 설정되어 있을 때만)
+  let vectorSources: SearchResult[] = []
   try {
     const embedding = await getEmbedding(q)
     if (embedding) {
@@ -52,16 +109,7 @@ export async function retrieveContext(
         match_count: limit,
       })
       if (!vectorError && Array.isArray(vectorRows)) {
-        for (const r of vectorRows as MatchCatalogRow[]) {
-          if (seenDatasetIds.has(r.dataset_id)) continue
-          seenDatasetIds.add(r.dataset_id)
-          sources.push({
-            source: 'catalog',
-            title: r.title ?? r.dataset_id,
-            snippet: [r.theme, r.keywords, r.description].filter(Boolean).join(' | '),
-            url: `/catalog/${r.dataset_id}`,
-          })
-        }
+        vectorSources = (vectorRows as MatchCatalogRow[]).map(makeCatalogSource)
       }
     }
   } catch {
@@ -92,26 +140,9 @@ export async function retrieveContext(
 
   const [{ data: catalogRows }, { data: ontoRows }] = await Promise.all([catalogPromise, ontoPromise])
 
-  for (const r of catalogRows ?? []) {
-    const id = r.dataset_id as string
-    if (seenDatasetIds.has(id)) continue
-    seenDatasetIds.add(id)
-    sources.push({
-      source: 'catalog',
-      title: (r.title as string | null) ?? id,
-      snippet: [r.theme, r.keywords, r.description].filter(Boolean).join(' | '),
-      url: id ? `/catalog/${id}` : undefined,
-    })
-  }
+  const catalogSources = (catalogRows ?? []).map(makeCatalogSource)
+  const ontoSources = (ontoRows ?? []).map(makeOntologySource)
 
-  for (const r of ontoRows ?? []) {
-    sources.push({
-      source: 'ontology',
-      title: (r.label as string | null) ?? (r.obj_id as string),
-      snippet: `유형=${r.obj_type}${r.props ? ` | ${r.props}` : ''}`,
-      url: r.obj_id ? `/ontology?node=${encodeURIComponent(String(r.obj_id))}` : undefined,
-    })
-  }
-
-  return sources.slice(0, limit)
+  const fused = fuseRrf([vectorSources, catalogSources, ontoSources])
+  return fused.slice(0, limit).map(({ key, ...rest }) => rest)
 }
