@@ -185,7 +185,7 @@ export default function UserManagement() {
                 required type="email" value={form.email}
                 onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                 placeholder="user@example.com"
-                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
               />
             </div>
             <div>
@@ -195,7 +195,7 @@ export default function UserManagement() {
                 required type="password" value={form.password}
                 onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
                 placeholder="8자 이상"
-                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
               />
             </div>
             <div>
@@ -204,7 +204,7 @@ export default function UserManagement() {
                 id="user-role"
                 value={form.role}
                 onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
-                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
               >
                 <option value="admin">최고 관리자</option>
                 <option value="center">센터 관리자</option>
@@ -222,7 +222,7 @@ export default function UserManagement() {
                     id="user-tenant"
                     value={form.tenant_id}
                     onChange={e => setForm(p => ({ ...p, tenant_id: e.target.value }))}
-                    className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
                   >
                     <option value="">기관 선택</option>
                     {tenants.map(t => (
@@ -258,7 +258,7 @@ export default function UserManagement() {
         <Select
           value={roleFilter}
           onChange={e => setRoleFilter(e.target.value as typeof roleFilter)}
-          className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+          className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
         >
           <option value="all">모든 역할</option>
           <option value="admin">최고 관리자</option>
@@ -317,7 +317,7 @@ export default function UserManagement() {
                         value={editingRole[u.id] ?? u.role}
                         onChange={e => changeField(u.id, 'role', e.target.value)}
                         disabled={isBusy(u.id)}
-                        className="text-xs border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 bg-white dark:bg-gray-900"
+                        className="text-xs border border-gray-300 dark:border-gray-700 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 bg-white dark:bg-gray-900 dark:text-gray-100"
                       >
                         <option value="admin">최고 관리자</option>
                         <option value="center">센터 관리자</option>
@@ -331,7 +331,7 @@ export default function UserManagement() {
                         value={u.tenant_id ?? ''}
                         onChange={e => changeField(u.id, 'tenant_id', e.target.value || null)}
                         disabled={isBusy(u.id)}
-                        className="text-xs border rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 max-w-[160px] bg-white dark:bg-gray-900"
+                        className="text-xs border border-gray-300 dark:border-gray-700 rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 max-w-[160px] bg-white dark:bg-gray-900 dark:text-gray-100"
                       >
                         <option value="">—</option>
                         {tenants.map(t => (

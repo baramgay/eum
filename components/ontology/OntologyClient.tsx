@@ -23,12 +23,13 @@ import { useRelatedDatasets } from './hooks/useRelatedDatasets'
 import { useRecentSearches } from './hooks/useRecentSearches'
 import { useOntologyFilters } from './hooks/useOntologyFilters'
 import { useOntologyWorkspace } from './hooks/useOntologyWorkspace'
+import dynamic from 'next/dynamic'
 import OverviewTab from './tabs/OverviewTab'
-import GraphTab from './tabs/GraphTab'
 import NodeListTab from './tabs/NodeListTab'
-import AnalysisTab from './tabs/AnalysisTab'
 import WorkspaceTab from './tabs/WorkspaceTab'
 import EditTab from './tabs/EditTab'
+const GraphTab = dynamic(() => import('./tabs/GraphTab'), { ssr: false })
+const AnalysisTab = dynamic(() => import('./tabs/AnalysisTab'), { ssr: false })
 import ScenarioSelector from './ScenarioSelector'
 
 type Tab = '개요' | '그래프' | '노드 목록' | '분석' | '워크스페이스' | '편집'
@@ -146,7 +147,7 @@ export default function OntologyClient() {
     if (graph) setGraph(patcher)
     else setDemoGraph(patcher)
     setSelectedNode(null)
-  }, [graph, setGraph])
+  }, [graph, setGraph, setSelectedNode])
 
   const handleLayoutChange = useCallback((next: GraphLayoutType) => {
     setLayout(next)

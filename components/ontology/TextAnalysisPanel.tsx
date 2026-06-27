@@ -168,7 +168,7 @@ export default function TextAnalysisPanel({ nodes, edges }: TextAnalysisPanelPro
   // Auto-load network when nodes arrive
   useEffect(() => {
     if (nodes.length > 0) loadNetwork()
-  }, [loadNetwork])
+  }, [loadNetwork, nodes.length])
 
   if (!nodes.length) {
     return (

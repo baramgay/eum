@@ -468,7 +468,7 @@ export default function AdminClient({ initialTenants }: Props) {
                 id="admin-bulk-type"
                 value={bulkType}
                 onChange={e => setBulkType(e.target.value as typeof bulkType)}
-                className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
               >
                 <option value="users">사용자 일괄 등록</option>
                 <option value="tenants">기관 일괄 등록</option>
@@ -531,7 +531,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   required value={form.tenant_id}
                   onChange={e => setForm(p => ({ ...p, tenant_id: e.target.value }))}
                   placeholder="예: gni_hadong"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
                 />
                 <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">영문·숫자·언더스코어만 권장합니다.</p>
               </div>
@@ -542,7 +542,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   required value={form.name}
                   onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                   placeholder="예: 하동군청"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
                 />
               </div>
               <div>
@@ -551,7 +551,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   id="admin-gov-type"
                   value={form.gov_type}
                   onChange={e => setForm(p => ({ ...p, gov_type: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
                 >
                   <option value="">선택</option>
                   <option value="시청">시청</option>
@@ -567,7 +567,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   value={form.sgg_cd}
                   onChange={e => setForm(p => ({ ...p, sgg_cd: e.target.value }))}
                   placeholder="예: 48850"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
                 />
               </div>
               <div className="md:col-span-2">
@@ -600,7 +600,7 @@ export default function AdminClient({ initialTenants }: Props) {
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1) }}
               placeholder="기관명·코드·시군코드 검색"
-              className="w-full pl-9 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+              className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -608,7 +608,7 @@ export default function AdminClient({ initialTenants }: Props) {
             <Select
               value={statusFilter}
               onChange={e => { setStatusFilter(e.target.value as typeof statusFilter); setPage(1) }}
-              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
             >
               <option value="all">모든 상태</option>
               <option value="pending">승인 대기</option>
@@ -618,7 +618,7 @@ export default function AdminClient({ initialTenants }: Props) {
             <Select
               value={govFilter}
               onChange={e => { setGovFilter(e.target.value); setPage(1) }}
-              className="px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100"
             >
               {GOV_TYPES.map(g => <option key={g} value={g}>{g}</option>)}
             </Select>
