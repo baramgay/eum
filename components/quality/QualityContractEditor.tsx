@@ -140,8 +140,9 @@ function CheckEditor({ check, onChange }: CheckEditorProps) {
         <div className="flex flex-col gap-1.5">
           {input('컬럼', check.column, 'column', 'column_name')}
           <div className="flex flex-col gap-0.5">
-            <label className="text-[10px] text-gray-500 dark:text-gray-400">허용 값 (쉼표 구분)</label>
+            <label htmlFor="check-in-values" className="text-[10px] text-gray-500 dark:text-gray-400">허용 값 (쉼표 구분)</label>
             <input
+              id="check-in-values"
               className="border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-xs bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
               value={check.values.join(', ')}
               placeholder="A, B, C"
@@ -163,8 +164,9 @@ function CheckEditor({ check, onChange }: CheckEditorProps) {
     case 'or_null':
       return (
         <div className="flex flex-col gap-0.5">
-          <label className="text-[10px] text-gray-500 dark:text-gray-400">컬럼 목록 (쉼표 구분)</label>
+          <label htmlFor="check-or-null-columns" className="text-[10px] text-gray-500 dark:text-gray-400">컬럼 목록 (쉼표 구분)</label>
           <input
+            id="check-or-null-columns"
             className="border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-xs bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
             value={check.columns.join(', ')}
             placeholder="col_a, col_b"
@@ -251,8 +253,9 @@ function RuleRow({ rule, index, onChange, onDelete }: RuleRowProps) {
           />
           {/* NIA 특성 선택 */}
           <div className="flex items-center gap-2 flex-wrap">
-            <label className="text-[10px] text-gray-500 dark:text-gray-400 flex-shrink-0">NIA 특성:</label>
+            <label htmlFor="nia-trait-select" className="text-[10px] text-gray-500 dark:text-gray-400 flex-shrink-0">NIA 특성:</label>
             <select
+              id="nia-trait-select"
               className="text-[10px] border border-gray-200 dark:border-gray-600 rounded px-1.5 py-1 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-400"
               value={rule.niaTrait ?? ''}
               onChange={e => onChange({ ...rule, niaTrait: (e.target.value || undefined) as NIACharacteristic | undefined })}

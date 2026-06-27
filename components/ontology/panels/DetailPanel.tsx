@@ -248,24 +248,27 @@ export default function DetailPanel({
         <div className="space-y-3">
           <p className="text-[10px] font-mono text-gray-400 dark:text-gray-500 break-all">{node.obj_id}</p>
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">이름 (Label)</label>
+            <label htmlFor="detail-edit-label" className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">이름 (Label)</label>
             <Input
+              id="detail-edit-label"
               value={editLabel}
               onChange={e => setEditLabel(e.target.value)}
               className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">유형 (Type)</label>
+            <label htmlFor="detail-edit-type" className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">유형 (Type)</label>
             <Input
+              id="detail-edit-type"
               value={editObjType}
               onChange={e => setEditObjType(e.target.value)}
               className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">속성 (Props)</label>
+            <label htmlFor="detail-edit-props" className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">속성 (Props)</label>
             <Textarea
+              id="detail-edit-props"
               value={editProps}
               onChange={e => setEditProps(e.target.value)}
               rows={4}

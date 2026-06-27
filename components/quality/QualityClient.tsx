@@ -1214,8 +1214,9 @@ export default function QualityClient() {
             <div className="space-y-4">
               <Card className="flex flex-wrap items-center gap-3">
                 <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-                <label className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택</label>
+                <label htmlFor="gap-dataset-select" className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택</label>
                 <select
+                  id="gap-dataset-select"
                   value={selectedDataset}
                   onChange={e => {
                     setSelectedDataset(e.target.value)
@@ -1345,8 +1346,9 @@ export default function QualityClient() {
               <Card>
                 <div className="flex flex-wrap items-center gap-3">
                   <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-                  <label className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택</label>
+                  <label htmlFor="contract-dataset-select" className="text-sm text-gray-600 dark:text-gray-400">데이터셋 선택</label>
                   <select
+                    id="contract-dataset-select"
                     value={selectedDataset}
                     onChange={e => {
                       setSelectedDataset(e.target.value)

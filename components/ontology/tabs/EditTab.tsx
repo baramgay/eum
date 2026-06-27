@@ -383,28 +383,28 @@ export default function EditTab() {
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">새 엣지</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">src (출발 노드 ID)</label>
-                <Input type="text" placeholder="예: sigun:48121" value={addEdgeForm.src}
+                <label htmlFor="edge-src" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">src (출발 노드 ID)</label>
+                <Input id="edge-src" type="text" placeholder="예: sigun:48121" value={addEdgeForm.src}
                   list="node-ids-src"
                   onChange={e => setAddEdgeForm(f => ({ ...f, src: e.target.value }))}
                   className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">rel (관계 유형)</label>
-                <Input type="text" placeholder="예: 포함, 인접, 청년이동" value={addEdgeForm.rel}
+                <label htmlFor="edge-rel" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">rel (관계 유형)</label>
+                <Input id="edge-rel" type="text" placeholder="예: 포함, 인접, 청년이동" value={addEdgeForm.rel}
                   onChange={e => setAddEdgeForm(f => ({ ...f, rel: e.target.value }))}
                   className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">dst (도착 노드 ID)</label>
-                <Input type="text" placeholder="예: sigun:48127" value={addEdgeForm.dst}
+                <label htmlFor="edge-dst" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">dst (도착 노드 ID)</label>
+                <Input id="edge-dst" type="text" placeholder="예: sigun:48127" value={addEdgeForm.dst}
                   list="node-ids-dst"
                   onChange={e => setAddEdgeForm(f => ({ ...f, dst: e.target.value }))}
                   className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900" />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">가중치</label>
-                <Input type="number" min="0" step="0.1" placeholder="1" value={addEdgeForm.weight}
+                <label htmlFor="edge-weight" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">가중치</label>
+                <Input id="edge-weight" type="number" min="0" step="0.1" placeholder="1" value={addEdgeForm.weight}
                   onChange={e => setAddEdgeForm(f => ({ ...f, weight: e.target.value }))}
                   className="w-full h-9 px-3 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white dark:bg-gray-900" />
               </div>

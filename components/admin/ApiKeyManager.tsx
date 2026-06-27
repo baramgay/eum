@@ -133,10 +133,11 @@ export default function ApiKeyManager() {
         <Modal open onClose={() => setShowIssueForm(false)} title="API 키 발급" size="sm">
           <div className="p-6 space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="api-tenant-id" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 기관 ID (선택)
               </label>
               <Input
+                id="api-tenant-id"
                 type="text"
                 value={form.tenant_id}
                 onChange={e => setForm(f => ({ ...f, tenant_id: e.target.value }))}
@@ -145,10 +146,11 @@ export default function ApiKeyManager() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="api-expires-days" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 유효 기간 (일)
               </label>
               <Input
+                id="api-expires-days"
                 type="number"
                 value={form.expires_days}
                 onChange={e => setForm(f => ({ ...f, expires_days: e.target.value }))}

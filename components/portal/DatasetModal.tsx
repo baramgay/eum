@@ -493,16 +493,18 @@ export default function DatasetModal({ item, onClose }: Props) {
                     <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">AI 제안 결과 — 수정 후 저장하세요</p>
                     <div className="space-y-2">
                       <div>
-                        <label className="text-xs text-gray-500 dark:text-gray-400">제목</label>
+                        <label htmlFor="meta-title" className="text-xs text-gray-500 dark:text-gray-400">제목</label>
                         <input
+                          id="meta-title"
                           value={metaForm.title}
                           onChange={e => setMetaForm(f => f ? { ...f, title: e.target.value } : f)}
                           className="mt-0.5 w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-purple-500"
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-gray-500 dark:text-gray-400">설명</label>
+                        <label htmlFor="meta-description" className="text-xs text-gray-500 dark:text-gray-400">설명</label>
                         <textarea
+                          id="meta-description"
                           value={metaForm.description}
                           onChange={e => setMetaForm(f => f ? { ...f, description: e.target.value } : f)}
                           rows={3}
@@ -510,16 +512,18 @@ export default function DatasetModal({ item, onClose }: Props) {
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-gray-500 dark:text-gray-400">카테고리</label>
+                        <label htmlFor="meta-category" className="text-xs text-gray-500 dark:text-gray-400">카테고리</label>
                         <input
+                          id="meta-category"
                           value={metaForm.category}
                           onChange={e => setMetaForm(f => f ? { ...f, category: e.target.value } : f)}
                           className="mt-0.5 w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-purple-500"
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-gray-500 dark:text-gray-400">키워드 (쉼표 구분)</label>
+                        <label htmlFor="meta-keywords" className="text-xs text-gray-500 dark:text-gray-400">키워드 (쉼표 구분)</label>
                         <input
+                          id="meta-keywords"
                           value={metaForm.keywords.join(', ')}
                           onChange={e => setMetaForm(f => f ? { ...f, keywords: e.target.value.split(',').map(k => k.trim()).filter(Boolean) } : f)}
                           className="mt-0.5 w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-purple-500"
