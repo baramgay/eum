@@ -1,4 +1,4 @@
--- 037_llm_usage.sql — LLM 사용량 할당량 추적
+-- 040_llm_usage.sql — LLM 사용량 할당량 추적
 
 CREATE TABLE IF NOT EXISTS llm_usage (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

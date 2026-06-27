@@ -7,15 +7,17 @@ import type { ConversationTurn } from '@/lib/nlquery/context'
 import { unstable_cache } from 'next/cache'
 import { chatCompletionGateway } from '@/lib/ai/gateway'
 import { checkQuota, recordUsage } from '@/lib/ai/quotas'
+import { redactSensitive } from '@/lib/ai/safety'
 
 async function addExplanation(result: QueryResult, userId: string, supabase: Awaited<ReturnType<typeof createClient>>): Promise<QueryResult & { explanation?: string }> {
   const quota = await checkQuota(userId, supabase)
   if (!quota.allowed) return result
 
-  const tableText = [
+  const rawTableText = [
     result.columns.join(' | '),
     ...result.rows.slice(0, 10).map((r) => result.columns.map((c) => String(r[c] ?? '')).join(' | ')),
   ].join('\n')
+  const tableText = redactSensitive(rawTableText)
 
   const prompt = `다음은 데이터 질의 결과입니다. 주요 인사이트를 한국어로 2~3문장으로 간결하게 요약해 주세요.\n\n${tableText}`
 

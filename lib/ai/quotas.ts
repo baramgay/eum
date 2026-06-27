@@ -19,7 +19,29 @@ function todayKey(): { date: string; month: string } {
 }
 
 /**
+ * 원자적 쿼터 체크 + 증가 (FOR UPDATE 행 잠금으로 TOCTOU 경쟁 조건 방지).
+ * checkQuota + recordUsage 두 단계 패턴을 이 함수 하나로 대체한다.
+ */
+export async function checkAndIncrementQuota(
+  userId: string,
+  supabase: SupabaseClient,
+): Promise<QuotaCheck> {
+  const { data, error } = await supabase.rpc('increment_and_check_quota', {
+    p_user_id: userId,
+  })
+
+  if (error) {
+    console.error('[quota] increment_and_check_quota rpc error:', error)
+    return { allowed: true }
+  }
+
+  const result = data as { allowed: boolean; reason?: string } | null
+  return { allowed: result?.allowed ?? true, reason: result?.reason }
+}
+
+/**
  * 사용자의 일/월 LLM 사용량 한도를 확인한다.
+ * @deprecated checkAndIncrementQuota 사용 권장 (TOCTOU 방지)
  */
 export async function checkQuota(userId: string, supabase: SupabaseClient): Promise<QuotaCheck> {
   const { date, month } = todayKey()

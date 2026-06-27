@@ -168,23 +168,21 @@ export async function enrichSources(
   supabase: SupabaseClient,
   sources: RetrievedSource[],
 ): Promise<RetrievedSource[]> {
-  const enriched: RetrievedSource[] = []
-
-  for (const source of sources) {
-    let details: string | undefined
-    try {
-      if (source.source === 'catalog') {
-        const datasetId = extractCatalogId(source.url)
-        if (datasetId) details = await buildCatalogContext(supabase, datasetId)
-      } else if (source.source === 'ontology') {
-        const objId = extractOntologyId(source.url)
-        if (objId) details = await buildOntologyContext(supabase, objId)
+  return Promise.all(
+    sources.map(async (source) => {
+      try {
+        let details: string | undefined
+        if (source.source === 'catalog') {
+          const datasetId = extractCatalogId(source.url)
+          if (datasetId) details = await buildCatalogContext(supabase, datasetId)
+        } else if (source.source === 'ontology') {
+          const objId = extractOntologyId(source.url)
+          if (objId) details = await buildOntologyContext(supabase, objId)
+        }
+        return details ? { ...source, details } : source
+      } catch {
+        return source
       }
-    } catch {
-      // 상세 정보 생성 실패 시 원본을 그대로 반환한다.
-    }
-    enriched.push(details ? { ...source, details } : source)
-  }
-
-  return enriched
+    }),
+  )
 }

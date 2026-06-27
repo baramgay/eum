@@ -1,4 +1,4 @@
--- 038_nl_to_sql_safe.sql — NL-to-SQL 안전 실행 함수 강화
+-- 041_nl_to_sql_safe.sql — NL-to-SQL 안전 실행 함수 강화
 
 -- 기존 SECURITY DEFINER 함수 제거
 DROP FUNCTION IF EXISTS run_select_sql(text);

@@ -7,7 +7,7 @@ import { buildSystemPrompt } from '@/lib/ai/prompts'
 import { scoreAction } from '@/lib/ontology/core'
 import { chatCompletionGateway, type ChatMessage, type ToolCall } from '@/lib/ai/gateway'
 import { generateTraceId } from '@/lib/ai/tracing'
-import { checkQuota, recordUsage } from '@/lib/ai/quotas'
+import { checkAndIncrementQuota } from '@/lib/ai/quotas'
 import { sanitizeForLlm, sanitizeOutput } from '@/lib/ai/safety'
 import { buildDynamicTools } from '@/lib/ai/tools'
 import { generateSql } from '@/lib/ai/nl-to-sql'
@@ -98,7 +98,7 @@ async function executeToolCall(
       return { content: JSON.stringify({ error: 'SQL 생성에 실패했습니다' }) }
     }
 
-    const { data, error } = await supabase.rpc('run_select_sql', { p_sql: generated.sql })
+    const { data, error } = await supabase.rpc('run_select_sql_safe', { p_sql: generated.sql })
     const sqlRows = Array.isArray(data) ? data : []
     const columns = sqlRows.length > 0 ? Object.keys(sqlRows[0]) : []
 
@@ -134,7 +134,7 @@ async function executeToolCall(
 
     if (catalogRow?.table_name && /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(catalogRow.table_name)) {
       const safeTable = catalogRow.table_name
-      const { data, error } = await supabase.rpc('run_select_sql', {
+      const { data, error } = await supabase.rpc('run_select_sql_safe', {
         p_sql: `SELECT * FROM "${safeTable}" LIMIT ${limit}`,
       })
       const rows = Array.isArray(data) ? data : []
@@ -310,8 +310,8 @@ export async function POST(req: NextRequest) {
 
   const supabase = await createServiceClient()
 
-  // LLM 사용량 할당량 확인
-  const quota = await checkQuota(user.id, supabase)
+  // 원자적 할당량 체크 + 첫 번째 LLM 호출 카운터 증가 (TOCTOU 방지)
+  const quota = await checkAndIncrementQuota(user.id, supabase)
   if (!quota.allowed) {
     return NextResponse.json({ error: quota.reason }, { status: 429 })
   }
@@ -340,13 +340,13 @@ export async function POST(req: NextRequest) {
   const systemPrompt = buildSystemPrompt(enrichedSources)
 
   try {
+    // checkAndIncrementQuota가 이미 첫 번째 호출을 카운트했으므로 recordUsage 불필요
     const first = await callLlm(
       [{ role: 'system', content: systemPrompt }, ...conversationMessages],
       tools,
       user.id,
       traceId,
     )
-    await recordUsage(user.id, supabase, { calls: 1 })
     let assistantContent = first.content ?? ''
     let toolResult: QueryResult | undefined
 
@@ -364,19 +364,22 @@ export async function POST(req: NextRequest) {
         })
       }
 
-      const second = await callLlm(
-        [
-          { role: 'system', content: systemPrompt },
-          ...conversationMessages,
-          { role: 'assistant', content: assistantContent, tool_calls: first.tool_calls },
-          ...toolMessages,
-        ],
-        tools,
-        user.id,
-        traceId,
-      )
-      await recordUsage(user.id, supabase, { calls: 1 })
-      assistantContent = second.content ?? assistantContent
+      // 두 번째 LLM 호출 전 할당량 재확인 + 카운터 증가
+      const quota2 = await checkAndIncrementQuota(user.id, supabase)
+      if (quota2.allowed) {
+        const second = await callLlm(
+          [
+            { role: 'system', content: systemPrompt },
+            ...conversationMessages,
+            { role: 'assistant', content: assistantContent, tool_calls: first.tool_calls },
+            ...toolMessages,
+          ],
+          tools,
+          user.id,
+          traceId,
+        )
+        assistantContent = second.content ?? assistantContent
+      }
     }
 
     const { sanitized: sanitizedOutput, toxic } = sanitizeOutput(assistantContent)

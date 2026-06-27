@@ -4,7 +4,10 @@ import { retrieveContext } from '@/lib/ai/retriever'
 import { buildSystemPrompt } from '@/lib/ai/prompts'
 import { chatCompletionGateway } from '@/lib/ai/gateway'
 import { sanitizeForLlm, sanitizeOutput } from '@/lib/ai/safety'
-import { checkQuota, recordUsage } from '@/lib/ai/quotas'
+import { checkAndIncrementQuota } from '@/lib/ai/quotas'
+import { SlidingWindowRateLimiter } from '@/lib/rate-limit'
+
+const limiter = new SlidingWindowRateLimiter(60_000, 5)
 
 const GUIDE_SYSTEM_PREFIX =
   '당신은 경남 공공데이터 평가 지원 AI 안내원입니다. ' +
@@ -13,9 +16,17 @@ const GUIDE_SYSTEM_PREFIX =
   '답변은 한국어로 간결하게, 핵심 사항을 번호 목록으로 정리해 주세요.\n'
 
 export async function POST(req: Request) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const authClient = await createClient()
+  const { data: { user } } = await authClient.auth.getUser()
   if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+
+  const rate = limiter.isAllowed(user.id)
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: '너무 많은 요청입니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 429, headers: { 'X-RateLimit-Reset': String(rate.resetAt) } },
+    )
+  }
 
   let body: { message?: string; history?: { role: string; content: string }[] } = {}
   try { body = await req.json() } catch { /* 빈 body 허용 */ }
@@ -23,13 +34,15 @@ export async function POST(req: Request) {
   const message = (body.message ?? '').trim()
   if (!message) return NextResponse.json({ error: '메시지가 필요합니다' }, { status: 400 })
 
-  const quota = await checkQuota(user.id, supabase)
-  if (!quota.allowed) return NextResponse.json({ error: quota.reason }, { status: 429 })
-
   const { sanitized, injection } = sanitizeForLlm(message)
   if (injection) return NextResponse.json({ error: '잘못된 입력이 감지되었습니다' }, { status: 400 })
 
   const sb = await createServiceClient()
+
+  // 원자적 할당량 체크 + 카운터 증가 (service client로 SECURITY DEFINER 함수 호출)
+  const quota = await checkAndIncrementQuota(user.id, sb)
+  if (!quota.allowed) return NextResponse.json({ error: quota.reason }, { status: 429 })
+
   const sources = await retrieveContext(sb, sanitized, 4)
   const systemPrompt = GUIDE_SYSTEM_PREFIX + buildSystemPrompt(sources).replace(/^당신은.*?\n/, '')
 
@@ -43,7 +56,6 @@ export async function POST(req: Request) {
   try {
     const result = await chatCompletionGateway({ messages, userId: user.id, maxTokens: 512 })
     const { sanitized: safeContent } = sanitizeOutput(result.content)
-    await recordUsage(user.id, supabase, { calls: 1 })
     return NextResponse.json({ content: safeContent, sources, model: result.model })
   } catch {
     return NextResponse.json({ error: 'AI 응답 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.' }, { status: 500 })
