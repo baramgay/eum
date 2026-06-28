@@ -356,7 +356,7 @@ export default function CollectClient({ role, tenantId }: Props) {
           <h3 className="font-semibold text-gray-800 dark:text-gray-200">
             {editingSource ? '수집 소스 수정' : '수집 소스 등록'}
           </h3>
-          <button onClick={closeModal} className="text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 text-lg">✕</button>
+          <button onClick={closeModal} className="text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 text-lg transition-colors duration-150">✕</button>
         </div>
         <div className="overflow-auto p-5 flex-1">
           <CollectSourceForm

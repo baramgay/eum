@@ -93,13 +93,13 @@ export default function PreviewPanel({ before, after, errors }: PreviewPanelProp
               <button
                 onClick={() => setPage(Math.max(0, page - 1))}
                 disabled={page === 0}
-                className="px-1.5 py-0.5 text-xs border rounded disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-950"
+                className="px-1.5 py-0.5 text-xs border rounded disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150"
               >◀</button>
               <span className="text-xs text-gray-500 dark:text-gray-400">{page + 1}/{pageCount}</span>
               <button
                 onClick={() => setPage(Math.min(pageCount - 1, page + 1))}
                 disabled={page === pageCount - 1}
-                className="px-1.5 py-0.5 text-xs border rounded disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-950"
+                className="px-1.5 py-0.5 text-xs border rounded disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150"
               >▶</button>
             </div>
           )}
@@ -119,7 +119,7 @@ export default function PreviewPanel({ before, after, errors }: PreviewPanelProp
               {pageRows.map((row, ri) => {
                 const absoluteIndex = start + ri
                 return (
-                  <tr key={ri} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                  <tr key={ri} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                     {cols.map(c => {
                       const isErr = highlightErrors && errorSet.has(errKey(absoluteIndex, c))
                       const isChanged = highlightChanges && changedCells.has(errKey(absoluteIndex, c))

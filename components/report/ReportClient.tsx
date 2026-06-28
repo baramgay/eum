@@ -625,7 +625,7 @@ export default function ReportClient({ role }: Props) {
             <PlusCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
             <span>{insertBanner}</span>
           </div>
-          <button onClick={() => setInsertBanner(null)} className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-200">
+          <button onClick={() => setInsertBanner(null)} className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-200 transition-colors duration-150">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -702,7 +702,7 @@ export default function ReportClient({ role }: Props) {
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                         {block.tableData.rows.map((row, ri) => (
-                          <tr key={ri} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                          <tr key={ri} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                             {row.map((cell, ci) => (
                               <td key={ci} className="px-3 py-2 text-gray-700 dark:text-gray-300">
                                 {cell === null ? '' : String(cell)}
@@ -782,7 +782,7 @@ export default function ReportClient({ role }: Props) {
               className={`px-4 py-2 text-sm font-medium rounded-t-md border-b-2 transition-colors ${
                 reportMode === mode
                   ? 'border-blue-600 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               {mode === 'report' ? '평가 리포트' : '기관 비교'}
@@ -986,7 +986,7 @@ export default function ReportClient({ role }: Props) {
                   const pct = item.goal > 0 ? Math.min(item.current / item.goal * 100, 100) : 0
                   const met = item.current >= item.goal
                   return (
-                    <div key={item.label} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors">
+                    <div key={item.label} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{item.label}</p>
                       <div className="flex items-baseline gap-1 mb-1.5">
                         <span className={`text-base font-bold ${met ? 'text-green-700 dark:text-green-400' : 'text-gray-800 dark:text-gray-200'}`}>
@@ -1064,7 +1064,7 @@ export default function ReportClient({ role }: Props) {
                     className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${
                       statusFilter === key
                         ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-medium'
-                        : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                        : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
                     {key === 'all' ? '전체' : STATUS_LABEL[key as StatusKey]}
@@ -1141,7 +1141,7 @@ export default function ReportClient({ role }: Props) {
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                     {area.indicators.map(ind => (
-                      <tr key={ind.name} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                      <tr key={ind.name} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                         <td className="px-4 py-2 text-gray-800 dark:text-gray-200">{ind.name}</td>
                         <td className="px-4 py-2 text-center font-medium text-gray-700 dark:text-gray-300">{ind.value}</td>
                         <td className="px-4 py-2">

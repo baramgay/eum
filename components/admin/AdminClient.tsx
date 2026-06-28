@@ -342,7 +342,7 @@ export default function AdminClient({ initialTenants }: Props) {
       render: t => (
         <a
           href={`/portal?tenant_id=${encodeURIComponent(t.tenant_id)}`}
-          className="inline-flex items-center gap-0.5 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline"
+          className="inline-flex items-center gap-0.5 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline transition-colors duration-150"
           title="해당 기관 데이터셋 보기"
         >
           <ExternalLink className="w-3 h-3" />
@@ -370,7 +370,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   if (memo === null) return
                   void updateStatus(t, 'approved', memo || undefined)
                 }}
-                className="!text-green-700 dark:!text-green-300 hover:!bg-green-50"
+                className="!text-green-700 dark:!text-green-300 hover:!bg-green-50 transition-colors duration-150"
                 title="승인"
               >
                 <CheckCircle className="w-3 h-3" />
@@ -388,7 +388,7 @@ export default function AdminClient({ initialTenants }: Props) {
                   if (!reason) return
                   void updateStatus(t, 'rejected', reason)
                 }}
-                className="!text-red-700 dark:!text-red-300 hover:!bg-red-50"
+                className="!text-red-700 dark:!text-red-300 hover:!bg-red-50 transition-colors duration-150"
                 title="반려"
               >
                 <XCircle className="w-3 h-3" />
@@ -401,7 +401,7 @@ export default function AdminClient({ initialTenants }: Props) {
               loading={isActing}
               disabled={isActing}
               onClick={() => deleteTenant(t.tenant_id, t.name)}
-              className="!text-red-600 dark:!text-red-400 hover:!bg-red-50"
+              className="!text-red-600 dark:!text-red-400 hover:!bg-red-50 transition-colors duration-150"
               title="삭제"
               aria-label="삭제"
             >
@@ -454,7 +454,7 @@ export default function AdminClient({ initialTenants }: Props) {
                 type="file"
                 accept=".csv,text/csv"
                 onChange={e => setBulkFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-gray-600 dark:text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/40"
+                className="block w-full text-sm text-gray-600 dark:text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 dark:hover:file:bg-blue-900/40 transition-colors duration-150"
               />
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">
                 {bulkType === 'users'
@@ -650,7 +650,7 @@ export default function AdminClient({ initialTenants }: Props) {
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
                 statusFilter === key
                   ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               {label}
@@ -664,7 +664,7 @@ export default function AdminClient({ initialTenants }: Props) {
           {isFiltered && (
             <button
               onClick={resetFilters}
-              className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 underline"
+              className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 underline transition-colors duration-150"
             >
               필터 초기화
             </button>
@@ -712,7 +712,7 @@ export default function AdminClient({ initialTenants }: Props) {
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40"
+                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors duration-150"
                   aria-label="이전 페이지"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -731,7 +731,7 @@ export default function AdminClient({ initialTenants }: Props) {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40"
+                  className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors duration-150"
                   aria-label="다음 페이지"
                 >
                   <ChevronRight className="w-4 h-4" />

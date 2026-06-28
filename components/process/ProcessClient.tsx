@@ -645,7 +645,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   statusFilter === key
                     ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-950'
+                    : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 {label}
@@ -665,7 +665,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
               {runResult.result.error_rows > 0 && (
                 <button
                   type="button"
-                  className="text-red-500 ml-1 underline underline-offset-2 hover:text-red-700 dark:hover:text-red-300"
+                  className="text-red-500 ml-1 underline underline-offset-2 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-150"
                   onClick={() => setShowErrorDialog(true)}
                 >
                   오류 {runResult.result.error_rows}건
@@ -685,7 +685,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
           </div>
           <button
             onClick={() => setRunResult(null)}
-            className="text-green-500 hover:text-green-700 dark:hover:text-green-300 ml-4 text-xs shrink-0"
+            className="text-green-500 hover:text-green-700 dark:hover:text-green-300 ml-4 text-xs shrink-0 transition-colors duration-150"
           >
             닫기
           </button>
@@ -697,7 +697,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
         <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="font-medium text-blue-800 dark:text-blue-200">배치 실행 결과</span>
-            <button onClick={() => setBatchResults(null)} className="text-blue-500 text-xs hover:text-blue-700 dark:hover:text-blue-300">닫기</button>
+            <button onClick={() => setBatchResults(null)} className="text-blue-500 text-xs hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-150">닫기</button>
           </div>
           <div className="space-y-1">
             {batchResults.map(r => {
@@ -987,7 +987,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                 </thead>
                 <tbody>
                   {runResult.result.errors.map((err, i) => (
-                    <tr key={i} className="hover:bg-red-50 dark:hover:bg-red-900/20">
+                    <tr key={i} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-100">
                       <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300">{err.rowIndex + 1}</td>
                       <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300">{err.ruleIndex + 1}</td>
                       <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-500 dark:text-gray-400">{err.column ?? '—'}</td>
@@ -1027,7 +1027,7 @@ export default function ProcessClient({ role, tenantId }: Props) {
                 </thead>
                 <tbody>
                   {(selectedHistoryRun.error_log as ProcessError[]).map((err, i) => (
-                    <tr key={i} className="hover:bg-red-50 dark:hover:bg-red-900/20">
+                    <tr key={i} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-100">
                       <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300">{(err.rowIndex ?? i) + 1}</td>
                       <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-700 dark:text-gray-300">{typeof err.ruleIndex === 'number' ? err.ruleIndex + 1 : '—'}</td>
                       <td className="border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-gray-500 dark:text-gray-400">{err.column ?? '—'}</td>

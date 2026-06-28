@@ -518,7 +518,7 @@ function Sources({ sources }: { sources?: SourceItem[] }) {
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400"
+                className="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
               >
                 <Badge variant="gray" size="sm">{s.source}</Badge>
                 <span className="font-medium">{s.title}</span>
@@ -583,7 +583,7 @@ function ResultCard({
         )}
         {onRetry && (
           <div className="px-4 py-2 bg-gray-50 dark:bg-gray-950 border-t flex items-center gap-2">
-            <Btn onClick={onRetry} variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200">
+            <Btn onClick={onRetry} variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors duration-150">
               <RotateCcw className="w-3.5 h-3.5" /> 다시 시도
             </Btn>
           </div>
@@ -649,7 +649,7 @@ function ResultCard({
                 <button
                   onClick={() => setViewMode('table')}
                   className={`flex items-center gap-1 px-2.5 py-1 text-xs ${
-                    viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                    viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
                   <Table2 className="w-3.5 h-3.5" /> 표
@@ -657,7 +657,7 @@ function ResultCard({
                 <button
                   onClick={() => setViewMode('chart')}
                   className={`flex items-center gap-1 px-2.5 py-1 text-xs ${
-                    viewMode === 'chart' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                    viewMode === 'chart' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
                   <BarChart2 className="w-3.5 h-3.5" /> 차트
@@ -709,7 +709,7 @@ function ResultCard({
             <div className="flex rounded border overflow-hidden">
               <button
                 onClick={() => setChartType('bar')}
-                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'bar' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'bar' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                 title="막대 차트"
                 aria-label="막대 차트"
               >
@@ -717,7 +717,7 @@ function ResultCard({
               </button>
               <button
                 onClick={() => setChartType('line')}
-                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'line' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'line' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                 title="선 차트"
                 aria-label="선 차트"
               >
@@ -725,7 +725,7 @@ function ResultCard({
               </button>
               <button
                 onClick={() => setChartType('pie')}
-                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'pie' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                className={`flex items-center gap-1 px-2 py-1 text-xs ${chartType === 'pie' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                 title="원형 차트"
                 aria-label="원형 차트"
               >
@@ -1188,7 +1188,7 @@ export default function AiQueryClient() {
             {sidebarSearch && (
               <button
                 onClick={() => setSidebarSearch('')}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150"
                 title="검색어 지우기"
                 aria-label="검색어 지우기"
               >
@@ -1216,7 +1216,7 @@ export default function AiQueryClient() {
                   className={`flex items-center gap-2 flex-1 min-w-0 px-3 py-2 rounded-md text-left ${
                     conv.id === currentId
                       ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
                   <MessageSquare className="w-4 h-4 shrink-0 opacity-60" />
@@ -1249,7 +1249,7 @@ export default function AiQueryClient() {
           {aiMode === 'chat' && (
             <button
               onClick={() => setSidebarOpen(o => !o)}
-              className="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
+              className="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors duration-150"
               title="대화 목록"
               aria-label="대화 목록"
               aria-expanded={sidebarOpen}
@@ -1326,14 +1326,14 @@ export default function AiQueryClient() {
                     <button
                       role="menuitem"
                       onClick={() => { setExportOpen(false); handleExport('markdown') }}
-                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950"
+                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150"
                     >
                       Markdown (.md)
                     </button>
                     <button
                       role="menuitem"
                       onClick={() => { setExportOpen(false); handleExport('json') }}
-                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950"
+                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150"
                     >
                       JSON (.json)
                     </button>
@@ -1421,7 +1421,7 @@ export default function AiQueryClient() {
                 variant="secondary"
                 size="sm"
                 loading={loading}
-                className="border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40"
+                className="border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors duration-150"
               >
                 <RotateCcw className="w-3.5 h-3.5" /> 다시 시도
               </Btn>

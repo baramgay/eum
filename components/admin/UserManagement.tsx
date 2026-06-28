@@ -305,7 +305,7 @@ export default function UserManagement() {
               ) : filteredUsers.map(u => {
                 const banned = u.banned_until && new Date(u.banned_until) > new Date()
                 return (
-                  <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                  <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                     <td className="px-4 py-2 text-gray-800 dark:text-gray-200">
                       {u.email}
                       {banned && (
@@ -368,7 +368,7 @@ export default function UserManagement() {
                         loading={deletingId === u.id}
                         disabled={isBusy(u.id)}
                         onClick={() => deleteUser(u.id, u.email)}
-                        className="!text-red-600 dark:!text-red-400 hover:!bg-red-50"
+                        className="!text-red-600 dark:!text-red-400 hover:!bg-red-50 transition-colors duration-150"
                       >
                         <Trash2 size={12} />
                         삭제
@@ -390,7 +390,7 @@ export default function UserManagement() {
               <button
                 onClick={() => loadUsers(Math.max(1, page - 1))}
                 disabled={page === 1 || loading}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40"
+                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors duration-150"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -409,7 +409,7 @@ export default function UserManagement() {
               <button
                 onClick={() => loadUsers(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages || loading}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40"
+                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors duration-150"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

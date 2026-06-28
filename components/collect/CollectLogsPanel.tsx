@@ -137,7 +137,7 @@ export default function CollectLogsPanel({
         log.error_msg ? (
           <button
             onClick={() => setExpandedLogId(expandedLogId === log.log_id ? null : log.log_id)}
-            className="text-red-600 dark:text-red-400 hover:underline flex items-center gap-0.5 text-xs"
+            className="text-red-600 dark:text-red-400 hover:underline flex items-center gap-0.5 text-xs transition-colors duration-150"
           >
             {expandedLogId === log.log_id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             보기
@@ -277,7 +277,7 @@ export default function CollectLogsPanel({
       >
         <div className="flex items-center justify-between px-5 py-3 border-b flex-shrink-0">
           <h3 className="font-semibold text-gray-800 dark:text-gray-200">수집 데이터 미리보기</h3>
-          <button onClick={closePreview} className="text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 text-lg">✕</button>
+          <button onClick={closePreview} className="text-gray-400 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 text-lg transition-colors duration-150">✕</button>
         </div>
         <div className="p-5 overflow-auto flex-1 max-h-[70vh]">
           {previewLoading ? (

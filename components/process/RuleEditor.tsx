@@ -408,7 +408,7 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
           <h2 className="font-semibold text-gray-800 dark:text-gray-200">규칙 편집</h2>
           <Badge variant="blue">{rules.length}개</Badge>
         </div>
-        <button onClick={onClose} className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 p-1"><X className="w-5 h-5" /></button>
+        <button onClick={onClose} className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 p-1 transition-colors duration-150"><X className="w-5 h-5" /></button>
       </div>
 
       <div className="p-4 space-y-3 overflow-y-auto flex-1">
@@ -443,13 +443,13 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
                   </span>
                   <div className="flex gap-1">
                     <button onClick={() => moveUp(i)}
-                      className="text-xs px-1.5 py-0.5 border rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40"
+                      className="text-xs px-1.5 py-0.5 border rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 transition-colors duration-150"
                       disabled={i === 0}><ArrowUp className="w-3 h-3" /></button>
                     <button onClick={() => moveDown(i)}
-                      className="text-xs px-1.5 py-0.5 border rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40"
+                      className="text-xs px-1.5 py-0.5 border rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 transition-colors duration-150"
                       disabled={i === rules.length - 1}><ArrowDown className="w-3 h-3" /></button>
                     <button onClick={() => deleteRule(i)}
-                      className="text-xs px-1.5 py-0.5 border rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 flex items-center gap-0.5">
+                      className="text-xs px-1.5 py-0.5 border rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 flex items-center gap-0.5 transition-colors duration-150">
                       <Trash2 className="w-3 h-3" /> 삭제
                     </button>
                   </div>
@@ -457,7 +457,7 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
                 <RuleForm rule={rule} onChange={r => updateRule(i, r)} />
                 {/* 조건부 적용 (when) */}
                 <details className="mt-2 border-t pt-2">
-                  <summary className="text-xs text-gray-400 dark:text-gray-300 cursor-pointer hover:text-gray-600 dark:hover:text-gray-400 select-none">
+                  <summary className="text-xs text-gray-400 dark:text-gray-300 cursor-pointer hover:text-gray-600 dark:hover:text-gray-400 select-none transition-colors duration-150">
                     조건 (when){(rule as Rule & { when?: WhenCondition }).when && (
                       <span className="ml-1 text-blue-500">●</span>
                     )}
@@ -502,7 +502,7 @@ export default function RuleEditor({ pipelineId, initialRules, onSave, onClose }
                     {(rule as Rule & { when?: WhenCondition }).when && (
                       <button
                         type="button"
-                        className="text-red-400 hover:text-red-600 dark:hover:text-red-400 text-xs"
+                        className="text-red-400 hover:text-red-600 dark:hover:text-red-400 text-xs transition-colors duration-150"
                         onClick={() => updateRule(i, { ...rule, when: undefined } as Rule)}
                       >
                         제거

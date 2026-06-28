@@ -185,7 +185,7 @@ export default function OneCycleChecklist({ datasetId }: OneCycleChecklistProps)
               )}
               <button
                 onClick={clearPhase}
-                className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-150"
               >
                 초기화
               </button>

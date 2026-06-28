@@ -161,7 +161,7 @@ function AnalysisTab() {
         </div>
         <Btn
           size="sm"
-          className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+          className="bg-purple-600 hover:bg-purple-700 border-purple-600 transition-colors duration-150"
           onClick={() => setShowForm(v => !v)}
         >
           <Plus className="w-3.5 h-3.5" />
@@ -247,7 +247,7 @@ function AnalysisTab() {
             <Btn size="sm" variant="ghost" onClick={() => setShowForm(false)}>취소</Btn>
             <Btn
               size="sm"
-              className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+              className="bg-purple-600 hover:bg-purple-700 border-purple-600 transition-colors duration-150"
               loading={saving}
               disabled={!form.title.trim() || !form.performed_at}
               onClick={save}
@@ -272,7 +272,7 @@ function AnalysisTab() {
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150"
               aria-label="검색어 초기화"
             >
               <X className="w-4 h-4" />
@@ -317,7 +317,7 @@ function AnalysisTab() {
                   <Btn
                     size="sm"
                     variant="ghost"
-                    className="text-gray-300 dark:text-gray-200 hover:text-red-600 hover:bg-red-50"
+                    className="text-gray-300 dark:text-gray-200 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
                     loading={deleting === r.record_id}
                     onClick={() => del(r.record_id)}
                     aria-label="삭제"
@@ -439,7 +439,7 @@ function SyntheticTab() {
         </div>
         <Btn
           size="sm"
-          className="bg-blue-600 hover:bg-blue-700 border-blue-600"
+          className="bg-blue-600 hover:bg-blue-700 border-blue-600 transition-colors duration-150"
           onClick={() => setShowForm(v => !v)}
         >
           <Plus className="w-3.5 h-3.5" />
@@ -543,7 +543,7 @@ function SyntheticTab() {
             <Btn size="sm" variant="ghost" onClick={() => setShowForm(false)}>취소</Btn>
             <Btn
               size="sm"
-              className="bg-blue-600 hover:bg-blue-700 border-blue-600"
+              className="bg-blue-600 hover:bg-blue-700 border-blue-600 transition-colors duration-150"
               loading={saving}
               disabled={!form.title.trim() || !form.opened_at}
               onClick={save}
@@ -569,7 +569,7 @@ function SyntheticTab() {
             {query && (
               <button
                 onClick={() => setQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150"
                 aria-label="검색어 초기화"
               >
                 <X className="w-4 h-4" />
@@ -584,7 +584,7 @@ function SyntheticTab() {
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                   typeFilter === t
                     ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300'
-                    : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                    : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 {t === 'all' ? '전체' : CASE_TYPE_LABEL[t]}
@@ -634,7 +634,7 @@ function SyntheticTab() {
                           href={c.portal_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-blue-500 hover:underline flex items-center gap-0.5"
+                          className="text-xs text-blue-500 hover:underline flex items-center gap-0.5 transition-colors duration-150"
                         >
                           포털 <ExternalLink className="w-3 h-3" />
                         </a>
@@ -644,7 +644,7 @@ function SyntheticTab() {
                   <Btn
                     size="sm"
                     variant="ghost"
-                    className="text-gray-300 dark:text-gray-200 hover:text-red-600 hover:bg-red-50"
+                    className="text-gray-300 dark:text-gray-200 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
                     loading={deleting === c.case_id}
                     onClick={() => del(c.case_id)}
                     aria-label="삭제"
@@ -902,7 +902,7 @@ function QualitativeTab() {
                           ? STATUS_BADGE[s] === 'green' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800' :
                             STATUS_BADGE[s] === 'amber' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800' :
                             'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                       }`}
                     >
                       {STATUS_LABEL[s]}
@@ -920,7 +920,7 @@ function QualitativeTab() {
                   <Btn size="sm" variant="ghost" onClick={() => setEditing(null)}>취소</Btn>
                   <Btn
                     size="sm"
-                    className="bg-indigo-600 hover:bg-indigo-700 border-indigo-600"
+                    className="bg-indigo-600 hover:bg-indigo-700 border-indigo-600 transition-colors duration-150"
                     loading={saving === inp.key}
                     onClick={() => saveEdit(inp.key)}
                   >
@@ -948,7 +948,7 @@ function QualitativeTab() {
                 <Btn
                   size="sm"
                   variant="secondary"
-                  className="text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                  className="text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors duration-150"
                   onClick={() => startEdit(inp)}
                 >
                   입력
@@ -1001,7 +1001,7 @@ export default function PipelineClient() {
               className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px whitespace-nowrap ${
                 active
                   ? 'border-blue-600 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -1030,7 +1030,7 @@ export default function PipelineClient() {
                   key={key}
                   onClick={() => setPerfTab(key)}
                   className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px whitespace-nowrap ${
-                    active ? ACTIVE_STYLE[color] : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'
+                    active ? ACTIVE_STYLE[color] : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
                   <Icon className="w-4 h-4" />

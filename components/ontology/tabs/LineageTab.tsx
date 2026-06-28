@@ -211,7 +211,7 @@ export default function LineageTab() {
       <div className="flex flex-col items-center justify-center h-64 gap-3 text-red-500">
         <AlertCircle className="w-8 h-8" />
         <span>{error}</span>
-        <button onClick={load} className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900">
+        <button onClick={load} className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">
           <RefreshCw className="w-4 h-4" /> 다시 시도
         </button>
       </div>
@@ -226,7 +226,7 @@ export default function LineageTab() {
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           데이터 계보 DAG (수집원 → 파이프라인 → 카탈로그)
         </h3>
-        <button onClick={load} className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800">
+        <button onClick={load} className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800 transition-colors duration-150">
           <RefreshCw className="w-3 h-3" /> 새로고침
         </button>
       </div>

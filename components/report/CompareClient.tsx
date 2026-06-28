@@ -127,7 +127,7 @@ export default function CompareClient() {
                 (r.analysis >= GOALS.analysis ? 1 : 0) +
                 (r.synthetic >= GOALS.synthetic ? 1 : 0)
               return (
-                <tr key={r.tenant_id} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                <tr key={r.tenant_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                   <td className="px-3 py-2.5 text-center text-xs text-gray-400 dark:text-gray-300">{i + 1}</td>
                   <td className="px-3 py-2.5 font-medium text-gray-800 dark:text-gray-200">{r.name}</td>
                   <td className="px-3 py-2.5 text-center text-gray-600 dark:text-gray-400 text-sm">{r.total}</td>

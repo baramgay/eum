@@ -12,10 +12,10 @@ interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClass: Record<Variant, string> = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700 border-transparent',
-  secondary: 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-300 dark:border-gray-600',
-  danger: 'bg-red-600 text-white hover:bg-red-700 border-transparent',
-  ghost: 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border-transparent',
+  primary: 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md hover:-translate-y-px border-transparent',
+  secondary: 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 border-gray-300 dark:border-gray-600',
+  danger: 'bg-red-600 text-white hover:bg-red-700 hover:shadow-md hover:-translate-y-px border-transparent',
+  ghost: 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-50 border-transparent',
 }
 const sizeClass: Record<Size, string> = {
   sm: 'text-xs px-3 py-1.5 rounded-lg',
@@ -28,7 +28,7 @@ export default function Btn({ variant = 'primary', size = 'md', loading, icon, c
   return (
     <button
       disabled={disabled || loading}
-      className={`inline-flex items-center gap-1.5 border font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed ${variantClass[variant]} ${sizeClass[size]} ${isPressed ? 'scale-[0.97] ring-2 ring-current/30' : ''} ${className}`}
+      className={`inline-flex items-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed ${variantClass[variant]} ${sizeClass[size]} ${isPressed ? 'scale-[0.97] ring-2 ring-current/30' : ''} ${className}`}
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
       onMouseLeave={() => setIsPressed(false)}

@@ -90,7 +90,7 @@ export default function AnalysisPanel({ nodes, edges, onResult }: AnalysisPanelP
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
               type === key
                 ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300'
-                : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
             }`}
           >
             <Icon className="w-3.5 h-3.5" />
@@ -306,7 +306,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">상위 {result.results.length}개</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors duration-150" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -344,7 +344,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">노드 {total}개</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors duration-150" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -406,7 +406,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">{labels.length - 1}홉</Badge>
             <Badge variant="blue" size="sm">거리 {Number(distance).toFixed(3)}</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors duration-150" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -452,7 +452,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">{result.results.length}개</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors duration-150" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -485,7 +485,7 @@ function AnalysisResultView({ result, nodes }: { result: AnalyticsResult; nodes:
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="gray" size="sm">{result.results.length}개</Badge>
-            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100" title="CSV 다운로드">
+            <button onClick={() => downloadAnalysisCSV(result)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors duration-150" title="CSV 다운로드">
               <Download className="w-3.5 h-3.5" />
             </button>
           </div>

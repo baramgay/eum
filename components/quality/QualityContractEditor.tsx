@@ -214,7 +214,7 @@ function RuleRow({ rule, index, onChange, onDelete }: RuleRowProps) {
       <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800">
         <button
           onClick={() => setOpen(o => !o)}
-          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0"
+          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0 transition-colors duration-150"
         >
           {open ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
         </button>
@@ -236,7 +236,7 @@ function RuleRow({ rule, index, onChange, onDelete }: RuleRowProps) {
         </select>
         <button
           onClick={onDelete}
-          className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 flex-shrink-0"
+          className="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 flex-shrink-0 transition-colors duration-150"
           title="규칙 삭제"
         >
           <Trash2 className="w-3.5 h-3.5" />
@@ -364,7 +364,7 @@ export default function QualityContractEditor({
         <div className="flex items-center gap-2">
           <button
             onClick={addRule}
-            className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border border-dashed border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border border-dashed border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-150"
           >
             <Plus className="w-3.5 h-3.5" />
             규칙 추가
@@ -372,7 +372,7 @@ export default function QualityContractEditor({
           <button
             onClick={save}
             disabled={saving}
-            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 disabled:opacity-50"
+            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 disabled:opacity-50 transition-colors duration-150"
           >
             <Save className="w-3.5 h-3.5" />
             {saving ? '저장 중…' : '저장'}
@@ -420,7 +420,7 @@ export default function QualityContractEditor({
           </p>
           <button
             onClick={addRule}
-            className="mt-3 text-xs px-3 py-1.5 rounded-lg border border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            className="mt-3 text-xs px-3 py-1.5 rounded-lg border border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-150"
           >
             + 규칙 추가
           </button>

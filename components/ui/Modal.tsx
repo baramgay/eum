@@ -89,7 +89,7 @@ export default function Modal({
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-4 top-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="absolute right-4 top-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-colors duration-150"
             aria-label="닫기"
           >
             <X className="w-5 h-5" />

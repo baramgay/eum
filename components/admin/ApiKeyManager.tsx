@@ -120,7 +120,7 @@ export default function ApiKeyManager() {
             </Btn>
           </div>
           <button
-            className="mt-2 text-xs text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200"
+            className="mt-2 text-xs text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 transition-colors duration-150"
             onClick={() => setNewKey(null)}
           >
             닫기

@@ -298,7 +298,7 @@ export default function OntologyClient() {
           </div>
           <button
             onClick={() => setShowScenarioSelector(true)}
-            className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-medium"
+            className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-medium transition-colors duration-150"
           >
             <LayoutGrid className="w-3.5 h-3.5" />
             시나리오 변경

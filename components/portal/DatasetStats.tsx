@@ -50,7 +50,7 @@ export default function DatasetStats({ datasetId }: { datasetId: string }) {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {stats.columns.map(c => (
-              <tr key={c.name} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+              <tr key={c.name} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                 <td className="px-3 py-1.5 font-mono text-gray-700 dark:text-gray-300 max-w-[120px] truncate">{c.name}</td>
                 <td className="px-3 py-1.5">
                   <span className={`px-1.5 py-0.5 rounded text-xs ${

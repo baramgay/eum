@@ -97,7 +97,7 @@ export default function DataUsageWidget() {
           ) : (
             <ul className="space-y-2">
               {usage.recentDatasets.map(ds => (
-                <li key={ds.datasetId} className="flex items-center justify-between gap-2 hover:bg-gray-50 dark:hover:bg-gray-950 rounded-lg px-2 py-1 -mx-2 transition-colors">
+                <li key={ds.datasetId} className="flex items-center justify-between gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg px-2 py-1 -mx-2 transition-colors">
                   <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1">{ds.title}</span>
                   <span className="text-xs text-gray-400 dark:text-gray-300 flex-shrink-0">
                     {ds.updatedAt ? new Date(ds.updatedAt).toLocaleDateString('ko-KR') : '—'}

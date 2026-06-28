@@ -138,7 +138,7 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
           (workspaces ?? []).map(ws => (
             <div
               key={ws.id}
-              className="flex items-center justify-between gap-2 p-3 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors"
+              className="flex items-center justify-between gap-2 p-3 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               {editingId === ws.id ? (
                 <div className="flex items-center gap-2 flex-1 min-w-0">

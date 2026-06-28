@@ -386,7 +386,7 @@ export default function OpenApiClient() {
                     navigator.clipboard.writeText(newPlain)
                     toast.success('API 키를 복사했습니다')
                   }}
-                  className="text-green-700 dark:text-green-300 border-green-300 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40"
+                  className="text-green-700 dark:text-green-300 border-green-300 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors duration-150"
                 >
                   <Copy className="w-3.5 h-3.5" /> 복사
                 </Btn>
@@ -407,7 +407,7 @@ export default function OpenApiClient() {
               {keyQuery && (
                 <button
                   onClick={() => setKeyQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -507,7 +507,7 @@ export default function OpenApiClient() {
                     variant="secondary"
                     loading={rotatingKeyId === k.key_id}
                     onClick={() => rotateKey(k)}
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-150"
                   >
                     <RefreshCw className="w-3 h-3" /> 재발급
                   </Btn>
@@ -542,7 +542,7 @@ export default function OpenApiClient() {
               {whQuery && (
                 <button
                   onClick={() => setWhQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150"
                 >
                   <X className="w-4 h-4" />
                 </button>

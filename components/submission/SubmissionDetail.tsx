@@ -144,7 +144,7 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
               </>
             ) : null}
           </div>
-          <button onClick={onClose} className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 text-xl leading-none p-1 -mt-1">×</button>
+          <button onClick={onClose} className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 text-xl leading-none p-1 -mt-1 transition-colors duration-150">×</button>
         </div>
 
         {/* 탭바 */}
@@ -232,19 +232,19 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
                       <div className="flex gap-2">
                         <button
                           onClick={() => decide('approved')} disabled={submitting}
-                          className="flex-1 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50 font-medium"
+                          className="flex-1 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50 font-medium transition-colors duration-150"
                         >
                           승인
                         </button>
                         <button
                           onClick={() => decide('review')} disabled={submitting}
-                          className="flex-1 py-2 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600 disabled:opacity-50 font-medium"
+                          className="flex-1 py-2 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600 disabled:opacity-50 font-medium transition-colors duration-150"
                         >
                           검토 중
                         </button>
                         <button
                           onClick={() => decide('rejected')} disabled={submitting}
-                          className="flex-1 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 font-medium"
+                          className="flex-1 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 font-medium transition-colors duration-150"
                         >
                           반려
                         </button>
@@ -278,7 +278,7 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
                           </thead>
                           <tbody className="divide-y divide-gray-100">
                             {detail.preview.slice(0, 20).map((row, i) => (
-                              <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                              <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                                 {previewCols.map(c => (
                                   <td key={c} className="px-3 py-1.5 text-gray-700 dark:text-gray-300 font-mono whitespace-nowrap">
                                     {row[c] != null ? String(row[c]) : <span className="text-gray-300 dark:text-gray-200">null</span>}
@@ -326,7 +326,7 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
                       <button
                         onClick={addComment}
                         disabled={submitting || !comment.trim()}
-                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors duration-150"
                       >
                         {submitting ? '등록 중...' : '코멘트 등록'}
                       </button>

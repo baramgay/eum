@@ -196,7 +196,7 @@ export default function CollectSourcesPanel({
             {runningId === s.source_id ? '실행 중' : '지금 실행'}
           </Btn>
           {lastRunResult?.sourceId === s.source_id && (
-            <Btn size="sm" variant="secondary" className="bg-emerald-600 text-white hover:bg-emerald-700 border-transparent"
+            <Btn size="sm" variant="secondary" className="bg-emerald-600 text-white hover:bg-emerald-700 border-transparent transition-colors duration-150"
               onClick={() => router.push(`/process?collect_source=${s.source_id}`)}>
               <ArrowRight className="w-3 h-3" />
               가공으로

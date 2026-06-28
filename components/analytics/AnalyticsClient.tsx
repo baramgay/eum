@@ -454,14 +454,14 @@ function LevelSelector({ variableName, levels, selected, onChange, min, max }: L
           <button
             onClick={selectAll}
             disabled={allSelected}
-            className="text-[10px] px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950 disabled:opacity-40"
+            className="text-[10px] px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 transition-colors duration-150"
           >
             전체 선택
           </button>
           <button
             onClick={clearAll}
             disabled={noneSelected}
-            className="text-[10px] px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950 disabled:opacity-40"
+            className="text-[10px] px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 transition-colors duration-150"
           >
             전체 해제
           </button>
@@ -477,7 +477,7 @@ function LevelSelector({ variableName, levels, selected, onChange, min, max }: L
               className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border transition-colors
                 ${checked
                   ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300'
-                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
               title={value}
             >
               {checked ? <CheckSquare className="w-3 h-3" /> : <Square className="w-3 h-3" />}
@@ -521,7 +521,7 @@ function ResultTableView({ table }: { table: ResultTable }) {
           </thead>
           <tbody>
             {table.rows.map((row, ri) => (
-              <tr key={ri} className="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-950">
+              <tr key={ri} className="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                 {row.map((cell, ci) => {
                   const header = table.headers[ci] ?? ''
                   const isPHint = pHint.some(h => header.toLowerCase().includes(h.toLowerCase()))
@@ -1351,7 +1351,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               disabled={loading}
               className="flex-1 flex flex-col items-center gap-3 p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group"
             >
-              <Upload className="w-8 h-8 text-gray-400 dark:text-gray-300 group-hover:text-blue-500" />
+              <Upload className="w-8 h-8 text-gray-400 dark:text-gray-300 group-hover:text-blue-500 transition-colors duration-150" />
               <div>
                 <p className="font-semibold text-gray-700 dark:text-gray-300 text-sm">파일 업로드</p>
                 <p className="text-xs text-gray-400 dark:text-gray-300 mt-0.5">CSV · Excel (.xlsx)</p>
@@ -1369,7 +1369,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               disabled={loading}
               className="flex-1 flex flex-col items-center gap-3 p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer group"
             >
-              <Database className="w-8 h-8 text-gray-400 dark:text-gray-300 group-hover:text-blue-500" />
+              <Database className="w-8 h-8 text-gray-400 dark:text-gray-300 group-hover:text-blue-500 transition-colors duration-150" />
               <div>
                 <p className="font-semibold text-gray-700 dark:text-gray-300 text-sm">카탈로그 로드</p>
                 <p className="text-xs text-gray-400 dark:text-gray-300 mt-0.5">등록된 데이터셋 목록에서 선택</p>
@@ -1400,7 +1400,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-lg mx-4 overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
               <p className="font-semibold text-gray-800 dark:text-gray-200">카탈로그 선택</p>
-              <button onClick={() => setShowCatalogPicker(false)} className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400">
+              <button onClick={() => setShowCatalogPicker(false)} className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -1495,7 +1495,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                 </div>
                 <button
                   onClick={() => { setSession(null); setResult(null); setSelectedAnalysis(null) }}
-                  className="p-1.5 rounded-lg text-gray-400 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-400"
+                  className="p-1.5 rounded-lg text-gray-400 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150"
                   title="세션 닫기"
                 >
                   <X className="w-4 h-4" />
@@ -1503,7 +1503,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               </div>
               <button
                 onClick={() => setShowPreview(v => !v)}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 transition-colors duration-150"
               >
                 {showPreview ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                 데이터 미리보기
@@ -1549,7 +1549,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                     className="flex-1 text-sm bg-transparent outline-none"
                   />
                   {varSearch && (
-                    <button onClick={() => setVarSearch('')} className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400">
+                    <button onClick={() => setVarSearch('')} className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   )}
@@ -1563,7 +1563,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                         className={`text-xs px-2 py-0.5 rounded-full border transition-colors
                           ${varTypeFilter[t]
                             ? typeBadge[t]
-                            : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                            : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                       >
                         {typeLabel[t]}
                       </button>
@@ -1572,7 +1572,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                   <button
                     onClick={() => setVarSortAsc(v => !v)}
                     title={varSortAsc ? '오름차순' : '내림차순'}
-                    className="p-1 rounded text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="p-1 rounded text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150"
                   >
                     {varSortAsc ? <SortAsc className="w-3.5 h-3.5" /> : <SortDesc className="w-3.5 h-3.5" />}
                   </button>
@@ -1630,7 +1630,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                           className={`w-full text-left px-3 py-2 rounded-lg transition-colors
                             ${selectedAnalysis?.id === item.id
                               ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                              : 'hover:bg-gray-50 dark:hover:bg-gray-950 text-gray-700 dark:text-gray-300'}`}
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
                         >
                           <p className="text-sm font-medium">{item.label}</p>
                           <p className="text-xs text-gray-400 dark:text-gray-300 mt-0.5">{item.desc}</p>
@@ -1647,7 +1647,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
               <div className="flex items-center justify-between mb-3">
                 <button
                   onClick={() => setShowHistory(v => !v)}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hover:text-gray-700 dark:hover:text-gray-200"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-150"
                 >
                   <History className="w-3.5 h-3.5" />
                   히스토리
@@ -1737,7 +1737,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                   {runs.map(run => (
                     <div
                       key={run.id}
-                      className="group text-xs rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-950 p-2 transition-colors"
+                      className="group text-xs rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 p-2 transition-colors"
                     >
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <Badge variant="blue" size="sm">{getAnalysisLabel(run.analysis_type)}</Badge>
@@ -1828,7 +1828,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                                 className={`w-full text-left px-3 py-2 text-sm border-b border-gray-100 dark:border-gray-700 last:border-0 flex items-center gap-2 transition-colors
                                   ${sel.includes(col.name)
                                     ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
-                                    : 'hover:bg-gray-50 dark:hover:bg-gray-950 text-gray-700 dark:text-gray-300'}`}
+                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'}`}
                               >
                                 <Badge variant={typeToBadgeVariant[col.type]} size="sm">
                                   {typeLabel[col.type]}
@@ -1940,7 +1940,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                             )}
                             <Btn
                               size="sm"
-                              className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+                              className="bg-purple-600 hover:bg-purple-700 border-purple-600 transition-colors duration-150"
                               onClick={() => {
                                 const today = new Date().toISOString().slice(0, 10)
                                 setRegisterForm({
@@ -1998,7 +1998,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                           variant="ghost"
                           size="sm"
                           onClick={() => setResult(null)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/40"
+                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors duration-150"
                         >
                           닫기
                         </Btn>
@@ -2076,7 +2076,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
             <Btn variant="ghost" size="sm" onClick={() => setShowRegisterModal(false)}>취소</Btn>
             <Btn
               size="sm"
-              className="bg-purple-600 hover:bg-purple-700 border-purple-600"
+              className="bg-purple-600 hover:bg-purple-700 border-purple-600 transition-colors duration-150"
               disabled={!registerForm.title.trim() || !registerForm.performed_at || registerSaving}
               onClick={async () => {
                 setRegisterSaving(true)

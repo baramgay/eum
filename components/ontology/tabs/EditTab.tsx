@@ -244,7 +244,7 @@ export default function EditTab() {
               노드 추가
             </Btn>
             <button onClick={loadNodes} disabled={loadingNodes} aria-label="새로고침"
-              className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-40">
+              className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-40 transition-colors duration-150">
               <Loader2 size={16} className={loadingNodes ? 'animate-spin' : ''} />
             </button>
           </div>
@@ -295,7 +295,7 @@ export default function EditTab() {
                 </td></tr>
               )}
               {filteredNodes.map(node => (
-                <tr key={node.obj_id} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                <tr key={node.obj_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                   {editingNodeId === node.obj_id && editingNode ? (
                     <>
                       <td className="px-3 py-2 text-gray-500 dark:text-gray-400 font-mono text-xs">{node.obj_id}</td>
@@ -314,11 +314,11 @@ export default function EditTab() {
                       <td className="px-3 py-2">
                         <div className="flex justify-end gap-1">
                           <button onClick={saveNode} disabled={savingNode} aria-label="저장"
-                            className="p-1 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 disabled:opacity-40">
+                            className="p-1 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 disabled:opacity-40 transition-colors duration-150">
                             {savingNode ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                           </button>
                           <button onClick={cancelEditNode} aria-label="취소"
-                            className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-150">
                             <X size={14} />
                           </button>
                         </div>
@@ -333,13 +333,13 @@ export default function EditTab() {
                       <td className="px-3 py-2">
                         <div className="flex justify-end gap-1">
                           <button onClick={() => startEditNode(node)} aria-label="편집"
-                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-150">
                             <Pencil size={14} />
                           </button>
                           <button onClick={() => deleteNode(node.obj_id)}
                             disabled={deletingNodeId === node.obj_id}
                             aria-label="삭제"
-                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 disabled:opacity-40">
+                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 disabled:opacity-40 transition-colors duration-150">
                             {deletingNodeId === node.obj_id
                               ? <Loader2 size={14} className="animate-spin" />
                               : <Trash2 size={14} />}
@@ -371,7 +371,7 @@ export default function EditTab() {
               엣지 추가
             </Btn>
             <button onClick={loadEdges} disabled={loadingEdges} aria-label="새로고침"
-              className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-40">
+              className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 disabled:opacity-40 transition-colors duration-150">
               <Loader2 size={16} className={loadingEdges ? 'animate-spin' : ''} />
             </button>
           </div>
@@ -445,7 +445,7 @@ export default function EditTab() {
               {filteredEdges.map(edge => {
                 const key = edgeKey(edge)
                 return (
-                  <tr key={key} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                  <tr key={key} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                     <td className="px-3 py-2 font-mono text-xs text-gray-600 dark:text-gray-400 max-w-[12rem] truncate">{edge.src}</td>
                     <td className="px-3 py-2"><Badge variant="blue">{edge.rel}</Badge></td>
                     <td className="px-3 py-2 font-mono text-xs text-gray-600 dark:text-gray-400 max-w-[12rem] truncate">{edge.dst}</td>
@@ -454,7 +454,7 @@ export default function EditTab() {
                       <button onClick={() => deleteEdge(edge)}
                         disabled={deletingEdge === key}
                         aria-label="엣지 삭제"
-                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 disabled:opacity-40">
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 disabled:opacity-40 transition-colors duration-150">
                         {deletingEdge === key
                           ? <Loader2 size={14} className="animate-spin" />
                           : <Trash2 size={14} />}

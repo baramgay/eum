@@ -29,7 +29,7 @@ export default function NodeKpiPanel({ node, scenarioKey, onClose }: NodeKpiPane
           <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate max-w-[180px]">{node.label}</span>
           <span className="text-[11px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">{node.obj_type}</span>
         </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-0.5">
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-0.5 transition-colors duration-150">
           <X className="w-4 h-4" />
         </button>
       </div>

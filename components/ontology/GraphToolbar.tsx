@@ -172,7 +172,7 @@ export default function GraphToolbar({
             <button
               type="button"
               onClick={() => { setSearchTerm(''); setIsOpen(false); inputRef.current?.focus() }}
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150"
               aria-label="검색어 지우기"
               title="검색어 지우기"
             >

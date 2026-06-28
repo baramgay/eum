@@ -51,7 +51,7 @@ export default function MigrationChartWidget({ migration, migYear }: MigrationCh
               className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                 migrationFilter === f.key
                   ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300'
-                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               {f.label}

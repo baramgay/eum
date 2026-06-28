@@ -206,7 +206,7 @@ export default function AuditLogViewer() {
         {isFiltered && (
           <button
             onClick={resetFilters}
-            className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 underline"
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 underline transition-colors duration-150"
           >
             필터 초기화
           </button>
@@ -252,7 +252,7 @@ export default function AuditLogViewer() {
                   const style = ACTION_LABELS[log.action] ?? { label: log.action, color: 'text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800', icon: FileText }
                   const Icon = style.icon
                   return (
-                    <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                    <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                       <td className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{fmtDate(log.created_at)}</td>
                       <td className="px-4 py-2">
                         <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${style.color}`}>
@@ -282,7 +282,7 @@ export default function AuditLogViewer() {
               <button
                 onClick={() => load(Math.max(1, pagination.page - 1))}
                 disabled={pagination.page === 1}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40"
+                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors duration-150"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -300,7 +300,7 @@ export default function AuditLogViewer() {
               <button
                 onClick={() => load(Math.min(pagination.total_pages, pagination.page + 1))}
                 disabled={pagination.page === pagination.total_pages}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40"
+                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors duration-150"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

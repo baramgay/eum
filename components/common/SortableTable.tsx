@@ -168,7 +168,7 @@ export default function SortableTable<T>({
               const expanded = expandedRow?.(row, idx)
               return (
                 <Fragment key={rowKey}>
-                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                     {columns.map(col => (
                       <td
                         key={col.key}

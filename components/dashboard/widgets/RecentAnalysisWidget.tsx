@@ -66,7 +66,7 @@ export default function RecentAnalysisWidget({ recentRuns }: RecentAnalysisWidge
               className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${
                 runTypeFilter === 'all'
                   ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
-                  : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-950'
+                  : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               전체
@@ -78,7 +78,7 @@ export default function RecentAnalysisWidget({ recentRuns }: RecentAnalysisWidge
                 className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${
                   runTypeFilter === t
                     ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
-                    : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-950'
+                    : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 {ANALYSIS_TYPE_LABEL[t] ?? t}
@@ -107,7 +107,7 @@ export default function RecentAnalysisWidget({ recentRuns }: RecentAnalysisWidge
             <li key={run.id}>
               <button
                 type="button"
-                className="flex items-start gap-2 w-full text-left cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-950 rounded-lg px-2 py-1.5 -mx-2 transition-colors"
+                className="flex items-start gap-2 w-full text-left cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg px-2 py-1.5 -mx-2 transition-colors"
                 onClick={() => router.push('/analytics')}
               >
                 <Badge variant="purple">

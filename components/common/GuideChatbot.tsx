@@ -85,7 +85,7 @@ export default function GuideChatbot() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-all"
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 text-white shadow-lg flex items-center justify-center transition-all duration-150"
           aria-label="AI 안내 챗봇 열기"
         >
           <MessageCircle className="w-6 h-6" />
@@ -145,7 +145,7 @@ export default function GuideChatbot() {
                 {sources.slice(0, 3).map((s, i) => (
                   <div key={i} className="text-xs text-indigo-600 dark:text-indigo-400 truncate">
                     {s.url ? (
-                      <a href={s.url} className="hover:underline">{s.title}</a>
+                      <a href={s.url} className="hover:underline transition-colors duration-150">{s.title}</a>
                     ) : (
                       s.title
                     )}

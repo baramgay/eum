@@ -85,7 +85,7 @@ export default function CollectSchedulesPanel({ sources, loading, updatingSource
             </thead>
             <tbody className="divide-y divide-gray-100">
               {scheduledSources.map(src => (
-                <tr key={src.source_id} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                <tr key={src.source_id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                   <td className="px-4 py-2">
                     <div className="font-medium text-gray-800 dark:text-gray-200">{src.title}</div>
                     <div className="text-xs text-gray-400 dark:text-gray-300 font-mono">{truncateUrl(src.url, 36)}</div>

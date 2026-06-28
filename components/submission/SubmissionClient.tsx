@@ -426,7 +426,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                         {filePreview.rows.map((row, i) => (
-                          <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+                          <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                             {row.map((cell, j) => (
                               <td key={j} className="px-3 py-1 text-gray-700 dark:text-gray-300">{cell || '—'}</td>
                             ))}
@@ -510,7 +510,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
               {search && (
                 <button
                   onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-150"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -538,7 +538,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                   className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${
                     active
                       ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-950'
+                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
                   {opt.label}
@@ -608,7 +608,7 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                   <tr
                     key={item.submission_id}
                     onClick={role === 'center' ? () => setSelectedId(item.submission_id) : undefined}
-                    className={`transition-colors ${role === 'center' ? 'cursor-pointer hover:bg-blue-50/60 dark:hover:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-950'}`}
+                    className={`transition-colors ${role === 'center' ? 'cursor-pointer hover:bg-blue-50/60 dark:hover:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                   >
                     <td className="px-4 py-3 text-gray-800 dark:text-gray-200">
                       <span className="font-medium">{item.title}</span>

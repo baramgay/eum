@@ -174,11 +174,11 @@ function StepDetail({ step, onClose }: { step: PipelineStep; onClose: () => void
         <div className="flex items-center gap-2">
           <Link
             href={step.href}
-            className="text-xs flex items-center gap-0.5 text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-xs flex items-center gap-0.5 text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-150"
           >
             관리로 이동 <ChevronRight className="w-3 h-3" />
           </Link>
-          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm">✕</button>
+          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm transition-colors duration-150">✕</button>
         </div>
       </div>
       <div className="max-h-80 overflow-auto">

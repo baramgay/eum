@@ -52,7 +52,7 @@ function CodeBlock({ label, code, lang }: { label: string; code: string; lang: s
         </span>
         <button
           onClick={copy}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 flex items-center gap-1"
+          className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 flex items-center gap-1 transition-colors duration-150"
         >
           {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
           {copied ? '복사됨' : '복사'}
@@ -100,7 +100,7 @@ function DatasetPreview({ datasetId }: { datasetId: string }) {
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {rows.map((row, i) => (
-              <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-950">
+              <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                 {cols.map(c => (
                   <td key={c} className="px-3 py-1.5 text-gray-700 dark:text-gray-300 font-mono whitespace-nowrap">
                     {row[c] != null ? String(row[c]) : <span className="text-gray-300 dark:text-gray-200">null</span>}
@@ -269,7 +269,7 @@ export default function DatasetModal({ item, onClose }: Props) {
           </button>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 text-xl leading-none"
+            className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-400 text-xl leading-none transition-colors duration-150"
             aria-label="닫기"
           >×</button>
         </div>
@@ -348,7 +348,7 @@ export default function DatasetModal({ item, onClose }: Props) {
                         <button
                           key={k}
                           onClick={() => { router.push(`/portal?q=${encodeURIComponent(k)}`); onClose() }}
-                          className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-1.5 py-0.5 rounded"
+                          className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-1.5 py-0.5 rounded transition-colors duration-150"
                         >
                           {k}
                         </button>
@@ -411,10 +411,10 @@ export default function DatasetModal({ item, onClose }: Props) {
                       <li key={r.dataset_id}>
                         <button
                           onClick={() => { router.push(`/portal?highlight=${encodeURIComponent(r.dataset_id)}`); onClose() }}
-                          className="w-full text-left flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md text-xs group"
+                          className="w-full text-left flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-950 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md text-xs group transition-colors duration-150"
                         >
                           <span className="text-gray-700 dark:text-gray-300 truncate pr-2">{r.title}</span>
-                          <ExternalLink className="w-3 h-3 text-gray-400 dark:text-gray-300 group-hover:text-gray-600 dark:group-hover:text-gray-400 flex-shrink-0" />
+                          <ExternalLink className="w-3 h-3 text-gray-400 dark:text-gray-300 group-hover:text-gray-600 dark:group-hover:text-gray-400 flex-shrink-0 transition-colors duration-150" />
                         </button>
                       </li>
                     ))}
@@ -458,7 +458,7 @@ export default function DatasetModal({ item, onClose }: Props) {
                         <button
                           key={k}
                           onClick={() => { router.push(`/portal?q=${encodeURIComponent(k)}`); onClose() }}
-                          className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-1.5 py-0.5 rounded"
+                          className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-1.5 py-0.5 rounded transition-colors duration-150"
                         >
                           {k}
                         </button>
@@ -643,7 +643,7 @@ export default function DatasetModal({ item, onClose }: Props) {
         <div className="px-6 pb-5 flex-shrink-0">
           <button
             onClick={onClose}
-            className="w-full py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950"
+            className="w-full py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150"
           >
             닫기
           </button>

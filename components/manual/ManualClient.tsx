@@ -677,7 +677,7 @@ export default function ManualClient({ role }: { role: string }) {
         </div>
         <button
           onClick={() => setShowLog(v => !v)}
-          className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <Clock className="w-4 h-4" />
           {showLog ? '가이드 보기' : '업데이트 이력'}
@@ -727,7 +727,7 @@ export default function ManualClient({ role }: { role: string }) {
                       border-b border-gray-50 dark:border-gray-800 last:border-b-0
                       ${isActive
                         ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950 hover:text-gray-900 dark:hover:text-gray-100'}
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'}
                     `}
                   >
                     <SIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400 dark:text-gray-300'}`} />
@@ -755,11 +755,11 @@ export default function ManualClient({ role }: { role: string }) {
                 ].map(({ href, label, icon: LIcon }) => (
                   <Link
                     key={href} href={href}
-                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-950 hover:text-gray-900 dark:hover:text-gray-100 transition-colors group"
+                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors group"
                   >
-                    <LIcon className="w-4 h-4 text-gray-400 dark:text-gray-300 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
+                    <LIcon className="w-4 h-4 text-gray-400 dark:text-gray-300 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors duration-150" />
                     <span className="flex-1">{label}</span>
-                    <ArrowUpRight className="w-3 h-3 text-gray-300 dark:text-gray-200 group-hover:text-gray-500 dark:group-hover:text-gray-400" />
+                    <ArrowUpRight className="w-3 h-3 text-gray-300 dark:text-gray-200 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors duration-150" />
                   </Link>
                 ))}
               </div>
@@ -799,7 +799,7 @@ export default function ManualClient({ role }: { role: string }) {
                 {activeIdx > 0 && (
                   <button
                     onClick={() => setActiveId(visibleSections[activeIdx - 1].id)}
-                    className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
                     이전

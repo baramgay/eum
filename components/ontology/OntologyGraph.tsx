@@ -1592,7 +1592,7 @@ export default function OntologyGraph({
                         setSelected(n)
                         onSelectProp?.(n)
                       }}
-                      className="w-full text-left flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                      className="w-full text-left flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 transition-colors duration-150"
                     >
                       <span
                         className="w-2.5 h-2.5 rounded-full flex-shrink-0"
@@ -1633,7 +1633,7 @@ export default function OntologyGraph({
                 setSelected(null)
                 onSelectProp?.(null)
               }}
-              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xs"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-xs transition-colors duration-150"
             >
               닫기
             </button>

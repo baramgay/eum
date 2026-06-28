@@ -93,7 +93,7 @@ function ActiveFilterChip({ label, icon, onRemove }: { label: string; icon?: Rea
       {label}
       <button
         onClick={onRemove}
-        className="hover:text-gray-900 dark:hover:text-gray-100 p-0.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+        className="hover:text-gray-900 dark:hover:text-gray-100 p-0.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-150"
         aria-label="필터 제거"
       >
         <X className="w-3 h-3" />
@@ -428,7 +428,7 @@ export default function PortalClient() {
                     <button
                       key={k}
                       onClick={e => { e.stopPropagation(); setSearchInput(k); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                      className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-1.5 py-0.5 rounded"
+                      className="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 px-1.5 py-0.5 rounded transition-colors duration-150"
                     >
                       #{highlightText(k, query)}
                     </button>

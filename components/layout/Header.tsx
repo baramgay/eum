@@ -197,7 +197,7 @@ export default function Header({ userEmail, role }: HeaderProps) {
                         {unreadCount > 0 && (
                           <button
                             onClick={markAllRead}
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1"
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 transition-colors duration-150"
                           >
                             <CheckCheck className="w-3 h-3" />
                             모두 읽음
@@ -354,7 +354,7 @@ export default function Header({ userEmail, role }: HeaderProps) {
                 </div>
                 <span className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[160px]">{userEmail}</span>
               </div>
-              <button onClick={signOut} className="text-sm text-red-500 dark:text-red-400 font-medium px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40">
+              <button onClick={signOut} className="text-sm text-red-500 dark:text-red-400 font-medium px-3 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors duration-150">
                 로그아웃
               </button>
             </div>

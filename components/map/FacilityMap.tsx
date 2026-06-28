@@ -602,7 +602,7 @@ export default function FacilityMap({ facilities }: Props) {
                 {search && (
                   <button
                     onClick={() => setSearch('')}
-                    className="mt-2 text-xs text-blue-500 hover:underline"
+                    className="mt-2 text-xs text-blue-500 hover:underline transition-colors duration-150"
                   >
                     검색 초기화
                   </button>
@@ -755,7 +755,7 @@ export default function FacilityMap({ facilities }: Props) {
                     <Building2 className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-xs font-medium text-gray-700 dark:text-gray-300">홈페이지</p>
-                      <a href={detail.homepage} target="_blank" rel="noreferrer" className="text-sm text-blue-600 dark:text-blue-400 hover:underline break-all">
+                      <a href={detail.homepage} target="_blank" rel="noreferrer" className="text-sm text-blue-600 dark:text-blue-400 hover:underline break-all transition-colors duration-150">
                         {detail.homepage.replace(/^https?:\/\//, '')}
                       </a>
                     </div>
@@ -794,7 +794,7 @@ export default function FacilityMap({ facilities }: Props) {
             </div>
             <button
               onClick={() => { setCompareSet(new Set()); setShowCompare(false) }}
-              className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-150"
             >
               초기화
             </button>

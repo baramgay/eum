@@ -18,7 +18,7 @@ export default function Card({ children, className = '', padding = 'md', hover, 
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick() } : undefined}
-      className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm ${padMap[padding]} ${hover ? 'hover:shadow-md transition-shadow' : ''} ${onClick ? 'cursor-pointer' : ''} ${draggable ? (isDragging ? 'cursor-grabbing ring-2 ring-blue-400 shadow-xl scale-[1.02] opacity-90' : 'cursor-grab') : ''} transition-all duration-150 ${className}`}
+      className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm ${padMap[padding]} ${(hover || onClick) ? 'hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-300 dark:hover:border-gray-600' : ''} ${onClick ? 'cursor-pointer' : ''} ${draggable ? (isDragging ? 'cursor-grabbing ring-2 ring-blue-400 shadow-xl scale-[1.02] opacity-90' : 'cursor-grab') : ''} transition-all duration-200 ${className}`}
       onClick={onClick}
       style={style}
       draggable={draggable}
