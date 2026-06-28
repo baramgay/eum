@@ -15,6 +15,11 @@ interface Source {
   url?: string
 }
 
+interface QuotaInfo {
+  daily_remaining: number
+  daily_limit: number
+}
+
 export default function GuideChatbot() {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
@@ -23,6 +28,7 @@ export default function GuideChatbot() {
   const [error, setError] = useState<string | null>(null)
   const [sources, setSources] = useState<Source[]>([])
   const [feedbackMap, setFeedbackMap] = useState<Record<string, 'up' | 'down'>>({})
+  const [quota, setQuota] = useState<QuotaInfo | null>(null)
   const contextMapRef = useRef<Map<string, { question: string; sources: Source[] }>>(new Map())
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -36,6 +42,10 @@ export default function GuideChatbot() {
           content: '안녕하세요! 공공데이터 평가 절차, 품질 기준, 제출 방법 등 궁금한 점을 물어보세요.',
         }])
       }
+      fetch('/api/user/quota')
+        .then((r) => r.ok ? r.json() : null)
+        .then((d) => { if (d) setQuota({ daily_remaining: d.daily_remaining, daily_limit: d.daily_limit }) })
+        .catch(() => {})
     }
   }, [open, messages.length])
 
@@ -70,6 +80,10 @@ export default function GuideChatbot() {
         contextMapRef.current.set(assistantId, { question: msg, sources: responseSources })
         setMessages((prev) => [...prev, { role: 'assistant', content: data.content, id: assistantId }])
         if (responseSources.length) setSources(responseSources)
+        fetch('/api/user/quota')
+          .then((r) => r.ok ? r.json() : null)
+          .then((d) => { if (d) setQuota({ daily_remaining: d.daily_remaining, daily_limit: d.daily_limit }) })
+          .catch(() => {})
       }
     } catch {
       setError('네트워크 오류가 발생했습니다')
@@ -121,6 +135,19 @@ export default function GuideChatbot() {
             <div className="flex items-center gap-2">
               <MessageCircle className="w-4 h-4" />
               <span className="text-sm font-semibold">EUM 안내 AI</span>
+              {quota !== null && (
+                <span
+                  className={`text-xs px-1.5 py-0.5 rounded-full font-normal ${
+                    quota.daily_remaining <= 10
+                      ? 'bg-red-500/80 text-white'
+                      : quota.daily_remaining <= 30
+                      ? 'bg-yellow-400/90 text-gray-900'
+                      : 'bg-indigo-500 text-indigo-100'
+                  }`}
+                >
+                  {quota.daily_remaining}/{quota.daily_limit}
+                </span>
+              )}
             </div>
             <button onClick={() => setOpen(false)} className="hover:opacity-70 transition-opacity duration-150" aria-label="닫기">
               <X className="w-4 h-4" />
