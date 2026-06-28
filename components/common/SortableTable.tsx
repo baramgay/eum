@@ -126,7 +126,7 @@ export default function SortableTable<T>({
         <caption className="caption-top text-left text-sm text-gray-500 dark:text-gray-400 px-4 pt-3 pb-2">
           {caption}
         </caption>
-        <thead className="bg-gray-50 dark:bg-gray-950 border-b">
+        <thead className="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700">
           <tr>
             {columns.map(col => {
               const active = sortKey === col.key
@@ -136,9 +136,10 @@ export default function SortableTable<T>({
                   scope="col"
                   aria-sort={col.sortable ? (active ? (sortDesc ? 'descending' : 'ascending') : 'none') : undefined}
                   className={cn(
-                    'px-4 py-2 font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap',
+                    'px-4 py-2 font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap transition-colors duration-150',
                     alignClass[col.align ?? 'left'],
-                    col.sortable && 'cursor-pointer select-none hover:text-gray-800 dark:hover:text-gray-200',
+                    col.sortable && 'cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-gray-700/60 hover:text-gray-800 dark:hover:text-gray-200',
+                    col.sortable && active && 'bg-gray-100 dark:bg-gray-700/60 text-gray-900 dark:text-gray-50',
                     col.thClassName
                   )}
                   style={col.width ? { width: col.width } : undefined}
@@ -146,7 +147,11 @@ export default function SortableTable<T>({
                 >
                   <span className="inline-flex items-center gap-1">
                     {col.label}
-                    {col.sortable && active && (sortDesc ? <SortDesc className="w-3 h-3" /> : <SortAsc className="w-3 h-3" />)}
+                    {col.sortable && (
+                      active
+                        ? (sortDesc ? <SortDesc className="w-3 h-3" /> : <SortAsc className="w-3 h-3" />)
+                        : <SortAsc className="w-3 h-3 opacity-25" />
+                    )}
                   </span>
                 </th>
               )
