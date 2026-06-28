@@ -208,7 +208,7 @@ export default function DatasetModal({ item, onClose }: Props) {
     if (modalTab !== 'ai-ready' || aiData || aiLoading) return
     setAiLoading(true)
     setAiError(null)
-    fetch(`/api/catalog/${item.dataset_id}/ai-ready`)
+    fetch(`/api/catalog/ai-ready/${item.dataset_id}`)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then((d: AiReadyResult) => { setAiData(d); setAiLoading(false) })
       .catch(e => { setAiError(e.message); setAiLoading(false) })

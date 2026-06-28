@@ -95,7 +95,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-xs" style={{ color: '#6b7280' }}>
+        <p className="text-xs" style={{ color: '#d1d5db' }}>
           경남빅데이터센터 GNI · {new Date().getFullYear()}
         </p>
       </div>
@@ -202,11 +202,11 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-xs mt-8" style={{ color: '#9ca3af' }}>
+          <p className="text-center text-xs mt-8" style={{ color: '#4b5563' }}>
             계정 문의:{' '}
             <a href="mailto:center@eum.gyeongnam.go.kr"
               className="underline underline-offset-2"
-              style={{ color: '#6b7280' }}>
+              style={{ color: '#1457b8' }}>
               center@eum.gyeongnam.go.kr
             </a>
           </p>

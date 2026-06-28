@@ -12,6 +12,7 @@ import {
   RefreshCw,
   LayoutGrid,
   Pencil,
+  GitBranch,
 } from 'lucide-react'
 import { PageHeader, Btn, Badge, Select } from '@/components/ui'
 import type { GraphLayoutType, AnalyticsResult, OntologyGraphData } from '@/lib/ontology/types'
@@ -30,9 +31,10 @@ import WorkspaceTab from './tabs/WorkspaceTab'
 import EditTab from './tabs/EditTab'
 const GraphTab = dynamic(() => import('./tabs/GraphTab'), { ssr: false })
 const AnalysisTab = dynamic(() => import('./tabs/AnalysisTab'), { ssr: false })
+const LineageTab = dynamic(() => import('./tabs/LineageTab'), { ssr: false })
 import ScenarioSelector from './ScenarioSelector'
 
-type Tab = '개요' | '그래프' | '노드 목록' | '분석' | '워크스페이스' | '편집'
+type Tab = '개요' | '그래프' | '노드 목록' | '분석' | '워크스페이스' | '편집' | '계보'
 
 const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
   { key: '개요', label: '개요', icon: Network },
@@ -41,6 +43,7 @@ const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
   { key: '분석', label: '분석', icon: Sparkles },
   { key: '워크스페이스', label: '워크스페이스', icon: Database },
   { key: '편집', label: '편집', icon: Pencil },
+  { key: '계보', label: '계보', icon: GitBranch },
 ]
 
 export default function OntologyClient() {
@@ -424,6 +427,8 @@ export default function OntologyClient() {
       )}
 
       {activeTab === '편집' && <EditTab />}
+
+      {activeTab === '계보' && <LineageTab />}
     </div>
   )
 }

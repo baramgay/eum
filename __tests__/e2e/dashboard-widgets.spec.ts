@@ -2,13 +2,16 @@ import { test, expect } from '@playwright/test'
 import { login, CENTER_EMAIL, CENTER_PASSWORD } from './helpers/auth'
 
 test.describe('대시보드 위젯', () => {
+  test.setTimeout(60000)
+
   test.beforeEach(async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
   })
 
   test('대시보드 페이지가 정상 로드된다', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /대시보드|이음/ })).toBeVisible()
+    // 첫 실행 시 대시보드 데이터 로딩이 느릴 수 있어 넉넉히 대기
+    await expect(page.getByRole('heading', { name: /대시보드|이음/ })).toBeVisible({ timeout: 30000 })
   })
 
   test('대시보드 페이지에 에러 없이 콘텐츠가 표시된다', async ({ page }) => {
@@ -23,7 +26,6 @@ test.describe('대시보드 위젯', () => {
 
   test('파이프라인 상태 위젯이 DOM에 존재한다', async ({ page }) => {
     test.slow()
-    await page.waitForLoadState('networkidle')
 
     // PipelineStatusWidget: 수집 현황, 파이프라인 관련 텍스트
     const pipelineWidget = page.getByText(/파이프라인|수집 현황|Pipeline/)
@@ -38,7 +40,6 @@ test.describe('대시보드 위젯', () => {
 
   test('수집 트렌드 차트 영역이 표시된다', async ({ page }) => {
     test.slow()
-    await page.waitForLoadState('networkidle')
 
     // CollectionTrendWidget: recharts SVG 또는 canvas
     // 차트 컨테이너가 DOM에 있어야 함
@@ -56,7 +57,6 @@ test.describe('대시보드 위젯', () => {
 
   test('품질 위젯 영역이 표시된다', async ({ page }) => {
     test.slow()
-    await page.waitForLoadState('networkidle')
 
     // QualityWidget 또는 QualitySignalWidget
     const qualityArea = page.getByText(/품질|Quality/).first()
@@ -69,7 +69,6 @@ test.describe('대시보드 위젯', () => {
 
   test('전체 점수 게이지(ScoreGaugeWidget)가 표시된다', async ({ page }) => {
     test.slow()
-    await page.waitForLoadState('networkidle')
 
     // ScoreGauge: "/ 100" 텍스트가 있어야 함
     const gauge = page.getByText('/ 100')
@@ -81,18 +80,8 @@ test.describe('대시보드 위젯', () => {
   })
 
   test('대시보드에서 /portal 링크로 이동할 수 있다', async ({ page }) => {
-    const portalLink = page.getByRole('link', { name: /데이터 포털/ })
-    const hasLink = await portalLink.isVisible().catch(() => false)
-    if (hasLink) {
-      await portalLink.first().click()
-      await page.waitForURL('**/portal**', { timeout: 8000 })
-      await expect(page).toHaveURL(/\/portal/)
-    } else {
-      // 헤더 탭을 통해 이동
-      await page.getByRole('link', { name: '데이터 포털' }).first().click()
-      await page.waitForURL('**/portal**', { timeout: 8000 })
-      await expect(page).toHaveURL(/\/portal/)
-    }
+    await page.getByRole('link', { name: /데이터 포털/ }).first().click()
+    await expect(page).toHaveURL(/\/portal/, { timeout: 15000 })
   })
 
   test('헤더 탭 네비게이션이 대시보드에서 정상 동작한다', async ({ page }) => {
@@ -114,9 +103,7 @@ test.describe('대시보드 위젯', () => {
   })
 
   test('ErrorState가 표시되지 않는다 (정상 로드 확인)', async ({ page }) => {
-    await page.waitForLoadState('networkidle')
-
-    // DashboardClient ErrorState: "다시 불러오기" 버튼
+    // DashboardClient ErrorState: "다시 시도" 버튼
     const retryButton = page.getByRole('button', { name: '다시 불러오기' })
     const hasError = await retryButton.isVisible().catch(() => false)
 

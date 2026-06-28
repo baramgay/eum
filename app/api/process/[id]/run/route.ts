@@ -31,6 +31,16 @@ export async function POST(
 
   try {
     const result = await runPipelineAndSave(supabase, id)
+
+    if (result.result_table) {
+      void supabase.from('data_lineage').insert({
+        run_type: 'processing',
+        run_id: result.run_id,
+        source_ids: JSON.stringify([pipeline.source_dataset_id ?? id]),
+        target_table: result.result_table,
+      })
+    }
+
     return NextResponse.json({
       run_id:       result.run_id,
       status:       result.status,

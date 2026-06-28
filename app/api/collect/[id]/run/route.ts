@@ -81,6 +81,13 @@ export async function POST(req: Request, { params }: Params) {
           link: `/collect`,
         })
 
+        void svcClient.from('data_lineage').insert({
+          run_type: 'collection',
+          run_id: logId,
+          source_ids: JSON.stringify([id]),
+          target_table: 'collection_logs',
+        })
+
         await send({ type: 'done', log_id: logId, status, rows_fetched: rowsFetched })
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err)
@@ -121,6 +128,13 @@ export async function POST(req: Request, { params }: Params) {
         link: `/collect`,
       })
     })()
+
+    void svcClient.from('data_lineage').insert({
+      run_type: 'collection',
+      run_id: logId,
+      source_ids: JSON.stringify([id]),
+      target_table: 'collection_logs',
+    })
 
     return NextResponse.json({
       log_id:      logId,

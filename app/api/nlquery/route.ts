@@ -6,11 +6,12 @@ import { normalizeContext } from '@/lib/nlquery/context'
 import type { ConversationTurn } from '@/lib/nlquery/context'
 import { unstable_cache } from 'next/cache'
 import { chatCompletionGateway } from '@/lib/ai/gateway'
-import { checkQuota, recordUsage } from '@/lib/ai/quotas'
+import { checkAndIncrementQuota } from '@/lib/ai/quotas'
 import { redactSensitive } from '@/lib/ai/safety'
 
 async function addExplanation(result: QueryResult, userId: string, supabase: Awaited<ReturnType<typeof createClient>>): Promise<QueryResult & { explanation?: string }> {
-  const quota = await checkQuota(userId, supabase)
+  const sb = await createServiceClient()
+  const quota = await checkAndIncrementQuota(userId, sb)
   if (!quota.allowed) return result
 
   const rawTableText = [
@@ -27,7 +28,6 @@ async function addExplanation(result: QueryResult, userId: string, supabase: Awa
       userId,
       maxTokens: 256,
     })
-    await recordUsage(userId, supabase, { calls: 1 })
     return { ...result, explanation: content }
   } catch {
     return result

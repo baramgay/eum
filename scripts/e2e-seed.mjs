@@ -4,19 +4,14 @@ const URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 const CENTER_EMAIL = process.env.TEST_CENTER_EMAIL || 'center@eum.test'
-const CENTER_PASSWORD = process.env.TEST_CENTER_PASSWORD
+const CENTER_PASSWORD = process.env.TEST_CENTER_PASSWORD || 'TestCenter123!'
 const AGENCY_EMAIL = process.env.TEST_AGENCY_EMAIL || 'changwon@eum.test'
-const AGENCY_PASSWORD = process.env.TEST_AGENCY_PASSWORD
+const AGENCY_PASSWORD = process.env.TEST_AGENCY_PASSWORD || 'TestAgency123!'
 
 const IS_CLEANUP = process.argv.includes('--cleanup')
 
 if (!URL || !SERVICE_KEY) {
   console.error('필수 환경변수가 누락되었습니다: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY')
-  process.exit(1)
-}
-
-if (!IS_CLEANUP && (!CENTER_PASSWORD || !AGENCY_PASSWORD)) {
-  console.error('테스트 사용자 생성 시 필수 환경변수: TEST_CENTER_PASSWORD, TEST_AGENCY_PASSWORD')
   process.exit(1)
 }
 
@@ -107,7 +102,15 @@ async function seed() {
   for (const u of TEST_USERS) {
     const found = existing.find(x => x.email === u.email)
     if (found) {
-      console.log(`  ℹ ${u.email} 이미 존재`)
+      const { error: updateError } = await supabase.auth.admin.updateUserById(found.id, {
+        password: u.password,
+        user_metadata: u.user_metadata,
+      })
+      if (updateError) {
+        console.warn(`  ⚠ ${u.email} 비밀번호 갱신 실패:`, updateError.message)
+      } else {
+        console.log(`  ℹ ${u.email} 이미 존재 (비밀번호 갱신)`)
+      }
       continue
     }
     const { data, error } = await supabase.auth.admin.createUser({

@@ -36,5 +36,13 @@ supabase/.temp/
 *.log
 eum_dev.log
 
+# Playwright 산출물
+test-results/
+playwright-report/
+
+# 자동 생성/분석 산출물
+status.html
+.understand-anything/
+
 .vercel
 .superpowers/

@@ -330,36 +330,34 @@ async function fetchCatalogInfo(
     if (table) catalogByTable.set(table, r)
   }
 
-  const result: CatalogInfo[] = []
   const sampleLimit = 3
   const maxSampleTables = 10
 
-  for (let i = 0; i < whitelist.tables.length; i++) {
-    const table = whitelist.tables[i]
-    const columns = whitelist.columns[table] ?? []
-    const info: CatalogInfo = {
-      table,
-      title: (catalogByTable.get(table)?.title as string | undefined) ?? undefined,
-      description: (catalogByTable.get(table)?.description as string | undefined) ?? undefined,
-      theme: (catalogByTable.get(table)?.theme as string | undefined) ?? undefined,
-      keywords: (catalogByTable.get(table)?.keywords as string | undefined) ?? undefined,
-      columns,
-      sampleRows: [],
-    }
-
-    if (i < maxSampleTables) {
-      try {
-        const { data } = await supabase.from(table).select('*').limit(sampleLimit)
-        if (Array.isArray(data)) info.sampleRows = data
-      } catch {
-        // 샘플 조회 실패는 무시하고 메타데이터만 사용
+  return Promise.all(
+    whitelist.tables.map(async (table, i) => {
+      const columns = whitelist.columns[table] ?? []
+      const info: CatalogInfo = {
+        table,
+        title: (catalogByTable.get(table)?.title as string | undefined) ?? undefined,
+        description: (catalogByTable.get(table)?.description as string | undefined) ?? undefined,
+        theme: (catalogByTable.get(table)?.theme as string | undefined) ?? undefined,
+        keywords: (catalogByTable.get(table)?.keywords as string | undefined) ?? undefined,
+        columns,
+        sampleRows: [],
       }
-    }
 
-    result.push(info)
-  }
+      if (i < maxSampleTables) {
+        try {
+          const { data } = await supabase.from(table).select('*').limit(sampleLimit)
+          if (Array.isArray(data)) info.sampleRows = data
+        } catch {
+          // 샘플 조회 실패는 무시하고 메타데이터만 사용
+        }
+      }
 
-  return result
+      return info
+    }),
+  )
 }
 
 async function fetchOntologyConcepts(

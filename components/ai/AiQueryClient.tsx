@@ -71,6 +71,7 @@ interface ExampleItem {
 }
 
 const STORAGE_KEY = 'eum-ai-conversations'
+const SERVER_CONV_KEY = 'eum-ai-server-conversation-ids'
 
 type AiMode = 'chat' | 'sql'
 
@@ -855,6 +856,7 @@ export default function AiQueryClient() {
   const [sidebarSearch, setSidebarSearch] = useState('')
   const [exampleCategory, setExampleCategory] = useState('전체')
   const [examples, setExamples] = useState<ExampleItem[]>(DEFAULT_EXAMPLES)
+  const [serverConvIds, setServerConvIds] = useState<Record<string, string>>({})
 
   const currentConv = useMemo(
     () => conversations.find(c => c.id === currentId) ?? null,
@@ -893,6 +895,13 @@ export default function AiQueryClient() {
   useEffect(() => {
     try {
       const raw = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null
+      const serverRaw = typeof window !== 'undefined' ? window.localStorage.getItem(SERVER_CONV_KEY) : null
+      if (serverRaw) {
+        const parsed = JSON.parse(serverRaw)
+        if (parsed && typeof parsed === 'object') {
+          setServerConvIds(parsed)
+        }
+      }
       if (raw) {
         const parsed: Conversation[] = JSON.parse(raw)
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -914,6 +923,12 @@ export default function AiQueryClient() {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations))
     }
   }, [conversations])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(SERVER_CONV_KEY, JSON.stringify(serverConvIds))
+    }
+  }, [serverConvIds])
 
   // handle URL shared query
   useEffect(() => {
@@ -1001,6 +1016,11 @@ export default function AiQueryClient() {
       }
       return next
     })
+    setServerConvIds(prev => {
+      const next: Record<string, string> = { ...prev }
+      delete next[id]
+      return next
+    })
   }
 
   function addMessage(message: ChatMessage) {
@@ -1065,19 +1085,26 @@ export default function AiQueryClient() {
     }
 
     try {
+      const serverConvId = currentId ? serverConvIds[currentId] : undefined
       const r = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: buildChatMessages(q, retry) }),
+        body: JSON.stringify({ messages: buildChatMessages(q, retry), conversation_id: serverConvId }),
       })
       const d: {
         content?: string
         result?: QueryResult
         sources?: SourceItem[]
+        conversation_id?: string
         error?: string
       } = await r.json()
       if (!r.ok) {
         throw new Error(d.error || `HTTP ${r.status}`)
+      }
+      if (d.conversation_id && currentId) {
+        const localId = currentId
+        const serverId = d.conversation_id
+        setServerConvIds(prev => ({ ...prev, [localId]: serverId }))
       }
       const assistantMsg: ChatMessage = {
         id: genId(),

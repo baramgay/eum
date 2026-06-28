@@ -74,7 +74,7 @@ export async function buildCatalogContext(
         .eq('table_schema', 'public')
         .eq('table_name', table)
         .returns<ColumnRow[]>(),
-      supabase.rpc('run_select_sql', { p_sql: `SELECT * FROM "${table}" LIMIT 5` }),
+      supabase.rpc('run_select_sql_safe', { p_sql: `SELECT * FROM "${table}" LIMIT 5` }),
     ])
     columns = colRows ?? []
     samples = Array.isArray(sampleRows) ? sampleRows : []

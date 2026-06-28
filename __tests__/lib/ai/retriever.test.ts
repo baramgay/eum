@@ -40,7 +40,7 @@ function createMockSupabase(
     if (name === 'match_catalog') {
       return Promise.resolve({ data: options.rpc?.match_catalog ?? [], error: null })
     }
-    if (name === 'run_select_sql') {
+    if (name === 'run_select_sql' || name === 'run_select_sql_safe') {
       return Promise.resolve({ data: options.rpc?.run_select_sql ?? options.samples ?? [], error: null })
     }
     return Promise.resolve({ data: [], error: null })

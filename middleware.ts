@@ -60,8 +60,13 @@ export async function middleware(request: NextRequest) {
 
   const isPublic = PUBLIC_PREFIXES.some(p => pathname.startsWith(p))
 
-  // 미인증 사용자가 보호 경로 접근 → 로그인 페이지로
+  // 미인증 사용자가 보호 경로 접근 → API는 JSON 401, 페이지는 로그인으로
   if (!user && !isPublic) {
+    if (pathname.startsWith('/api/')) {
+      const res = NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      logAccess(res)
+      return res
+    }
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
     const res = NextResponse.redirect(loginUrl)

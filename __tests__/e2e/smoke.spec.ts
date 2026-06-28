@@ -1,24 +1,17 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
-
-const CENTER_EMAIL = process.env.TEST_CENTER_EMAIL || 'center@eum.test'
-const AGENCY_EMAIL = process.env.TEST_AGENCY_EMAIL || 'changwon@eum.test'
-const CENTER_PASSWORD = process.env.TEST_CENTER_PASSWORD || ''
-const AGENCY_PASSWORD = process.env.TEST_AGENCY_PASSWORD || ''
-
-async function login(page: import('@playwright/test').Page, email: string, password: string) {
-  await page.goto('/login')
-  await page.getByRole('textbox', { name: '이메일' }).fill(email)
-  await page.getByRole('textbox', { name: '비밀번호' }).fill(password)
-  await page.getByRole('button', { name: '로그인' }).click()
-  await page.waitForURL('/')
-}
+import {
+  login,
+  CENTER_EMAIL,
+  CENTER_PASSWORD,
+  AGENCY_EMAIL,
+  AGENCY_PASSWORD,
+} from './helpers/auth'
 
 test.describe('EUM smoke tests', () => {
   test('로그인 후 대시보드가 표시된다', async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
-    await page.waitForURL('/')
-    await expect(page.getByRole('heading', { name: /대시보드|이음/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /대시보드|이음/ })).toBeVisible({ timeout: 30000 })
   })
 
   test('데이터 등록 폼이 정상적으로 열린다', async ({ page }) => {

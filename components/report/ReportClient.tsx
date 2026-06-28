@@ -379,6 +379,7 @@ export default function ReportClient({ role }: Props) {
   const reportRef = useRef<HTMLDivElement>(null)
   const [downloadingPng, setDownloadingPng] = useState(false)
   const [downloadingPdf, setDownloadingPdf] = useState(false)
+  const [downloadingEvidence, setDownloadingEvidence] = useState(false)
 
   async function downloadPNG() {
     if (!reportRef.current || !data) return
@@ -423,6 +424,104 @@ export default function ReportClient({ role }: Props) {
       alert('PDF 저장에 실패했습니다.')
     } finally {
       setDownloadingPdf(false)
+    }
+  }
+
+  async function downloadEvidence() {
+    if (!data) return
+    setDownloadingEvidence(true)
+    try {
+      const { jsPDF } = await import('jspdf')
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const margin = 14
+      let y = margin
+
+      // Title
+      doc.setFontSize(16)
+      doc.setFont('helvetica', 'bold')
+      doc.text('EUM 플랫폼 평가 증빙 자료', margin, y)
+      y += 8
+
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(120, 120, 120)
+      doc.text(`산출일: ${today}`, margin, y)
+      y += 10
+      doc.setTextColor(0, 0, 0)
+
+      // Section 1: Overall score
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold')
+      doc.text('1. 종합 점수', margin, y)
+      y += 6
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`종합 점수: ${data.overall.toFixed(1)}점 / 100점`, margin + 4, y)
+      y += 5
+      doc.text(`가점: ${data.bonus?.bonus_score ?? 0}점`, margin + 4, y)
+      y += 5
+      doc.text(`데이터셋 수: ${data.summary.datasets}개`, margin + 4, y)
+      y += 5
+      doc.text(`개방 데이터셋: ${data.summary.open}개`, margin + 4, y)
+      y += 5
+      doc.text(`AI-Ready: ${data.summary.ai_ready}개`, margin + 4, y)
+      y += 10
+
+      // Section 2: Area scores
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold')
+      doc.text('2. 영역별 점수', margin, y)
+      y += 6
+
+      const colW = [60, 25, 25, 25, 25]
+      const headers = ['영역', '점수', '충족', '미충족', '비중']
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'bold')
+      headers.forEach((h, i) => {
+        doc.text(h, margin + colW.slice(0, i).reduce((a, b) => a + b, 0), y)
+      })
+      y += 5
+      doc.setFont('helvetica', 'normal')
+      for (const area of data.areas) {
+        if (y > 260) { doc.addPage(); y = margin }
+        const cells = [
+          area.name,
+          `${area.score.toFixed(1)}`,
+          `${area.ok}`,
+          `${area.total - area.ok - (area.na ?? 0)}`,
+          `${area.weight}%`,
+        ]
+        cells.forEach((c, i) => {
+          doc.text(c, margin + colW.slice(0, i).reduce((a, b) => a + b, 0), y)
+        })
+        y += 5
+      }
+      y += 6
+
+      // Section 3: Quality summary
+      if (y > 240) { doc.addPage(); y = margin }
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold')
+      doc.text('3. 품질 현황', margin, y)
+      y += 6
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`품질 점검 건수: ${data.summary.quality_total}건`, margin + 4, y)
+      y += 5
+      doc.text(`품질 통과 건수: ${data.summary.quality_pass}건`, margin + 4, y)
+      y += 5
+      const qRate = data.summary.quality_total
+        ? ((data.summary.quality_pass / data.summary.quality_total) * 100).toFixed(1)
+        : '0.0'
+      doc.text(`품질 통과율: ${qRate}%`, margin + 4, y)
+
+      const filename = `평가증빙_${today}.pdf`
+      doc.save(filename)
+    } catch (e) {
+      console.error('[Report] 증빙 PDF 실패:', e)
+      alert('증빙 PDF 생성에 실패했습니다.')
+    } finally {
+      setDownloadingEvidence(false)
     }
   }
 
@@ -658,6 +757,10 @@ export default function ReportClient({ role }: Props) {
                 <Btn variant="ghost" size="sm" onClick={downloadPDF} loading={downloadingPdf} disabled={downloadingPdf}>
                   <FileText className="w-4 h-4" />
                   {downloadingPdf ? '생성 중...' : 'PDF 저장'}
+                </Btn>
+                <Btn variant="secondary" size="sm" onClick={downloadEvidence} loading={downloadingEvidence} disabled={downloadingEvidence}>
+                  <Download className="w-4 h-4" />
+                  {downloadingEvidence ? '생성 중...' : '평가 증빙 내보내기'}
                 </Btn>
               </>
             )}
