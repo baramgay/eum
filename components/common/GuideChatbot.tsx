@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { MessageCircle, X, Send, Loader2, ChevronDown } from 'lucide-react'
+import { MessageCircle, X, Send, Loader2, ThumbsUp, ThumbsDown } from 'lucide-react'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
+  id?: string
 }
 
 interface Source {
@@ -21,6 +22,8 @@ export default function GuideChatbot() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sources, setSources] = useState<Source[]>([])
+  const [feedbackMap, setFeedbackMap] = useState<Record<string, 'up' | 'down'>>({})
+  const contextMapRef = useRef<Map<string, { question: string; sources: Source[] }>>(new Map())
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -62,8 +65,11 @@ export default function GuideChatbot() {
       if (!res.ok) {
         setError(data.error ?? '오류가 발생했습니다')
       } else {
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.content }])
-        if (data.sources?.length) setSources(data.sources)
+        const assistantId = `${Date.now()}-${Math.random().toString(36).slice(2)}`
+        const responseSources: Source[] = data.sources ?? []
+        contextMapRef.current.set(assistantId, { question: msg, sources: responseSources })
+        setMessages((prev) => [...prev, { role: 'assistant', content: data.content, id: assistantId }])
+        if (responseSources.length) setSources(responseSources)
       }
     } catch {
       setError('네트워크 오류가 발생했습니다')
@@ -71,6 +77,21 @@ export default function GuideChatbot() {
       setLoading(false)
     }
   }, [input, loading, messages])
+
+  const submitFeedback = useCallback(async (msgId: string, helpful: boolean) => {
+    const ctx = contextMapRef.current.get(msgId)
+    if (!ctx) return
+    setFeedbackMap((prev) => ({ ...prev, [msgId]: helpful ? 'up' : 'down' }))
+    try {
+      await fetch('/api/feedback/rag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: ctx.question, sources_used: ctx.sources, helpful }),
+      })
+    } catch {
+      // 피드백 전송 실패는 사용자에게 노출하지 않음
+    }
+  }, [])
 
   const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -109,7 +130,7 @@ export default function GuideChatbot() {
           {/* 메시지 목록 */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3 max-h-80">
             {messages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                 <div
                   className={`max-w-[85%] px-3 py-2 rounded-xl text-sm whitespace-pre-wrap leading-relaxed ${
                     msg.role === 'user'
@@ -119,6 +140,32 @@ export default function GuideChatbot() {
                 >
                   {msg.content}
                 </div>
+                {msg.role === 'assistant' && msg.id && (
+                  <div className="flex items-center gap-1 mt-1 pl-1">
+                    {feedbackMap[msg.id] ? (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        {feedbackMap[msg.id] === 'up' ? '도움이 됐어요' : '도움이 안 됐어요'}
+                      </span>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => submitFeedback(msg.id!, true)}
+                          className="p-1 rounded text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-150"
+                          aria-label="도움이 됐어요"
+                        >
+                          <ThumbsUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => submitFeedback(msg.id!, false)}
+                          className="p-1 rounded text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-150"
+                          aria-label="도움이 안 됐어요"
+                        >
+                          <ThumbsDown className="w-3 h-3" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
 
