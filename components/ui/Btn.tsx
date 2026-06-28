@@ -28,7 +28,7 @@ export default function Btn({ variant = 'primary', size = 'md', loading, icon, c
   return (
     <button
       disabled={disabled || loading}
-      className={`inline-flex items-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed ${variantClass[variant]} ${sizeClass[size]} ${isPressed ? 'scale-[0.97] ring-2 ring-current/30' : ''} ${className}`}
+      className={`inline-flex items-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed ${variantClass[variant]} ${sizeClass[size]} ${isPressed ? 'scale-[0.97] ring-2 ring-black/20 dark:ring-white/20' : ''} ${className}`}
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
       onMouseLeave={() => setIsPressed(false)}

@@ -101,7 +101,7 @@ export default function GuideChatbot() {
               <MessageCircle className="w-4 h-4" />
               <span className="text-sm font-semibold">EUM 안내 AI</span>
             </div>
-            <button onClick={() => setOpen(false)} className="hover:opacity-70 transition-opacity" aria-label="닫기">
+            <button onClick={() => setOpen(false)} className="hover:opacity-70 transition-opacity duration-150" aria-label="닫기">
               <X className="w-4 h-4" />
             </button>
           </div>
