@@ -21,20 +21,24 @@ ALTER TABLE rag_evals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rag_feedback ENABLE ROW LEVEL SECURITY;
 
 -- 인증된 사용자는 평가 세트를 읽을 수 있다.
-CREATE POLICY IF NOT EXISTS "rag_evals_select_authenticated"
+DROP POLICY IF EXISTS "rag_evals_select_authenticated" ON rag_evals;
+CREATE POLICY "rag_evals_select_authenticated"
   ON rag_evals FOR SELECT TO authenticated USING (true);
 
 -- 인증된 사용자는 피드백을 남길 수 있다.
-CREATE POLICY IF NOT EXISTS "rag_feedback_insert_authenticated"
+DROP POLICY IF EXISTS "rag_feedback_insert_authenticated" ON rag_feedback;
+CREATE POLICY "rag_feedback_insert_authenticated"
   ON rag_feedback FOR INSERT TO authenticated WITH CHECK (true);
 
 -- 사용자는 자신의 피드백을 읽을 수 있다.
-CREATE POLICY IF NOT EXISTS "rag_feedback_select_own"
+DROP POLICY IF EXISTS "rag_feedback_select_own" ON rag_feedback;
+CREATE POLICY "rag_feedback_select_own"
   ON rag_feedback FOR SELECT TO authenticated
   USING (created_by = auth.uid());
 
 -- 센터는 모든 피드백을 읽을 수 있다.
-CREATE POLICY IF NOT EXISTS "rag_feedback_select_center"
+DROP POLICY IF EXISTS "rag_feedback_select_center" ON rag_feedback;
+CREATE POLICY "rag_feedback_select_center"
   ON rag_feedback FOR SELECT TO authenticated
   USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'center');
 
