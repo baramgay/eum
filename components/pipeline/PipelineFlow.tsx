@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useTheme } from '@/components/theme/ThemeProvider'
 import { AnimatePresence } from 'framer-motion'
 import { ReducedMotionDiv, ReducedMotionButton } from '@/components/ui/ReducedMotionWrapper'
 import {
@@ -273,6 +274,8 @@ function Timeline({ runs }: { runs: TimelineRun[] }) {
 
 // ────── 메인 컴포넌트 ──────
 export default function PipelineFlow() {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const [data, setData] = useState<FlowData | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -410,7 +413,7 @@ export default function PipelineFlow() {
         {/* SVG 연결선 (데스크톱) */}
         {!loading && data && (
           <svg className="hidden lg:block w-full h-2 mt-2" preserveAspectRatio="none">
-            <line x1="0" y1="1" x2="100%" y2="1" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="4 4" />
+            <line x1="0" y1="1" x2="100%" y2="1" stroke={isDark ? '#374151' : '#e5e7eb'} strokeWidth="2" strokeDasharray="4 4" />
           </svg>
         )}
       </div>

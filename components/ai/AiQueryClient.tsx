@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTheme } from '@/components/theme/ThemeProvider'
 import { createFocusTrap } from '@/lib/focus-trap'
 import SortableTable from '@/components/common/SortableTable'
 import {
@@ -550,6 +551,8 @@ function ResultCard({
   onRetry?: () => void
 }) {
   const result = message.result
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const [viewMode, setViewMode] = useState<'table'|'chart'>('table')
   const [chartType, setChartType] = useState<ChartType>('bar')
   const [chartCol, setChartCol] = useState('')
@@ -779,7 +782,7 @@ function ResultCard({
                   <LabelList
                     dataKey="v"
                     position="top"
-                    style={{ fontSize: 10, fill: '#6b7280' }}
+                    style={{ fontSize: 10, fill: isDark ? '#9CA3AF' : '#6b7280' }}
                     formatter={(v: unknown) => {
                       const n = Number(v)
                       return n >= 10000 ? `${(n / 10000).toFixed(1)}만` : n.toLocaleString()
@@ -840,7 +843,6 @@ function ResultCard({
 export default function AiQueryClient() {
   const searchParams = useSearchParams()
   const scrollRef = useRef<HTMLDivElement>(null)
-
   const [aiMode, setAiMode] = useState<AiMode>('chat')
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentId, setCurrentId] = useState<string | null>(null)

@@ -6,6 +6,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
 } from 'recharts'
 import { Building2, Users, Clock, ClipboardList } from 'lucide-react'
+import { useTheme } from '@/components/theme/ThemeProvider'
 import Card from '@/components/ui/Card'
 import StatCard from '@/components/ui/StatCard'
 
@@ -30,6 +31,9 @@ const STATUS_COLORS = {
 }
 
 export default function TenantStats({ tenants }: Props) {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+
   const statusData = useMemo(() => [
     { name: '승인 대기', key: 'pending', value: tenants.filter(t => (t.status ?? 'pending') === 'pending').length },
     { name: '승인 완료', key: 'approved', value: tenants.filter(t => (t.status ?? 'pending') === 'approved').length },
@@ -119,13 +123,15 @@ export default function TenantStats({ tenants }: Props) {
                     <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#f3f4f6'} />
                 <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="#9ca3af" />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12 }} stroke="#9ca3af" />
                 <ReTooltip
                   formatter={(value) => [`${value}개`, '등록 수']}
                   labelFormatter={(label) => `${label}`}
-                  contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb' }}
+                  contentStyle={isDark
+                    ? { borderRadius: 8, border: '1px solid #374151', backgroundColor: '#1F2937', color: '#F9FAFB' }
+                    : { borderRadius: 8, border: '1px solid #e5e7eb' }}
                 />
                 <Area
                   type="monotone"

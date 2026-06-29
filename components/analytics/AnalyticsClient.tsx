@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { useTheme } from '@/components/theme/ThemeProvider'
 import {
   Upload, Database, ChevronDown, ChevronRight, PlayCircle,
   X, AlertCircle, Loader2, BarChart2, Info, Download, Search,
@@ -682,6 +683,10 @@ function HeatmapChart({ chart }: { chart: ChartSpec }) {
 }
 
 function ResultCharts({ charts }: { charts: ChartSpec[] }) {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+  const axisLabelFill = isDark ? '#9CA3AF' : '#6B7280'
+  const gridStroke = isDark ? '#374151' : '#e5e7eb'
   return (
     <div className="space-y-6 mt-6">
       {charts.map((chart, idx) => {
@@ -699,16 +704,16 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
               {chart.type === 'bar' && (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 24 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridStroke} />
                     <XAxis
                       dataKey={chart.xKey ?? 'name'}
                       tick={{ fontSize: 11 }}
                       interval={0}
                       angle={data.length > 8 ? 30 : 0}
                       height={data.length > 8 ? 50 : 30}
-                      label={{ value: chart.xKey ?? '범주', position: 'insideBottom', offset: -8, fontSize: 11, fill: '#6B7280' }}
+                      label={{ value: chart.xKey ?? '범주', position: 'insideBottom', offset: -8, fontSize: 11, fill: axisLabelFill }}
                     />
-                    <YAxis tickFormatter={formatTick} tick={{ fontSize: 11 }} label={{ value: chart.yKey ?? '값', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6B7280' }} />
+                    <YAxis tickFormatter={formatTick} tick={{ fontSize: 11 }} label={{ value: chart.yKey ?? '값', angle: -90, position: 'insideLeft', fontSize: 11, fill: axisLabelFill }} />
                     <Tooltip formatter={(v: unknown) => [formatTick(v), chart.yKey ?? '값']} />
                     {chart.stackKeys && chart.stackKeys.length > 0 ? (
                       <>
@@ -725,13 +730,13 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
               {chart.type === 'line' && (
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 24 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                     <XAxis
                       dataKey={chart.xKey ?? 'name'}
                       tick={{ fontSize: 11 }}
-                      label={{ value: chart.xKey ?? '시점', position: 'insideBottom', offset: -8, fontSize: 11, fill: '#6B7280' }}
+                      label={{ value: chart.xKey ?? '시점', position: 'insideBottom', offset: -8, fontSize: 11, fill: axisLabelFill }}
                     />
-                    <YAxis tickFormatter={formatTick} tick={{ fontSize: 11 }} label={{ value: '값', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6B7280' }} />
+                    <YAxis tickFormatter={formatTick} tick={{ fontSize: 11 }} label={{ value: '값', angle: -90, position: 'insideLeft', fontSize: 11, fill: axisLabelFill }} />
                     <Tooltip />
                     <Legend />
                     {chart.yKey ? (
@@ -748,14 +753,14 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
               {chart.type === 'scatter' && (
                 <ResponsiveContainer width="100%" height={340}>
                   <ScatterChart margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                     <XAxis
                       type="number"
                       dataKey={chart.xKey ?? 'x'}
                       name={chart.xKey ?? 'x'}
                       tickFormatter={formatTick}
                       tick={{ fontSize: 11 }}
-                      label={{ value: chart.xKey ?? 'x', position: 'insideBottom', offset: -4, fontSize: 11, fill: '#6B7280' }}
+                      label={{ value: chart.xKey ?? 'x', position: 'insideBottom', offset: -4, fontSize: 11, fill: axisLabelFill }}
                     />
                     <YAxis
                       type="number"
@@ -763,7 +768,7 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
                       name={chart.yKey ?? 'y'}
                       tickFormatter={formatTick}
                       tick={{ fontSize: 11 }}
-                      label={{ value: chart.yKey ?? 'y', angle: -90, position: 'insideLeft', fontSize: 11, fill: '#6B7280' }}
+                      label={{ value: chart.yKey ?? 'y', angle: -90, position: 'insideLeft', fontSize: 11, fill: axisLabelFill }}
                     />
                     <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v: unknown) => formatTick(v)} />
                     <Legend />
@@ -835,7 +840,6 @@ interface Props { role: string; tenantId: string }
 export default function AnalyticsClient({ role, tenantId }: Props) {
   const searchParams = useSearchParams()
   const router = useRouter()
-
   const [session, setSession]   = useState<SessionState | null>(null)
   const [loading, setLoading]   = useState(false)
   const [loadError, setLoadError] = useState('')
