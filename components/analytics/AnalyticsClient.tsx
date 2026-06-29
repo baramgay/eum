@@ -7,7 +7,7 @@ import {
   X, AlertCircle, Loader2, BarChart2, Info, Download, Search,
   RotateCcw, CheckSquare, Square, Copy, Image as ImageIcon,
   Check, Filter, Layers, SortAsc, SortDesc, Clock, History,
-  FileText, Share2,
+  FileText, Share2, Lightbulb,
 } from 'lucide-react'
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, ScatterChart, Scatter,
@@ -848,6 +848,8 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
 
   const [running, setRunning]   = useState(false)
   const [result, setResult]     = useState<AnalysisResult | null>(null)
+  const [narration, setNarration]     = useState<string | null>(null)
+  const [narrateLoading, setNarrateLoading] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
 
   const [showCatalogPicker, setShowCatalogPicker] = useState(false)
@@ -1190,9 +1192,37 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
     return { ok: messages.length === 0, messages }
   }
 
+  async function fetchNarration(analysisType: string, analysisResult: AnalysisResult) {
+    if (!process.env.NEXT_PUBLIC_AI_NARRATE_ENABLED && !analysisResult.tables?.length) return
+    setNarrateLoading(true)
+    try {
+      const firstTable = analysisResult.tables?.[0]
+      const summaryData = firstTable
+        ? { title: analysisResult.title, table_title: firstTable.title, headers: firstTable.headers, sample_rows: firstTable.rows.slice(0, 5) }
+        : { title: analysisResult.title }
+      const res = await fetch('/api/analyze/narrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          analysis_type: analysisType,
+          dataset_title: session?.source_label,
+          summary_data: summaryData,
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json() as { narration?: string }
+        setNarration(data.narration ?? null)
+      }
+    } catch {
+      // 해설 실패는 조용히 무시
+    } finally {
+      setNarrateLoading(false)
+    }
+  }
+
   async function runAnalysis() {
     if (!session || !selectedAnalysis) return
-    setRunning(true); setResult(null)
+    setRunning(true); setResult(null); setNarration(null)
     try {
       const payload: Record<string, unknown> = {
         session_id: session.session_id,
@@ -1208,6 +1238,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
       const json = await res.json()
       setResult(json)
       if (json.ok) {
+        fetchNarration(selectedAnalysis.id, json as AnalysisResult)
         const updated = pushLocalHistory({
           dataset_id: session.session_id,
           dataset_label: session.source_label,
@@ -1959,6 +1990,18 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                             </Btn>
                           </div>
                         </div>
+                        {/* AI 해설 패널 */}
+                        {(narrateLoading || narration) && (
+                          <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 flex gap-2.5">
+                            <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                            {narrateLoading ? (
+                              <span className="text-xs text-amber-700 dark:text-amber-300 animate-pulse">AI 해설 생성 중…</span>
+                            ) : (
+                              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{narration}</p>
+                            )}
+                          </div>
+                        )}
+
                         {result.tables?.map((t, i) => (
                           <ResultTableView key={i} table={t} />
                         ))}
