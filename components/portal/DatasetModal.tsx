@@ -12,7 +12,7 @@ interface CatalogItem {
   quality_summary: string | null; description: string | null
   updated_at: string | null; rows: number | null
   keywords?: string | null; is_open?: boolean; ai_ready?: boolean; api_enabled?: boolean
-  download_count?: number
+  is_pseudonymized?: boolean; is_synthetic?: boolean; download_count?: number
 }
 
 interface SuggestMetaResult {
@@ -292,6 +292,12 @@ export default function DatasetModal({ item, onClose }: Props) {
             {item.ai_ready && (
               <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded">AI-Ready</span>
             )}
+            {item.is_pseudonymized && (
+              <span className="text-xs bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded">가명</span>
+            )}
+            {item.is_synthetic && (
+              <span className="text-xs bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded">합성</span>
+            )}
           </div>
           {/* 탭 버튼 */}
           <div className="flex gap-1 mt-3 flex-wrap">
@@ -442,6 +448,8 @@ export default function DatasetModal({ item, onClose }: Props) {
                   ['개방 여부', item.is_open ? '개방' : '비개방'],
                   ['API 제공', item.api_enabled ? '제공' : '미제공'],
                   ['AI-Ready', item.ai_ready ? '충족' : '미충족'],
+                  ['가명처리', item.is_pseudonymized ? '해당' : '해당 없음'],
+                  ['합성데이터', item.is_synthetic ? '해당' : '해당 없음'],
                   ['다운로드 수', `${(item.download_count ?? 0).toLocaleString()}회`],
                   ['품질 요약', item.quality_summary || '—'],
                 ].map(([dt, dd]) => (

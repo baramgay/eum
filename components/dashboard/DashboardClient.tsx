@@ -24,6 +24,7 @@ import SettlementRankWidget from './widgets/SettlementRankWidget'
 import DataUsageWidget from './widgets/DataUsageWidget'
 import LineageWidget from './widgets/LineageWidget'
 import GovernanceWidget from './widgets/GovernanceWidget'
+import SyntheticBonusWidget from './widgets/SyntheticBonusWidget'
 
 export interface AreaScore { name: string; score: number; color: string; weight: number }
 export interface CollectionTrendRow {
@@ -36,6 +37,7 @@ export interface CollectionTrendRow {
 
 export interface Indicators {
   overall: number; areas: AreaScore[]; summary: string
+  bonus?: { synthetic_cases: number; bonus_score: number }
   pipeline?: {
     collect_sources: number
     last_run_ok: number
@@ -334,6 +336,8 @@ export default function DashboardClient() {
       />
 
       <ScoreGaugeWidget overall={data.overall} areas={data.areas} />
+
+      {data.bonus && <SyntheticBonusWidget bonus={data.bonus} />}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         <PipelineStatusWidget pipeline={data.pipeline} />

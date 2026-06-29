@@ -51,14 +51,15 @@ export async function GET(req: NextRequest) {
   const q        = req.nextUrl.searchParams.get('q') ?? ''
   const theme    = req.nextUrl.searchParams.get('theme') ?? ''
   const isOpen   = req.nextUrl.searchParams.get('open')
-  const aiReady  = req.nextUrl.searchParams.get('ai_ready')
+  const aiReady        = req.nextUrl.searchParams.get('ai_ready')
+  const onlySynthetic  = req.nextUrl.searchParams.get('only_synthetic')
   const tenantId = req.nextUrl.searchParams.get('tenant_id') ?? ''
   const page     = parseInt(req.nextUrl.searchParams.get('page') ?? '1', 10)
   const pageSize = 20
 
   let query = supabase
     .from('catalog')
-    .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract', { count: 'exact' })
+    .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract,is_pseudonymized,is_synthetic', { count: 'exact' })
     .order('updated_at', { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -70,8 +71,9 @@ export async function GET(req: NextRequest) {
   }
   if (theme)              query = query.eq('theme', theme) as typeof query
   if (isOpen === 'true')  query = query.eq('is_open', true) as typeof query
-  if (aiReady === 'true') query = query.eq('ai_ready', true) as typeof query
-  if (tenantId)           query = query.eq('tenant_id', tenantId) as typeof query
+  if (aiReady === 'true')       query = query.eq('ai_ready', true) as typeof query
+  if (onlySynthetic === 'true') query = query.or('is_synthetic.eq.true,is_pseudonymized.eq.true') as typeof query
+  if (tenantId)                 query = query.eq('tenant_id', tenantId) as typeof query
 
   const { data, count, error } = await query
 
@@ -80,7 +82,7 @@ export async function GET(req: NextRequest) {
     const term = `%${q}%`
     const { data: fallback } = await supabase
       .from('catalog')
-      .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract')
+      .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract,is_pseudonymized,is_synthetic')
       .or(`title.ilike.${term},description.ilike.${term}`)
       .order('updated_at', { ascending: false })
       .limit(pageSize)

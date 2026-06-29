@@ -75,10 +75,12 @@ export async function GET() {
     .slice(0, 3)
     .map(([rule]) => rule)
 
-  const s = ev.summary as Record<string, number>
+  const s  = ev.summary as Record<string, number>
+  const b  = ev.bonus as { synthetic_cases: number; bonus_score: number } | undefined
   return jsonOk({
     overall: ev.overall,
     areas:   ev.areas,
+    bonus:   b ?? { synthetic_cases: 0, bonus_score: 0 },
     summary: `데이터셋 ${s.datasets}개 · 개방 ${s.open}개 · AI-Ready ${s.ai_ready}개 · 입주기관 ${s.tenants_on}/${s.tenants_total}`,
     pipeline: {
       collect_sources: collectSources ?? 0,
