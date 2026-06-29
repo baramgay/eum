@@ -7,6 +7,7 @@ import {
   isQualityPassed,
   computeAiReadyChecklist,
   computeSubmissionContribution,
+  computeSyntheticBonus,
 } from '@/lib/evaluation'
 
 describe('AREAS', () => {
@@ -83,6 +84,30 @@ describe('computeAiReadyChecklist', () => {
       expect(c).toHaveProperty('pass')
       expect(c).toHaveProperty('detail')
     })
+  })
+})
+
+describe('computeSyntheticBonus', () => {
+  it('0건 → bonus_score=0', () => {
+    expect(computeSyntheticBonus(0, 0).bonus_score).toBe(0)
+  })
+
+  it('합성 1건 → bonus_score=1', () => {
+    expect(computeSyntheticBonus(1, 0).bonus_score).toBe(1)
+  })
+
+  it('가명 1건 → bonus_score=1', () => {
+    expect(computeSyntheticBonus(0, 1).bonus_score).toBe(1)
+  })
+
+  it('합성 2건 + 가명 1건 → bonus_score=3', () => {
+    const r = computeSyntheticBonus(2, 1)
+    expect(r.bonus_score).toBe(3)
+    expect(r.total_cases).toBe(3)
+  })
+
+  it('10건이어도 max=5 초과 불가', () => {
+    expect(computeSyntheticBonus(5, 5).bonus_score).toBe(5)
   })
 })
 

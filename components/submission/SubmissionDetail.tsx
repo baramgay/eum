@@ -8,6 +8,7 @@ interface SubmissionMeta {
   license: string | null; format: string | null; table_name: string
   rows: number; status: string; quality_summary: string | null
   decision_note: string | null; submitted_at: string; decided_at: string | null
+  is_pseudonymized?: boolean; is_synthetic?: boolean
 }
 
 interface Comment {
@@ -196,6 +197,17 @@ export default function SubmissionDetail({ submissionId, role, onClose, onDecisi
                       </div>
                     ))}
                   </dl>
+
+                  {(detail.meta.is_pseudonymized || detail.meta.is_synthetic) && (
+                    <div className="flex gap-2">
+                      {detail.meta.is_pseudonymized && (
+                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">가명처리 데이터셋 (평가편람 ⑤ 가점)</span>
+                      )}
+                      {detail.meta.is_synthetic && (
+                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300">합성데이터셋 (평가편람 ⑤ 가점)</span>
+                      )}
+                    </div>
+                  )}
 
                   {detail.meta.description && (
                     <div>

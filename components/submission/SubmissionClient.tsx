@@ -21,6 +21,7 @@ import Textarea from '@/components/ui/Textarea'
 interface Submission {
   submission_id: string; title: string; status: string; tenant_id: string
   submitted_at: string; quality_summary: string | null
+  is_pseudonymized?: boolean; is_synthetic?: boolean
   consultant_comments?: { count: number }[]
 }
 
@@ -624,6 +625,12 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                   >
                     <td className="px-4 py-3 text-gray-800 dark:text-gray-200">
                       <span className="font-medium">{item.title}</span>
+                      {item.is_pseudonymized && (
+                        <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-semibold rounded bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">가명</span>
+                      )}
+                      {item.is_synthetic && (
+                        <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold rounded bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300">합성</span>
+                      )}
                       {role === 'center' && <span className="ml-1 text-xs text-blue-400">→</span>}
                     </td>
                     {role === 'center' && (
