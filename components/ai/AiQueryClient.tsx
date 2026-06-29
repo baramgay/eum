@@ -891,15 +891,18 @@ export default function AiQueryClient() {
     }
   }, [conversations.length, currentConv])
 
-  // load from localStorage
+  // load from localStorage then sync from server
   useEffect(() => {
+    let localIds: Set<string> = new Set()
+    let serverIdMap: Record<string, string> = {}
     try {
       const raw = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null
       const serverRaw = typeof window !== 'undefined' ? window.localStorage.getItem(SERVER_CONV_KEY) : null
       if (serverRaw) {
         const parsed = JSON.parse(serverRaw)
         if (parsed && typeof parsed === 'object') {
-          setServerConvIds(parsed)
+          serverIdMap = parsed as Record<string, string>
+          setServerConvIds(serverIdMap)
         }
       }
       if (raw) {
@@ -907,15 +910,78 @@ export default function AiQueryClient() {
         if (Array.isArray(parsed) && parsed.length > 0) {
           setConversations(parsed)
           setCurrentId(parsed[0].id)
-          return
+          localIds = new Set(parsed.map(c => c.id))
+        } else {
+          createNewConversation()
         }
+      } else {
+        createNewConversation()
       }
     } catch {
-      // ignore corrupt storage
+      createNewConversation()
     }
-    createNewConversation()
+
+    // 서버 대화 목록 동기화 (크로스디바이스)
+    const knownServerIds = new Set(Object.values(serverIdMap))
+    fetch('/api/ai/conversations')
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { conversations: { id: string; title: string; updated_at: string }[] } | null) => {
+        if (!data?.conversations?.length) return
+        const missing = data.conversations.filter(
+          c => !knownServerIds.has(c.id) && !localIds.has(c.id)
+        )
+        if (!missing.length) return
+        const stubs: Conversation[] = missing.map(c => ({
+          id: c.id,
+          title: c.title || '저장된 대화',
+          messages: [],
+          updatedAt: new Date(c.updated_at).getTime(),
+        }))
+        setConversations(prev => {
+          const merged = [...prev]
+          stubs.forEach(stub => {
+            if (!merged.find(c => c.id === stub.id)) merged.push(stub)
+          })
+          return merged.sort((a, b) => b.updatedAt - a.updatedAt)
+        })
+        // 서버 ID를 자기 자신으로 매핑 (ask()에서 conversation_id로 그대로 사용)
+        setServerConvIds(prev => {
+          const next = { ...prev }
+          missing.forEach(c => { next[c.id] = c.id })
+          return next
+        })
+      })
+      .catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // 서버 스텁 대화 선택 시 메시지 지연 로드
+  useEffect(() => {
+    if (!currentId) return
+    const conv = conversations.find(c => c.id === currentId)
+    if (!conv || conv.messages.length > 0) return
+    const serverId = serverConvIds[currentId]
+    if (!serverId) return
+
+    fetch(`/api/ai/conversations?id=${encodeURIComponent(serverId)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { messages: { id: string; role: string; content: string; created_at: string }[] } | null) => {
+        if (!data?.messages?.length) return
+        const loaded: ChatMessage[] = data.messages
+          .filter(m => m.role === 'user' || m.role === 'assistant')
+          .map(m => ({
+            id: m.id,
+            role: m.role as 'user' | 'assistant',
+            ...(m.role === 'user' ? { query: m.content } : { content: m.content }),
+            createdAt: new Date(m.created_at).getTime(),
+          }))
+        setConversations(prev => prev.map(c =>
+          c.id === currentId ? { ...c, messages: loaded } : c
+        ))
+      })
+      .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentId])
 
   // persist
   useEffect(() => {
