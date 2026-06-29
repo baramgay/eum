@@ -32,6 +32,7 @@ export async function createSubmission(
   tableName: string,
   rows: number,
   qualitySummary: string,
+  flags?: { is_pseudonymized?: boolean; is_synthetic?: boolean },
 ): Promise<string> {
   const submissionId = randomHex(16)
   await supabase.from('submissions').insert({
@@ -41,6 +42,8 @@ export async function createSubmission(
     table_name: tableName, rows, status: 'submitted',
     quality_summary: qualitySummary, decision_note: null,
     submitted_at: new Date().toISOString(), decided_at: null,
+    is_pseudonymized: flags?.is_pseudonymized ?? false,
+    is_synthetic: flags?.is_synthetic ?? false,
   })
   return submissionId
 }

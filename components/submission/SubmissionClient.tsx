@@ -336,6 +336,18 @@ export default function SubmissionClient({ role, tenantId }: Props) {
                 className="px-3 py-2 rounded-lg bg-white dark:bg-gray-900" />
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-300">최소 20자 이상 입력해 주세요.</p>
             </div>
+            <div className="flex flex-wrap gap-6 pt-1">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" name="is_pseudonymized" className="w-4 h-4 rounded accent-blue-600" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">가명처리 데이터셋</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">(평가편람 ⑤ 가점)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" name="is_synthetic" className="w-4 h-4 rounded accent-blue-600" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">합성데이터셋</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">(평가편람 ⑤ 가점)</span>
+              </label>
+            </div>
             <div>
               <label htmlFor="submission-csv-file" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">CSV 파일 <span className="text-red-500">*</span></label>
               <button

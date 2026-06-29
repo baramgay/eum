@@ -554,6 +554,8 @@ export default function ReportClient({ role }: Props) {
       .map(ind => ({ area: area.name, ind, ...indicatorAction(ind) }))
   ).sort((a, b) => b.pts - a.pts) : []
 
+  const totalPotentialPts = actionItems.reduce((s, a) => s + a.pts, 0)
+
   const radarData = data ? data.areas.map(a => ({ subject: a.name, score: a.score, fullMark: 100 })) : []
 
   const statusDistribution = data ? [
@@ -1019,6 +1021,9 @@ export default function ReportClient({ role }: Props) {
                   우선 개선 액션 — {actionItems.length}개 지표 미충족
                 </span>
                 <span className="text-xs text-amber-600 dark:text-amber-400 ml-1">점수 기여도 높은 순</span>
+                <span className="ml-auto text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-800/60 px-2 py-0.5 rounded-full">
+                  최대 +{totalPotentialPts}점 획득 가능
+                </span>
               </div>
               <div className="divide-y divide-amber-100 dark:divide-amber-800/50">
                 {actionItems.slice(0, 6).map((item, i) => (

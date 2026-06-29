@@ -87,7 +87,11 @@ export async function POST(req: Request) {
   const diag    = await runQualityGeneric(supabase, tableName, uploadedData)
   const summary = summarizeQuality(diag)
   const rows    = parseInt(form.get('rows') as string ?? String(uploadedData.length), 10)
-  const subId   = await createSubmission(supabase, meta, tableName, rows || uploadedData.length, summary)
+  const flags   = {
+    is_pseudonymized: form.get('is_pseudonymized') === 'on',
+    is_synthetic:     form.get('is_synthetic')     === 'on',
+  }
+  const subId   = await createSubmission(supabase, meta, tableName, rows || uploadedData.length, summary, flags)
 
   // 감사 로그 (fire-and-forget)
   void logAction(supabase, user, 'submitted', 'submission', subId, undefined, { title: meta.title, tenant_id: tenantId }, req)
