@@ -80,10 +80,15 @@ describe('GET /api/ai/conversations', () => {
   })
 
   it('존재하지 않는 ?id → 404', async () => {
-    const client = mockUser('u1')
-    const convBuilder = client.from('conversations')
-    convBuilder.single = jest.fn().mockResolvedValue({ data: null })
-    ;(createClient as jest.Mock).mockResolvedValue(client)
+    const convBuilder = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({ data: null }),
+    }
+    ;(createClient as jest.Mock).mockResolvedValue({
+      auth: { getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'u1' } }, error: null }) },
+      from: jest.fn().mockReturnValue(convBuilder),
+    })
     const res = await GET(new Request(makeUrl('', { id: 'no-such-id' })) as never)
     expect(res.status).toBe(404)
   })
