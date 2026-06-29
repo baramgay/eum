@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTheme } from '@/components/theme/ThemeProvider'
 import { select } from 'd3-selection'
 import 'd3-transition'
 import Card from '@/components/ui/Card'
@@ -76,6 +77,8 @@ function edgePath(
 export default function LineageWidget() {
   const svgRef  = useRef<SVGSVGElement>(null)
   const router  = useRouter()
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const [graph,   setGraph]   = useState<LineageGraph | null>(null)
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState<string | null>(null)
@@ -111,7 +114,7 @@ export default function LineageWidget() {
       .attr('orient', 'auto-start-reverse')
       .append('path')
       .attr('d', 'M 0 0 L 10 5 L 0 10 z')
-      .attr('fill', '#94A3B8')
+      .attr('fill', isDark ? '#64748B' : '#94A3B8')
 
     for (const e of validEdges) {
       const from = nodeMap.get(e.from)!
@@ -119,7 +122,7 @@ export default function LineageWidget() {
       svg.append('path')
         .attr('d', edgePath(from, to))
         .attr('fill', 'none')
-        .attr('stroke', '#CBD5E1')
+        .attr('stroke', isDark ? '#475569' : '#CBD5E1')
         .attr('stroke-width', 1.5)
         .attr('marker-end', 'url(#arrow)')
     }
@@ -133,7 +136,7 @@ export default function LineageWidget() {
           .attr('y', PAD_TOP - 10)
           .attr('text-anchor', 'middle')
           .attr('font-size', 11)
-          .attr('fill', '#94A3B8')
+          .attr('fill', isDark ? '#94A3B8' : '#94A3B8')
           .attr('font-family', 'Pretendard, sans-serif')
           .text(NODE_TYPE_LABEL[n.type])
       }
@@ -162,12 +165,11 @@ export default function LineageWidget() {
         .attr('y', NODE_H / 2 + 1)
         .attr('dominant-baseline', 'middle')
         .attr('font-size', 12)
-        .attr('fill', '#1E293B')
+        .attr('fill', isDark ? '#F1F5F9' : '#1E293B')
         .attr('font-family', 'Pretendard, sans-serif')
-        .attr('class', 'dark:text-slate-100')
         .text(n.label.length > 16 ? `${n.label.slice(0, 15)}…` : n.label)
     }
-  }, [graph, router])
+  }, [graph, router, isDark])
 
   const isEmpty = !loading && !error && graph && graph.nodes.length === 0
 

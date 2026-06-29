@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { TrendingUp } from 'lucide-react'
+import { useTheme } from '@/components/theme/ThemeProvider'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer,
 } from 'recharts'
@@ -14,6 +15,9 @@ interface CollectionTrendWidgetProps {
 }
 
 export default function CollectionTrendWidget({ trend }: CollectionTrendWidgetProps) {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+
   return (
     <Card>
       <div className="flex items-center justify-between mb-3">
@@ -24,15 +28,16 @@ export default function CollectionTrendWidget({ trend }: CollectionTrendWidgetPr
         <figure className="w-full h-40" role="img" aria-label="최근 7일 수집 트렌드 선 차트">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={trend} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v: string) => v.slice(5)} />
-              <YAxis tick={{ fontSize: 10 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#f3f4f6'} />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: isDark ? '#9CA3AF' : '#6B7280' }} tickFormatter={(v: string) => v.slice(5)} />
+              <YAxis tick={{ fontSize: 10, fill: isDark ? '#9CA3AF' : '#6B7280' }} />
               <Tooltip
                 formatter={(value, name) => {
                   const label = name === 'ok' ? '정상' : name === 'fail' ? '실패' : name === 'rows' ? '수집 행' : String(name)
                   return [typeof value === 'number' ? value.toLocaleString() : value, label]
                 }}
                 labelFormatter={(label) => String(label)}
+                contentStyle={isDark ? { backgroundColor: '#1F2937', border: '1px solid #374151', color: '#F9FAFB' } : undefined}
               />
               <Line type="monotone" dataKey="ok" stroke="#16a34a" strokeWidth={2} dot={false} name="정상" />
               <Line type="monotone" dataKey="fail" stroke="#dc2626" strokeWidth={2} dot={false} name="실패" />

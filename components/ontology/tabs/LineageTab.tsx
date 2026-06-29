@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
+import { useTheme } from '@/components/theme/ThemeProvider'
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 
 interface LineageNode {
@@ -35,6 +36,7 @@ function drawGraph(
   canvas: HTMLCanvasElement,
   graph: LineageGraph,
   hoverId: string | null,
+  isDark = false,
 ) {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
@@ -122,7 +124,7 @@ function drawGraph(
     ctx.restore()
 
     ctx.save()
-    ctx.fillStyle = '#374151'
+    ctx.fillStyle = isDark ? '#9CA3AF' : '#374151'
     ctx.font = '10px sans-serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
@@ -132,6 +134,8 @@ function drawGraph(
 }
 
 export default function LineageTab() {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const [graph, setGraph] = useState<LineageGraph | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -180,8 +184,8 @@ export default function LineageTab() {
       })
     }
     positionsRef.current = map
-    drawGraph(canvas, graph, hoverId)
-  }, [graph, hoverId])
+    drawGraph(canvas, graph, hoverId, isDark)
+  }, [graph, hoverId, isDark])
 
   function handleMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current
