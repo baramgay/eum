@@ -35,21 +35,23 @@ export async function POST(
 
   if (body.status === 'approved' && sub) {
     await supabase.from('catalog').upsert({
-      dataset_id:  `ds-${id}`,
-      tenant_id:   sub.tenant_id,
-      title:       sub.title,
-      description: sub.description,
-      theme:       sub.theme,
-      keywords:    sub.keywords,
-      license:     sub.license,
-      format:      sub.format,
-      table_name:  sub.table_name,
-      rows:        sub.rows,
-      is_open:     true,
-      ai_ready:    false,
-      high_value:  false,
-      layer:       'silver',
-      updated_at:  new Date().toISOString(),
+      dataset_id:       `ds-${id}`,
+      tenant_id:        sub.tenant_id,
+      title:            sub.title,
+      description:      sub.description,
+      theme:            sub.theme,
+      keywords:         sub.keywords,
+      license:          sub.license,
+      format:           sub.format,
+      table_name:       sub.table_name,
+      rows:             sub.rows,
+      is_open:          true,
+      ai_ready:         false,
+      high_value:       false,
+      layer:            'silver',
+      is_pseudonymized: sub.is_pseudonymized ?? false,
+      is_synthetic:     sub.is_synthetic     ?? false,
+      updated_at:       new Date().toISOString(),
     }, { onConflict: 'dataset_id' })
   }
 

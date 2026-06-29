@@ -270,7 +270,8 @@ export async function computeIndicators(supabase: SupabaseClient, tenantId?: str
   const [totalDs, openDs, aiReady, highValue, apiEnabled,
          usage, qTotal, qPass, errRes,
          objCnt, linkCnt, tTotal, tOn,
-         syntheticCnt, analysisCnt] = await Promise.all([
+         syntheticCnt, analysisCnt,
+         catalogSyntheticCnt, catalogPseudoCnt] = await Promise.all([
     scFiltered('catalog'),
     scFiltered('catalog', 'is_open', true),
     scFiltered('catalog', 'ai_ready', true),
@@ -300,6 +301,9 @@ export async function computeIndicators(supabase: SupabaseClient, tenantId?: str
         ? supabase.from('analysis_records').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId)
         : supabase.from('analysis_records').select('*', { count: 'exact', head: true })
     ).then(r => (r as { count: number | null }).count ?? 0).catch(() => 0),
+    // catalog 플래그 기반 가명·합성 실적 (043 마이그레이션 이후)
+    scFiltered('catalog', 'is_synthetic',     true),
+    scFiltered('catalog', 'is_pseudonymized', true),
   ])
   const errData = (errRes as { data: { error_rate: number }[] | null }).data
   const avgErr = errData?.length
@@ -337,8 +341,9 @@ export async function computeIndicators(supabase: SupabaseClient, tenantId?: str
     ['open', '④-3 공공데이터 활용 지원 실적',
       '실적 등록 필요', 'na', '수요조사·교육·기업지원 등 지원 활동 (정성, 10점)'],
     ['open', '⑤ 가명정보·합성데이터 개방 실적 (가점)',
-      `${syntheticCnt as number}건 / 최대 5점 가점`,
-      (syntheticCnt as number) >= 2 ? 'ok' : (syntheticCnt as number) >= 1 ? 'warn' : 'na',
+      `${(syntheticCnt as number) + (catalogSyntheticCnt as number) + (catalogPseudoCnt as number)}건 / 최대 5점 가점`,
+      ((syntheticCnt as number) + (catalogSyntheticCnt as number) + (catalogPseudoCnt as number)) >= 2 ? 'ok'
+      : ((syntheticCnt as number) + (catalogSyntheticCnt as number) + (catalogPseudoCnt as number)) >= 1 ? 'warn' : 'na',
       '가명정보 제공 또는 합성데이터 개방 1건당 1점 (가점 최대 5점)'],
 
     // ─── 품질 (45점) ─────────────────────────────────────────────────────────
