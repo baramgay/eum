@@ -16,6 +16,7 @@ import {
   Sparkles,
   Clock,
   TrendingUp,
+  Star,
 } from 'lucide-react'
 import { Card, Badge, Btn, EmptyState, Skeleton, StatCard, PageHeader } from '@/components/ui'
 
@@ -34,6 +35,8 @@ interface CatalogItem {
   ai_ready?: boolean
   api_enabled?: boolean
   download_count?: number
+  is_pseudonymized?: boolean
+  is_synthetic?: boolean
 }
 
 interface CatalogResponse {
@@ -117,7 +120,8 @@ export default function PortalClient() {
   const [query, setQuery]               = useState('')
   const [sort, setSort]                 = useState('updated_at')
   const [activeTheme, setActiveTheme]   = useState('')
-  const [onlyAiReady, setOnlyAiReady]   = useState(false)
+  const [onlyAiReady, setOnlyAiReady]     = useState(false)
+  const [onlySynthetic, setOnlySynthetic] = useState(false)
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState(false)
   const [retryCount, setRetryCount]     = useState(0)
@@ -186,8 +190,9 @@ export default function PortalClient() {
     const params = new URLSearchParams({ sort, page: String(page) })
     if (query.trim())  params.set('q', query.trim())
     if (activeTheme)   params.set('theme', activeTheme)
-    if (onlyAiReady)   params.set('ai_ready', 'true')
-    if (tenantId)      params.set('tenant_id', tenantId)
+    if (onlyAiReady)    params.set('ai_ready', 'true')
+    if (onlySynthetic)  params.set('only_synthetic', 'true')
+    if (tenantId)       params.set('tenant_id', tenantId)
 
     fetch(`/api/catalog?${params}`)
       .then(r => r.json())
@@ -228,7 +233,7 @@ export default function PortalClient() {
         setLoading(false)
         setError(true)
       })
-  }, [query, sort, activeTheme, page, onlyAiReady, usage, tenantId, retryCount])
+  }, [query, sort, activeTheme, page, onlyAiReady, onlySynthetic, usage, tenantId, retryCount])
 
   const totalPages = Math.ceil(total / pageSize)
 
@@ -237,12 +242,14 @@ export default function PortalClient() {
     setQuery('')
     setActiveTheme('')
     setOnlyAiReady(false)
+    setOnlySynthetic(false)
     if (tenantId) router.push('/portal')
   }
 
-  const hasFilters = Boolean(query || activeTheme || onlyAiReady || tenantId)
+  const hasFilters = Boolean(query || activeTheme || onlyAiReady || onlySynthetic || tenantId)
 
   const aiReadyCount = items.filter(i => i.ai_ready).length
+  const bonusCount   = items.filter(i => i.is_synthetic || i.is_pseudonymized).length
   const topDownloadCount = usage?.topDownloads?.[0]?.count ?? 0
   const recentUpdateCount = usage?.recentDatasets?.length ?? 0
 
@@ -262,7 +269,7 @@ export default function PortalClient() {
       />
 
       {/* 요약 KPI */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           label="전체 데이터셋"
           value={loading ? '—' : total.toLocaleString()}
@@ -286,6 +293,12 @@ export default function PortalClient() {
           value={loading ? '—' : topDownloadCount.toLocaleString()}
           icon={<TrendingUp className="w-5 h-5 text-amber-500" />}
           color="amber"
+        />
+        <StatCard
+          label="가명·합성 가점 대상"
+          value={loading ? '—' : bonusCount.toLocaleString()}
+          icon={<Star className="w-5 h-5 text-teal-500" />}
+          color="green"
         />
       </div>
 
@@ -333,6 +346,9 @@ export default function PortalClient() {
           {onlyAiReady && (
             <ActiveFilterChip label="AI-Ready" onRemove={() => setOnlyAiReady(false)} />
           )}
+          {onlySynthetic && (
+            <ActiveFilterChip label="가명·합성" onRemove={() => setOnlySynthetic(false)} />
+          )}
           {tenantId && (
             <ActiveFilterChip
               label={tenantName || tenantId}
@@ -378,6 +394,16 @@ export default function PortalClient() {
           }`}
         >
           ✦ AI-Ready
+        </button>
+        <button
+          onClick={() => { setOnlySynthetic(v => !v); setPage(1) }}
+          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+            onlySynthetic
+              ? 'bg-teal-600 text-white'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+          }`}
+        >
+          ★ 가명·합성
         </button>
       </div>
 
@@ -460,6 +486,12 @@ export default function PortalClient() {
                   <div className="flex items-center gap-1 flex-wrap">
                     {item.ai_ready && (
                       <Badge variant="purple">AI-Ready</Badge>
+                    )}
+                    {item.is_pseudonymized && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">가명</span>
+                    )}
+                    {item.is_synthetic && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300">합성</span>
                     )}
                     {item.api_enabled && (
                       <Badge variant="blue">API</Badge>

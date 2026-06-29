@@ -238,7 +238,7 @@ export const QUALITATIVE_KEYS: Record<string, string> = {
   open_request_timeliness:       "③-1 공공데이터 제공신청 적기 처리율",
   open_period_compliance:        "③-2 공공데이터 제공 주기 준수율",
   open_support_activity:         "④-3 공공데이터 활용 지원 실적",
-  analysis_policy_impact:        "①-2 분析 결과의 정책활용 노력 및 성과",
+  analysis_policy_impact:        "①-2 분석 결과의 정책활용 노력 및 성과",
   analysis_ai_training:          "② AI·데이터 문해력 교육 실적",
   analysis_data_governance:      "③-3 AI·데이터기반행정 활성화 노력",
   mgmt_capability_infra:         "③ 데이터 역량 강화 인프라",
