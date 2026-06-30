@@ -72,7 +72,7 @@ function drawGraph(
 
   // Draw edges
   ctx.save()
-  ctx.strokeStyle = '#94a3b8'
+  ctx.strokeStyle = isDark ? '#475569' : '#94a3b8'
   ctx.lineWidth = 1.5
   for (const e of graph.edges) {
     const from = positions.get(e.from)
@@ -86,7 +86,7 @@ function drawGraph(
     ctx.stroke()
     // Arrow
     const angle = Math.atan2(to.y - from.y, to.x - from.x)
-    ctx.fillStyle = '#94a3b8'
+    ctx.fillStyle = isDark ? '#475569' : '#94a3b8'
     ctx.beginPath()
     ctx.moveTo(to.x, to.y)
     ctx.lineTo(to.x - 10 * Math.cos(angle - 0.4), to.y - 10 * Math.sin(angle - 0.4))

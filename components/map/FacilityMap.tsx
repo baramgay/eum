@@ -343,7 +343,7 @@ export default function FacilityMap({ facilities }: Props) {
                 <Select
                   value={heatmapValueMode}
                   onChange={(e) => setHeatmapValueMode(e.target.value as HeatmapValueMode)}
-                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
+                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-900 outline-none"
                   aria-label="히트맵 값 기준"
                 >
                   <option value="count">시설 개수</option>
@@ -355,7 +355,7 @@ export default function FacilityMap({ facilities }: Props) {
                 <Select
                   value={heatmapPalette}
                   onChange={(e) => setHeatmapPalette(e.target.value as HeatmapPalette)}
-                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
+                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-900 outline-none"
                   aria-label="히트맵 색상 팔레트"
                 >
                   <option value="default">기본</option>
@@ -371,7 +371,7 @@ export default function FacilityMap({ facilities }: Props) {
               <Select
                 value={clusterOptions.algorithm}
                 onChange={(e) => setClusterOptions((o) => ({ ...o, algorithm: e.target.value as ClusterOptions['algorithm'] }))}
-                className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
+                className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-900 outline-none"
                 aria-label="클러스터 알고리즘"
               >
                 <option value="dbscan">DBSCAN</option>
@@ -382,7 +382,7 @@ export default function FacilityMap({ facilities }: Props) {
                   <Select
                     value={clusterOptions.eps}
                     onChange={(e) => setClusterOptions((o) => ({ ...o, eps: Number(e.target.value) }))}
-                    className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
+                    className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-900 outline-none"
                     aria-label="클러스터 반경"
                   >
                     <option value={300}>300m</option>
@@ -392,7 +392,7 @@ export default function FacilityMap({ facilities }: Props) {
                   <Select
                     value={clusterOptions.minPts}
                     onChange={(e) => setClusterOptions((o) => ({ ...o, minPts: Number(e.target.value) }))}
-                    className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
+                    className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-900 outline-none"
                     aria-label="최소 점 수"
                   >
                     {[2, 3, 5, 10].map((v) => (
@@ -404,7 +404,7 @@ export default function FacilityMap({ facilities }: Props) {
                 <Select
                   value={clusterOptions.k}
                   onChange={(e) => setClusterOptions((o) => ({ ...o, k: Number(e.target.value) }))}
-                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
+                  className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-900 outline-none"
                   aria-label="클러스터 수"
                 >
                   {[2, 3, 4, 5, 6, 7, 8].map((v) => (
@@ -421,7 +421,7 @@ export default function FacilityMap({ facilities }: Props) {
               <Select
                 value={radiusKm}
                 onChange={e => setRadiusKm(Number(e.target.value))}
-                className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent outline-none"
+                className="text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-900 outline-none"
                 aria-label="반경 검색"
               >
                 {RADIUS_OPTIONS.map(opt => (
