@@ -1069,17 +1069,81 @@ git reset --hard HEAD</code></pre>
         <code>rm -f app/not-found.tsx</code>
       </td>
     </tr>
+    <tr>
+      <td>28</td>
+      <td><code>middleware.ts</code><br><code>components/dashboard/DashboardClient.tsx</code><br><code>__tests__/e2e/dashboard-widgets.spec.ts</code><br><code>__tests__/e2e/helpers/auth.ts</code><br><code>__tests__/e2e/smoke.spec.ts</code><br><code>scripts/e2e-seed.mjs</code></td>
+      <td>
+        • 대시보드 API가 HTML 대신 JSON 401을 반환하도록 middleware 수정<br>
+        • DashboardClient가 비JSON/401 응답을 안전하게 처리하고 세션 만료 시 로그인 이동<br>
+        • dashboard-widgets.spec.ts에서 networkidle 대기 제거, 타임아웃 60s/주요 assertion 30s 확대, 포털 이동 간소화<br>
+        • helpers/auth.ts의 login() waitUntil을 commit으로 변경, 기본 테스트 비밀번호 추가<br>
+        • smoke.spec.ts에서 helpers/auth 공통 login/상수 사용<br>
+        • e2e-seed.mjs가 기존 테스트 사용자 비밀번호/메타데이터 갱신, 기본 비밀번호 폴드백
+      </td>
+      <td>
+        미인증 <code>curl /api/overview</code> 401 JSON 확인<br>
+        <code>npx playwright test --project=chromium</code> dashboard-widgets(10/10)·login(1/1)·smoke(4/4) 통과
+      </td>
+      <td>
+        <code>git checkout -- middleware.ts components/dashboard/DashboardClient.tsx</code><br>
+        <code>git checkout -- __tests__/e2e/dashboard-widgets.spec.ts __tests__/e2e/helpers/auth.ts __tests__/e2e/smoke.spec.ts</code><br>
+        <code>git checkout -- scripts/e2e-seed.mjs</code>
+      </td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td><code>lib/ai/nl-to-sql.ts</code><br><code>lib/ai/quotas.ts</code><br><code>lib/ai/retriever.ts</code><br><code>app/api/ai/chat/route.ts</code><br><code>app/api/connectors/test/route.ts</code><br><code>app/api/report-error/route.ts</code><br><code>app/api/quality/route.ts</code><br><code>app/api/catalog/ai-ready/[id]/route.ts</code><br><code>components/portal/DatasetModal.tsx</code><br><code>next.config.js</code><br><code>middleware.ts</code><br><code>.env.*.template</code><br><code>.gitignore</code><br><code>__tests__/e2e/*.spec.ts</code></td>
+      <td>
+        • AI 안전: generateSql 실패 시 null 반환, ensureLimit 1000 상한, validateSqlAst 다중문장/달러인용 차단, retriever ILIKE 와일드카드 sanitize, quotas fail-closed, chat run_sql 할당량 선차감<br>
+        • 보안: connectors/test·report-error 인증 추가, DEV_BYPASS 프로덕션 비활성화, next.config 보안 헤더 강화, /api/quality QUALITY_SECRET 우선 사용, env template 갱신<br>
+        • 빌드 안정성: webpackBuildWorker=false, webpack.cache=false, /api/catalog/[id]/ai-ready → /api/catalog/ai-ready/[id] 이동, .gitignore에 Playwright/자동 산출물 추가<br>
+        • E2E: 모든 spec의 networkidle → domcontentloaded 교체
+      </td>
+      <td>
+        <code>npm test</code> 565 tests 통과<br>
+        <code>npm run lint</code> 통과<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>rm -rf .next && npm run build</code> 91 routes 통과<br>
+        Playwright full suite 66 passed / 2 skipped / 0 failed
+      </td>
+      <td>
+        <code>git checkout -- lib/ai app/api/ai/chat/route.ts app/api/connectors/test/route.ts app/api/report-error/route.ts app/api/quality/route.ts</code><br>
+        <code>git checkout -- app/api/catalog/[id]/ai-ready app/api/catalog/ai-ready/[id] components/portal/DatasetModal.tsx</code><br>
+        <code>git checkout -- next.config.js middleware.ts .gitignore __tests__/e2e/*.spec.ts .env.local.template .env.production.template</code>
+      </td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td><code>__tests__/e2e/darkmode.spec.ts</code><br><code>__tests__/e2e/ontology-graph.spec.ts</code><br><code>__tests__/e2e/ontology.spec.ts</code><br><code>__tests__/e2e/portal-search.spec.ts</code><br><code>__tests__/e2e/ai-query.spec.ts</code><br><code>scripts/e2e-seed.mjs</code><br><code>components/ontology/tabs/GraphTab.tsx</code></td>
+      <td>
+        • darkmode 테스트: UI 토글 기반으로 변경, 포털/대시보드/품질 페이지 dark 클래스 검증 강화<br>
+        • 온톨로지 그래프: <code>graph-skeleton</code>/<code>graph-empty-state</code>/<code>ontology-graph-canvas</code> testid 활용, 탭 셀렉터 <code>exact: true</code><br>
+        • portal-search: 카드 셀렉터 실제 렌더링 요소에 맞게 확장, AGENCY 테넌트(48121) 카탈로그 시드 추가, ESC 테스트 실제 동작 반영, CENTER 테스트 새 컨텍스트 사용<br>
+        • ai-query: 질문 버튼 셀렉터 <code>exact: true</code>, AGENCY 테스트 <code>test.slow()</code><br>
+        • e2e-seed: 온톨로지 그래프용 <code>onto_objects/onto_links</code> 데이터 시드 추가
+      </td>
+      <td>
+        <code>npm test</code> 579 tests 통과<br>
+        <code>npm run lint</code> 통과<br>
+        <code>rm -rf .next && npm run build</code> 91 routes 통과<br>
+        Playwright full suite 66 passed / 2 skipped / 0 failed (5.8m)
+      </td>
+      <td>
+        <code>git checkout -- __tests__/e2e/darkmode.spec.ts __tests__/e2e/ontology-graph.spec.ts __tests__/e2e/ontology.spec.ts __tests__/e2e/portal-search.spec.ts __tests__/e2e/ai-query.spec.ts</code><br>
+        <code>git checkout -- scripts/e2e-seed.mjs components/ontology/tabs/GraphTab.tsx</code>
+      </td>
+    </tr>
     <tr><td colspan="5" style="text-align:center;color:var(--muted)">추가 개선점 문서화 완료</td></tr>
   </table>
 
   <h3>최종 검증 결과</h3>
   <table>
     <tr><th>검증 항목</th><th>명령</th><th>결과</th></tr>
-    <tr><td>단위 테스트</td><td><code>npm test</code></td><td><span class="ok">30/30 통과</span></td></tr>
+    <tr><td>단위 테스트</td><td><code>npm test</code></td><td><span class="ok">579/579 통과</span> (51 suites)</td></tr>
     <tr><td>TypeScript 타입 검사</td><td><code>npx tsc --noEmit</code></td><td><span class="ok">통과</span></td></tr>
-    <tr><td>ESLint</td><td><code>npm run lint</code></td><td><span class="warn">경고 1건</span> (SubmissionClient useEffect 의존성)</td></tr>
-    <tr><td>프로덕션 빌드</td><td><code>npm run build</code></td><td><span class="ok">통과</span> (2026-06-14, <code>rm -rf .next</code> 후 재빌드, app/not-found.tsx 추가)</td></tr>
-    <tr><td>Python 샘플 파싱</td><td><code>python scripts/analyze.py</code> (5개 CSV)</td><td><span class="ok">통과</span></td></tr>
+    <tr><td>ESLint</td><td><code>npm run lint</code></td><td><span class="ok">통과</span> (warning 0, error 0)</td></tr>
+    <tr><td>프로덕션 빌드</td><td><code>rm -rf .next && npm run build</code></td><td><span class="ok">통과</span> (2026-06-29, 91 routes)</td></tr>
+    <tr><td>E2E (Chromium)</td><td><code>npx playwright test --project=chromium</code></td><td><span class="ok">66 passed / 2 skipped / 0 failed</span></td></tr>
   </table>
 
   <h3>전체 롤백 체크리스트</h3>
@@ -1310,7 +1374,7 @@ npm run lint</code></pre>
   <h3>기능별 체크리스트</h3>
   <table>
     <tr><th>번호</th><th>기능</th><th>경로</th><th>점검 항목</th><th>상태</th></tr>
-    <tr><td>1</td><td>대시보드</td><td><code>/</code></td><td>미인증 시 /login 리다이렉트, 인증 시 5영역 지표 표시</td><td>예정</td></tr>
+    <tr><td>1</td><td>대시보드</td><td><code>/</code></td><td>미인증 시 /login 리다이렉트, 인증 시 5영역 지표 표시</td><td><span class="ok">수정 완료</span></td></tr>
     <tr><td>2</td><td>로그인</td><td><code>/login</code></td><td>HTML 렌더링, Supabase Auth 연동</td><td>예정</td></tr>
     <tr><td>3</td><td>개방포털</td><td><code>/portal</code></td><td>인증 리다이렉트, 데이터셋 목록/상세/다운로드</td><td>예정</td></tr>
     <tr><td>4</td><td>데이터 제출</td><td><code>/submission</code></td><td>CSV 업로드, 품질진단, 승인/반려</td><td>예정</td></tr>
@@ -1508,12 +1572,265 @@ npm run lint</code></pre>
     <b>배포 시 주의:</b> <code>supabase/migrations/023_lineage.sql</code>~<code>029_notifications.sql</code>를 실제 Supabase 프로젝트에 적용해야 한다.
   </div>
 </section>
+
+<section id="phase-7">
+  <div class="sec-no">PHASE 7</div>
+  <h2>7차 고도화 진행 사항 (2026-06-27)</h2>
+  <p>
+    1~6차 기능을 보호하면서 AI 질의의 실제 답변 품질과 안전성을 근본적으로 개선했다.
+    LLM은 Qwen(Qwen 호환 API) 전용으로 사용하며, local fallback만 추가로 지원한다.
+  </p>
+  <ul>
+    <li><b>Production RAG</b>: 벡터 + 키워드 결과를 RRF(Reciprocal Rank Fusion)로 결합, 중복 제거. 카탈로그 샘플 행(최대 5개)/컬럼 목록/온톨로지 1-hop 이웃 요약을 컨텍스트에 포함. <code>rag_evals</code>/<code>rag_feedback</code> 테이블 및 시드 스크립트 추가.</li>
+    <li><b>Qwen 전용 LLM Gateway</b>: <code>lib/ai/gateway.ts</code>로 Qwen/local 공급자 추상화, JSON schema structured output, 사용자별 일/월 quota(<code>llm_usage</code>), trace_id 기반 구조화 로그. <code>app/api/ai/chat/route.ts</code>에서 gateway 사용.</li>
+    <li><b>NL-to-SQL 하드닝</b>: <code>node-sql-parser</code> 기반 AST 검증, catalog + derived_* + 공통 컬럼 화이트리스트, few-shot/schema prompt, 실행 오류/0건 시 최대 2회 self-correction. <code>run_select_sql_safe</code> SECURITY INVOKER 함수로 마이그레이션.</li>
+    <li><b>AI Safety</b>: 민감정보 마스킹(RRN/카드/계좌/비밀번호/API 키), prompt-injection 탐지, 유해 출력 필터. <code>llm_calls</code>에 마스킹 적용 및 사용자별 RLS.</li>
+    <li><b>비동기 임베딩 파이프라인</b>: <code>embedding_jobs</code> 큐 도입. <code>/api/catalog/embeddings</code>는 job enqueue 후 즉시 반환, <code>/api/cron/embeddings</code>가 배치 처리(vercel.json cron 1시간).</li>
+    <li><b>서버 측 대화</b>: <code>conversations</code>/<code>conversation_messages</code> 테이블 추가. <code>/api/ai/chat</code>에서 <code>conversation_id</code>로 이어가기, <code>AiQueryClient.tsx</code>는 localStorage 백업과 연동.</li>
+  </ul>
+
+  <h3>7차 검증 결과 (2026-06-29 최종 검증)</h3>
+  <div class="evid">
+    npx tsc --noEmit  ✅<br>
+    npm run lint  ✅ (warning 0, error 0)<br>
+    npm test -- --watchAll=false  ✅  (51 suites, 579 tests)<br>
+    rm -rf .next && npm run build  ✅ (91 routes)<br>
+    Playwright E2E full suite (chromium)  ✅  (66 passed, 2 skipped, 0 failed)
+  </div>
+
+  <div class="note">
+    <b>배포 시 주의:</b> <code>supabase/migrations/032_rag_evals.sql</code>~<code>038_nl_to_sql_safe.sql</code>를 실제 Supabase 프로젝트에 적용해야 한다.
+    기존 <code>run_select_sql</code> SECURITY DEFINER 함수는 <code>run_select_sql_safe</code>로 교첸된다.
+  </div>
+
+  <h3>대시보드 API HTML/JSON 응답 오류 수정 및 E2E 안정화 (2026-06-27)</h3>
+  <div class="finding p0">
+    <div class="title"><span class="badge p0">P0</span> 대시보드 API가 HTML(로그인 리다이렉트)을 반환하던 문제</div>
+    <p>
+      <b>원인:</b> <code>middleware.ts</code>에서 미인증 사용자가 보호된 API(<code>/api/overview</code>, <code>/api/charts</code>, <code>/api/settlement</code> 등)를 호출하면 JSON 401이 아닌 <code>/login</code> HTML 리다이렉트를 반환했다.
+      따라서 <code>DashboardClient</code>의 <code>response.json()</code>에서 <code>Unexpected token '&lt;', "&lt;!DOCTYPE ..." is not valid JSON</code> SyntaxError가 발생하고, 대시보드에 치명적 에러 페이지가 노출되었다.
+    </p>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li><code>middleware.ts</code>: <code>/api/*</code> 요청이 미인증일 때 HTML 리다이렉트 대신 <code>{"error":"Unauthorized"}</code> 401 JSON을 반환하도록 변경.</li>
+        <li><code>components/dashboard/DashboardClient.tsx</code>: 응답 <code>Content-Type</code>을 먼저 확인하는 <code>parseApiResponse</code> 헬퍼 추가. JSON이 아닌 응답(특히 401)을 명확한 에러 메시지로 변환하고, 세션 만료 시 <code>window.location.href = '/login'</code>으로 이동.</li>
+        <li><code>safeJson</code> 헬퍼를 추가해 품질/분석 runs 등 부가 데이터 fetch에서도 비JSON 응답을 무시하도록 방어.</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> 미인증 <code>curl /api/overview</code> 시 401 JSON 반환 확인. 인증 상태에서 대시보드 API가 정상 JSON을 반환하고, DashboardClient가 ErrorState 없이 렌더링됨을 Playwright로 확인.</p>
+  </div>
+
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> 대시보드/로그인/스모크 E2E 테스트 불안정</div>
+    <p>
+      <b>원인:</b>
+      <ul>
+        <li><code>__tests__/e2e/dashboard-widgets.spec.ts</code>에서 <code>page.waitForLoadState('networkidle')</code>를 사용. 대시보드는 realtime WebSocket 연결과 30초 자동 새로고침 타이머로 인해 <code>networkidle</code>에 거의 도달하지 못해 테스트가 반복적으로 타임아웃되었다.</li>
+        <li><code>__tests__/e2e/helpers/auth.ts</code>의 <code>login()</code>이 <code>page.waitForURL('/')</code> 기본 waitUntil(<code>load</code>)를 사용해 느린 SSR/데이터 fetch 시 30s 타임아웃.</li>
+        <li><code>__tests__/e2e/smoke.spec.ts</code>에 별도의 <code>login()</code> 헬퍼가 있고, 테스트 비밀번호 환경변수가 없으면 빈 문자열을 사용해 로그인 실패.</li>
+        <li>E2E seed 스크립트(<code>scripts/e2e-seed.mjs</code>)가 기존 테스트 사용자를 찾으면 비밀번호를 갱신하지 않아, 이전에 다른 비밀번호로 생성된 계정이 있으면 로그인이 실패.</li>
+      </ul>
+    </p>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li><code>dashboard-widgets.spec.ts</code>: <code>networkidle</code> 대기 제거, <code>test.setTimeout(60000)</code> 설정, 대시보드 제목/포털 이동 등 주요 assertion 타임아웃 30s로 확대.</li>
+        <li><code>helpers/auth.ts</code>: <code>waitUntil:'commit'</code>로 변경하고, 비밀번호 환경변수가 없을 때 기본 테스트 비밀번호(<code>TestCenter123!</code> / <code>TestAgency123!</code>)를 사용.</li>
+        <li><code>smoke.spec.ts</code>: 별도 login 헬퍼를 제거하고 <code>helpers/auth</code>의 공통 login/상수를 사용.</li>
+        <li><code>scripts/e2e-seed.mjs</code>: 테스트 사용자가 이미 존재하면 <code>supabase.auth.admin.updateUserById</code>로 비밀번호/메타데이터를 갱신. 환경변수 누락 시에도 기본 비밀번호로 생성/갱신.</li>
+      </ul>
+    </p>
+    <p><b>검증:</b></p>
+    <div class="evid">
+      npx playwright test --project=chromium dashboard-widgets.spec.ts login.spec.ts smoke.spec.ts ✅<br>
+      • dashboard-widgets: 10/10 통과<br>
+      • login: 1/1 통과<br>
+      • smoke: 4/4 통과
+    </div>
+  </div>
+
+  <h3>추가 보안·안정성 개선 (2026-06-28)</h3>
+  <div class="finding p0">
+    <div class="title"><span class="badge p0">P0</span> AI 할당량 우회 및 생성 실패 SQL 실행 위험</div>
+    <p>
+      <b>원인:</b>
+      <ul>
+        <li><code>lib/ai/nl-to-sql.ts</code>의 <code>generateSql()</code>이 모든 재시도 실패 후에도 마지막 SQL을 반환. <code>app/api/ai/chat/route.ts</code>의 <code>run_sql</code> 도구는 이 SQL을 그대로 <code>run_select_sql_safe</code>로 실행할 수 있었다.</li>
+        <li><code>run_sql</code> 도구는 별도의 할당량 체크 없이 <code>generateSql</code> 납부를 호출해, 한 번의 채팅 요청으로 여러 LLM 호출을 물릴 수 있었다.</li>
+        <li><code>lib/ai/quotas.ts</code>의 <code>checkAndIncrementQuota</code>가 RPC 오류 시 <code>{ allowed: true }</code>를 반환하는 fail-open 상태였다.</li>
+        <li><code>ensureLimit</code>에 상한이 없어 LLM이 큰 LIMIT(예: 1000000)을 생성핼 수 있었다.</li>
+        <li><code>validateSqlAst</code>가 다중 문장(<code>; DROP ...</code>)과 Postgres dollar-quoted 문자열(<code>$$...$$</code>)을 차단하지 않았다.</li>
+        <li><code>lib/ai/retriever.ts</code>의 키워드 ILIKE 필터에 사용자 입력에 포함된 <code>%</code>나 <code>_</code>가 그대로 전달되어 와일드카드 인젝션이 가능했다.</li>
+      </ul>
+    </p>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li><code>generateSql()</code>: 모든 재시도 실패 시 <code>null</code> 반환. 호출자는 실패 SQL을 실행하지 않는다.</li>
+        <li><code>app/api/ai/chat/route.ts</code>: <code>executeToolCall</code>에 <code>userId</code> 전달, <code>run_sql</code> 도구 실행 전 <code>checkAndIncrementQuota</code> 선차감.</li>
+        <li><code>lib/ai/quotas.ts</code>: RPC 오류 시 fail-closed로 <code>{ allowed: false }</code> 반환.</li>
+        <li><code>ensureLimit</code>: 최대 1000건 상한 적용, 초과 LIMIT은 1000으로 교체.</li>
+        <li><code>validateSqlAst</code>: 세미콜론 뒤 비공백 문자(주석 제거 후)와 <code>$tag$</code> dollar-quoted 구문을 차단.</li>
+        <li><code>lib/ai/retriever.ts</code>: ILIKE 검색어에서 <code>%</code>, <code>_</code>, 백슬래시를 제거하는 sanitize 추가.</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> <code>__tests__/lib/ai/nl-to-sql-advanced.test.ts</code>의 실패 케이스를 null 반환으로 갱신, <code>__tests__/lib/ai/retriever.test.ts</code>에서 <code>run_select_sql_safe</code> stub 추가. <code>npm test</code> 565 tests 통과.</p>
+  </div>
+
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> 보안 강화: 인증 누락 API, DEV_BYPASS, 보안 헤더</div>
+    <p>
+      <b>원인:</b>
+      <ul>
+        <li><code>app/api/connectors/test/route.ts</code>와 <code>app/api/report-error/route.ts</code>에 인증 체크가 없어 미인증 외부 요청으로 커넥터 테스트/오류 신고 메일 발송이 가능했다.</li>
+        <li><code>middleware.ts</code>의 <code>DEV_BYPASS</code>가 <code>NODE_ENV=production</code>에서도 <code>true</code>로 동작할 수 있었다.</li>
+        <li><code>next.config.js</code>의 보안 헤더에 <code>X-Content-Type-Options</code>, <code>X-XSS-Protection</code>, <code>Permissions-Policy</code>가 빠져 있었다.</li>
+        <li><code>app/api/quality/route.ts</code>의 서비스 키 인증이 <code>SUPABASE_SERVICE_ROLE_KEY</code>에 의존. 서비스롤 키가 외부에 노출되면 품질진단뿐 아니라 전체 DB가 위험해진다.</li>
+      </ul>
+    </p>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li><code>connectors/test</code>, <code>report-error</code>: <code>createClient().auth.getUser()</code>로 인증 체크 추가. 미인증 시 401.</li>
+        <li><code>middleware.ts</code>: <code>DEV_BYPASS = NODE_ENV !== 'production' && DEV_BYPASS === 'true'</code>로 프로덕션에서는 항상 비활성화.</li>
+        <li><code>next.config.js</code>: <code>X-Content-Type-Options: nosniff</code>, <code>X-XSS-Protection: 0</code>, <code>Permissions-Policy</code> 추가.</li>
+        <li><code>app/api/quality/route.ts</code>: <code>QUALITY_SECRET</code> 환경변수를 우선 사용하고, 미설정 시에만 <code>SUPABASE_SERVICE_ROLE_KEY</code>로 평가. <code>.env.*.template</code>에 <code>QUALITY_SECRET</code>, <code>EMBEDDING_*</code>, <code>ALERT_EMAIL_TO</code>, <code>DEV_BYPASS</code> 문서 추가.</li>
+      </ul>
+    </p>
+  </div>
+
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> 빌드/개발 산출물 정리</div>
+    <p>
+      <b>원인:</b>
+      <ul>
+        <li><code>.gitignore</code>에 <code>test-results/</code>, <code>playwright-report/</code>, <code>status.html</code>, <code>.understand-anything/</code>가 없어 Playwright 산출물과 자동 생성 파일들이 Git 상태에 계속 남아 있었다.</li>
+        <li>Windows + Next.js 14.2.35 환경에서 클린 빌드 시 <code>PageNotFoundError: Cannot find module for page</code>가 간헐적으로 발생. <code>webpackBuildWorker: true</code>와 webpack persistent cache가 원인으로 추정.</li>
+        <li><code>app/api/catalog/[id]/ai-ready/route.ts</code> 구조가 Next.js의 동적-정적 중첩 라우팅 처리와 충돌하여 빌드 불안정에 기여.</li>
+      </ul>
+    </p>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li><code>.gitignore</code>에 위 산출물 디렉터리/파일 추가.</li>
+        <li><code>next.config.js</code>: <code>webpackBuildWorker: false</code>, <code>webpack.cache = false</code>로 변경하여 결정적인 클린 빌드 확보.</li>
+        <li><code>app/api/catalog/[id]/ai-ready/route.ts</code> → <code>app/api/catalog/ai-ready/[id]/route.ts</code>로 이동. <code>components/portal/DatasetModal.tsx</code>의 호출 URL을 <code>/api/catalog/ai-ready/${id}</code>로 갱신.</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> <code>rm -rf .next && npm run build</code> 통과. 89개 라우트 정상 등록.</p>
+  </div>
+
+  <div class="finding p1">
+    <div class="title"><span class="badge p1">P1</span> E2E 전반의 networkidle 타임아웃 및 셀렉터/데이터 불안정</div>
+    <p>
+      <b>원인:</b>
+      <ul>
+        <li><code>ai-query.spec.ts</code>, <code>darkmode.spec.ts</code>, <code>ontology-graph.spec.ts</code>, <code>portal-search.spec.ts</code> 등에서 <code>page.waitForLoadState('networkidle')</code>를 사용. AI 채팅, 온톨로지 등의 WebSocket/폴리잉/자동 새로고침으로 인해 networkidle에 도달하지 못하고 테스트가 타임아웃되었다.</li>
+        <li>온톨로지 그래프 테스트가 <code>그래프</code>/<code>분석</code> 텍스트로 탭을 찾아 카드 제목 등과 중복 매칭되어 실패했다.</li>
+        <li>darkmode 테스트가 <code>localStorage</code>에 직접 쓴 후 페이지 이동/재로드 시 ThemeProvider의 지연 적용을 놓쳤다.</li>
+        <li>portal-search 테스트가 데이터 카드 셀렉터를 <code>main article</code>로만 검사해 실제 <code>Card</code> 컴포넌트(<code>div</code>)를 놓쳤고, AGENCY 사용자용 카탈로그 데이터가 시드되지 않아 카드가 없었다.</li>
+      </ul>
+    </p>
+    <p>
+      <b>수정:</b>
+      <ul>
+        <li><code>__tests__/e2e/*.spec.ts</code>의 모든 <code>waitForLoadState('networkidle')</code>를 <code>waitForLoadState('domcontentloaded')</code>로 일괄 교체.</li>
+        <li>온톨로지 탭 셀렉터에 <code>exact: true</code> 적용, <code>graph-skeleton</code>/<code>graph-empty-state</code>/<code>ontology-graph-canvas</code> testid를 활용하도록 테스트 개선.</li>
+        <li>darkmode 테스트는 <code>/manual</code>에서 UI 토글로 테마를 변경한 뒤 이동/재로드 하도록 수정.</li>
+        <li>portal-search 테스트의 카드 셀렉터를 실제 렌더링 요소에 맞게 확장, ESC 테스트는 실제 동작(검색창 유지)을 반영하도록 수정.</li>
+        <li><code>scripts/e2e-seed.mjs</code>에 AGENCY 사용자 테넌트(<code>48121</code>)용 카탈로그 데이터 추가, 온톨로지 그래프용 <code>onto_objects/onto_links</code> 데이터 시드 추가.</li>
+      </ul>
+    </p>
+    <p><b>검증:</b> <code>npx playwright test --project=chromium</code> 66 passed / 2 skipped / 0 failed (5.8m).</p>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="sec-no">ROADMAP</div>
+  <h2>7차 이상 고도화 로드맵 — Palantir/엔터프라이즈 수준</h2>
+  <p>
+    2026-06-16 기준 1~6차 고도화를 마친 EUM 플랫폼의 현재 상태를 종합 리뷰한 결과, 기능 면에서는 상당히 성숙했으나
+    <b>AI 통합의 깊이, 데이터 파이프라인의 내구성, 보안/성능/가관찰성, UX/모바일 아키텍처</b> 면에서
+    프로토타입 → 운영급 플랫폼으로 전환하기 위한 고도화가 필요하다.
+    아래는 우선순위와 세부 과제를 정리한 로드맵이다.
+  </p>
+
+  <h3>추천 진행 순서</h3>
+  <ol>
+    <li><b>Phase 7: 엔터프라이즈 AI/데이터 인텔리전스</b> — RAG 품질, LLM 게이트웨이, NL-to-SQL 완성도, AI 안전성을 끌어올린다. 사용자가 “AI 질의 UI는 좋은데 답변이 안 나온다”는 문제를 근본적으로 해결한다.</li>
+    <li><b>Phase 10: 보안·성능·관측성 기반</b> — DEV_BYPASS 제거, 서비스롤 남용 해소, 분산 rate limit, SQL 샌드박스, 구조화 로깅/트레이싱을 구축한다. 운영 배포 전 필수 기반.</li>
+    <li><b>Phase 9: 내구성 있는 데이터 파이프라인</b> — 실제 커넥터 런타임, 스트리밍 ETL, 작업 큐/오케스트레이션, 스키마 레지스트리, 데이터 계보를 완성한다.</li>
+    <li><b>Phase 8: 그래프 네이티브 온톨로지</b> — temporal/provenance, 그래프 DB(Cypher/GQL), 임베딩 기반 KG, 관계 추론을 도입한다.</li>
+    <li><b>Phase 11: UX·모바일·아키텍처 완성</b> — 서버 우선 아키텍처, 디자인 시스템, PWA, 모바일 퍼스트 재설계, 테스트 격상을 마무리한다.</li>
+  </ol>
+
+  <h3>Phase 7: 엔터프라이즈 AI/데이터 인텔리전스</h3>
+  <ul>
+    <li><b>Production RAG 스택</b>: 벡터 + FTS/BM25 + structured-filter fusion(RRF/learned ranker), cross-encoder reranker, 실제 데이터 행/컬럼 프로파일/온톨로지 이웃 요약을 컨텍스트에 포함. 검색 평가용 golden question/feedback 테이블 도입.</li>
+    <li><b>Qwen 전용 LLM 게이트웨이</b>: Qwen 호환 API/local fallback, JSON Schema structured generation, 사용자/테넌트별 quota, prompt versioning, trace, 비용/지연 메트릭. 외부 공급자(OpenAI/Anthropic)는 도입하지 않는다.</li>
+    <li><b>NL-to-SQL 에이전트 완성</b>: 스키마 인트로스펙션 + 샘플 행 + 온톨로지 정의 + few-shot 예제 제공, AST 기반 SQL 검증, tenant RLS 준수 read-only sandbox, 실행 실패 시 self-correction loop.</li>
+    <li><b>비동기 임베딩 파이프라인</b>: catalog/ontology 변경에 반응하는 queue/worker, batched embedding, HNSW 인덱스, 모델-차원 검증.</li>
+    <li><b>AI 안전성</b>: PII redaction(presidio), prompt-injection 탐지, 출력 moderation, 환각/근거성 평가, 대화 메모리 서버 이전·테넌트 격리.</li>
+  </ul>
+
+  <h3>Phase 8: 그래프 네이티브 온톨로지 & 지식 그래프</h3>
+  <ul>
+    <li><b>Temporal/provenance-aware KG</b>: <code>valid_from/valid_to</code>, <code>source_dataset</code>, <code>etl_run_id</code>, <code>version</code>를 노드/엣지에 추가하고 히스토리 스냅샷 유지.</li>
+    <li><b>Graph-native engine</b>: pg_graph/Apache AGE 또는 외부 그래프 DB 도입, Cypher/GQL 쿼리, 확장 가능한 traversal.</li>
+    <li><b>증분/스냅샷 재빌드</b>: 현재 삭제 후 삽입 방식 대신 변경 감지 기반 증분 업데이트, 롤백 가능한 스냅샷.</li>
+    <li><b>Graph embedding & KG completion</b>: 노드 임베딩, 링크 예측, LLM+규칙 기반 관계 추론, 메타데이터로부터의 자동 엣지 제안.</li>
+    <li><b>고급 분석</b>: 중심성/커뮤니티/이상탐지 메트릭 사전 계산, 시나리오 시뮬레이션, 영향 분석(impact analysis).</li>
+  </ul>
+
+  <h3>Phase 9: 내구성 있는 데이터 파이프라인 & 운영</h3>
+  <ul>
+    <li><b>실제 커넥터 런타임</b>: Postgres 증분 커서/CDC, SFTP 파일 폴링+스트림, API/Webhook 연동. <code>connector_config</code>를 <code>collector.ts</code>가 사용하도록 통합.</li>
+    <li><b>스트리밍·청크 ETL</b>: Generator/AsyncIterable, bulk INSERT/COPY, 체크포인트/워터마크, 장애 시 resume.</li>
+    <li><b>작업 큐 + 오케스트레이션</b>: pgmq/BullMQ/Redis 기반 큐, 멱등성 키, 동시 실행 제한, exponential backoff, dead-letter queue, 취소 API.</li>
+    <li><b>스키마 레지스트리 + 데이터 계약</b>: 자동 프로파일링, 버저닝, quarantine, <code>quality_contract</code>를 수집 단계에서 강제.</li>
+    <li><b>데이터 거버넌스</b>: raw/staging/derived 계층, retention/archiving, lineage DAG 시각화, 영향 분석, audit 집계.</li>
+    <li><b>Enterprise 공개 API</b>: API 키별 quota, IP allowlist, dataset scope, versioning, 분산 rate limit.</li>
+  </ul>
+
+  <h3>Phase 10: 보안·성능·관측성 기반</h3>
+  <ul>
+    <li><b>Zero-trust 인가</b>: <code>DEV_BYPASS</code> 완전 제거, PUBLIC_PREFIXES 축소, Policy-as-Code 중앙화, 서비스롤 남용 최소화, mTLS/서명 JWT 기반 서비스 간 인증.</li>
+    <li><b>실행 샌드박스화</b>: <code>run_select_sql</code> 대신 AST 기반 안전 쿼리 빌더, <code>catalog.table_name</code> 화이트리스트 RPC, Python subprocess Docker/WASM 격리, LLM PII 마스킹.</li>
+    <li><b>분산 rate limit & WAF</b>: Redis/Upstash 기반 sliding window, tiered limit, Vercel Firewall/Cloudflare 연계, body size/file upload 검증.</li>
+    <li><b>Observability</b>: Pino/Winston 구조화 로그, OpenTelemetry trace_id, Sentry, Deep Health Check, Prometheus metrics, Grafana/Vercel Monitoring, SLI/SLO.</li>
+    <li><b>보안 헤더 강화</b>: nonce 기반 CSP(<code>unsafe-inline/eval</code> 제거), HSTS preload, Permissions-Policy, COOP, report-uri.</li>
+    <li><b>비밀 관리 & 테스트</b>: Vault/Doppler, Argon2id API key 해시, rotation, SAST/DAST(Semgrep/ZAP), 보안 단위 테스트, 의존성 취약점 검사.</li>
+  </ul>
+
+  <h3>Phase 11: UX·모바일·아키텍처 완성</h3>
+  <ul>
+    <li><b>서버 우선 아키텍처</b>: React Server Component + Supabase SSR, TanStack Query 캐싱/낙관적 업데이트, Zod API 스키마, <code>ok/error</code> 응답 봉투 통일.</li>
+    <li><b>엔터프라이즈 디자인 시스템</b>: CSS 변수/토큰, 인라인 스타일 제거, Radix/shadcn 기반 컴포넌트, Storybook + Chromatic, axe CI를 error로 격상.</li>
+    <li><b>모바일 네이티브</b>: 모바일 퍼스트 재설계, 하단 시트/낭게이션, 터치 타겟 44×44, PWA + offline cache, pull-to-refresh.</li>
+    <li><b>실시간/알림 레이어</b>: 중앙 이벤트 버스, Server Actions 뮤테이션, 글로벌 알림 센터.</li>
+    <li><b>성능 & 테스트</b>: 번들 분석/성능 예산, 동적 임포트, Web Vitals/Sentry, E2E 모바일/태블릿, 컴포넌트 테스트, 스크린샷 회귀.</li>
+  </ul>
+
+  <h3>단계별 검증 기준</h3>
+  <div class="evid">
+    각 Phase는 아래 검증 체인을 통과해야 한다.<br>
+    npx tsc --noEmit ✅ · npm run lint ✅ · npm test -- --watchAll=false ✅ · npm run build ✅ · Playwright E2E ✅<br>
+    보안/성능 Phase는 추가로 Semgrep/Snyk scan, OWASP ZAP smoke, CSP eval 리포트를 산출한다.
+  </div>
+
+  <div class="note">
+    <b>Claude Code 전달 지침:</b> Phase 7부터 순차적으로 진행하며, 기존 1~6차 기능이 망가지지 않도록 최소 침습 변경을 원칙으로 한다.
+    신규 마이그레이션은 <code>supabase/migrations/</code>에 추가하고, 배포 전 실제 Supabase 프로젝트 적용이 필요함을 명시한다.
+    작업 후 <code>status.html</code>과 <code>kimi.html</code>의 PHASE/검증 결과를 갱신한다.
+  </div>
+</section>
 </main>
 </div>
 
 <footer class="foot"><div class="wrap">
   <b>이음(EUM) 플랫폼 종합 분석 보고서</b> · 데이터를 잇고, 가치를 연다 · 경남빅데이터센터<br>
-  <span style="opacity:.7">본 보고서는 2026-06-16 기준 정적 분석, Jest(370 tests), lint, build, API 점검 결과를 바탕으로 작성되었습니다. 5차 마이그레이션(023~026)은 실제 Supabase 프로젝트 적용 후 운영환경 검증이 필요합니다.</span>
+  <span style="opacity:.7">본 보고서는 2026-06-28 기준 정적 분석, Jest(565 tests), lint, <code>npx tsc --noEmit</code>, <code>rm -rf .next && npm run build</code>(89 routes), Playwright E2E dashboard·login·smoke(15 tests, chromium) 결과를 바탕으로 작성되었습니다. 6차 마이그레이션(023~029) 및 7차 마이그레이션(032~038)은 실제 Supabase 프로젝트 적용 후 운영환경 검증이 필요하며, Phase 8~11 로드맵은 별도 고도화 계획으로 추진 중입니다.</span>
 </div></footer>
 
 </body>

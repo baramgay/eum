@@ -41,7 +41,10 @@ function securityHeaders() {
         { key: 'Content-Security-Policy', value: csp },
         { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
         { key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'X-XSS-Protection', value: '0' },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=()' },
       ],
     },
   ]
@@ -59,6 +62,10 @@ const config = {
   eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
   webpack: (config) => {
+    // Windows/Next.js 14에서 클린 빌드 시 page-module 누락 오류가 간헐적으로 발생해
+    // persistent cache를 비활성화하여 결정적인 빌드 결과를 얻는다.
+    config.cache = false
+
     // .node 네이티브 바이너리 파일을 externals로 처리 (안전망)
     config.externals = [
       ...(Array.isArray(config.externals) ? config.externals : [config.externals].filter(Boolean)),
@@ -75,8 +82,8 @@ const config = {
     serverActions: { allowedOrigins: getAllowedOrigins() },
     // ssh2/ssh2-sftp-client의 네이티브 .node 바이너리를 webpack 번들링에서 제외
     serverComponentsExternalPackages: ['ssh2', 'ssh2-sftp-client'],
-    // webpack 빌드를 워커 스레드에서 수행하여 빌드 시간 단축
-    webpackBuildWorker: true,
+    // Windows + Next.js 14 조합에서 워커 스레드 빌드 시 _document 모듈 누락 오류가 발생해 비활성화
+    webpackBuildWorker: false,
     // 대형 barrel import 라이브러리의 트리셰이킹/번들 최적화
     optimizePackageImports: [
       'lucide-react',

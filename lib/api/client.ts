@@ -1,4 +1,5 @@
 import { ApiError } from './errors'
+import { logger } from '@/lib/logger'
 
 export interface ApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -107,11 +108,9 @@ export async function apiClient<T>(url: string, options: ApiRequestOptions = {})
 
       const duration = Date.now() - startMs
       if (duration > 1000) {
-        // eslint-disable-next-line no-console
-        console.warn(`[apiClient] 느린 요청 경고: ${method} ${url} — ${duration}ms`)
+        logger.warn('slow api request', { method, url, durationMs: duration })
       } else {
-        // eslint-disable-next-line no-console
-        console.log(`[apiClient] ${method} ${url} — ${duration}ms`)
+        logger.info('api request', { method, url, durationMs: duration })
       }
 
       return data as T
@@ -122,14 +121,12 @@ export async function apiClient<T>(url: string, options: ApiRequestOptions = {})
         break
       }
       const delay = baseDelay * 2 ** (attempt - 1)
-      // eslint-disable-next-line no-console
-      console.warn(`[apiClient] 재시도 ${attempt}/${retry} — ${method} ${url} (${delay}ms 후)`)
+      logger.warn('api request retry', { attempt, retry, method, url, delayMs: delay })
       await sleep(delay)
     }
   }
 
   const duration = Date.now() - startMs
-  // eslint-disable-next-line no-console
-  console.warn(`[apiClient] 요청 실패: ${method} ${url} — ${duration}ms`)
+  logger.warn('api request failed', { method, url, durationMs: duration })
   throw lastError
 }

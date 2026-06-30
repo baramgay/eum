@@ -1,4 +1,5 @@
 import type { SupabaseClient, User } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 export type AuditAction =
   | 'submitted'
@@ -77,7 +78,7 @@ export async function logAction(
   }
 
   // 재시도 실패 시 동기 경고: 메인 기능은 차단하지 않지만 운영자가 알 수 있어야 함
-  console.warn('[audit] 감사 로그 기록 실패 (재시도 후):', lastError, { action, resourceType, resourceId })
+  logger.warn('audit log insert failed after retries', { lastError, action, resourceType, resourceId })
 }
 
 /** API 키 발급 감사 로그 */

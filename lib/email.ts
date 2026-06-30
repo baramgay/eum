@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger'
+
 const RESEND_API_KEY   = process.env.RESEND_API_KEY
 const FROM_EMAIL       = process.env.RESEND_FROM_EMAIL    ?? 'noreply@eum.gyeongnam.go.kr'
 const CENTER_EMAIL     = process.env.CENTER_NOTIFICATION_EMAIL ?? 'center@eum.gyeongnam.go.kr'
@@ -34,7 +36,7 @@ function emailTemplate(title: string, bodyHtml: string, actionLabel?: string, ac
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   if (!RESEND_API_KEY) {
-    console.log(`[EMAIL SKIP] to=${to} subject=${subject} (RESEND_API_KEY 없음)`)
+    logger.info('email skipped', { to, subject, reason: 'RESEND_API_KEY missing' })
     return
   }
   try {
@@ -48,7 +50,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
     })
     if (!res.ok) {
       const err = await res.text()
-      console.error('[EMAIL ERROR]', err)
+      logger.error('email send failed', { response: err })
     }
   } catch {
     // fire-and-forget
