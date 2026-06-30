@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from('catalog')
-    .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract,is_pseudonymized,is_synthetic', { count: 'exact' })
+    .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract', { count: 'exact' })
     .order('updated_at', { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1)
 
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
   if (theme)              query = query.eq('theme', theme) as typeof query
   if (isOpen === 'true')  query = query.eq('is_open', true) as typeof query
   if (aiReady === 'true')       query = query.eq('ai_ready', true) as typeof query
-  if (onlySynthetic === 'true') query = query.or('is_synthetic.eq.true,is_pseudonymized.eq.true') as typeof query
+  // NOTE: is_pseudonymized/is_synthetic 컬럼이 DB에 없으므로 필터 제외
   if (tenantId)                 query = query.eq('tenant_id', tenantId) as typeof query
 
   const { data, count, error } = await query
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
     const term = `%${q}%`
     const { data: fallback } = await supabase
       .from('catalog')
-      .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract,is_pseudonymized,is_synthetic')
+      .select('dataset_id,tenant_id,title,description,theme,keywords,layer,table_name,rows,is_open,ai_ready,high_value,updated_at,license,format,api_enabled,derived_from,lineage_ids,suggestions,quality_contract')
       .or(`title.ilike.${term},description.ilike.${term}`)
       .order('updated_at', { ascending: false })
       .limit(pageSize)

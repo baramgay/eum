@@ -166,8 +166,42 @@ test.describe('AI 질의', () => {
     await expect(generateBtn).toBeEnabled()
   })
 
-  test.skip('출처 URL 클릭 시 포털 페이지로 이동한다 — LLM 응답 필요', () => {
-    // 이 테스트는 실제 LLM API 호출 결과(source_url/datasetId)가 필요함
-    // Supabase + LLM 없이는 검증 불가
+  test('출처 URL 클릭 시 포털 페이지로 이동한다', async ({ page }) => {
+    test.slow()
+
+    // /api/ai/chat 응답을 모의하여 출처 링크가 렌더링되도록 함
+    await page.route('/api/ai/chat', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: '테스트 답변입니다.',
+          result: {
+            intent: '데이터셋조회:ds-e2e-youth',
+            source: 'EUM 데이터 카탈로그',
+            columns: [],
+            rows: [],
+          },
+          sources: [],
+          conversation_id: null,
+        }),
+      })
+    })
+
+    const queryInput = page.getByPlaceholder('예: 청년 정착잠재 순위 보여줘')
+    await expect(queryInput).toBeVisible()
+    await queryInput.fill('출처 테스트')
+
+    const sendBtn = page.getByRole('button', { name: '질문', exact: true })
+    await expect(sendBtn).toBeEnabled()
+    await sendBtn.click()
+
+    // 출처 배지가 나타날 때까지 대기
+    const sourceBadge = page.getByTitle('데이터셋 포털에서 보기')
+    await expect(sourceBadge).toBeVisible({ timeout: 10000 })
+
+    // 포털 페이지로 이동
+    await sourceBadge.click()
+    await page.waitForURL(/\/portal/, { waitUntil: 'domcontentloaded' })
   })
 })

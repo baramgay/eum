@@ -1133,6 +1133,23 @@ git reset --hard HEAD</code></pre>
         <code>git checkout -- scripts/e2e-seed.mjs components/ontology/tabs/GraphTab.tsx</code>
       </td>
     </tr>
+    <tr>
+      <td>31</td>
+      <td><code>.github/workflows/ci.yml</code><br><code>app/api/catalog/route.ts</code><br><code>__tests__/e2e/ai-query.spec.ts</code><br><code>__tests__/e2e/portal-search.spec.ts</code></td>
+      <td>
+        • GitHub Actions CI/CD 파이프라인 추가 (lint/tsc/jest/build/e2e)<br>
+        • /api/catalog에서 DB에 없는 <code>is_pseudonymized/is_synthetic</code> 컬럼 조회로 인해 포털 데이터가 0건으로 날아가는 버그 수정<br>
+        • E2E skipped 2건 해소: AI 출처 URL 클릭은 /api/ai/chat 모의 응답으로, 포털 카드 클릭은 카드 제목 클릭으로 변경
+      </td>
+      <td>
+        <code>npm run lint</code> 통과<br>
+        <code>npm test</code> 589 tests 통과<br>
+        Playwright full suite 69 passed / 0 skipped / 0 failed (6.1m)
+      </td>
+      <td>
+        <code>git checkout -- .github/workflows/ci.yml app/api/catalog/route.ts __tests__/e2e/ai-query.spec.ts __tests__/e2e/portal-search.spec.ts</code>
+      </td>
+    </tr>
     <tr><td colspan="5" style="text-align:center;color:var(--muted)">추가 개선점 문서화 완료</td></tr>
   </table>
 
@@ -1143,7 +1160,7 @@ git reset --hard HEAD</code></pre>
     <tr><td>TypeScript 타입 검사</td><td><code>npx tsc --noEmit</code></td><td><span class="ok">통과</span></td></tr>
     <tr><td>ESLint</td><td><code>npm run lint</code></td><td><span class="ok">통과</span> (warning 0, error 0)</td></tr>
     <tr><td>프로덕션 빌드</td><td><code>rm -rf .next && npm run build</code></td><td><span class="ok">통과</span> (2026-06-29, 91 routes)</td></tr>
-    <tr><td>E2E (Chromium)</td><td><code>npx playwright test --project=chromium</code></td><td><span class="ok">66 passed / 2 skipped / 0 failed</span></td></tr>
+    <tr><td>E2E (Chromium)</td><td><code>npx playwright test --project=chromium</code></td><td><span class="ok">69 passed / 0 skipped / 0 failed</span></td></tr>
   </table>
 
   <h3>전체 롤백 체크리스트</h3>

@@ -95,16 +95,10 @@ test.describe('포털 검색', () => {
     test.slow()
     await page.waitForLoadState('domcontentloaded')
 
-    // E2E 시드된 카드를 클릭 (제목으로 찾음)
-    const card = page.locator('main').getByText(/E2E (청년인구|사업체|창원시)/).first()
-    const cardVisible = await card.isVisible({ timeout: 15000 }).catch(() => false)
-
-    if (!cardVisible) {
-      test.skip(true, '로그인 후 데이터셋 카드가 없습니다 — Supabase 필요')
-      return
-    }
-
-    await card.click()
+    // E2E 시드된 첫 번째 카드 제목을 클릭하면 카드 onClick이 전파되어 모달 열림
+    const cardTitle = page.locator('main').getByText(/E2E (청년인구|사업체|창원시)/).first()
+    await expect(cardTitle).toBeVisible({ timeout: 15000 })
+    await cardTitle.click()
 
     const modal = page.getByRole('dialog')
     await expect(modal).toBeVisible({ timeout: 8000 })
