@@ -607,6 +607,8 @@ function ChartToolbar({ chart, chartRef }: { chart: ChartSpec; chartRef?: React.
 // ────────────────────────────────────────────
 
 function HeatmapChart({ chart }: { chart: ChartSpec }) {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
   const data = chart.data
   const valueKey = chart.valueKey ?? 'value'
   const xValues = useMemo(() => Array.from(new Set(data.map(d => String(d.x)))), [data])
@@ -623,7 +625,7 @@ function HeatmapChart({ chart }: { chart: ChartSpec }) {
   const height = labelHeight + yValues.length * cellSize + 24
 
   const colorFor = (v: number | null) => {
-    if (v === null || Number.isNaN(v)) return '#F3F4F6'
+    if (v === null || Number.isNaN(v)) return isDark ? '#374151' : '#F3F4F6'
     const t = range === 0 ? 0.5 : (v - min) / range
     if (t < 0.5) {
       const s = t * 2
@@ -656,7 +658,7 @@ function HeatmapChart({ chart }: { chart: ChartSpec }) {
                 width={cellSize - 2}
                 height={cellSize - 2}
                 fill={colorFor(v)}
-                stroke="#E5E7EB"
+                stroke={isDark ? '#374151' : '#E5E7EB'}
                 strokeWidth={0.5}
               />
               {v !== null && !Number.isNaN(v) && (
@@ -664,7 +666,7 @@ function HeatmapChart({ chart }: { chart: ChartSpec }) {
                   x={labelWidth + xi * cellSize + (cellSize - 2) / 2}
                   y={labelHeight + yj * cellSize + (cellSize - 2) / 2 + 4}
                   textAnchor="middle"
-                  className="text-[9px] fill-gray-700"
+                  className="text-[9px] fill-gray-700 dark:fill-gray-300"
                 >
                   {formatTick(v)}
                 </text>
@@ -1910,7 +1912,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                           <Select
                             value={optValues[opt.key] ?? opt.default}
                             onChange={e => setOptValues(prev => ({ ...prev, [opt.key]: e.target.value }))}
-                            className="text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 bg-white"
+                            className="text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-900 dark:text-gray-100"
                           >
                             {opt.choices.map(c => (
                               <option key={c.value} value={c.value}>{c.label}</option>

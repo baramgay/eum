@@ -260,14 +260,14 @@ export default function FacilityMap({ facilities }: Props) {
       <div className="absolute top-3 left-3 right-3 z-10 flex flex-col gap-2 pointer-events-none">
 
         {/* 검색바 */}
-        <div className="pointer-events-auto flex items-center gap-2 bg-white/96 backdrop-blur-md rounded-2xl shadow-md px-4 py-2.5 border border-white/60">
+        <div className="pointer-events-auto flex items-center gap-2 bg-white/96 dark:bg-gray-900/90 backdrop-blur-md rounded-2xl shadow-md px-4 py-2.5 border border-white/60 dark:border-gray-700/70">
           <Search className="w-4 h-4 text-gray-400 shrink-0" />
           <Input
             ref={searchRef}
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="시설명, 시군으로 검색"
-            className="flex-1 text-sm bg-transparent outline-none text-gray-700 placeholder-gray-400"
+            className="flex-1 text-sm bg-transparent outline-none text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
           />
           {search && (
             <button
@@ -289,7 +289,7 @@ export default function FacilityMap({ facilities }: Props) {
 
         {/* 레이어 모드 + 반경 필터 */}
         <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
+          <div className="flex items-center gap-1 bg-white/96 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60 dark:border-gray-700/70">
             {LAYERS.map(({ key, label, icon }) => {
               const active = layerMode === key
               return (
@@ -312,7 +312,7 @@ export default function FacilityMap({ facilities }: Props) {
 
           {layerMode === 'heatmap' && (
             <div className="pointer-events-auto flex flex-wrap items-center gap-1.5">
-              <div className="flex items-center gap-1 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
+              <div className="flex items-center gap-1 bg-white/96 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60 dark:border-gray-700/70">
                 {[
                   { key: 'grid', label: '격자' },
                   { key: 'kernel', label: '커널밀도' },
@@ -332,7 +332,7 @@ export default function FacilityMap({ facilities }: Props) {
                 })}
               </div>
 
-              <div className="flex items-center gap-1 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
+              <div className="flex items-center gap-1 bg-white/96 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60 dark:border-gray-700/70">
                 <Select
                   value={heatmapValueMode}
                   onChange={(e) => setHeatmapValueMode(e.target.value as HeatmapValueMode)}
@@ -344,7 +344,7 @@ export default function FacilityMap({ facilities }: Props) {
                 </Select>
               </div>
 
-              <div className="flex items-center gap-1 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
+              <div className="flex items-center gap-1 bg-white/96 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60 dark:border-gray-700/70">
                 <Select
                   value={heatmapPalette}
                   onChange={(e) => setHeatmapPalette(e.target.value as HeatmapPalette)}
@@ -360,7 +360,7 @@ export default function FacilityMap({ facilities }: Props) {
           )}
 
           {layerMode === 'cluster' && (
-            <div className="pointer-events-auto flex items-center gap-1.5 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
+            <div className="pointer-events-auto flex items-center gap-1.5 bg-white/96 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60 dark:border-gray-700/70">
               <Select
                 value={clusterOptions.algorithm}
                 onChange={(e) => setClusterOptions((o) => ({ ...o, algorithm: e.target.value as ClusterOptions['algorithm'] }))}
@@ -409,7 +409,7 @@ export default function FacilityMap({ facilities }: Props) {
           )}
 
           {showFilters && (
-            <div className="flex items-center gap-1.5 bg-white/96 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60">
+            <div className="flex items-center gap-1.5 bg-white/96 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-md px-2 py-1.5 border border-white/60 dark:border-gray-700/70">
               <Navigation className="w-3.5 h-3.5 text-blue-500" />
               <Select
                 value={radiusKm}
