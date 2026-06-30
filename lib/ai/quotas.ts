@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 const DAILY_LIMIT = 100
 const MONTHLY_LIMIT = 2000
@@ -31,8 +32,9 @@ export async function checkAndIncrementQuota(
   })
 
   if (error) {
-    console.error('[quota] increment_and_check_quota rpc error:', error)
-    return { allowed: true }
+    logger.error('quota rpc error', { error })
+    // RPC 오류 시 할당량을 알 수 없으므로 안전하게 차단(fail-closed)
+    return { allowed: false, reason: '사용량 한도 확인 중 오류가 발생했습니다' }
   }
 
   const result = data as { allowed: boolean; reason?: string } | null

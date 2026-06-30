@@ -290,7 +290,7 @@ describe('generateSql with self-correction', () => {
     expect(result?.sql).toContain('2024')
   })
 
-  it('모든 재시도가 실패하면 실패 설명을 반환한다', async () => {
+  it('모든 재시도가 실패하면 null을 반환한다', async () => {
     mockChatCompletion.mockResolvedValue({
       content: '{"sql": "SELECT bad_col FROM gold_settlement_index LIMIT 10", "explanation": "계속 실패"}',
     })
@@ -306,7 +306,6 @@ describe('generateSql with self-correction', () => {
 
     const result = await generateSql(supabase, '목록', { execute, maxRetries: 1 })
 
-    expect(result).not.toBeNull()
-    expect(result?.explanation).toContain('실패')
+    expect(result).toBeNull()
   })
 })

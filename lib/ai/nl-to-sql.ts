@@ -152,6 +152,21 @@ function collectFunctionNames(node: unknown, names: Set<string>): void {
  * 서브쿼리, CTE, JOIN을 허용한다.
  */
 export function validateSqlAst(sql: string, whitelist: Whitelist): { ok: boolean; reason?: string } {
+  const normalized = normalizeWhitespace(sql)
+
+  // 다중 문장, 달러 인용 문자열, 세미콜론 인젝션 차단 (주석은 먼저 제거)
+  const strippedForSemi = normalized
+    .replace(/'(?:[^']|'')*'/g, "''")
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/--[^\n]*/g, ' ')
+    .replace(/#[^\n]*/g, ' ')
+  if (/;\s*\S/.test(strippedForSemi)) {
+    return { ok: false, reason: '한 번에 하나의 SELECT 문만 허용됩니다' }
+  }
+  if (/\$\w*\$/.test(normalized)) {
+    return { ok: false, reason: 'Dollar-quoted 문자열은 허용되지 않습니다' }
+  }
+
   const parser = new Parser()
   let parsed: { tableList?: string[]; columnList?: string[]; ast: unknown }
   try {
@@ -289,13 +304,23 @@ export function validateSql(sql: string, whitelist: Whitelist): { ok: boolean; r
   return { ok: true }
 }
 
+const MAX_LIMIT = 1000
+
 /**
  * SQL에 LIMIT 절이 없으면 기본값을 추가한다.
+ * 이미 LIMIT이 있으면 상한을 초과하지 않도록 제한한다.
  */
 export function ensureLimit(sql: string, limit = 100): string {
   const normalized = normalizeWhitespace(sql)
-  if (/\blimit\s+\d+\b/i.test(normalized)) return normalized
-  return `${normalized} LIMIT ${limit}`
+  const existing = /\blimit\s+(\d+)\b/i.exec(normalized)
+  if (existing) {
+    const n = parseInt(existing[1], 10)
+    if (n > MAX_LIMIT) {
+      return normalized.replace(/\blimit\s+\d+\b/i, `LIMIT ${MAX_LIMIT}`)
+    }
+    return normalized
+  }
+  return `${normalized} LIMIT ${Math.min(limit, MAX_LIMIT)}`
 }
 
 interface CatalogInfo {
@@ -550,6 +575,6 @@ export async function generateSql(
     }
   }
 
-  if (!lastSql) return null
-  return { sql: lastSql, explanation: `SQL 생성/실행에 실패했습니다: ${lastError ?? '알 수 없는 오류'}` }
+  // 모든 재시도가 실패하면 실패한 SQL을 반환하지 않는다 (호출자가 실패 SQL을 그대로 실행하는 것을 방지)
+  return null
 }

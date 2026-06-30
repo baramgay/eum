@@ -32,6 +32,7 @@ function buildTitle(text: string): string {
 async function executeToolCall(
   supabase: SupabaseClient,
   call: ToolCall,
+  userId: string,
 ): Promise<{ content: string; result?: QueryResult }> {
   const args = safeJsonParse<Record<string, unknown>>(call.function.arguments) ?? {}
   const name = call.function.name
@@ -93,6 +94,13 @@ async function executeToolCall(
 
   if (name === 'run_sql') {
     const question = String(args.question ?? '')
+
+    // run_sql은 납부 generateSql 납부를 통해 추가 LLM 호출을 발생시키므로 할당량을 선차감한다
+    const toolQuota = await checkAndIncrementQuota(userId, supabase)
+    if (!toolQuota.allowed) {
+      return { content: JSON.stringify({ error: toolQuota.reason ?? '할당량이 초과되었습니다' }) }
+    }
+
     const generated = await generateSql(supabase, question)
     if (!generated) {
       return { content: JSON.stringify({ error: 'SQL 생성에 실패했습니다' }) }
@@ -353,7 +361,7 @@ export async function POST(req: NextRequest) {
     if (first.tool_calls && Array.isArray(first.tool_calls) && first.tool_calls.length > 0) {
       const toolMessages: ChatMessage[] = []
       for (const call of first.tool_calls as ToolCall[]) {
-        const { content, result } = await executeToolCall(supabase, call)
+        const { content, result } = await executeToolCall(supabase, call, user.id)
         if (result && (call.function.name === 'query_dataset' || call.function.name.startsWith('query_dataset_'))) {
           toolResult = result
         }

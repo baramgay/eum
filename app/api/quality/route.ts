@@ -90,9 +90,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     // 1) 서비스 키 인증 또는 로그인 사용자 인증
+    // 운영 환경에서는 QUALITY_SECRET을 별도로 설정해 서비스롤 키 노출을 방지한다
     const serviceKey = req.headers.get('x-service-key')
-    const expectedKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
-    const isService = Boolean(serviceKey && serviceKey === expectedKey)
+    const expectedKey = process.env.QUALITY_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+    const isService = Boolean(serviceKey && expectedKey && serviceKey === expectedKey)
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

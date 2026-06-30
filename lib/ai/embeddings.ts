@@ -1,4 +1,5 @@
 import { env } from '@/lib/env'
+import { logger } from '@/lib/logger'
 
 export interface EmbeddingOptions {
   model?: string
@@ -41,8 +42,7 @@ export async function getEmbedding(
 
     if (!res.ok) {
       const err = await res.text()
-      // eslint-disable-next-line no-console
-      console.error('[embeddings] API 오류:', err)
+      logger.error('embedding api error', { response: err })
       return null
     }
 
@@ -51,8 +51,7 @@ export async function getEmbedding(
     if (!Array.isArray(vec) || vec.length === 0) return null
     return vec as number[]
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('[embeddings] 예외:', e instanceof Error ? e.message : String(e))
+    logger.error('embedding exception', { error: e instanceof Error ? e.message : String(e) })
     return null
   }
 }

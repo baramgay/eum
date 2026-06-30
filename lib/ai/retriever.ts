@@ -116,9 +116,16 @@ export async function retrieveContext(
     // vector 확장이나 RPC가 없어도 키워드 검색으로 폭로
   }
 
-  // 2) 키워드 ILIKE 폭로
+  // 2) 키워드 ILIKE 폭로 (와일드카드 문자 제거로 인젝션 방지)
+  function sanitizeLikeTerm(term: string): string {
+    return term.replace(/[%_\\]/g, '')
+  }
+
   const catalogFilters = terms
-    .map((t) => `title.ilike.%${t}%,theme.ilike.%${t}%,keywords.ilike.%${t}%,description.ilike.%${t}%`)
+    .map((t) => {
+      const s = sanitizeLikeTerm(t)
+      return `title.ilike.%${s}%,theme.ilike.%${s}%,keywords.ilike.%${s}%,description.ilike.%${s}%`
+    })
     .join(',')
 
   const catalogPromise = supabase
@@ -129,7 +136,10 @@ export async function retrieveContext(
     .limit(limit)
 
   const ontoFilters = terms
-    .map((t) => `label.ilike.%${t}%,obj_type.ilike.%${t}%,props.ilike.%${t}%`)
+    .map((t) => {
+      const s = sanitizeLikeTerm(t)
+      return `label.ilike.%${s}%,obj_type.ilike.%${s}%,props.ilike.%${s}%`
+    })
     .join(',')
 
   const ontoPromise = supabase
