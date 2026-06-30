@@ -1150,6 +1150,25 @@ git reset --hard HEAD</code></pre>
         <code>git checkout -- .github/workflows/ci.yml app/api/catalog/route.ts __tests__/e2e/ai-query.spec.ts __tests__/e2e/portal-search.spec.ts</code>
       </td>
     </tr>
+    <tr>
+      <td>32</td>
+      <td><code>package.json</code><br><code>package-lock.json</code><br><code>next.config.js</code><br><code>sentry.client.config.ts</code><br><code>sentry.server.config.ts</code><br><code>sentry.edge.config.ts</code><br><code>scripts/eval-rag.ts</code><br><code>scripts/eval-nl-to-sql.ts</code></td>
+      <td>
+        • Sentry 통합 추가: client/server/edge config + <code>withSentryConfig</code> 래퍼. DSN이 없으면 이벤트를 버려 로컬/스테이징에서도 안전<br>
+        • AI 품질 평가 스크립트 추가: <code>scripts/eval-rag.ts</code>, <code>scripts/eval-nl-to-sql.ts</code><br>
+        • npm audit non-breaking 추가 패치 반영
+      </td>
+      <td>
+        <code>npm run lint</code> 통과<br>
+        <code>npx tsc --noEmit</code> 통과<br>
+        <code>npm test</code> 589 tests 통과<br>
+        <code>rm -rf .next && npm run build</code> 93 routes 통과<br>
+        <code>npx tsx scripts/eval-rag.ts</code> 실행 확인
+      </td>
+      <td>
+        <code>git checkout -- package.json package-lock.json next.config.js sentry.*.config.ts scripts/eval-*.ts</code>
+      </td>
+    </tr>
     <tr><td colspan="5" style="text-align:center;color:var(--muted)">추가 개선점 문서화 완료</td></tr>
   </table>
 
@@ -1159,7 +1178,7 @@ git reset --hard HEAD</code></pre>
     <tr><td>단위 테스트</td><td><code>npm test</code></td><td><span class="ok">579/579 통과</span> (51 suites)</td></tr>
     <tr><td>TypeScript 타입 검사</td><td><code>npx tsc --noEmit</code></td><td><span class="ok">통과</span></td></tr>
     <tr><td>ESLint</td><td><code>npm run lint</code></td><td><span class="ok">통과</span> (warning 0, error 0)</td></tr>
-    <tr><td>프로덕션 빌드</td><td><code>rm -rf .next && npm run build</code></td><td><span class="ok">통과</span> (2026-06-29, 91 routes)</td></tr>
+    <tr><td>프로덕션 빌드</td><td><code>rm -rf .next && npm run build</code></td><td><span class="ok">통과</span> (2026-06-30, 93 routes)</td></tr>
     <tr><td>E2E (Chromium)</td><td><code>npx playwright test --project=chromium</code></td><td><span class="ok">69 passed / 0 skipped / 0 failed</span></td></tr>
   </table>
 

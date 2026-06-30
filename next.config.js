@@ -54,6 +54,8 @@ function securityHeaders() {
 // const withBundleAnalyzer = require('@next/bundle-analyzer')({ enabled: process.env.ANALYZE === 'true' })
 // module.exports = withBundleAnalyzer(config)
 
+const { withSentryConfig } = require('@sentry/nextjs')
+
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -97,4 +99,9 @@ const config = {
   headers: securityHeaders,
 }
 
-module.exports = config
+module.exports = withSentryConfig(config, {
+  // Sentry 자동 source map 업로드 등을 기본값으로 사용
+  // DSN이 없으면 beforeSend에서 이벤트를 버리므로 로컬/스테이징에서도 안전
+  silent: true,
+  hideSourceMaps: true,
+})
