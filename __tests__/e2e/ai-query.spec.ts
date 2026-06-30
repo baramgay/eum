@@ -5,7 +5,7 @@ test.describe('AI 질의', () => {
   test.beforeEach(async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
     await page.goto('/ai')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
   })
 
   test('/ai 페이지가 정상 로드된다', async ({ page }) => {
@@ -84,8 +84,8 @@ test.describe('AI 질의', () => {
     const queryInput = page.getByPlaceholder('예: 청년 정착잠재 순위 보여줘')
     await expect(queryInput).toBeVisible()
 
-    // 빈 상태에서 버튼이 비활성화되어야 함
-    const sendBtn = page.getByRole('button', { name: '질문' })
+    // 빈 상태에서 버튼이 비활성화되어야 함 (exact: true로 추천 질문 버튼과 구분)
+    const sendBtn = page.getByRole('button', { name: '질문', exact: true })
     await expect(sendBtn).toBeDisabled()
 
     // 텍스트 입력 후 활성화
@@ -124,15 +124,26 @@ test.describe('AI 질의', () => {
     await expect(menu.getByRole('menuitem', { name: /JSON/ })).toBeVisible()
   })
 
-  test('AGENCY 사용자도 /ai 페이지에 접근할 수 있다', async ({ page }) => {
-    // agency 계정으로 별도 접근
-    await login(page, AGENCY_EMAIL, AGENCY_PASSWORD)
-    await page.goto('/ai')
-    await page.waitForLoadState('networkidle')
+  test('AGENCY 사용자도 /ai 페이지에 접근할 수 있다', async ({ browser }) => {
+    test.slow() // 새 컨텍스트 로그인 + /ai 로드에 시간이 더 걸림
+    // 이미 CENTER로 로그인된 페이지에서는 /login이 대시보드로 리디렉션되므로
+    // AGENCY 전용의 새 브라우저 컨텍스트에서 로그인한다.
+    const context = await browser.newContext({
+      baseURL: test.info().project.use.baseURL as string,
+    })
+    const agencyPage = await context.newPage()
 
-    await expect(page.locator('main')).toBeVisible()
-    // 로그인으로 리디렉션되지 않아야 함
-    await expect(page).toHaveURL(/\/ai/)
+    try {
+      await login(agencyPage, AGENCY_EMAIL, AGENCY_PASSWORD)
+      await agencyPage.goto('/ai')
+      await agencyPage.waitForLoadState('domcontentloaded')
+
+      await expect(agencyPage.locator('main')).toBeVisible()
+      // 로그인으로 리디렉션되지 않아야 함
+      await expect(agencyPage).toHaveURL(/\/ai/)
+    } finally {
+      await context.close()
+    }
   })
 
   test('SQL 질의 모드에서 쿼리 없이 SQL 생성 버튼이 비활성화된다', async ({ page }) => {

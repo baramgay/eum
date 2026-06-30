@@ -5,7 +5,7 @@ test.describe('온톨로지 그래프 인터랙션', () => {
   test.beforeEach(async ({ page }) => {
     await login(page, AGENCY_EMAIL, AGENCY_PASSWORD)
     await page.goto('/ontology')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
   })
 
   test('/ontology 페이지가 정상적으로 로드된다', async ({ page }) => {
@@ -14,19 +14,19 @@ test.describe('온톨로지 그래프 인터랙션', () => {
 
   test('온톨로지 탭이 모두 표시된다', async ({ page }) => {
     await expect(page.getByRole('button', { name: '개요' })).toBeVisible()
-    await expect(page.getByRole('button', { name: '그래프' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '그래프', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: '노드 목록' })).toBeVisible()
-    await expect(page.getByRole('button', { name: '분석' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '분석', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: '워크스페이스' })).toBeVisible()
     await expect(page.getByRole('button', { name: '편집' })).toBeVisible()
   })
 
   test('그래프 탭 클릭 시 그래프 영역으로 전환된다', async ({ page }) => {
-    await page.getByRole('button', { name: '그래프' }).click()
-    await page.waitForLoadState('networkidle')
+    await page.getByRole('button', { name: '그래프', exact: true }).click()
+    await page.waitForLoadState('domcontentloaded')
 
     // 그래프 탭이 활성화된 상태
-    const graphTab = page.getByRole('button', { name: '그래프' })
+    const graphTab = page.getByRole('button', { name: '그래프', exact: true })
     await expect(graphTab).toHaveClass(/text-indigo/)
   })
 
@@ -44,7 +44,7 @@ test.describe('온톨로지 그래프 인터랙션', () => {
 
   test('노드 목록 탭으로 전환하면 노드 목록 영역이 표시된다', async ({ page }) => {
     await page.getByRole('button', { name: '노드 목록' }).click()
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     // 노드 목록 탭 활성화 확인 (노드 검색 또는 관련 UI)
     const nodeListArea = page.getByRole('button', { name: '노드 목록' })
@@ -52,16 +52,16 @@ test.describe('온톨로지 그래프 인터랙션', () => {
   })
 
   test('분석 탭으로 전환할 수 있다', async ({ page }) => {
-    await page.getByRole('button', { name: '분석' }).click()
-    await page.waitForLoadState('networkidle')
+    await page.getByRole('button', { name: '분석', exact: true }).click()
+    await page.waitForLoadState('domcontentloaded')
 
-    const analysisTab = page.getByRole('button', { name: '분석' })
+    const analysisTab = page.getByRole('button', { name: '분석', exact: true })
     await expect(analysisTab).toHaveClass(/text-indigo/)
   })
 
   test('시군 선택 드롭다운이 그래프 탭에서 표시된다', async ({ page }) => {
-    await page.getByRole('button', { name: '그래프' }).click()
-    await page.waitForLoadState('networkidle')
+    await page.getByRole('button', { name: '그래프', exact: true }).click()
+    await page.waitForLoadState('domcontentloaded')
 
     // 시나리오 없이 그래프 탭이면 시군 필터가 표시됨
     const sggSelect = page.getByRole('combobox', { name: '시군 선택' })
@@ -77,7 +77,7 @@ test.describe('온톨로지 그래프 인터랙션', () => {
 
   test('워크스페이스 탭으로 전환할 수 있다', async ({ page }) => {
     await page.getByRole('button', { name: '워크스페이스' }).click()
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     const wsTab = page.getByRole('button', { name: '워크스페이스' })
     await expect(wsTab).toHaveClass(/text-indigo/)
@@ -85,39 +85,36 @@ test.describe('온톨로지 그래프 인터랙션', () => {
 
   test('편집 탭으로 전환할 수 있다', async ({ page }) => {
     await page.getByRole('button', { name: '편집' }).click()
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     const editTab = page.getByRole('button', { name: '편집' })
     await expect(editTab).toHaveClass(/text-indigo/)
   })
 
-  test('그래프 탭에서 그래프 SVG 또는 캔버스 요소가 DOM에 존재한다', async ({ page }) => {
-    await page.getByRole('button', { name: '그래프' }).click()
+  test('그래프 탭에서 그래프 캔버스 요소가 DOM에 존재한다', async ({ page }) => {
+    await page.getByRole('button', { name: '그래프', exact: true }).click()
 
-    // 그래프 데이터가 없으면 재구축 시도
-    const empty = page.getByText('그래프 데이터 없음')
+    // 로딩 스켈레톤이 사라질 때까지 대기
+    await expect(page.getByTestId('graph-skeleton')).toHaveCount(0, { timeout: 30000 })
+
+    // canvas 또는 empty state 중 하나가 나타날 때까지 대기
+    const graphCanvas = page.getByTestId('ontology-graph-canvas')
+    const empty = page.getByTestId('graph-empty-state')
+    await expect(
+      graphCanvas.or(empty)
+    ).toBeVisible({ timeout: 15000 })
+
+    // 데이터가 없으면 재구축 시도
     if (await empty.isVisible().catch(() => false)) {
       await page.getByRole('button', { name: '온톨로지 재구축' }).first().click()
-      await page.waitForTimeout(3000)
-      await page.reload()
-      await page.getByRole('button', { name: '그래프' }).click()
+      await expect(page.getByTestId('graph-skeleton')).toHaveCount(0, { timeout: 30000 })
+      await expect(graphCanvas.or(empty)).toBeVisible({ timeout: 15000 })
     }
-
-    // SVG 또는 canvas가 DOM에 있어야 함
-    const graphSvg = page.getByTestId('ontology-graph-svg')
-    const canvas = page.locator('canvas')
-    const svgExists = await graphSvg.count().then(c => c > 0).catch(() => false)
-    const canvasExists = await canvas.count().then(c => c > 0).catch(() => false)
-
-    // 둘 중 하나는 있어야 함 (또는 데이터 없음 안내)
-    const hasGraphEl = svgExists || canvasExists
-    const hasEmptyState = await page.getByText(/데이터 없음|데이터를 불러오지 못/).isVisible().catch(() => false)
-    expect(hasGraphEl || hasEmptyState).toBe(true)
   })
 
   test('레이아웃 변경 기능이 그래프 탭에서 동작한다', async ({ page }) => {
-    await page.getByRole('button', { name: '그래프' }).click()
-    await page.waitForLoadState('networkidle')
+    await page.getByRole('button', { name: '그래프', exact: true }).click()
+    await page.waitForLoadState('domcontentloaded')
 
     // GraphTab에서 layout 관련 버튼 또는 드롭다운 확인
     // OntologyClient → GraphTab으로 layoutChange가 전달됨

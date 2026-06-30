@@ -35,7 +35,10 @@ interface GraphTabProps {
 
 function GraphSkeleton() {
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 h-[400px] md:h-[600px] flex flex-col items-center justify-center animate-pulse">
+    <div
+      data-testid="graph-skeleton"
+      className="bg-gray-100 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 h-[400px] md:h-[600px] flex flex-col items-center justify-center animate-pulse"
+    >
       <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 mb-4" />
       <Skeleton className="h-4 w-32 mb-2" />
       <Skeleton className="h-3 w-48" />
@@ -88,12 +91,14 @@ export default function GraphTab({
         {loading ? (
           <GraphSkeleton />
         ) : !graph?.nodes?.length ? (
-          <EmptyState
-            icon={<Network />}
-            title="그래프 데이터 없음"
-            description="온톨로지를 재구축하면 그래프가 생성됩니다."
-            action={{ label: '온톨로지 재구축', onClick: onBuildOntology }}
-          />
+          <div data-testid="graph-empty-state">
+            <EmptyState
+              icon={<Network />}
+              title="그래프 데이터 없음"
+              description="온톨로지를 재구축하면 그래프가 생성됩니다."
+              action={{ label: '온톨로지 재구축', onClick: onBuildOntology }}
+            />
+          </div>
         ) : (
           <OntologyGraph
             nodes={graph.nodes}

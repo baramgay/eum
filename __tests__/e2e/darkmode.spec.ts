@@ -4,11 +4,15 @@ import { login, CENTER_EMAIL, CENTER_PASSWORD, AGENCY_EMAIL, AGENCY_PASSWORD } f
 test.describe('다크 모드', () => {
   test('테마 토글로 다크 모드를 활성화하면 html에 dark 클래스가 추가된다', async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
-    await page.waitForLoadState('networkidle')
+    await page.goto('/manual')
+    await page.waitForLoadState('domcontentloaded')
 
     // ThemeToggle 버튼 열기
-    await page.getByRole('button', { name: '테마 변경' }).click()
+    const toggle = page.getByRole('button', { name: '테마 변경' })
+    await expect(toggle).toBeVisible()
+    await toggle.click()
     // 다크 옵션 클릭
+    await expect(page.getByRole('option', { name: '다크' })).toBeVisible()
     await page.getByRole('option', { name: '다크' }).click()
 
     await expect(page.locator('html')).toHaveClass(/dark/)
@@ -16,15 +20,21 @@ test.describe('다크 모드', () => {
 
   test('다크 모드 설정이 localStorage에 저장되고 페이지 재로드 후에도 유지된다', async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
-    await page.waitForLoadState('networkidle')
+    await page.goto('/manual')
+    await page.waitForLoadState('domcontentloaded')
 
-    // localStorage에 직접 설정 (eum-theme 키)
-    await page.evaluate(() => localStorage.setItem('eum-theme', 'dark'))
+    // UI 토글로 다크 모드 설정
+    await page.getByRole('button', { name: '테마 변경' }).click()
+    await page.getByRole('option', { name: '다크' }).click()
+
+    // 토글 메뉴가 닫히고 클래스가 적용될 때까지 대기
+    await expect(page.locator('html')).toHaveClass(/dark/, { timeout: 10000 })
+
     await page.reload()
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     // html에 dark 클래스가 있어야 한다
-    await expect(page.locator('html')).toHaveClass(/dark/)
+    await expect(page.locator('html')).toHaveClass(/dark/, { timeout: 15000 })
 
     // localStorage 값도 유지되어야 한다
     const stored = await page.evaluate(() => localStorage.getItem('eum-theme'))
@@ -33,11 +43,14 @@ test.describe('다크 모드', () => {
 
   test('라이트 모드 설정 후 재로드하면 dark 클래스가 없다', async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
-    await page.waitForLoadState('networkidle')
+    await page.goto('/manual')
+    await page.waitForLoadState('domcontentloaded')
 
-    await page.evaluate(() => localStorage.setItem('eum-theme', 'light'))
+    await page.getByRole('button', { name: '테마 변경' }).click()
+    await page.getByRole('option', { name: '라이트' }).click()
+
     await page.reload()
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     const htmlClass = await page.locator('html').getAttribute('class')
     expect(htmlClass ?? '').not.toContain('dark')
@@ -45,12 +58,14 @@ test.describe('다크 모드', () => {
 
   test('다크 모드에서 대시보드 배경이 순수 흰색이 아니다', async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
-    await page.waitForLoadState('networkidle')
+    await page.goto('/manual')
+    await page.waitForLoadState('domcontentloaded')
 
-    // 다크 모드 적용
-    await page.evaluate(() => localStorage.setItem('eum-theme', 'dark'))
-    await page.reload()
-    await page.waitForLoadState('networkidle')
+    // UI 토글로 다크 모드 적용
+    await page.getByRole('button', { name: '테마 변경' }).click()
+    await page.getByRole('option', { name: '다크' }).click()
+    await page.goto('/dashboard')
+    await page.waitForLoadState('domcontentloaded')
 
     await expect(page.locator('html')).toHaveClass(/dark/)
 
@@ -65,12 +80,13 @@ test.describe('다크 모드', () => {
 
   test('다크 모드에서 포털 페이지 배경이 순수 흰색이 아니다', async ({ page }) => {
     await login(page, AGENCY_EMAIL, AGENCY_PASSWORD)
-
-    await page.evaluate(() => localStorage.setItem('eum-theme', 'dark'))
     await page.goto('/portal')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
-    await expect(page.locator('html')).toHaveClass(/dark/)
+    await page.getByRole('button', { name: '테마 변경' }).click()
+    await page.getByRole('option', { name: '다크' }).click()
+
+    await expect(page.locator('html')).toHaveClass(/dark/, { timeout: 15000 })
 
     const bgColor = await page.locator('body').evaluate(el =>
       getComputedStyle(el).backgroundColor
@@ -80,10 +96,13 @@ test.describe('다크 모드', () => {
 
   test('다크 모드에서 품질 페이지 배경이 순수 흰색이 아니다', async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
+    await page.goto('/manual')
+    await page.waitForLoadState('domcontentloaded')
 
-    await page.evaluate(() => localStorage.setItem('eum-theme', 'dark'))
+    await page.getByRole('button', { name: '테마 변경' }).click()
+    await page.getByRole('option', { name: '다크' }).click()
     await page.goto('/quality')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     await expect(page.locator('html')).toHaveClass(/dark/)
 
@@ -101,7 +120,7 @@ test.describe('다크 모드', () => {
     await darkPage.goto('/login')
     await darkPage.evaluate(() => localStorage.setItem('eum-theme', 'system'))
     await darkPage.reload()
-    await darkPage.waitForLoadState('networkidle')
+    await darkPage.waitForLoadState('domcontentloaded')
 
     await expect(darkPage.locator('html')).toHaveClass(/dark/)
     await darkContext.close()
@@ -109,9 +128,12 @@ test.describe('다크 모드', () => {
 
   test('테마 토글 메뉴에 라이트·다크·시스템 옵션이 모두 있다', async ({ page }) => {
     await login(page, CENTER_EMAIL, CENTER_PASSWORD)
-    await page.waitForLoadState('networkidle')
+    await page.goto('/manual')
+    await page.waitForLoadState('domcontentloaded')
 
-    await page.getByRole('button', { name: '테마 변경' }).click()
+    const toggle = page.getByRole('button', { name: '테마 변경' })
+    await expect(toggle).toBeVisible()
+    await toggle.click()
 
     await expect(page.getByRole('option', { name: '라이트' })).toBeVisible()
     await expect(page.getByRole('option', { name: '다크' })).toBeVisible()
