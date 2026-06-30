@@ -136,7 +136,7 @@ export default function LineageWidget() {
           .attr('y', PAD_TOP - 10)
           .attr('text-anchor', 'middle')
           .attr('font-size', 11)
-          .attr('fill', isDark ? '#94A3B8' : '#94A3B8')
+          .attr('fill', isDark ? '#CBD5E1' : '#94A3B8')
           .attr('font-family', 'Pretendard, sans-serif')
           .text(NODE_TYPE_LABEL[n.type])
       }

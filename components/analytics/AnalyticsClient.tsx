@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo, memo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback, memo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useTheme } from '@/components/theme/ThemeProvider'
 import {
@@ -719,7 +719,7 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
                       label={{ value: chart.xKey ?? '범주', position: 'insideBottom', offset: -8, fontSize: 11, fill: axisLabelFill }}
                     />
                     <YAxis tickFormatter={formatTick} tick={{ fontSize: 11 }} label={{ value: chart.yKey ?? '값', angle: -90, position: 'insideLeft', fontSize: 11, fill: axisLabelFill }} />
-                    <Tooltip formatter={(v: unknown) => [formatTick(v), chart.yKey ?? '값']} />
+                    <Tooltip formatter={(v: unknown) => [formatTick(v), chart.yKey ?? '값']} contentStyle={isDark ? { backgroundColor: '#1F2937', border: '1px solid #374151', color: '#F9FAFB' } : undefined} />
                     {chart.stackKeys && chart.stackKeys.length > 0 ? (
                       <>
                         <Legend />
@@ -742,7 +742,7 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
                       label={{ value: chart.xKey ?? '시점', position: 'insideBottom', offset: -8, fontSize: 11, fill: axisLabelFill }}
                     />
                     <YAxis tickFormatter={formatTick} tick={{ fontSize: 11 }} label={{ value: '값', angle: -90, position: 'insideLeft', fontSize: 11, fill: axisLabelFill }} />
-                    <Tooltip />
+                    <Tooltip contentStyle={isDark ? { backgroundColor: '#1F2937', border: '1px solid #374151', color: '#F9FAFB' } : undefined} />
                     <Legend />
                     {chart.yKey ? (
                       <Line type="monotone" dataKey={chart.yKey} stroke={CHART_COLORS[0]} strokeWidth={2} dot={{ r: 3 }} />
@@ -775,7 +775,7 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
                       tick={{ fontSize: 11 }}
                       label={{ value: chart.yKey ?? 'y', angle: -90, position: 'insideLeft', fontSize: 11, fill: axisLabelFill }}
                     />
-                    <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v: unknown) => formatTick(v)} />
+                    <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v: unknown) => formatTick(v)} contentStyle={isDark ? { backgroundColor: '#1F2937', border: '1px solid #374151', color: '#F9FAFB' } : undefined} />
                     <Legend />
                     {chart.groupKey ? (
                       (() => {
@@ -812,7 +812,7 @@ function ResultCharts({ charts }: { charts: ChartSpec[] }) {
                     >
                       {data.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
                     </Pie>
-                    <Tooltip formatter={((v: unknown, n: string) => [formatTick(v), n]) as any} />
+                    <Tooltip formatter={((v: unknown, n: string) => [formatTick(v), n]) as any} contentStyle={isDark ? { backgroundColor: '#1F2937', border: '1px solid #374151', color: '#F9FAFB' } : undefined} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -1151,17 +1151,17 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
 
   // ── 레벨 선택 ────────────────────────────────
 
-  function updateLevelValues(variableName: string, selected: string[]) {
+  const updateLevelValues = useCallback((variableName: string, selected: string[]) => {
     setLevelValues(prev => ({ ...prev, [variableName]: selected }))
-  }
+  }, [])
 
-  function clearLevelValues(variableName: string) {
+  const clearLevelValues = useCallback((variableName: string) => {
     setLevelValues(prev => {
       const next = { ...prev }
       delete next[variableName]
       return next
     })
-  }
+  }, [])
 
   // ── 분석 실행 ────────────────────────────────
 
