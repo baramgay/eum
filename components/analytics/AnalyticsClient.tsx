@@ -677,7 +677,7 @@ function HeatmapChart({ chart }: { chart: ChartSpec }) {
       </svg>
       <div className="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
         <span>{formatTick(min)}</span>
-        <div className="w-24 h-2 rounded" style={{ background: 'linear-gradient(to right, #3B82F6, #FFFFFF, #EF4444)' }} />
+        <div className="w-24 h-2 rounded" style={{ background: `linear-gradient(to right, #3B82F6, ${isDark ? '#1F2937' : '#FFFFFF'}, #EF4444)` }} />
         <span>{formatTick(max)}</span>
       </div>
     </div>

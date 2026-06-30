@@ -94,7 +94,9 @@ export default function TenantStats({ tenants }: Props) {
                 </Pie>
                 <ReTooltip
                   formatter={(value, name) => [`${value}개`, name]}
-                  contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb' }}
+                  contentStyle={isDark
+                    ? { borderRadius: 8, border: '1px solid #374151', backgroundColor: '#1F2937', color: '#F9FAFB' }
+                    : { borderRadius: 8, border: '1px solid #e5e7eb' }}
                 />
               </PieChart>
             </ResponsiveContainer>
