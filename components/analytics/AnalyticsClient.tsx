@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, memo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useTheme } from '@/components/theme/ThemeProvider'
 import {
@@ -405,8 +405,11 @@ function parseP(value: unknown): number | null {
   return Number.isFinite(n) ? n : null
 }
 
+const ANALYSIS_LABEL_MAP = new Map(
+  ANALYSIS_MENU.flatMap(g => g.items).map(i => [i.id, i.label])
+)
 function getAnalysisLabel(id: string) {
-  return ANALYSIS_MENU.flatMap(g => g.items).find(i => i.id === id)?.label ?? id
+  return ANALYSIS_LABEL_MAP.get(id) ?? id
 }
 
 // ────────────────────────────────────────────
@@ -422,7 +425,7 @@ interface LevelSelectorProps {
   max?: number
 }
 
-function LevelSelector({ variableName, levels, selected, onChange, min, max }: LevelSelectorProps) {
+const LevelSelector = memo(function LevelSelector({ variableName, levels, selected, onChange, min, max }: LevelSelectorProps) {
   if (!levels || levels.length === 0) return null
 
   const allSelected = selected.length === levels.length && levels.every(v => selected.includes(v))
@@ -495,7 +498,7 @@ function LevelSelector({ variableName, levels, selected, onChange, min, max }: L
       )}
     </div>
   )
-}
+})
 
 // ────────────────────────────────────────────
 // 서브컴포넌트: 결과 테이블

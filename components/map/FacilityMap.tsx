@@ -228,12 +228,19 @@ export default function FacilityMap({ facilities }: Props) {
     }
   }, [])
 
+  const handleSelectFacilityNoCenter = useCallback((f: Facility) => handleSelectFacility(f, false), [handleSelectFacility])
+  const handleHeatmapClick = useCallback((list: Facility[], cell: HeatmapCell) => setDrilldown({ type: 'heatmap', list, cell }), [])
+  const handleClusterClick = useCallback((list: Facility[], cluster: Cluster<Facility & { id: string }>) => setDrilldown({ type: 'cluster', list, cluster }), [])
+
   const comparedFacilities = useMemo(() =>
     facilities.filter(f => compareSet.has(f.facility_id)),
     [facilities, compareSet]
   )
 
-  const detail = selectedFacility ? getFacilityDetail(selectedFacility) : null
+  const detail = useMemo(
+    () => selectedFacility ? getFacilityDetail(selectedFacility) : null,
+    [selectedFacility]
+  )
 
   return (
     <div
@@ -250,10 +257,10 @@ export default function FacilityMap({ facilities }: Props) {
         heatmapPalette={heatmapPalette}
         clusterOptions={clusterOptions}
         selectedFacilityId={selectedFacility?.facility_id}
-        onSelectFacility={(f) => handleSelectFacility(f, false)}
+        onSelectFacility={handleSelectFacilityNoCenter}
         onCenterChange={setMapCenter}
-        onHeatmapClick={(list, cell) => setDrilldown({ type: 'heatmap', list, cell })}
-        onClusterClick={(list, cluster) => setDrilldown({ type: 'cluster', list, cluster })}
+        onHeatmapClick={handleHeatmapClick}
+        onClusterClick={handleClusterClick}
       />
 
       {/* ── 상단 오버레이: 검색바 + 필터 + 카테고리 칩 ── */}

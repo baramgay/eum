@@ -2,7 +2,7 @@
 
 /// <reference types="kakao.maps.d.ts" />
 
-import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react'
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle, memo } from 'react'
 import { pinDataUrl } from './pinDataUrl'
 import { FTYPE_META, DEFAULT_META } from './MapPin'
 import { dbscan, kmeans, clusterTypeBreakdown, haversineMeters, type Cluster } from '@/lib/geo-cluster'
@@ -952,4 +952,4 @@ function MapInner(
   )
 }
 
-export default forwardRef(MapInner)
+export default memo(forwardRef(MapInner))
