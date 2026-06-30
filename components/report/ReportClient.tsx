@@ -1142,7 +1142,7 @@ export default function ReportClient({ role }: Props) {
                     <tr>
                       <th className="px-4 py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">지표명</th>
                       <th className="px-4 py-2 text-center text-gray-500 dark:text-gray-400 font-medium text-xs w-24">현황</th>
-                      <th className="px-4 py-2 text-center text-gray-500 dark:text-gray-400 font-medium text-xs w-20">상태</th>
+                      <th className="px-4 py-2 text-center text-gray-500 dark:text-gray-400 font-medium text-xs w-28">상태</th>
                       <th className="px-4 py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">설명</th>
                     </tr>
                   </thead>
@@ -1151,7 +1151,7 @@ export default function ReportClient({ role }: Props) {
                       <tr key={ind.name} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-100">
                         <td className="px-4 py-2 text-gray-800 dark:text-gray-200">{ind.name}</td>
                         <td className="px-4 py-2 text-center font-medium text-gray-700 dark:text-gray-300">{ind.value}</td>
-                        <td className="px-4 py-2">
+                        <td className="px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-center gap-1">
                             {STATUS_ICON[ind.status]}
                             <Badge variant={STATUS_BADGE[ind.status]} size="sm">
