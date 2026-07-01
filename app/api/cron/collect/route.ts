@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
     if (outcome.status === 'rejected') {
       // 개별 잡 실패는 전체 cron 실행을 중단하지 않음
       const reason = outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason)
-      // eslint-disable-next-line no-console
+
       console.error('[cron/collect] 개별 잡 실패:', reason)
       continue
     }

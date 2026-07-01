@@ -118,7 +118,7 @@ export default function SortableTable<T>({
         'overflow-x-auto rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
         containerClassName
       )}
-      tabIndex={0} // eslint-disable-line jsx-a11y/no-noninteractive-tabindex -- 키보드 사용자가 가로 스크롤할 수 있도록 허용
+      tabIndex={0}
       aria-label={ariaLabel ?? caption}
       style={containerStyle}
     >

@@ -40,8 +40,8 @@ interface NodeListTabProps {
   searchSuggestions: OntologyNode[]
   showSearchDropdown: boolean
   setShowSearchDropdown: (value: boolean) => void
-  searchInputRef: React.RefObject<HTMLInputElement>
-  searchWrapRef: React.RefObject<HTMLDivElement>
+  searchInputRef: React.RefObject<HTMLInputElement | null>
+  searchWrapRef: React.RefObject<HTMLDivElement | null>
   recentSearches: string[]
   clearRecent: () => void
   degrees: Map<string, number>

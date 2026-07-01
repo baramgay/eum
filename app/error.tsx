@@ -14,7 +14,7 @@ export default function Error({
   const [reported, setReported] = useState(false)
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
+
     console.error(error)
   }, [error])
 

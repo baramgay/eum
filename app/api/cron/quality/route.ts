@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       const reason = err instanceof Error ? err.message : String(err)
       failures.push({ schedule_id: schedule.id, dataset_id: schedule.dataset_id, reason })
-      // eslint-disable-next-line no-console
+
       console.error('[cron/quality] 스케줄 실행 실패:', reason)
     }
   }

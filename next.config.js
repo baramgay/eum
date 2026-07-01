@@ -59,33 +59,11 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // eslint.ignoreDuringBuilds를 true로 설정하면 CI 빌드 중 ESLint 오류가 무시됩니다.
-  // 린트 문제를 숨기지 않도록 기본값(false)을 유지합니다.
-  eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
-  webpack: (config) => {
-    // Windows/Next.js 14에서 클린 빌드 시 page-module 누락 오류가 간헐적으로 발생해
-    // persistent cache를 비활성화하여 결정적인 빌드 결과를 얻는다.
-    config.cache = false
-
-    // .node 네이티브 바이너리 파일을 externals로 처리 (안전망)
-    config.externals = [
-      ...(Array.isArray(config.externals) ? config.externals : [config.externals].filter(Boolean)),
-      ({ request }, callback) => {
-        if (request && request.endsWith('.node')) {
-          return callback(null, `commonjs ${request}`)
-        }
-        callback()
-      },
-    ]
-    return config
-  },
+  // ssh2/ssh2-sftp-client의 네이티브 .node 바이너리를 번들링에서 제외
+  serverExternalPackages: ['ssh2', 'ssh2-sftp-client'],
   experimental: {
     serverActions: { allowedOrigins: getAllowedOrigins() },
-    // ssh2/ssh2-sftp-client의 네이티브 .node 바이너리를 webpack 번들링에서 제외
-    serverComponentsExternalPackages: ['ssh2', 'ssh2-sftp-client'],
-    // Windows + Next.js 14 조합에서 워커 스레드 빌드 시 _document 모듈 누락 오류가 발생해 비활성화
-    webpackBuildWorker: false,
     // 대형 barrel import 라이브러리의 트리셰이킹/번들 최적화
     optimizePackageImports: [
       'lucide-react',
@@ -103,5 +81,4 @@ module.exports = withSentryConfig(config, {
   // Sentry 자동 source map 업로드 등을 기본값으로 사용
   // DSN이 없으면 beforeSend에서 이벤트를 버리므로 로컬/스테이징에서도 안전
   silent: true,
-  hideSourceMaps: true,
 })

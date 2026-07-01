@@ -37,7 +37,7 @@ export function logLlmEvent(event: LlmEvent): void {
       level: event.error ? 'error' : 'info',
       service: 'llm-gateway',
     }
-    // eslint-disable-next-line no-console
+
     console.log(JSON.stringify(payload))
   } catch {
     // 로깅 실패는 본 기능에 영향을 주지 않는다.

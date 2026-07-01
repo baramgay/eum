@@ -1,12 +1,10 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
-import dynamic from 'next/dynamic'
 import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
 import RealtimeProvider from '@/components/realtime/RealtimeProvider'
+import GuideChatbot from '@/components/common/GuideChatbotDynamic'
 import './globals.css'
-
-const GuideChatbot = dynamic(() => import('@/components/common/GuideChatbot'), { ssr: false })
 
 const pretendard = localFont({
   src: [

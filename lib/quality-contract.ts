@@ -115,7 +115,7 @@ export function contractToRuleFns(
         return [name, async sb => {
           const { data, error } = await sb.rpc(check.name)
           if (error) {
-            // eslint-disable-next-line no-console
+
             console.warn(`[quality-contract] RPC ${check.name} 실패:`, error.message)
             return 0
           }

@@ -18,7 +18,7 @@ function createMockSupabase(tables: Record<string, unknown[]>): SupabaseClient {
       ilike() { return chain },
       then<TResult1 = { data: unknown[] }, TResult2 = never>(
         onfulfilled?: ((value: { data: unknown[] }) => TResult1 | PromiseLike<TResult1>) | undefined,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
         _onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | undefined,
       ) {
         const value = { data }

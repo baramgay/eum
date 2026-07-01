@@ -1453,7 +1453,7 @@ export default function AnalyticsClient({ role, tenantId }: Props) {
                   onChange={e => setCatalogSearch(e.target.value)}
                   placeholder="데이터셋 이름 검색..."
                   className="flex-1 text-sm bg-transparent outline-none"
-                  // eslint-disable-next-line jsx-a11y/no-autofocus
+
                   autoFocus
                 />
               </div>

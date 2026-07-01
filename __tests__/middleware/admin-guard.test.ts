@@ -4,7 +4,7 @@
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321'
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-key'
 
-import { middleware } from '@/middleware'
+import { proxy } from '@/proxy'
 
 jest.mock('@supabase/ssr', () => ({
   createServerClient: jest.fn(),
@@ -72,14 +72,14 @@ describe('middleware admin guard', () => {
   it('센터 역할이면 /admin에 통과한다', async () => {
     mockUser('center')
     const req = new mockedNext.NextRequest('http://localhost:3001/admin')
-    const res = await middleware(req as never)
+    const res = await proxy(req as never)
     expect(res.type).toBe('next')
   })
 
   it('비센터 역할은 /admin 접근 시 홈으로 리다이렉트한다', async () => {
     mockUser('agency')
     const req = new mockedNext.NextRequest('http://localhost:3001/admin')
-    const res = await middleware(req as never)
+    const res = await proxy(req as never)
     expect(res.type).toBe('redirect')
     expect((res as unknown as { url: URL }).url.pathname).toBe('/')
   })
@@ -87,7 +87,7 @@ describe('middleware admin guard', () => {
   it('비센터 역할은 /api/admin/users에 403을 반환한다', async () => {
     mockUser('viewer')
     const req = new mockedNext.NextRequest('http://localhost:3001/api/admin/users')
-    const res = await middleware(req as never)
+    const res = await proxy(req as never)
     expect(res.type).toBe('json')
     expect((res as unknown as { status: number }).status).toBe(403)
   })
@@ -95,7 +95,7 @@ describe('middleware admin guard', () => {
   it('비센터 역할은 /api/evaluation/compare에 403을 반환한다', async () => {
     mockUser('agency')
     const req = new mockedNext.NextRequest('http://localhost:3001/api/evaluation/compare')
-    const res = await middleware(req as never)
+    const res = await proxy(req as never)
     expect(res.type).toBe('json')
     expect((res as unknown as { status: number }).status).toBe(403)
   })
@@ -103,7 +103,7 @@ describe('middleware admin guard', () => {
   it('미인증 사용자는 /admin 접근 시 로그인으로 리다이렉트한다', async () => {
     mockUser(null)
     const req = new mockedNext.NextRequest('http://localhost:3001/admin')
-    const res = await middleware(req as never)
+    const res = await proxy(req as never)
     expect(res.type).toBe('redirect')
     expect((res as unknown as { url: URL }).url.pathname).toBe('/login')
   })

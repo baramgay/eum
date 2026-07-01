@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { AlertCircle, Loader2 } from 'lucide-react'
+import * as Sentry from '@sentry/nextjs'
 
 export default function GlobalError({
   error,
@@ -14,8 +15,9 @@ export default function GlobalError({
   const [reported, setReported] = useState(false)
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
+
     console.error(error)
+    Sentry.captureException(error)
   }, [error])
 
   const handleReport = async () => {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import type { MutableRefObject } from 'react'
+import type { RefObject } from 'react'
 import type { Selection } from 'd3-selection'
 import type { SimNode, SimLink } from './useGraphState'
 import { baseNodeRadius, edgeLookupKey } from './useGraphState'
@@ -16,7 +16,7 @@ import type { VisualEncoding } from '@/lib/ontology/types'
 const DIM_OPACITY = 0.15
 
 interface UseGraphHighlightArgs {
-  gRef: MutableRefObject<Selection<SVGGElement, unknown, null, undefined> | null>
+  gRef: RefObject<Selection<SVGGElement, unknown, null, undefined> | null>
   selected: { obj_id: string } | null
   hovered: { obj_id: string } | null
   neighborMap: Map<string, Set<string>>

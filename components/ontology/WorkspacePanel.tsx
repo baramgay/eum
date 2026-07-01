@@ -150,7 +150,7 @@ export default function WorkspacePanel({ snapshot, onLoad }: WorkspacePanelProps
                       if (e.key === 'Enter') handleRename(ws.id)
                       if (e.key === 'Escape') cancelEdit()
                     }}
-                    // eslint-disable-next-line jsx-a11y/no-autofocus
+
                     autoFocus
                   />
                   <Btn onClick={() => handleRename(ws.id)} variant="ghost" size="sm" className="!p-1 h-auto">

@@ -5,9 +5,9 @@ Sentry.init({
   environment: process.env.NEXT_PUBLIC_ENVIRONMENT || process.env.NODE_ENV,
   release: process.env.NEXT_PUBLIC_APP_VERSION,
 
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
   replaysSessionSampleRate: 0,
-  replaysOnErrorSampleRate: 0.1,
+  replaysOnErrorSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
 
   beforeSend(event) {
     // 개발 환경에서는 Sentry로 전송하지 않음 (DSN이 없어도 안전)

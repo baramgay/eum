@@ -954,7 +954,7 @@ export default function AiQueryClient() {
         })
       })
       .catch(() => {})
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [])
 
   // 서버 스텁 대화 선택 시 메시지 지연 로드

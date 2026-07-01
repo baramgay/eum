@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (upsertErr) {
-      // eslint-disable-next-line no-console
+
       console.error('[embeddings] enqueue failed:', upsertErr.message)
       continue
     }

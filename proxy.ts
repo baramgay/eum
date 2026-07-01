@@ -18,7 +18,7 @@ const PUBLIC_PREFIXES = [
   '/api/ontology/text-analysis', // 텍스트 분석 (로컬 연산)
 ]
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const startMs = performance.now()
   let supabaseResponse = NextResponse.next({ request })
 

@@ -6,7 +6,7 @@ import { randomHex } from '@/lib/utils'
 // Node.js 환경에서 Web Crypto API polyfill
 // (Jest testEnvironment: 'node' 에서는 globalThis.crypto 가 없을 수 있음)
 if (!globalThis.crypto) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+
   const nodeCrypto = require('crypto')
   Object.defineProperty(globalThis, 'crypto', {
     value: {
