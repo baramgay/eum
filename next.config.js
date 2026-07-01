@@ -14,10 +14,12 @@ function securityHeaders() {
   if (process.env.NODE_ENV !== 'production') return []
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const supabaseWss = supabaseUrl.replace(/^https:\/\//, 'wss://')
   const qwenBaseUrl = process.env.QWEN_BASE_URL || ''
   const connectSrc = [
     "'self'",
     supabaseUrl,
+    supabaseWss,
     qwenBaseUrl,
   ].filter(Boolean).join(' ')
 
