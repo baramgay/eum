@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { randomUUID } from 'crypto'
-import { writeFileSync, unlinkSync } from 'fs'
-import { tmpdir } from 'os'
-import { join, extname } from 'path'
-import { runAnalyzePy } from '@/lib/analyzeRunner'
+import { extname } from 'path'
+import { actionParse, actionParseCsv } from '@/lib/analyzeEngine'
 
 export const runtime = 'nodejs'
 
@@ -18,27 +16,36 @@ export async function POST(req: Request) {
   if (!file) return NextResponse.json({ error: 'file 필드가 없습니다' }, { status: 400 })
 
   const ext = extname(file.name).toLowerCase() || '.csv'
-  const tmpPath = join(tmpdir(), `eum_upload_${randomUUID()}${ext}`)
   const sessionId = randomUUID().replace(/-/g, '')
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer())
-    writeFileSync(tmpPath, buffer)
+    let result: Record<string, unknown>
 
-    const result = await runAnalyzePy({
-      action: 'parse',
-      session_id: sessionId,
-      file_path: tmpPath,
-    }) as Record<string, unknown>
+    if (ext === '.json') {
+      const text = buffer.toString('utf-8')
+      let raw: unknown[]
+      try {
+        const parsed = JSON.parse(text)
+        raw = Array.isArray(parsed) ? parsed : [parsed]
+      } catch {
+        // NDJSON
+        raw = text.split(/\r?\n/).filter(l => l.trim()).map(l => {
+          try { return JSON.parse(l) } catch { return null }
+        }).filter(Boolean) as unknown[]
+      }
+      result = await actionParse({ session_id: sessionId, user_id: user.id, raw_json: raw })
+    } else {
+      // CSV / TSV / Excel (텍스트 처리)
+      const text = buffer.toString('utf-8')
+      result = await actionParseCsv({ session_id: sessionId, user_id: user.id, text })
+    }
 
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 422 })
     }
-
     return NextResponse.json(result)
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 })
-  } finally {
-    try { unlinkSync(tmpPath) } catch { /* temp file may not exist */ }
   }
 }

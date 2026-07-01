@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { runAnalyzePy } from '@/lib/analyzeRunner'
+import { actionParse, actionUpdateTypes, runAnalyze } from '@/lib/analyzeEngine'
 
 export const runtime = 'nodejs'
 
@@ -25,29 +25,28 @@ export async function POST(req: Request) {
     let result: Record<string, unknown>
 
     if (body.action === 'update_types') {
-      result = await runAnalyzePy({
-        action: 'update_types',
+      result = await actionUpdateTypes({
         session_id: body.session_id,
+        user_id: user.id,
         column_types: body.column_types ?? {},
-      }) as Record<string, unknown>
+      })
     } else if (body.action === 'parse_json') {
-      // 카탈로그 JSON 데이터를 세션으로 로드
-      result = await runAnalyzePy({
-        action: 'parse',
+      result = await actionParse({
         session_id: body.session_id,
+        user_id: user.id,
         raw_json: body.raw_json ?? [],
-      }) as Record<string, unknown>
+      })
     } else {
       if (!body.analysis_type) {
         return NextResponse.json({ error: 'analysis_type 필요' }, { status: 400 })
       }
-      result = await runAnalyzePy({
-        action: 'analyze',
+      result = await runAnalyze({
         session_id: body.session_id,
+        user_id: user.id,
         analysis_type: body.analysis_type,
         variables: body.variables ?? {},
         options: body.options ?? {},
-      }) as Record<string, unknown>
+      })
     }
 
     if (!result.ok) {
